@@ -22,6 +22,40 @@ class Controller:
     suc_node_id: int
     supports_timers: bool
 
+    def receive_event(self, event: dict):
+        """Receive an event."""
+        if event["event"] == "inclusion failed":
+            return
+
+        if event["event"] == "exclusion failed":
+            return
+
+        if event["event"] == "inclusion started":
+            return
+
+        if event["event"] == "exclusion started":
+            return
+
+        if event["event"] == "inclusion stopped":
+            return
+
+        if event["event"] == "exclusion stopped":
+            return
+
+        if event["event"] == "node added":
+            return
+
+        if event["event"] == "node removed":
+            return
+
+        if event["event"] == "heal network progress":
+            return
+
+        if event["event"] == "heal network done":
+            return
+
+        # TODO decide what to do with unknown event
+
     @classmethod
     def from_state(cls, data):
         return cls(

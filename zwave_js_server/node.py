@@ -11,7 +11,7 @@ class Node:
     user_icon: int
     status: int
     ready: bool
-    device_class: dict # XXXXXX NEEDS CLASS
+    device_class: dict  # XXXXXX NEEDS CLASS
     is_listening: bool
     is_frequent_listening: bool
     is_routing: bool
@@ -28,7 +28,7 @@ class Node:
     role_type: int
     name: str
     location: str
-    device_config: dict # XXXXXX NEEDS CLASS
+    device_config: dict  # XXXXXX NEEDS CLASS
     label: str
     neighbors: List[int]
     endpoint_count_is_dynamic: bool
@@ -36,6 +36,55 @@ class Node:
     individual_endpoint_count: int
     aggregated_endpoint_count: int
     interview_attempts: int
+
+    def receive_event(self, event: dict):
+        """Receive an event."""
+        if event["event"] == "value added":
+            return
+
+        if event["event"] == "value updated":
+            return
+
+        if event["event"] == "value removed":
+            return
+
+        if event["event"] == "metadata updated":
+            return
+
+        if event["event"] == "value notification":
+            return
+
+        if event["event"] == "notification":
+            return
+
+        if event["event"] == "interview failed":
+            return
+
+        if event["event"] == "firmware update progress":
+            return
+
+        if event["event"] == "firmware update finished":
+            return
+
+        if event["event"] == "wake up":
+            return
+
+        if event["event"] == "sleep":
+            return
+
+        if event["event"] == "dead":
+            return
+
+        if event["event"] == "alive":
+            return
+
+        if event["event"] == "interview completed":
+            return
+
+        if event["event"] == "ready":
+            return
+
+        # TODO decide what to do with unknown event
 
     @classmethod
     def from_state(cls, data):
