@@ -11,7 +11,7 @@ class Node:
     user_icon: int
     status: int
     ready: bool
-    device_class: str # XXXXXX
+    device_class: dict # XXXXXX NEEDS CLASS
     is_listening: bool
     is_frequent_listening: bool
     is_routing: bool
@@ -28,7 +28,7 @@ class Node:
     role_type: int
     name: str
     location: str
-    device_config: str # XXXXXX
+    device_config: dict # XXXXXX NEEDS CLASS
     label: str
     neighbors: List[int]
     endpoint_count_is_dynamic: bool
