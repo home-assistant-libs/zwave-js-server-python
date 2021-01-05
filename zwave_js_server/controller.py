@@ -55,6 +55,7 @@ class Controller:
             return
 
         # TODO decide what to do with unknown event
+        print(f"Unhandled node event for controller: {event}")
 
     @classmethod
     def from_state(cls, data):

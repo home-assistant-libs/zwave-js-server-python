@@ -85,6 +85,7 @@ class Node:
             return
 
         # TODO decide what to do with unknown event
+        print(f"Unhandled node event for node {self.node_id}: {event}")
 
     @classmethod
     def from_state(cls, data):
