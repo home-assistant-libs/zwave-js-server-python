@@ -1,5 +1,6 @@
+-r requirements.txt
 -r requirements_lint.txt
 -r requirements_test.txt
-tox==3.14.6
+tox==3.20.1
 
 -e .
