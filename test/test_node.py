@@ -16,11 +16,11 @@ def test_from_state():
     assert node.status == 4
     assert node.ready is True
     assert node.device_class == {
-      "basic": "Routing Slave",
-      "generic": "Static Controller",
-      "specific": "PC Controller",
-      "mandatorySupportedCCs": [],
-      "mandatoryControlCCs": ["Basic"]
+        "basic": "Routing Slave",
+        "generic": "Static Controller",
+        "specific": "PC Controller",
+        "mandatorySupportedCCs": [],
+        "mandatoryControlCCs": ["Basic"],
     }
     assert node.is_listening is True
     assert node.is_frequent_listening is False
@@ -33,18 +33,18 @@ def test_from_state():
     assert node.product_id == 90
     assert node.product_type == 257
     assert node.device_config == {
-      "manufacturerId": 134,
-      "manufacturer": "AEON Labs",
-      "label": "ZW090",
-      "description": "Z‐Stick Gen5 USB Controller",
-      "devices": [
-        { "productType": "0x0001", "productId": "0x005a" },
-        { "productType": "0x0101", "productId": "0x005a" },
-        { "productType": "0x0201", "productId": "0x005a" }
-      ],
-      "firmwareVersion": { "min": "0.0", "max": "255.255" },
-      "associations": {},
-      "paramInformation": { "_map": {} }
+        "manufacturerId": 134,
+        "manufacturer": "AEON Labs",
+        "label": "ZW090",
+        "description": "Z‐Stick Gen5 USB Controller",
+        "devices": [
+            {"productType": "0x0001", "productId": "0x005a"},
+            {"productType": "0x0101", "productId": "0x005a"},
+            {"productType": "0x0201", "productId": "0x005a"},
+        ],
+        "firmwareVersion": {"min": "0.0", "max": "255.255"},
+        "associations": {},
+        "paramInformation": {"_map": {}},
     }
     assert node.label == "ZW090"
     assert node.neighbors == [31, 32, 33, 36, 37, 39, 52]
