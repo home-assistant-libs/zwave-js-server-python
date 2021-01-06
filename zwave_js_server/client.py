@@ -7,7 +7,7 @@ from typing import Awaitable, Callable, List
 
 from aiohttp import ClientSession, WSMsgType, client_exceptions
 
-from .driver import Driver
+from .model.driver import Driver
 
 STATE_CONNECTING = "connecting"
 STATE_CONNECTED = "connected"

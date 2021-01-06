@@ -1,8 +1,8 @@
 """Tests for controller model."""
 import json
-from zwave_js_server import controller
+from zwave_js_server.model import controller
 
-from . import load_fixture
+from .. import load_fixture
 
 
 def test_from_state():

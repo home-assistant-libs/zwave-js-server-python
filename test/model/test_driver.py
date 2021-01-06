@@ -1,8 +1,8 @@
 """Tests for data class."""
 import json
-from zwave_js_server import driver as driver_pkg
+from zwave_js_server.model import driver as driver_pkg
 
-from . import load_fixture
+from .. import load_fixture
 
 
 def test_from_state():

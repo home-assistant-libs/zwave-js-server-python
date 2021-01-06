@@ -1,5 +1,5 @@
 from typing import Dict, List
-from .event import EventBase
+from ..event import EventBase
 from .node import Node
 
 

@@ -1,6 +1,6 @@
 """Z-Wave JS Driver."""
 from .controller import Controller
-from .event import EventBase
+from ..event import EventBase
 
 
 class Driver(EventBase):

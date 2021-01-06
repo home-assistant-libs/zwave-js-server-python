@@ -1,6 +1,6 @@
 """Z-Wave node."""
 from typing import List
-from zwave_js_server.event import EventBase
+from ..event import EventBase
 
 
 class Node(EventBase):
