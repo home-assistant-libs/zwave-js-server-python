@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from ..exceptions import MissingNodeError
 
 if TYPE_CHECKING:
-    from ..model.gateway import Gateway
+    from ..model.gateway import Gateway, GatewayEvent
 
 
 class Type(Enum):
@@ -20,18 +20,18 @@ class Handler:
     """Represent an event handler for the gateway."""
 
     @classmethod
-    def handle_controller(cls, gateway: "Gateway", event: dict) -> None:
+    def handle_controller(cls, gateway: "Gateway", event: "GatewayEvent") -> None:
         """Process a controller event."""
         gateway.controller.handle_event(event)
 
     @classmethod
-    def handle_driver(cls, gateway: "Gateway", event: dict) -> None:
+    def handle_driver(cls, gateway: "Gateway", event: "GatewayEvent") -> None:
         """Process a driver event."""
 
     @classmethod
-    def handle_node(cls, gateway: "Gateway", event: dict) -> None:
+    def handle_node(cls, gateway: "Gateway", event: "GatewayEvent") -> None:
         """Process a node event."""
-        node = gateway.nodes.get(event["nodeId"])
+        node = gateway.nodes.get(event.data["nodeId"])
 
         if node is None:
             raise MissingNodeError

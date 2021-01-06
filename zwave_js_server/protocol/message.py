@@ -2,7 +2,7 @@
 from enum import Enum
 from typing import TYPE_CHECKING
 
-from ..model.gateway import Gateway
+from ..model.gateway import Gateway, GatewayEvent
 from ..model.message import Message
 
 if TYPE_CHECKING:
@@ -22,7 +22,8 @@ class Handler:
     @classmethod
     async def handle_event(cls, client: "Client", message: Message) -> None:
         """Process an event message."""
-        client.gateway.handle_event(message.data)
+        gateway_event = GatewayEvent(type=message.data["source"], data=message.data)
+        client.gateway.handle_event(gateway_event)
 
     @classmethod
     async def handle_state(cls, client: "Client", message: Message) -> None:
