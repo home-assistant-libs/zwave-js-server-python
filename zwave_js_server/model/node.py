@@ -9,8 +9,7 @@ class Node(EventBase):
         """Initialize a node."""
         super().__init__()
         self.data = data
-        self.values = {}
-        # TODO create values from data['values]
+        self.values = {value_id(self, val): Value(self, val) for val in data["values"]}
 
     @property
     def node_id(self) -> int:
@@ -170,23 +169,25 @@ class Node(EventBase):
     def receive_event(self, event: dict):
         """Receive an event."""
         if event["event"] == "value added":
-            value = Value(self, event)
+            value = Value(self, event["args"])
             self.values[value.value_id] = event["value"] = value
 
         elif event["event"] == "value updated":
-            value = self.values.get(value_id(self, event))
+            value = self.values.get(value_id(self, event["args"]))
             if value is None:
-                print(
-                    "TODO Received value updated without knowing value. Creating it now"
-                )
-                value = Value(self, event)
+                # TODO decide how to handle value updated for unknown values
+                print()
+                print("Value updated for unknown value", value_id(self, event["args"]))
+                print("Available value IDs", ", ".join(self.values))
+                print()
+                value = Value(self, event["args"])
                 self.values[value.value_id] = value
             else:
                 value.receive_event(event)
             event["value"] = value
 
         elif event["event"] == "value removed":
-            event["value"] = self.values.pop(value_id(self, event))
+            event["value"] = self.values.pop(value_id(self, event["args"]))
 
         elif event["event"] == "metadata updated":
             pass

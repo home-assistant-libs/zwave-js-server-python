@@ -1,7 +1,7 @@
 """Value model."""
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .node import Node
@@ -25,12 +25,12 @@ class ValueMetadata:
         return self.data.get("type")
 
     @property
-    def readable(self) -> str:
+    def readable(self) -> bool:
         """Return readable."""
         return self.data.get("readable")
 
     @property
-    def writeable(self) -> str:
+    def writeable(self) -> bool:
         """Return writeable."""
         return self.data.get("writeable")
 
@@ -39,24 +39,47 @@ class ValueMetadata:
         """Return label."""
         return self.data.get("label")
 
+    @property
+    def min(self) -> Optional[int]:
+        """Return min."""
+        return self.data.get("min")
+
+    @property
+    def max(self) -> Optional[int]:
+        """Return max."""
+        return self.data.get("max")
+
+    @property
+    def unit(self) -> Optional[str]:
+        """Return unit."""
+        return self.data.get("unit")
+
+    @property
+    def cc_specific(self) -> Optional[dict]:
+        """Return ccSpecific."""
+        return self.data.get("ccSpecific")
+
 
 class Value:
-    def __init__(self, node: "Node", added_event: dict) -> None:
+    def __init__(self, node: "Node", data: dict) -> None:
         self.node = node
-        self.data = added_event
+        self.data = data
+        self._value = data.get("value")
 
     @property
     def value_id(self) -> str:
+        """Return value ID."""
         return value_id(self.node, self.data)
 
-    # Only included in initial state dump which can't be used yet
-    # @property
-    # def metadata(self) -> ValueMetadata:
-    #     return ValueMetadata(self.data["metadata"])
+    @property
+    def metadata(self) -> ValueMetadata:
+        """Return value metadata."""
+        return ValueMetadata(self.data["metadata"])
 
     @property
-    def value(self) -> Any:
-        return self.data.get("newValue")
+    def value(self) -> Optional[Any]:
+        """Return value."""
+        return self._value
 
     @property
     def command_class_name(self) -> str:
@@ -73,11 +96,10 @@ class Value:
         """Return endpoint."""
         return self.data.get("endpoint")
 
-    # TODO Invalid Python. Decide on proper name.
-    # @property
-    # def property(self) -> str:
-    #     """Return property."""
-    #     return self.data.get("property")
+    @property
+    def property_(self) -> str:
+        """Return property."""
+        return self.data.get("property")
 
     @property
     def property_key(self) -> str:
@@ -99,4 +121,5 @@ class Value:
         if event["event"] != "value updated":
             return
 
-        self.data = event
+        self.data.update(event["args"])
+        self._value = event["args"].get("newValue")

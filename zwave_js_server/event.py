@@ -8,7 +8,7 @@ class EventBase:
 
     def on(self, event_name, callback):
         listeners: list = self._listeners.setdefault(event_name, [])
-        listeners.push(callback)
+        listeners.append(callback)
 
         def unsub():
             if callback in listeners:
