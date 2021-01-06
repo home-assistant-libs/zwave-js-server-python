@@ -9,7 +9,7 @@ def test_from_state():
     """Test from_state method."""
     state = json.loads(load_fixture("basic_dump.txt").split("\n")[0])["state"]
 
-    node = node_pkg.Node.from_state(state["nodes"][0])
+    node = node_pkg.Node(state["nodes"][0])
 
     assert node.node_id == 1
     assert node.index == 0

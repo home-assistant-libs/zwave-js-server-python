@@ -4,10 +4,10 @@ from . import controller, node as node_pkg
 
 class ZWaveData:
     def __init__(self, state: dict):
-        self.controller = controller.Controller.from_state(state["controller"])
+        self.controller = controller.Controller(state["controller"])
         self.nodes = {}
         for node_state in state["nodes"]:
-            node = node_pkg.Node.from_state(node_state)
+            node = node_pkg.Node(node_state)
             self.nodes[node.node_id] = node
 
     def receive_event(self, event: dict):

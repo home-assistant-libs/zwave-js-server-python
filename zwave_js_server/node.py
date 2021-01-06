@@ -1,41 +1,166 @@
 """Z-Wave node."""
-from dataclasses import dataclass
 from typing import List
 
 
-@dataclass
 class Node:
-    node_id: int
-    index: int
-    installer_icon: int
-    user_icon: int
-    status: int
-    ready: bool
-    device_class: dict  # XXXXXX NEEDS CLASS
-    is_listening: bool
-    is_frequent_listening: bool
-    is_routing: bool
-    max_baud_rate: int
-    is_secure: bool
-    version: int
-    is_beaming: bool
-    manufacturer_id: int
-    product_id: int
-    product_type: int
-    firmware_version: str
-    zwave_plus_version: int
-    node_type: int
-    role_type: int
-    name: str
-    location: str
-    device_config: dict  # XXXXXX NEEDS CLASS
-    label: str
-    neighbors: List[int]
-    endpoint_count_is_dynamic: bool
-    endpoints_have_identical_capabilities: bool
-    individual_endpoint_count: int
-    aggregated_endpoint_count: int
-    interview_attempts: int
+    def __init__(self, data: dict) -> None:
+        """Initialize a node."""
+        self.data = data
+
+    @property
+    def node_id(self) -> int:
+        """Return the node_id."""
+        return self.data.get("nodeId")
+
+    @property
+    def index(self) -> int:
+        """Return the index."""
+        return self.data.get("index")
+
+    @property
+    def installer_icon(self) -> int:
+        """Return the installer_icon."""
+        return self.data.get("installerIcon")
+
+    @property
+    def user_icon(self) -> int:
+        """Return the user_icon."""
+        return self.data.get("userIcon")
+
+    @property
+    def status(self) -> int:
+        """Return the status."""
+        return self.data.get("status")
+
+    @property
+    def ready(self) -> bool:
+        """Return the ready."""
+        return self.data.get("ready")
+
+    @property
+    def device_class(self) -> dict:  # XXXXXX NEEDS CLASS
+        """Return the device_class."""
+        return self.data.get("deviceClass")
+
+    @property
+    def is_listening(self) -> bool:
+        """Return the is_listening."""
+        return self.data.get("isListening")
+
+    @property
+    def is_frequent_listening(self) -> bool:
+        """Return the is_frequent_listening."""
+        return self.data.get("isFrequentListening")
+
+    @property
+    def is_routing(self) -> bool:
+        """Return the is_routing."""
+        return self.data.get("isRouting")
+
+    @property
+    def max_baud_rate(self) -> int:
+        """Return the max_baud_rate."""
+        return self.data.get("maxBaudRate")
+
+    @property
+    def is_secure(self) -> bool:
+        """Return the is_secure."""
+        return self.data.get("isSecure")
+
+    @property
+    def version(self) -> int:
+        """Return the version."""
+        return self.data.get("version")
+
+    @property
+    def is_beaming(self) -> bool:
+        """Return the is_beaming."""
+        return self.data.get("isBeaming")
+
+    @property
+    def manufacturer_id(self) -> int:
+        """Return the manufacturer_id."""
+        return self.data.get("manufacturerId")
+
+    @property
+    def product_id(self) -> int:
+        """Return the product_id."""
+        return self.data.get("productId")
+
+    @property
+    def product_type(self) -> int:
+        """Return the product_type."""
+        return self.data.get("productType")
+
+    @property
+    def firmware_version(self) -> str:
+        """Return the firmware_version."""
+        return self.data.get("firmwareVersion")
+
+    @property
+    def zwave_plus_version(self) -> int:
+        """Return the zwave_plus_version."""
+        return self.data.get("zwavePlusVersion")
+
+    @property
+    def node_type(self) -> int:
+        """Return the node_type."""
+        return self.data.get("nodeType")
+
+    @property
+    def role_type(self) -> int:
+        """Return the role_type."""
+        return self.data.get("roleType")
+
+    @property
+    def name(self) -> str:
+        """Return the name."""
+        return self.data.get("name")
+
+    @property
+    def location(self) -> str:
+        """Return the location."""
+        return self.data.get("location")
+
+    @property
+    def device_config(self) -> dict:  # XXXXXX NEEDS CLASS
+        """Return the device_config."""
+        return self.data.get("deviceConfig")
+
+    @property
+    def label(self) -> str:
+        """Return the label."""
+        return self.data.get("label")
+
+    @property
+    def neighbors(self) -> List[int]:
+        """Return the neighbors."""
+        return self.data.get("neighbors")
+
+    @property
+    def endpoint_count_is_dynamic(self) -> bool:
+        """Return the endpoint_count_is_dynamic."""
+        return self.data.get("endpointCountIsDynamic")
+
+    @property
+    def endpoints_have_identical_capabilities(self) -> bool:
+        """Return the endpoints_have_identical_capabilities."""
+        return self.data.get('                "endpointsHaveIdenticalCapabilities')
+
+    @property
+    def individual_endpoint_count(self) -> int:
+        """Return the individual_endpoint_count."""
+        return self.data.get("individualEndpointCount")
+
+    @property
+    def aggregated_endpoint_count(self) -> int:
+        """Return the aggregated_endpoint_count."""
+        return self.data.get("aggregatedEndpointCount")
+
+    @property
+    def interview_attempts(self) -> int:
+        """Return the interview_attempts."""
+        return self.data.get("interviewAttempts")
 
     def receive_event(self, event: dict):
         """Receive an event."""
@@ -86,41 +211,3 @@ class Node:
 
         # TODO decide what to do with unknown event
         print(f"Unhandled node event for node {self.node_id}: {event}")
-
-    @classmethod
-    def from_state(cls, data):
-        return cls(
-            node_id=data.get("nodeId"),
-            index=data.get("index"),
-            installer_icon=data.get("installerIcon"),
-            user_icon=data.get("userIcon"),
-            status=data.get("status"),
-            ready=data.get("ready"),
-            device_class=data.get("deviceClass"),
-            is_listening=data.get("isListening"),
-            is_frequent_listening=data.get("isFrequentListening"),
-            is_routing=data.get("isRouting"),
-            max_baud_rate=data.get("maxBaudRate"),
-            is_secure=data.get("isSecure"),
-            version=data.get("version"),
-            is_beaming=data.get("isBeaming"),
-            manufacturer_id=data.get("manufacturerId"),
-            product_id=data.get("productId"),
-            product_type=data.get("productType"),
-            firmware_version=data.get("firmwareVersion"),
-            zwave_plus_version=data.get("zwavePlusVersion"),
-            node_type=data.get("nodeType"),
-            role_type=data.get("roleType"),
-            name=data.get("name"),
-            location=data.get("location"),
-            device_config=data.get("deviceConfig"),
-            label=data.get("label"),
-            neighbors=data.get("neighbors"),
-            endpoint_count_is_dynamic=data.get("endpointCountIsDynamic"),
-            endpoints_have_identical_capabilities=data.get(
-                "endpointsHaveIdenticalCapabilities"
-            ),
-            individual_endpoint_count=data.get("individualEndpointCount"),
-            aggregated_endpoint_count=data.get("aggregatedEndpointCount"),
-            interview_attempts=data.get("interviewAttempts"),
-        )
