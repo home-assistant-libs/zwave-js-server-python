@@ -1,6 +1,7 @@
 """Z-Wave node."""
 from typing import List
 from ..event import EventBase
+from .value import Value, value_id
 
 
 class Node(EventBase):
@@ -8,6 +9,8 @@ class Node(EventBase):
         """Initialize a node."""
         super().__init__()
         self.data = data
+        self.values = {}
+        # TODO create values from data['values]
 
     @property
     def node_id(self) -> int:
@@ -167,13 +170,23 @@ class Node(EventBase):
     def receive_event(self, event: dict):
         """Receive an event."""
         if event["event"] == "value added":
-            pass
+            value = Value(self, event)
+            self.values[value.value_id] = event["value"] = value
 
         elif event["event"] == "value updated":
-            pass
+            value = self.values.get(value_id(self, event))
+            if value is None:
+                print(
+                    "TODO Received value updated without knowing value. Creating it now"
+                )
+                value = Value(self, event)
+                self.values[value.value_id] = value
+            else:
+                value.receive_event(event)
+            event["value"] = value
 
         elif event["event"] == "value removed":
-            pass
+            event["value"] = self.values.pop(value_id(self, event))
 
         elif event["event"] == "metadata updated":
             pass
