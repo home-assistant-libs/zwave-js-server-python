@@ -1,10 +1,17 @@
-from typing import List
+from typing import Dict, List
+from .event import EventBase
+from .node import Node
 
 
-class Controller:
-    def __init__(self, data: dict) -> None:
+class Controller(EventBase):
+    def __init__(self, state: dict) -> None:
         """Initialize controller."""
-        self.data = data
+        super().__init__()
+        self.data = state["controller"]
+        self.nodes: Dict[int, Node] = {}
+        for node_state in state["nodes"]:
+            node = Node(node_state)
+            self.nodes[node.node_id] = node
 
     @property
     def library_version(self) -> str:
@@ -93,35 +100,54 @@ class Controller:
 
     def receive_event(self, event: dict):
         """Receive an event."""
+        if event["source"] == "node":
+            node = self.nodes.get(event["nodeId"])
+            if node is None:
+                # TODO handle event for uknown node
+                pass
+            else:
+                node.receive_event(event)
+            return
+
+        if event["source"] != "controller":
+            # TODO decide what to do here
+            print(f"Controller doesn't know how to handle/forward this event: {event}")
+
         if event["event"] == "inclusion failed":
-            return
+            pass
 
-        if event["event"] == "exclusion failed":
-            return
+        elif event["event"] == "exclusion failed":
+            pass
 
-        if event["event"] == "inclusion started":
-            return
+        elif event["event"] == "inclusion started":
+            pass
 
-        if event["event"] == "exclusion started":
-            return
+        elif event["event"] == "exclusion started":
+            pass
 
-        if event["event"] == "inclusion stopped":
-            return
+        elif event["event"] == "inclusion stopped":
+            pass
 
-        if event["event"] == "exclusion stopped":
-            return
+        elif event["event"] == "exclusion stopped":
+            pass
 
-        if event["event"] == "node added":
-            return
+        elif event["event"] == "node added":
+            node = event["node"] = Node(event["node"])
+            self.nodes[node.node_id] = node
 
-        if event["event"] == "node removed":
-            return
+        elif event["event"] == "node removed":
+            event["node"] = self.nodes.pop(event["node"]["nodeId"])
 
-        if event["event"] == "heal network progress":
-            return
+        elif event["event"] == "heal network progress":
+            pass
 
-        if event["event"] == "heal network done":
-            return
+        elif event["event"] == "heal network done":
+            pass
 
-        # TODO decide what to do with unknown event
-        print(f"Unhandled node event for controller: {event}")
+        else:
+            # TODO decide what to do with unknown event
+            print(f"Unhandled node event for controller: {event}")
+
+        event["controller"] = self
+
+        self.emit(event["event"], event)

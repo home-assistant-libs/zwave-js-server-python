@@ -7,7 +7,7 @@ from typing import Awaitable, Callable, List
 
 from aiohttp import ClientSession, WSMsgType, client_exceptions
 
-from .data import ZWaveData
+from .driver import Driver
 
 STATE_CONNECTING = "connecting"
 STATE_CONNECTED = "connected"
@@ -39,7 +39,7 @@ class Client:
         """Initialize the Client class."""
         self.ws_server_url = ws_server_url
         self.aiohttp_session = aiohttp_session
-        self.data = None
+        self.driver = None
         # The WebSocket client
         self.client = None
         # Scheduled sleep task till next connection retry
@@ -60,10 +60,10 @@ class Client:
         Run all async tasks in a wrapper to log appropriately.
         """
         if msg["type"] == "state":
-            if self.data is None:
-                self.data = ZWaveData(msg["state"])
+            if self.driver is None:
+                self.driver = Driver(msg["state"])
                 self._logger.info(
-                    "Z-Wave JS initialized. %s nodes", len(self.data.nodes)
+                    "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
                 )
             else:
                 # TODO how do we handle reconnect?
@@ -71,14 +71,14 @@ class Client:
 
             return
 
-        if self.data is None:
+        if self.driver is None:
             raise InvalidState("Did not receive state as first message")
 
         if msg["type"] != "event":
             # Can't handle
             return
 
-        self.data.receive_event(msg["event"])
+        self.driver.receive_event(msg["event"])
 
     def register_on_connect(self, on_connect_cb: Callable[[], Awaitable[None]]):
         """Register an async on_connect callback."""

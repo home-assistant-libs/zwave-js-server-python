@@ -1,10 +1,12 @@
 """Z-Wave node."""
 from typing import List
+from zwave_js_server.event import EventBase
 
 
-class Node:
+class Node(EventBase):
     def __init__(self, data: dict) -> None:
         """Initialize a node."""
+        super().__init__()
         self.data = data
 
     @property
@@ -165,49 +167,54 @@ class Node:
     def receive_event(self, event: dict):
         """Receive an event."""
         if event["event"] == "value added":
-            return
+            pass
 
-        if event["event"] == "value updated":
-            return
+        elif event["event"] == "value updated":
+            pass
 
-        if event["event"] == "value removed":
-            return
+        elif event["event"] == "value removed":
+            pass
 
-        if event["event"] == "metadata updated":
-            return
+        elif event["event"] == "metadata updated":
+            pass
 
-        if event["event"] == "value notification":
-            return
+        elif event["event"] == "value notification":
+            pass
 
-        if event["event"] == "notification":
-            return
+        elif event["event"] == "notification":
+            pass
 
-        if event["event"] == "interview failed":
-            return
+        elif event["event"] == "interview failed":
+            pass
 
-        if event["event"] == "firmware update progress":
-            return
+        elif event["event"] == "firmware update progress":
+            pass
 
-        if event["event"] == "firmware update finished":
-            return
+        elif event["event"] == "firmware update finished":
+            pass
 
-        if event["event"] == "wake up":
-            return
+        elif event["event"] == "wake up":
+            pass
 
-        if event["event"] == "sleep":
-            return
+        elif event["event"] == "sleep":
+            pass
 
-        if event["event"] == "dead":
-            return
+        elif event["event"] == "dead":
+            pass
 
-        if event["event"] == "alive":
-            return
+        elif event["event"] == "alive":
+            pass
 
-        if event["event"] == "interview completed":
-            return
+        elif event["event"] == "interview completed":
+            pass
 
-        if event["event"] == "ready":
-            return
+        elif event["event"] == "ready":
+            pass
 
-        # TODO decide what to do with unknown event
-        print(f"Unhandled node event for node {self.node_id}: {event}")
+        else:
+            # TODO decide what to do with unknown event
+            print(f"Unhandled node event for node {self.node_id}: {event}")
+
+        event["node"] = self
+
+        self.emit(event["event"], event)

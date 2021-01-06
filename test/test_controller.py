@@ -9,7 +9,7 @@ def test_from_state():
     """Test from_state method."""
     state = json.loads(load_fixture("basic_dump.txt").split("\n")[0])["state"]
 
-    ctrl = controller.Controller(state["controller"])
+    ctrl = controller.Controller(state)
 
     assert ctrl.library_version == "Z-Wave 3.95"
     assert ctrl.controller_type == 1
