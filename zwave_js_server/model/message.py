@@ -23,4 +23,4 @@ class Message:
         else:
             raise InvalidMessageError
 
-        return cls(data["type"], message_data)
+        return cls(type=data["type"], data=message_data)
