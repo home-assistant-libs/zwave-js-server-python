@@ -147,7 +147,7 @@ class Node(EventBase):
     @property
     def endpoints_have_identical_capabilities(self) -> bool:
         """Return the endpoints_have_identical_capabilities."""
-        return self.data.get('                "endpointsHaveIdenticalCapabilities')
+        return self.data.get('"endpointsHaveIdenticalCapabilities')
 
     @property
     def individual_endpoint_count(self) -> int:
