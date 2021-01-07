@@ -1,4 +1,4 @@
-"""Tests for controller model."""
+"""Test the controller model."""
 import json
 from zwave_js_server.model import controller
 

@@ -1,4 +1,4 @@
-"""Tests for data class."""
+"""Test the driver model."""
 import json
 from zwave_js_server.model import driver as driver_pkg
 
