@@ -1,8 +1,9 @@
 """Basic CLI to test Z-Wave JS server."""
 import asyncio
-import aiohttp
 import logging
 import sys
+
+import aiohttp
 
 from .client import Client
 
