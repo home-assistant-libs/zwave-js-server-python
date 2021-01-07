@@ -110,8 +110,7 @@ class Controller(EventBase):
                 # TODO handle event for unknown node
                 pass
             else:
-                # FIXME: Complete node protocol.
-                node.receive_event(event.data)
+                node.receive_event(event)
             return
 
         if event.data["source"] != "controller":

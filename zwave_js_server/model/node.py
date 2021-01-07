@@ -1,7 +1,7 @@
 """Provide a model for the Z-Wave JS node."""
 from typing import List
 
-from ..event import EventBase
+from ..event import Event, EventBase
 from .device_class import DeviceClass
 from .device_config import DeviceConfig
 from .value import Value, value_id
@@ -171,71 +171,69 @@ class Node(EventBase):
         """Return the interview_attempts."""
         return self.data.get("interviewAttempts")
 
-    def receive_event(self, event: dict):
+    def receive_event(self, event: Event) -> None:
         """Receive an event."""
-        if event["event"] == "value added":
-            value = Value(self, event["args"])
-            self.values[value.value_id] = event["value"] = value
+        self._handle_event_protocol(event)
+        event.data["node"] = self
 
-        elif event["event"] == "value updated":
-            value = self.values.get(value_id(self, event["args"]))
-            if value is None:
-                # TODO decide how to handle value updated for unknown values
-                print()
-                print("Value updated for unknown value", value_id(self, event["args"]))
-                print("Available value IDs", ", ".join(self.values))
-                print()
-                value = Value(self, event["args"])
-                self.values[value.value_id] = value
-            else:
-                value.receive_event(event)
-            event["value"] = value
+        self.emit(event.data["event"], event.data)
 
-        elif event["event"] == "value removed":
-            event["value"] = self.values.pop(value_id(self, event["args"]))
+    def handle_wake_up(self, event: Event) -> None:
+        """Process a node wake up event."""
 
-        # FIXME: Complete node event protocol handlers.
+    def handle_sleep(self, event: Event) -> None:
+        """Process a node sleep event."""
 
-        elif event["event"] == "metadata updated":
-            pass
+    def handle_dead(self, event: Event) -> None:
+        """Process a node dead event."""
 
-        elif event["event"] == "value notification":
-            pass
+    def handle_alive(self, event: Event) -> None:
+        """Process a node alive event."""
 
-        elif event["event"] == "notification":
-            pass
+    def handle_interview_completed(self, event: Event) -> None:
+        """Process a node interview completed event."""
 
-        elif event["event"] == "interview failed":
-            pass
+    def handle_interview_failed(self, event: Event) -> None:
+        """Process a node interview failed event."""
 
-        elif event["event"] == "firmware update progress":
-            pass
+    def handle_ready(self, event: Event) -> None:
+        """Process a node ready event."""
 
-        elif event["event"] == "firmware update finished":
-            pass
+    def handle_value_added(self, event: Event) -> None:
+        """Process a node value added event."""
+        value = Value(self, event.data["args"])
+        self.values[value.value_id] = event.data["value"] = value
 
-        elif event["event"] == "wake up":
-            pass
-
-        elif event["event"] == "sleep":
-            pass
-
-        elif event["event"] == "dead":
-            pass
-
-        elif event["event"] == "alive":
-            pass
-
-        elif event["event"] == "interview completed":
-            pass
-
-        elif event["event"] == "ready":
-            pass
-
+    def handle_value_updated(self, event: Event) -> None:
+        """Process a node value updated event."""
+        value = self.values.get(value_id(self, event.data["args"]))
+        if value is None:
+            # TODO decide how to handle value updated for unknown values
+            print()
+            print("Value updated for unknown value", value_id(self, event.data["args"]))
+            print("Available value IDs", ", ".join(self.values))
+            print()
+            value = Value(self, event.data["args"])
+            self.values[value.value_id] = value
         else:
-            # TODO decide what to do with unknown event
-            print(f"Unhandled node event for node {self.node_id}: {event}")
+            value.receive_event(event.data)
+        event.data["value"] = value
 
-        event["node"] = self
+    def handle_value_removed(self, event: Event) -> None:
+        """Process a node value removed event."""
+        event.data["value"] = self.values.pop(value_id(self, event.data["args"]))
 
-        self.emit(event["event"], event)
+    def handle_value_notification(self, event: Event) -> None:
+        """Process a node value notification event."""
+
+    def handle_metadata_updated(self, event: Event) -> None:
+        """Process a node metadata updated event."""
+
+    def handle_notification(self, event: Event) -> None:
+        """Process a node notification event."""
+
+    def handle_firmware_update_progress(self, event: Event) -> None:
+        """Process a node firmware update progress event."""
+
+    def handle_firmware_update_finished(self, event: Event) -> None:
+        """Process a node firmware update finished event."""
