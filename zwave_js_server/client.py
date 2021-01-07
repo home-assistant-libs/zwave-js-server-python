@@ -66,7 +66,11 @@ class Client:
                 self._logger.info(
                     "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
                 )
-                await gather_callbacks(self._logger, "on_initialized", self._on_initialized)
+                asyncio.create_task(
+                    gather_callbacks(
+                        self._logger, "on_initialized", self._on_initialized
+                    )
+                )
             else:
                 # TODO how do we handle reconnect?
                 pass
