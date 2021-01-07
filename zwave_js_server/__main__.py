@@ -1,4 +1,4 @@
-"""Basic CLI to test wrapper."""
+"""Basic CLI to test Z-Wave JS server."""
 import asyncio
 import aiohttp
 import logging
@@ -11,6 +11,7 @@ logger = logging.getLogger(__package__)
 
 
 async def main():
+    """Run main."""
     if len(sys.argv) < 2:
         print("Error: pass URL to Z-Wave JS server")
         return
