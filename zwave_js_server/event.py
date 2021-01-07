@@ -5,7 +5,7 @@ from typing import Any, Callable, Dict, List
 
 @dataclass
 class Event:
-    """Represent a Driver event."""
+    """Represent an event."""
 
     type: str
     data: dict = field(default_factory=dict)
