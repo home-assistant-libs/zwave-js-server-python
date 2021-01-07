@@ -47,7 +47,7 @@ class Node(EventBase):
         return self.data.get("ready")
 
     @property
-    def device_class(self) -> dict:
+    def device_class(self) -> DeviceClass:
         """Return the device_class."""
         return DeviceClass(self.data.get("deviceClass", {}))
 
@@ -132,7 +132,7 @@ class Node(EventBase):
         return self.data.get("location")
 
     @property
-    def device_config(self) -> dict:
+    def device_config(self) -> DeviceConfig:
         """Return the device_config."""
         return DeviceConfig(self.data.get("deviceConfig", {}))
 
