@@ -14,6 +14,7 @@ def test_from_state():
     for msg in ws_msgs[1:]:
         msg = json.loads(msg)
         assert msg["type"] == "event"
-        driver.receive_event(msg["event"])
+        driver_event = driver_pkg.DriverEvent(type=msg["event"], data=msg)
+        driver.handle_event(driver_event)
 
     assert len(driver.controller.nodes) == 8
