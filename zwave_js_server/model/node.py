@@ -1,5 +1,4 @@
 """Provide a model for the Z-Wave JS node."""
-from enum import Enum
 from typing import List
 
 from ..event import EventBase
@@ -13,7 +12,7 @@ class Node(EventBase):
 
     def __init__(self, data: dict) -> None:
         """Initialize the node."""
-        super().__init__(EventType)
+        super().__init__()
         self.data = data
         self.values = {value_id(self, val): Value(self, val) for val in data["values"]}
 
@@ -195,6 +194,8 @@ class Node(EventBase):
         elif event["event"] == "value removed":
             event["value"] = self.values.pop(value_id(self, event["args"]))
 
+        # FIXME: Complete node event protocol handlers.
+
         elif event["event"] == "metadata updated":
             pass
 
@@ -238,10 +239,3 @@ class Node(EventBase):
         event["node"] = self
 
         self.emit(event["event"], event)
-
-
-class EventType(Enum):
-    """Represent a node event type."""
-
-    WAKE_UP = "wake up"
-    # FIXME: Complete node event types.

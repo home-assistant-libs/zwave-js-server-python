@@ -1,5 +1,4 @@
 """Provide a model for the Z-Wave JS controller."""
-from enum import Enum
 from typing import Dict, List
 
 from ..event import Event, EventBase
@@ -11,7 +10,7 @@ class Controller(EventBase):
 
     def __init__(self, state: dict) -> None:
         """Initialize controller."""
-        super().__init__(EventType)
+        super().__init__()
         self.data = state["controller"]
         self.nodes: Dict[int, Node] = {}
         for node_state in state["nodes"]:
@@ -158,18 +157,3 @@ class Controller(EventBase):
 
     def handle_heal_network_done(self, event: Event) -> None:
         """Process a heal network done event."""
-
-
-class EventType(Enum):
-    """Represent a controller event type."""
-
-    INCLUSION_FAILED = "inclusion failed"
-    EXCLUSION_FAILED = "exclusion failed"
-    INCLUSION_STARTED = "inclusion started"
-    EXCLUSION_STARTED = "exclusion started"
-    INCLUSION_STOPPED = "inclusion stopped"
-    EXCLUSION_STOPPED = "exclusion stopped"
-    NODE_ADDED = "node added"
-    NODE_REMOVED = "node removed"
-    HEAL_NETWORK_PROGRESS = "heal network progress"
-    HEAL_NETWORK_DONE = "heal network done"

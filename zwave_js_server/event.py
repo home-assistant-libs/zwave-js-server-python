@@ -1,6 +1,9 @@
 """Provide Event base classes for Z-Wave JS."""
+import logging
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List
+from typing import Callable, Dict, List
+
+LOGGER = logging.getLogger(__package__)
 
 
 @dataclass
@@ -14,9 +17,8 @@ class Event:
 class EventBase:
     """Represent a Z-Wave JS base class for event handling models."""
 
-    def __init__(self, protocol: Any) -> None:
+    def __init__(self) -> None:
         """Initialize event base."""
-        self.protocol = protocol
         self._listeners: Dict[str, List[Callable]] = {}
 
     def on(  # pylint: disable=invalid-name
@@ -40,8 +42,8 @@ class EventBase:
 
     def _handle_event_protocol(self, event: Event) -> None:
         """Process an event based on event protocol."""
-    handler = getattr(self, f"handle_{event.type.replace(' ', '_')}", None)
-    if handler is None:
-        LOGGER.debug("Received unknown event")
-        return
-    handler(event)
+        handler = getattr(self, f"handle_{event.type.replace(' ', '_')}", None)
+        if handler is None:
+            LOGGER.debug("Received unknown event: %s", event)
+            return
+        handler(event)

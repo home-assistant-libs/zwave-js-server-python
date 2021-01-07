@@ -1,6 +1,4 @@
 """Provide a model for the Z-Wave JS Driver."""
-from enum import Enum
-
 from ..event import Event, EventBase
 from .controller import Controller
 
@@ -10,7 +8,7 @@ class Driver(EventBase):
 
     def __init__(self, state: dict):
         """Initialize driver."""
-        super().__init__(EventType)
+        super().__init__()
         self.controller = Controller(state)
 
     def receive_event(self, event: Event) -> None:
@@ -31,11 +29,3 @@ class Driver(EventBase):
 
     def handle_all_nodes_ready(self, event: Event) -> None:
         """Process a driver all nodes ready event."""
-
-
-class EventType(Enum):
-    """Represent a driver event type."""
-
-    ERROR = "error"
-    DRIVER_READY = "driver ready"
-    ALL_NODES_READY = "all nodes ready"
