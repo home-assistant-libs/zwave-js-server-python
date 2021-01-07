@@ -47,7 +47,7 @@ class Controller(EventBase):
         return self.data.get("isUsingHomeIdFromOtherNetwork")
 
     @property
-    def is_SIS_present(self) -> bool:
+    def is_SIS_present(self) -> bool:  # pylint: disable=invalid-name
         """Return is_SIS_present."""
         return self.data.get("isSISPresent")
 

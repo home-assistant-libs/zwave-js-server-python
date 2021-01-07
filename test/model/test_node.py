@@ -1,7 +1,6 @@
 """Test the node model."""
 import json
 from zwave_js_server.model import node as node_pkg
-from zwave_js_server.model.device_class import DeviceClass
 
 from .. import load_fixture
 

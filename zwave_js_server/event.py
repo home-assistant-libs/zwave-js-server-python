@@ -8,16 +8,17 @@ class EventBase:
         """Initialize event base."""
         self._listeners = {}
 
-    def on(self, event_name, callback):
+    def on(self, event_name, callback):  # pylint: disable=invalid-name
         """Register an event callback."""
         listeners: list = self._listeners.setdefault(event_name, [])
         listeners.append(callback)
 
-        def unsub():
+        def unsubscribe():
+            """Unsubscribe listeners."""
             if callback in listeners:
                 listeners.remove(callback)
 
-        return unsub
+        return unsubscribe
 
     def emit(self, event_name, data):
         """Run all callbacks for an event."""
