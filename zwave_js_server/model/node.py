@@ -1,6 +1,9 @@
 """Provide a model for the Z-Wave JS node."""
 from typing import List
+
 from ..event import EventBase
+from .device_class import DeviceClass
+from .device_config import DeviceConfig
 from .value import Value, value_id
 
 
@@ -44,9 +47,9 @@ class Node(EventBase):
         return self.data.get("ready")
 
     @property
-    def device_class(self) -> dict:  # XXXXXX NEEDS CLASS
+    def device_class(self) -> dict:
         """Return the device_class."""
-        return self.data.get("deviceClass")
+        return DeviceClass(self.data.get("deviceClass", {}))
 
     @property
     def is_listening(self) -> bool:
@@ -131,7 +134,7 @@ class Node(EventBase):
     @property
     def device_config(self) -> dict:  # XXXXXX NEEDS CLASS
         """Return the device_config."""
-        return self.data.get("deviceConfig")
+        return DeviceConfig(self.data.get("deviceConfig", {}))
 
     @property
     def label(self) -> str:
