@@ -1,9 +1,12 @@
+"""Provide a model for the Z-Wave JS controller."""
 from typing import Dict, List
 from ..event import EventBase
 from .node import Node
 
 
 class Controller(EventBase):
+    """Represent a Z-Wave JS controller."""
+
     def __init__(self, state: dict) -> None:
         """Initialize controller."""
         super().__init__()
@@ -103,7 +106,7 @@ class Controller(EventBase):
         if event["source"] == "node":
             node = self.nodes.get(event["nodeId"])
             if node is None:
-                # TODO handle event for uknown node
+                # TODO handle event for unknown node
                 pass
             else:
                 node.receive_event(event)
