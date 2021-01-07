@@ -21,11 +21,5 @@ class Driver(EventBase):
 
         self.emit(event.data["event"], event.data)
 
-    def handle_error(self, event: Event) -> None:
-        """Process a driver error event."""
-
-    def handle_driver_ready(self, event: Event) -> None:
-        """Process a driver ready event."""
-
     def handle_all_nodes_ready(self, event: Event) -> None:
         """Process a driver all nodes ready event."""
