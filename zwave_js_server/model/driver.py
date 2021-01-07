@@ -1,10 +1,13 @@
-"""Z-Wave JS Driver."""
+"""Provide a model for the Z-Wave JS driver."""
 from .controller import Controller
 from ..event import EventBase
 
 
 class Driver(EventBase):
+    """Represent a Z-Wave JS driver."""
+
     def __init__(self, state: dict):
+        """Initialize driver."""
         super().__init__()
         self.controller = Controller(state)
 

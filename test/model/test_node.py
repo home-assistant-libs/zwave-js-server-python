@@ -1,4 +1,4 @@
-"""Tests for controller model."""
+"""Test the node model."""
 import json
 from zwave_js_server.model import node as node_pkg
 
