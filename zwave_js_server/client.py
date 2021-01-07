@@ -17,6 +17,7 @@ STATE_DISCONNECTED = "disconnected"
 async def gather_callbacks(
     logger: logging.Logger, name: str, callbacks: List[Callable[[], Awaitable[None]]]
 ) -> None:
+    """Gather callbacks."""
     results = await asyncio.gather(*[cb() for cb in callbacks], return_exceptions=True)
     for result, callback in zip(results, callbacks):
         if not isinstance(result, Exception):
@@ -58,6 +59,7 @@ class Client:
 
     def async_handle_message(self, msg) -> None:
         """Handle incoming message.
+
         Run all async tasks in a wrapper to log appropriately.
         """
         if msg["type"] == "state":
