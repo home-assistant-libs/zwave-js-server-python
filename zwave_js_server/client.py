@@ -3,10 +3,11 @@ import asyncio
 import logging
 import pprint
 import random
-from typing import Awaitable, Callable, List
+from typing import Awaitable, Callable, List, Optional
 
 from aiohttp import ClientSession, WSMsgType, client_exceptions
 
+from .event import Event
 from .model.driver import Driver
 
 STATE_CONNECTING = "connecting"
@@ -40,7 +41,7 @@ class Client:
         """Initialize the Client class."""
         self.ws_server_url = ws_server_url
         self.aiohttp_session = aiohttp_session
-        self.driver = None
+        self.driver: Optional[Driver] = None
         # The WebSocket client
         self.client = None
         # Scheduled sleep task till next connection retry
@@ -86,7 +87,8 @@ class Client:
             # Can't handle
             return
 
-        self.driver.receive_event(msg["event"])
+        event = Event(type=msg["event"]["event"], data=msg["event"])
+        self.driver.receive_event(event)
 
     def register_on_connect(self, on_connect_cb: Callable[[], Awaitable[None]]):
         """Register an async on_connect callback."""

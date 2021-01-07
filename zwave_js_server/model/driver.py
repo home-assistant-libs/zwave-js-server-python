@@ -1,6 +1,6 @@
-"""Provide a model for the Z-Wave JS driver."""
+"""Provide a model for the Z-Wave JS Driver."""
+from ..event import Event, EventBase
 from .controller import Controller
-from ..event import EventBase
 
 
 class Driver(EventBase):
@@ -11,13 +11,15 @@ class Driver(EventBase):
         super().__init__()
         self.controller = Controller(state)
 
-    def receive_event(self, event: dict):
+    def receive_event(self, event: Event) -> None:
         """Receive an event."""
-        if event["source"] != "driver":
+        if event.data["source"] != "driver":
             self.controller.receive_event(event)
             return
 
-        if event["event"] == "all nodes ready":
-            pass
+        self._handle_event_protocol(event)
 
-        self.emit(event["event"], event)
+        self.emit(event.type, event.data)
+
+    def handle_all_nodes_ready(self, event: Event) -> None:
+        """Process a driver all nodes ready event."""
