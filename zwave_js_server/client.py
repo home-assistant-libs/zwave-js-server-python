@@ -3,6 +3,7 @@ import asyncio
 import logging
 import pprint
 import random
+import uuid
 from typing import Awaitable, Callable, List, Optional
 
 from aiohttp import ClientSession, WSMsgType, client_exceptions
@@ -34,6 +35,16 @@ class InvalidState(Exception):
     """Exception raised when data gets in invalid state."""
 
 
+class FailedCommand(Exception):
+    """When a command has failed."""
+
+    def __init__(self, message_id: str, error_code: str):
+        """Initialize a failed command error."""
+        super().__init__(f"Command failed: {error_code}")
+        self.message_id = message_id
+        self.error_code = error_code
+
+
 class Client:
     """Class to manage the IoT connection."""
 
@@ -63,9 +74,10 @@ class Client:
 
         Run all async tasks in a wrapper to log appropriately.
         """
-        if msg["type"] == "state":
+        # Right now only result is from receiving state.
+        if msg["type"] == "result":
             if self.driver is None:
-                self.driver = Driver(msg["state"])
+                self.driver = Driver(msg["result"]["state"])
                 self._logger.info(
                     "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
                 )
@@ -180,11 +192,22 @@ class Client:
             )
             self.tries = 0
 
-            self._logger.info("Connected")
+            version_msg = await client.receive_json()
+
+            self._logger.info(
+                "Connected to Home %s (Server %s, Driver %s)",
+                version_msg["homeId"],
+                version_msg["serverVersion"],
+                version_msg["driverVersion"],
+            )
             self.state = STATE_CONNECTED
 
             if self._on_connect:
                 await gather_callbacks(self._logger, "on_connect", self._on_connect)
+
+            await client.send_json(
+                {"messageId": uuid.uuid4().hex, "command": "start_listening"}
+            )
 
             while not client.closed:
                 msg = await client.receive()
