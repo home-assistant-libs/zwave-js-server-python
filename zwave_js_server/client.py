@@ -87,7 +87,7 @@ class Client:
             return
 
         driver_event = DriverEvent(type=msg["event"]["event"], data=msg["event"])
-        self.driver.handle_event(driver_event)
+        self.driver.receive_event(driver_event)
 
     def register_on_connect(self, on_connect_cb: Callable[[], Awaitable[None]]):
         """Register an async on_connect callback."""

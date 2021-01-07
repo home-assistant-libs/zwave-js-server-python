@@ -180,7 +180,7 @@ class Node(EventBase):
         """Return the interview_attempts."""
         return self.data.get("interviewAttempts")
 
-    def handle_event(self, event: dict):
+    def receive_event(self, event: dict):
         """Receive an event."""
         if event["event"] == "value added":
             value = Value(self, event["args"])

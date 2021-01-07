@@ -112,7 +112,7 @@ class Controller(EventBase):
         """Return supports_timers."""
         return self.data.get("supportsTimers")
 
-    def handle_event(self, event: ControllerEvent) -> None:
+    def receive_event(self, event: ControllerEvent) -> None:
         """Receive an event."""
         if event.data["source"] == "node":
             node = self.nodes.get(event.data["nodeId"])
@@ -122,7 +122,7 @@ class Controller(EventBase):
             else:
                 node_event = NodeEvent(type=event.data["event"], data=event.data)
                 # FIXME: Complete node protocol.
-                node.handle_event(node_event.data)
+                node.receive_event(node_event.data)
             return
 
         if event.data["source"] != "controller":

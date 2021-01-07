@@ -23,13 +23,13 @@ class Driver(EventBase):
         super().__init__()
         self.controller = Controller(state)
 
-    def handle_event(self, event: DriverEvent) -> None:
+    def receive_event(self, event: DriverEvent) -> None:
         """Handle a zwave-js event."""
         if event.data["source"] != "driver":
             controller_event = ControllerEvent(
                 type=event.data["event"], data=event.data
             )
-            self.controller.handle_event(controller_event)
+            self.controller.receive_event(controller_event)
             return
 
         protocol_ = cast(ProtocolType, protocol)
