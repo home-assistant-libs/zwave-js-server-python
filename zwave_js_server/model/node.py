@@ -1,19 +1,10 @@
 """Provide a model for the Z-Wave JS node."""
-from dataclasses import dataclass, field
 from typing import List
 
 from ..event import EventBase
 from .device_class import DeviceClass
 from .device_config import DeviceConfig
 from .value import Value, value_id
-
-
-@dataclass
-class NodeEvent:
-    """Represent a Node event."""
-
-    type: str
-    data: dict = field(default_factory=dict)
 
 
 class Node(EventBase):

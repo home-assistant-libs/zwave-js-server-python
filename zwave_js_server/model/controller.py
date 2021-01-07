@@ -1,18 +1,9 @@
 """Provide a model for the Z-Wave JS controller."""
-from dataclasses import dataclass, field
 from typing import Dict, List, cast
 
-from ..event import EventBase
+from ..event import Event, EventBase
 from ..protocol import ProtocolType, controller as protocol, get_handler
-from .node import Node, NodeEvent
-
-
-@dataclass
-class ControllerEvent:
-    """Represent a Controller event."""
-
-    type: str
-    data: dict = field(default_factory=dict)
+from .node import Node
 
 
 class Controller(EventBase):
@@ -112,7 +103,7 @@ class Controller(EventBase):
         """Return supports_timers."""
         return self.data.get("supportsTimers")
 
-    def receive_event(self, event: ControllerEvent) -> None:
+    def receive_event(self, event: Event) -> None:
         """Receive an event."""
         if event.data["source"] == "node":
             node = self.nodes.get(event.data["nodeId"])
@@ -120,9 +111,8 @@ class Controller(EventBase):
                 # TODO handle event for unknown node
                 pass
             else:
-                node_event = NodeEvent(type=event.data["event"], data=event.data)
                 # FIXME: Complete node protocol.
-                node.receive_event(node_event.data)
+                node.receive_event(event.data)
             return
 
         if event.data["source"] != "controller":

@@ -1,7 +1,14 @@
 """Provide Event base classes for Z-Wave JS."""
-
-
+from dataclasses import dataclass, field
 from typing import Callable, Dict, List
+
+
+@dataclass
+class Event:
+    """Represent a Driver event."""
+
+    type: str
+    data: dict = field(default_factory=dict)
 
 
 class EventBase:
