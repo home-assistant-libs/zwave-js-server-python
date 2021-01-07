@@ -1,20 +1,21 @@
 """Provide a client for zwave-js-server."""
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, cast
 
-from .model.gateway import Gateway
+from .model.driver import Driver
 from .model.message import Message
-from .protocol import get_handler, message as protocol
+from .protocol import ProtocolType, get_handler, message as protocol
 
 
 @dataclass
 class Client:
     """Represent a zwave-js-server client."""
 
-    gateway: Optional[Gateway] = None
+    driver: Optional[Driver] = None
 
     async def handle_message(self, message: Message) -> None:
         """Handle a message."""
-        message_handler = get_handler(protocol, message)
+        protocol_ = cast(ProtocolType, protocol)
+        message_handler = get_handler(protocol_, message)
 
-        await message_handler(self, message)
+        message_handler(self, message)

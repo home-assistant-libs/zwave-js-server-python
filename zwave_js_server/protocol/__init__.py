@@ -20,6 +20,6 @@ def get_handler(protocol: ProtocolType, data: ModelType) -> Callable:
     """Return a handler based on protocol."""
     protocol_type = protocol.Type(data.type)
     protocol_handler: Callable = getattr(
-        protocol.Handler, f"handle_{protocol_type.value}"
+        protocol.Handler, f"handle_{protocol_type.name.lower()}"
     )
     return protocol_handler

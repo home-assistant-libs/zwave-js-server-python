@@ -1,7 +1,18 @@
 """Provide a model for the Z-Wave JS controller."""
-from typing import Dict, List
+from dataclasses import dataclass, field
+from typing import Dict, List, cast
+
 from ..event import EventBase
-from .node import Node
+from ..protocol import ProtocolType, controller as protocol, get_handler
+from .node import Node, NodeEvent
+
+
+@dataclass
+class ControllerEvent:
+    """Represent a Controller event."""
+
+    type: str
+    data: dict = field(default_factory=dict)
 
 
 class Controller(EventBase):
@@ -101,56 +112,28 @@ class Controller(EventBase):
         """Return supports_timers."""
         return self.data.get("supportsTimers")
 
-    def receive_event(self, event: dict):
+    def handle_event(self, event: ControllerEvent) -> None:
         """Receive an event."""
-        if event["source"] == "node":
-            node = self.nodes.get(event["nodeId"])
+        if event.data["source"] == "node":
+            node = self.nodes.get(event.data["nodeId"])
             if node is None:
                 # TODO handle event for unknown node
                 pass
             else:
-                node.receive_event(event)
+                node_event = NodeEvent(type=event.data["event"], data=event.data)
+                # FIXME: Complete node protocol.
+                node.handle_event(node_event.data)
             return
 
-        if event["source"] != "controller":
+        if event.data["source"] != "controller":
             # TODO decide what to do here
-            print(f"Controller doesn't know how to handle/forward this event: {event}")
+            print(
+                f"Controller doesn't know how to handle/forward this event: {event.data}"
+            )
 
-        if event["event"] == "inclusion failed":
-            pass
+        protocol_ = cast(ProtocolType, protocol)
+        event_handler = get_handler(protocol_, event)
+        event_handler(self, event)
 
-        elif event["event"] == "exclusion failed":
-            pass
-
-        elif event["event"] == "inclusion started":
-            pass
-
-        elif event["event"] == "exclusion started":
-            pass
-
-        elif event["event"] == "inclusion stopped":
-            pass
-
-        elif event["event"] == "exclusion stopped":
-            pass
-
-        elif event["event"] == "node added":
-            node = event["node"] = Node(event["node"])
-            self.nodes[node.node_id] = node
-
-        elif event["event"] == "node removed":
-            event["node"] = self.nodes.pop(event["node"]["nodeId"])
-
-        elif event["event"] == "heal network progress":
-            pass
-
-        elif event["event"] == "heal network done":
-            pass
-
-        else:
-            # TODO decide what to do with unknown event
-            print(f"Unhandled node event for controller: {event}")
-
-        event["controller"] = self
-
-        self.emit(event["event"], event)
+        event.data["controller"] = self
+        self.emit(event.data["event"], event.data)

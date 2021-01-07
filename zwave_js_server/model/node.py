@@ -1,10 +1,19 @@
 """Provide a model for the Z-Wave JS node."""
+from dataclasses import dataclass, field
 from typing import List
 
 from ..event import EventBase
 from .device_class import DeviceClass
 from .device_config import DeviceConfig
 from .value import Value, value_id
+
+
+@dataclass
+class NodeEvent:
+    """Represent a Node event."""
+
+    type: str
+    data: dict = field(default_factory=dict)
 
 
 class Node(EventBase):
@@ -171,7 +180,7 @@ class Node(EventBase):
         """Return the interview_attempts."""
         return self.data.get("interviewAttempts")
 
-    def receive_event(self, event: dict):
+    def handle_event(self, event: dict):
         """Receive an event."""
         if event["event"] == "value added":
             value = Value(self, event["args"])

@@ -1,1 +1,1 @@
-"""Provide a protocol for nodes."""
+"""Provide a protocol for the node model."""

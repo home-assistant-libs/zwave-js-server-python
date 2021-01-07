@@ -1,8 +1,8 @@
-"""Provide a protocol for the websocket message."""
+"""Provide a protocol for the websocket message model."""
 from enum import Enum
 from typing import TYPE_CHECKING
 
-from ..model.gateway import Gateway, GatewayEvent
+from ..model.driver import Driver, DriverEvent
 from ..model.message import Message
 
 if TYPE_CHECKING:
@@ -20,12 +20,13 @@ class Handler:
     """Represent a message handler."""
 
     @classmethod
-    async def handle_event(cls, client: "Client", message: Message) -> None:
+    def handle_event(cls, client: "Client", message: Message) -> None:
         """Process an event message."""
-        gateway_event = GatewayEvent(type=message.data["source"], data=message.data)
-        client.gateway.handle_event(gateway_event)
+        driver_event = DriverEvent(type=message.data["event"], data=message.data)
+        assert client.driver
+        client.driver.handle_event(driver_event)
 
     @classmethod
-    async def handle_state(cls, client: "Client", message: Message) -> None:
+    def handle_state(cls, client: "Client", message: Message) -> None:
         """Process a state message."""
-        client.gateway = Gateway(message.data)
+        client.driver = Driver(message.data)

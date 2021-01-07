@@ -1,39 +1,30 @@
-"""Provide a protocol for the gateway."""
+"""Provide a protocol for the driver model."""
 from enum import Enum
 from typing import TYPE_CHECKING
 
-from ..exceptions import MissingNodeError
-
 if TYPE_CHECKING:
-    from ..model.gateway import Gateway, GatewayEvent
+    from ..model.driver import Driver, DriverEvent
 
 
 class Type(Enum):
-    """Represent a gateway event type."""
+    """Represent a driver event type."""
 
-    CONTROLLER = "controller"
-    DRIVER = "driver"
-    NODE = "node"
+    ERROR = "error"
+    DRIVER_READY = "driver ready"
+    ALL_NODES_READY = "all nodes ready"
 
 
 class Handler:
-    """Represent an event handler for the gateway."""
+    """Represent an event handler for the driver."""
 
     @classmethod
-    def handle_controller(cls, gateway: "Gateway", event: "GatewayEvent") -> None:
-        """Process a controller event."""
-        gateway.controller.handle_event(event)
+    def handle_error(cls, driver: "Driver", event: "DriverEvent") -> None:
+        """Process a driver error event."""
 
     @classmethod
-    def handle_driver(cls, gateway: "Gateway", event: "GatewayEvent") -> None:
-        """Process a driver event."""
+    def handle_driver_ready(cls, driver: "Driver", event: "DriverEvent") -> None:
+        """Process a driver ready event."""
 
     @classmethod
-    def handle_node(cls, gateway: "Gateway", event: "GatewayEvent") -> None:
-        """Process a node event."""
-        node = gateway.nodes.get(event.data["nodeId"])
-
-        if node is None:
-            raise MissingNodeError
-
-        node.handle_event(event)
+    def handle_all_nodes_ready(cls, driver: "Driver", event: "DriverEvent") -> None:
+        """Process a driver all nodes ready event."""

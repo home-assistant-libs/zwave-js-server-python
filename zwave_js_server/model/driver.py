@@ -1,6 +1,18 @@
 """Provide a model for the Z-Wave JS driver."""
-from .controller import Controller
+from dataclasses import dataclass, field
+from typing import cast
+
 from ..event import EventBase
+from ..protocol import ProtocolType, driver as protocol, get_handler
+from .controller import Controller, ControllerEvent
+
+
+@dataclass
+class DriverEvent:
+    """Represent a Driver event."""
+
+    type: str
+    data: dict = field(default_factory=dict)
 
 
 class Driver(EventBase):
@@ -11,13 +23,17 @@ class Driver(EventBase):
         super().__init__()
         self.controller = Controller(state)
 
-    def receive_event(self, event: dict):
-        """Receive an event."""
-        if event["source"] != "driver":
-            self.controller.receive_event(event)
+    def handle_event(self, event: DriverEvent) -> None:
+        """Handle a zwave-js event."""
+        if event.data["source"] != "driver":
+            controller_event = ControllerEvent(
+                type=event.data["event"], data=event.data
+            )
+            self.controller.handle_event(controller_event)
             return
 
-        if event["event"] == "all nodes ready":
-            pass
+        protocol_ = cast(ProtocolType, protocol)
+        event_handler = get_handler(protocol_, event)
+        event_handler(self, event)
 
-        self.emit(event["event"], event)
+        self.emit(event.data["event"], event.data)
