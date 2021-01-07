@@ -30,43 +30,43 @@ class Handler:
     def handle_inclusion_failed(
         cls, controller: "Controller", event: "ControllerEvent"
     ) -> None:
-        """Process a inclusion failed event."""
+        """Process an inclusion failed event."""
 
     @classmethod
     def handle_exclusion_failed(
         cls, controller: "Controller", event: "ControllerEvent"
     ) -> None:
-        """Process a controller event."""
+        """Process an exclusion failed event."""
 
     @classmethod
     def handle_inclusion_started(
         cls, controller: "Controller", event: "ControllerEvent"
     ) -> None:
-        """Process a node event."""
+        """Process an inclusion started event."""
 
     @classmethod
     def handle_exclusion_started(
         cls, controller: "Controller", event: "ControllerEvent"
     ) -> None:
-        """Process a node event."""
+        """Process an exclustion started event."""
 
     @classmethod
     def handle_inclusion_stopped(
         cls, controller: "Controller", event: "ControllerEvent"
     ) -> None:
-        """Process a node event."""
+        """Process an inclusion stopped event."""
 
     @classmethod
     def handle_exclusion_stopped(
         cls, controller: "Controller", event: "ControllerEvent"
     ) -> None:
-        """Process a node event."""
+        """Process an exclusion stopped event."""
 
     @classmethod
     def handle_node_added(
         cls, controller: "Controller", event: "ControllerEvent"
     ) -> None:
-        """Process a node event."""
+        """Process a node added event."""
         node = event.data["node"] = Node(event.data["node"])
         controller.nodes[node.node_id] = node
 
@@ -74,17 +74,17 @@ class Handler:
     def handle_node_removed(
         cls, controller: "Controller", event: "ControllerEvent"
     ) -> None:
-        """Process a node event."""
+        """Process a node removed event."""
         event.data["node"] = controller.nodes.pop(event.data["node"]["nodeId"])
 
     @classmethod
     def handle_heal_network_progress(
         cls, controller: "Controller", event: "ControllerEvent"
     ) -> None:
-        """Process a node event."""
+        """Process a heal network progress event."""
 
     @classmethod
     def handle_heal_network_done(
         cls, controller: "Controller", event: "ControllerEvent"
     ) -> None:
-        """Process a node event."""
+        """Process a heal network done event."""

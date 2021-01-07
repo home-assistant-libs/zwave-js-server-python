@@ -3,7 +3,7 @@ from typing import Any, Callable, Protocol
 
 
 class ModelType(Protocol):
-    """Represent a model message or event type."""
+    """Represent a model event type."""
 
     type: Any
     data: Any
