@@ -52,6 +52,7 @@ class Client:
         self.state = STATE_DISCONNECTED
         self._on_connect: List[Callable[[], Awaitable[None]]] = []
         self._on_disconnect: List[Callable[[], Awaitable[None]]] = []
+        self._on_initialized: List[Callable[[], Awaitable[None]]] = []
         self._logger = logging.getLogger(__package__)
         self._disconnect_event = None
 
@@ -65,6 +66,7 @@ class Client:
                 self._logger.info(
                     "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
                 )
+                await gather_callbacks(self._logger, "on_initialized", self._on_initialized)
             else:
                 # TODO how do we handle reconnect?
                 pass
@@ -87,6 +89,10 @@ class Client:
     def register_on_disconnect(self, on_disconnect_cb: Callable[[], Awaitable[None]]):
         """Register an async on_disconnect callback."""
         self._on_disconnect.append(on_disconnect_cb)
+
+    def register_on_initialized(self, on_initialized_cb: Callable[[], Awaitable[None]]):
+        """Register an async on_initialized_cb callback."""
+        self._on_initialized.append(on_initialized_cb)
 
     @property
     def connected(self):
