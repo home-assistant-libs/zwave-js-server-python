@@ -216,7 +216,7 @@ class Node(EventBase):
             value = Value(self, event.data["args"])
             self.values[value.value_id] = value
         else:
-            value.receive_event(event.data)
+            value.receive_event(event)
         event.data["value"] = value
 
     def handle_value_removed(self, event: Event) -> None:

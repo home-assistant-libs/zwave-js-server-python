@@ -1,5 +1,7 @@
 """Provide a model for the Z-Wave JS value."""
-from typing import Any, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Optional
+
+from ..event import Event
 
 if TYPE_CHECKING:
     from .node import Node
@@ -16,7 +18,7 @@ def value_id(node: "Node", event: dict) -> str:
 class ValueMetadata:
     """Represent metadata on a value instance."""
 
-    def __init__(self, data) -> None:
+    def __init__(self, data: dict) -> None:
         """Initialize metadata."""
         self.data = data
 
@@ -120,10 +122,7 @@ class Value:
         """Return propertyKeyName."""
         return self.data.get("propertyKeyName")
 
-    def receive_event(self, event: dict):
+    def receive_event(self, event: Event) -> None:
         """Receive an event."""
-        if event["event"] != "value updated":
-            return
-
-        self.data.update(event["args"])
-        self._value = event["args"].get("newValue")
+        self.data.update(event.data["args"])
+        self._value = event.data["args"].get("newValue")
