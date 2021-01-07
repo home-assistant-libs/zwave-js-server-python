@@ -7,7 +7,8 @@ from typing import Awaitable, Callable, List, Optional
 
 from aiohttp import ClientSession, WSMsgType, client_exceptions
 
-from .model.driver import Driver, DriverEvent
+from .event import Event
+from .model.driver import Driver
 
 STATE_CONNECTING = "connecting"
 STATE_CONNECTED = "connected"
@@ -86,8 +87,8 @@ class Client:
             # Can't handle
             return
 
-        driver_event = DriverEvent(type=msg["event"]["event"], data=msg["event"])
-        self.driver.receive_event(driver_event)
+        event = Event(type=msg["event"]["event"], data=msg["event"])
+        self.driver.receive_event(event)
 
     def register_on_connect(self, on_connect_cb: Callable[[], Awaitable[None]]):
         """Register an async on_connect callback."""
