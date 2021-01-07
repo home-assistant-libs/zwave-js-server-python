@@ -19,7 +19,7 @@ class Driver(EventBase):
 
         self._handle_event_protocol(event)
 
-        self.emit(event.data["event"], event.data)
+        self.emit(event.type, event.data)
 
     def handle_all_nodes_ready(self, event: Event) -> None:
         """Process a driver all nodes ready event."""

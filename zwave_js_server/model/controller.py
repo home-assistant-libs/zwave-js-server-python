@@ -122,7 +122,7 @@ class Controller(EventBase):
         self._handle_event_protocol(event)
 
         event.data["controller"] = self
-        self.emit(event.data["event"], event.data)
+        self.emit(event.type, event.data)
 
     def handle_inclusion_failed(self, event: Event) -> None:
         """Process an inclusion failed event."""

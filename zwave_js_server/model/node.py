@@ -176,7 +176,7 @@ class Node(EventBase):
         self._handle_event_protocol(event)
         event.data["node"] = self
 
-        self.emit(event.data["event"], event.data)
+        self.emit(event.type, event.data)
 
     def handle_wake_up(self, event: Event) -> None:
         """Process a node wake up event."""
