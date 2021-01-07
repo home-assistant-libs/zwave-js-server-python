@@ -1,5 +1,4 @@
 """Constants for the Z-Wave JS python library."""
-
 from enum import IntEnum
 
 
