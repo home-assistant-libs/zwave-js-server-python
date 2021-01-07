@@ -1,12 +1,14 @@
-"""Z-Wave node."""
+"""Provide a model for the Z-Wave JS node."""
 from typing import List
 from ..event import EventBase
 from .value import Value, value_id
 
 
 class Node(EventBase):
+    """Represent a Z-Wave JS node."""
+
     def __init__(self, data: dict) -> None:
-        """Initialize a node."""
+        """Initialize the node."""
         super().__init__()
         self.data = data
         self.values = {value_id(self, val): Value(self, val) for val in data["values"]}
