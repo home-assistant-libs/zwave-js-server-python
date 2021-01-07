@@ -167,7 +167,7 @@ class Client:
         await self.retry_task
         self.retry_task = None
 
-    async def _handle_connection(self):
+    async def _handle_connection(self):  # pylint: disable=too-many-branches
         """Connect to the Z-Wave JS server."""
         client = None
         disconnect_warn = None
