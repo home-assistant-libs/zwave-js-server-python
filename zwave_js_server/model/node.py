@@ -132,7 +132,7 @@ class Node(EventBase):
         return self.data.get("location")
 
     @property
-    def device_config(self) -> dict:  # XXXXXX NEEDS CLASS
+    def device_config(self) -> dict:
         """Return the device_config."""
         return DeviceConfig(self.data.get("deviceConfig", {}))
 
