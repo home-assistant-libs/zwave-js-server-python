@@ -1,8 +1,8 @@
 """Provide a model for the Z-Wave JS controller."""
-from typing import Dict, List, cast
+from enum import Enum
+from typing import Dict, List
 
 from ..event import Event, EventBase
-from ..protocol import ProtocolType, controller as protocol, get_handler
 from .node import Node
 
 
@@ -11,7 +11,7 @@ class Controller(EventBase):
 
     def __init__(self, state: dict) -> None:
         """Initialize controller."""
-        super().__init__()
+        super().__init__(EventType)
         self.data = state["controller"]
         self.nodes: Dict[int, Node] = {}
         for node_state in state["nodes"]:
@@ -121,9 +121,55 @@ class Controller(EventBase):
                 f"Controller doesn't know how to handle/forward this event: {event.data}"
             )
 
-        protocol_ = cast(ProtocolType, protocol)
-        event_handler = get_handler(protocol_, event)
-        event_handler(self, event)
+        self._handle_event_protocol(event)
 
         event.data["controller"] = self
         self.emit(event.data["event"], event.data)
+
+    def handle_inclusion_failed(self, event: Event) -> None:
+        """Process an inclusion failed event."""
+
+    def handle_exclusion_failed(self, event: Event) -> None:
+        """Process an exclusion failed event."""
+
+    def handle_inclusion_started(self, event: Event) -> None:
+        """Process an inclusion started event."""
+
+    def handle_exclusion_started(self, event: Event) -> None:
+        """Process an exclustion started event."""
+
+    def handle_inclusion_stopped(self, event: Event) -> None:
+        """Process an inclusion stopped event."""
+
+    def handle_exclusion_stopped(self, event: Event) -> None:
+        """Process an exclusion stopped event."""
+
+    def handle_node_added(self, event: Event) -> None:
+        """Process a node added event."""
+        node = event.data["node"] = Node(event.data["node"])
+        self.nodes[node.node_id] = node
+
+    def handle_node_removed(self, event: Event) -> None:
+        """Process a node removed event."""
+        event.data["node"] = self.nodes.pop(event.data["node"]["nodeId"])
+
+    def handle_heal_network_progress(self, event: Event) -> None:
+        """Process a heal network progress event."""
+
+    def handle_heal_network_done(self, event: Event) -> None:
+        """Process a heal network done event."""
+
+
+class EventType(Enum):
+    """Represent a controller event type."""
+
+    INCLUSION_FAILED = "inclusion failed"
+    EXCLUSION_FAILED = "exclusion failed"
+    INCLUSION_STARTED = "inclusion started"
+    EXCLUSION_STARTED = "exclusion started"
+    INCLUSION_STOPPED = "inclusion stopped"
+    EXCLUSION_STOPPED = "exclusion stopped"
+    NODE_ADDED = "node added"
+    NODE_REMOVED = "node removed"
+    HEAL_NETWORK_PROGRESS = "heal network progress"
+    HEAL_NETWORK_DONE = "heal network done"

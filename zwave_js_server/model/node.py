@@ -1,4 +1,5 @@
 """Provide a model for the Z-Wave JS node."""
+from enum import Enum
 from typing import List
 
 from ..event import EventBase
@@ -12,7 +13,7 @@ class Node(EventBase):
 
     def __init__(self, data: dict) -> None:
         """Initialize the node."""
-        super().__init__()
+        super().__init__(EventType)
         self.data = data
         self.values = {value_id(self, val): Value(self, val) for val in data["values"]}
 
@@ -237,3 +238,10 @@ class Node(EventBase):
         event["node"] = self
 
         self.emit(event["event"], event)
+
+
+class EventType(Enum):
+    """Represent a node event type."""
+
+    WAKE_UP = "wake up"
+    # FIXME: Complete node event types.
