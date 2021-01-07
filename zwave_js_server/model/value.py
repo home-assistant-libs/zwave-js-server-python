@@ -1,6 +1,4 @@
-"""Value model."""
-
-
+"""Provide a model for the Z-Wave JS value."""
 from typing import Any, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -16,7 +14,10 @@ def value_id(node: "Node", event: dict) -> str:
 
 
 class ValueMetadata:
+    """Represent metadata on a value instance."""
+
     def __init__(self, data) -> None:
+        """Initialize metadata."""
         self.data = data
 
     @property
@@ -61,7 +62,10 @@ class ValueMetadata:
 
 
 class Value:
+    """Represent a Z-Wave JS value."""
+
     def __init__(self, node: "Node", data: dict) -> None:
+        """Initialize value."""
         self.node = node
         self.data = data
         self._value = data.get("value")
