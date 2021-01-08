@@ -13,7 +13,7 @@ class VersionInfo:
     home_id: int
 
     @classmethod
-    def from_message(cls, msg) -> "VersionInfo":
+    def from_message(cls, msg: dict) -> "VersionInfo":
         """Create a version info from a version message."""
         return cls(
             driver_version=msg["driverVersion"],

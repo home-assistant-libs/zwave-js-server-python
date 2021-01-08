@@ -1,16 +1,54 @@
 """Provide a model for the Z-Wave JS node."""
-from typing import List
+from typing import List, Optional, TypedDict
 
 from ..event import Event, EventBase
-from .device_class import DeviceClass
-from .device_config import DeviceConfig
-from .value import Value, value_id
+from .device_class import DeviceClass, DeviceClassDataType
+from .device_config import DeviceConfig, DeviceConfigDataType
+from .value import Value, ValueDataType, value_id
+
+
+class NodeDataType(TypedDict, total=False):
+    """Represent a node data dict type."""
+
+    nodeId: int  # required
+    name: str
+    location: str
+    status: int  # 0-4  # required
+    deviceClass: DeviceClassDataType  # required
+    zwavePlusVersion: int
+    nodeType: int
+    roleType: int
+    isListening: bool  # required
+    isFrequentListening: bool  # required
+    isRouting: bool  # required
+    maxBaudRate: int  # required
+    isSecure: bool  # required
+    isBeaming: bool  # required
+    version: int  # required
+    firmwareVersion: str  # required
+    manufacturerId: int  # required
+    productId: int  # required
+    productType: int  # required
+    deviceConfig: DeviceConfigDataType
+    neighbors: List[int]  # required
+    keepAwake: bool  # required
+    index: int  # TODO: I can't the below items in the docs.
+    installerIcon: int
+    userIcon: int
+    ready: bool
+    label: str
+    endpointCountIsDynamic: bool
+    endpointsHaveIdenticalCapabilities: bool
+    individualEndpointCount: int
+    aggregatedEndpointCount: int
+    interviewAttempts: int
+    values: List[ValueDataType]
 
 
 class Node(EventBase):
     """Represent a Z-Wave JS node."""
 
-    def __init__(self, data: dict) -> None:
+    def __init__(self, data: NodeDataType) -> None:
         """Initialize the node."""
         super().__init__()
         self.data = data
@@ -19,115 +57,115 @@ class Node(EventBase):
     @property
     def node_id(self) -> int:
         """Return the node_id."""
-        return self.data.get("nodeId")
+        return self.data["nodeId"]
 
     @property
-    def index(self) -> int:
+    def index(self) -> Optional[int]:
         """Return the index."""
         return self.data.get("index")
 
     @property
-    def installer_icon(self) -> int:
+    def installer_icon(self) -> Optional[int]:
         """Return the installer_icon."""
         return self.data.get("installerIcon")
 
     @property
-    def user_icon(self) -> int:
+    def user_icon(self) -> Optional[int]:
         """Return the user_icon."""
         return self.data.get("userIcon")
 
     @property
     def status(self) -> int:
         """Return the status."""
-        return self.data.get("status")
+        return self.data["status"]
 
     @property
-    def ready(self) -> bool:
+    def ready(self) -> Optional[bool]:
         """Return the ready."""
-        return self.data.get("ready")
+        return self.data.get("ready")  # TODO: I can't find ready in the docs.
 
     @property
     def device_class(self) -> DeviceClass:
         """Return the device_class."""
-        return DeviceClass(self.data.get("deviceClass", {}))
+        return DeviceClass(self.data["deviceClass"])
 
     @property
     def is_listening(self) -> bool:
         """Return the is_listening."""
-        return self.data.get("isListening")
+        return self.data["isListening"]
 
     @property
     def is_frequent_listening(self) -> bool:
         """Return the is_frequent_listening."""
-        return self.data.get("isFrequentListening")
+        return self.data["isFrequentListening"]
 
     @property
     def is_routing(self) -> bool:
         """Return the is_routing."""
-        return self.data.get("isRouting")
+        return self.data["isRouting"]
 
     @property
     def max_baud_rate(self) -> int:
         """Return the max_baud_rate."""
-        return self.data.get("maxBaudRate")
+        return self.data["maxBaudRate"]
 
     @property
     def is_secure(self) -> bool:
         """Return the is_secure."""
-        return self.data.get("isSecure")
+        return self.data["isSecure"]
 
     @property
     def version(self) -> int:
         """Return the version."""
-        return self.data.get("version")
+        return self.data["version"]
 
     @property
     def is_beaming(self) -> bool:
         """Return the is_beaming."""
-        return self.data.get("isBeaming")
+        return self.data["isBeaming"]
 
     @property
     def manufacturer_id(self) -> int:
         """Return the manufacturer_id."""
-        return self.data.get("manufacturerId")
+        return self.data["manufacturerId"]
 
     @property
     def product_id(self) -> int:
         """Return the product_id."""
-        return self.data.get("productId")
+        return self.data["productId"]
 
     @property
     def product_type(self) -> int:
         """Return the product_type."""
-        return self.data.get("productType")
+        return self.data["productType"]
 
     @property
     def firmware_version(self) -> str:
         """Return the firmware_version."""
-        return self.data.get("firmwareVersion")
+        return self.data["firmwareVersion"]
 
     @property
-    def zwave_plus_version(self) -> int:
+    def zwave_plus_version(self) -> Optional[int]:
         """Return the zwave_plus_version."""
         return self.data.get("zwavePlusVersion")
 
     @property
-    def node_type(self) -> int:
+    def node_type(self) -> Optional[int]:
         """Return the node_type."""
         return self.data.get("nodeType")
 
     @property
-    def role_type(self) -> int:
+    def role_type(self) -> Optional[int]:
         """Return the role_type."""
         return self.data.get("roleType")
 
     @property
-    def name(self) -> str:
+    def name(self) -> Optional[str]:
         """Return the name."""
         return self.data.get("name")
 
     @property
-    def location(self) -> str:
+    def location(self) -> Optional[str]:
         """Return the location."""
         return self.data.get("location")
 
@@ -137,37 +175,37 @@ class Node(EventBase):
         return DeviceConfig(self.data.get("deviceConfig", {}))
 
     @property
-    def label(self) -> str:
+    def label(self) -> Optional[str]:
         """Return the label."""
         return self.data.get("label")
 
     @property
     def neighbors(self) -> List[int]:
         """Return the neighbors."""
-        return self.data.get("neighbors")
+        return self.data["neighbors"]
 
     @property
-    def endpoint_count_is_dynamic(self) -> bool:
+    def endpoint_count_is_dynamic(self) -> Optional[bool]:
         """Return the endpoint_count_is_dynamic."""
         return self.data.get("endpointCountIsDynamic")
 
     @property
-    def endpoints_have_identical_capabilities(self) -> bool:
+    def endpoints_have_identical_capabilities(self) -> Optional[bool]:
         """Return the endpoints_have_identical_capabilities."""
-        return self.data.get('"endpointsHaveIdenticalCapabilities')
+        return self.data.get("endpointsHaveIdenticalCapabilities")
 
     @property
-    def individual_endpoint_count(self) -> int:
+    def individual_endpoint_count(self) -> Optional[int]:
         """Return the individual_endpoint_count."""
         return self.data.get("individualEndpointCount")
 
     @property
-    def aggregated_endpoint_count(self) -> int:
+    def aggregated_endpoint_count(self) -> Optional[int]:
         """Return the aggregated_endpoint_count."""
         return self.data.get("aggregatedEndpointCount")
 
     @property
-    def interview_attempts(self) -> int:
+    def interview_attempts(self) -> Optional[int]:
         """Return the interview_attempts."""
         return self.data.get("interviewAttempts")
 

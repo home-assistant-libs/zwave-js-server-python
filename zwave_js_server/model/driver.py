@@ -6,7 +6,7 @@ from .controller import Controller
 class Driver(EventBase):
     """Represent a Z-Wave JS driver."""
 
-    def __init__(self, state: dict):
+    def __init__(self, state: dict) -> None:
         """Initialize driver."""
         super().__init__()
         self.controller = Controller(state)

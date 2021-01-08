@@ -4,9 +4,9 @@ import logging
 import pprint
 import random
 import uuid
-from typing import Awaitable, Callable, List, Optional
+from typing import Any, Awaitable, Callable, List, Optional, cast
 
-from aiohttp import ClientSession, WSMsgType, client_exceptions
+from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, client_exceptions
 
 from .event import Event
 from .model.driver import Driver
@@ -54,9 +54,9 @@ class Client:
         self.aiohttp_session = aiohttp_session
         self.driver: Optional[Driver] = None
         # The WebSocket client
-        self.client = None
+        self.client: Optional[ClientWebSocketResponse] = None
         # Scheduled sleep task till next connection retry
-        self.retry_task = None
+        self.retry_task: Optional[asyncio.Task] = None
         # Boolean to indicate if we wanted the connection to close
         self.close_requested = False
         # The current number of attempts to connect, impacts wait time
@@ -67,9 +67,9 @@ class Client:
         self._on_disconnect: List[Callable[[], Awaitable[None]]] = []
         self._on_initialized: List[Callable[[], Awaitable[None]]] = []
         self._logger = logging.getLogger(__package__)
-        self._disconnect_event = None
+        self._disconnect_event: Optional[asyncio.Event] = None
 
-    def async_handle_message(self, msg) -> None:
+    def async_handle_message(self, msg: dict) -> None:
         """Handle incoming message.
 
         Run all async tasks in a wrapper to log appropriately.
@@ -102,24 +102,28 @@ class Client:
         event = Event(type=msg["event"]["event"], data=msg["event"])
         self.driver.receive_event(event)
 
-    def register_on_connect(self, on_connect_cb: Callable[[], Awaitable[None]]):
+    def register_on_connect(self, on_connect_cb: Callable[[], Awaitable[None]]) -> None:
         """Register an async on_connect callback."""
         self._on_connect.append(on_connect_cb)
 
-    def register_on_disconnect(self, on_disconnect_cb: Callable[[], Awaitable[None]]):
+    def register_on_disconnect(
+        self, on_disconnect_cb: Callable[[], Awaitable[None]]
+    ) -> None:
         """Register an async on_disconnect callback."""
         self._on_disconnect.append(on_disconnect_cb)
 
-    def register_on_initialized(self, on_initialized_cb: Callable[[], Awaitable[None]]):
+    def register_on_initialized(
+        self, on_initialized_cb: Callable[[], Awaitable[None]]
+    ) -> None:
         """Register an async on_initialized_cb callback."""
         self._on_initialized.append(on_initialized_cb)
 
     @property
-    def connected(self):
+    def connected(self) -> bool:
         """Return if we're currently connected."""
         return self.state == STATE_CONNECTED
 
-    async def async_send_json_message(self, message):
+    async def async_send_json_message(self, message: Any) -> None:
         """Send a message.
 
         Raises NotConnected if client not connected.
@@ -130,9 +134,10 @@ class Client:
         if self._logger.isEnabledFor(logging.DEBUG):
             self._logger.debug("Publishing message:\n%s\n", pprint.pformat(message))
 
+        assert self.client
         await self.client.send_json(message)
 
-    async def connect(self):
+    async def connect(self) -> None:
         """Connect to the IoT broker."""
         if self.state != STATE_DISCONNECTED:
             raise RuntimeError("Connect called while not disconnected")
@@ -172,7 +177,7 @@ class Client:
         self._disconnect_event.set()
         self._disconnect_event = None
 
-    async def _wait_retry(self):
+    async def _wait_retry(self) -> None:
         """Wait until it's time till the next retry."""
         # Sleep 2^tries + 0…tries*3 seconds between retries
         self.retry_task = asyncio.create_task(
@@ -181,9 +186,9 @@ class Client:
         await self.retry_task
         self.retry_task = None
 
-    async def _handle_connection(
+    async def _handle_connection(  # pylint: disable=too-many-branches, too-many-statements
         self,
-    ):  # pylint: disable=too-many-branches, too-many-statements
+    ) -> None:
         """Connect to the Z-Wave JS server."""
         client = None
         disconnect_warn = None
@@ -234,8 +239,9 @@ class Client:
                 if self._logger.isEnabledFor(logging.DEBUG):
                     self._logger.debug("Received message:\n%s\n", pprint.pformat(msg))
 
+                msg_ = cast(dict, msg)
                 try:
-                    self.async_handle_message(msg)
+                    self.async_handle_message(msg_)
 
                 except InvalidState as err:
                     disconnect_warn = f"Invalid state: {err}"
@@ -261,7 +267,7 @@ class Client:
             else:
                 self._logger.warning("Connection closed: %s", disconnect_warn)
 
-    async def disconnect(self):
+    async def disconnect(self) -> None:
         """Disconnect the client."""
         self.close_requested = True
 

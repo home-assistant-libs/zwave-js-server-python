@@ -1,8 +1,30 @@
 """Provide a model for the Z-Wave JS controller."""
-from typing import Dict, List
+from typing import Dict, List, Optional, TypedDict
 
 from ..event import Event, EventBase
 from .node import Node
+
+
+class ControllerDataType(TypedDict, total=False):
+    """Represent a node data dict type."""
+
+    libraryVersion: str
+    type: int
+    homeId: int
+    ownNodeId: int
+    isSecondary: bool  # TODO: The following items are missing in the docs.
+    isUsingHomeIdFromOtherNetwork: bool
+    isSISPresent: bool
+    wasRealPrimary: bool
+    isStaticUpdateController: bool
+    isSlave: bool
+    serialApiVersion: str
+    manufacturerId: int
+    productType: int
+    productId: int
+    supportedFunctionTypes: List[int]
+    sucNodeId: int
+    supportsTimers: bool
 
 
 class Controller(EventBase):
@@ -11,94 +33,94 @@ class Controller(EventBase):
     def __init__(self, state: dict) -> None:
         """Initialize controller."""
         super().__init__()
-        self.data = state["controller"]
+        self.data: ControllerDataType = state["controller"]
         self.nodes: Dict[int, Node] = {}
         for node_state in state["nodes"]:
             node = Node(node_state)
             self.nodes[node.node_id] = node
 
     @property
-    def library_version(self) -> str:
+    def library_version(self) -> Optional[str]:
         """Return library_version."""
         return self.data.get("libraryVersion")
 
     @property
-    def controller_type(self) -> int:
+    def controller_type(self) -> Optional[int]:
         """Return controller_type."""
         return self.data.get("type")
 
     @property
-    def home_id(self) -> int:
+    def home_id(self) -> Optional[int]:
         """Return home_id."""
         return self.data.get("homeId")
 
     @property
-    def own_node_id(self) -> int:
+    def own_node_id(self) -> Optional[int]:
         """Return own_node_id."""
         return self.data.get("ownNodeId")
 
     @property
-    def is_secondary(self) -> bool:
+    def is_secondary(self) -> Optional[bool]:
         """Return is_secondary."""
-        return self.data.get("isSecondary")
+        return self.data.get("isSecondary")  # TODO: This is missing in the docs.
 
     @property
-    def is_using_home_id_from_other_network(self) -> bool:
+    def is_using_home_id_from_other_network(self) -> Optional[bool]:
         """Return is_using_home_id_from_other_network."""
         return self.data.get("isUsingHomeIdFromOtherNetwork")
 
     @property
-    def is_SIS_present(self) -> bool:  # pylint: disable=invalid-name
+    def is_SIS_present(self) -> Optional[bool]:  # pylint: disable=invalid-name
         """Return is_SIS_present."""
         return self.data.get("isSISPresent")
 
     @property
-    def was_real_primary(self) -> bool:
+    def was_real_primary(self) -> Optional[bool]:
         """Return was_real_primary."""
         return self.data.get("wasRealPrimary")
 
     @property
-    def is_static_update_controller(self) -> bool:
+    def is_static_update_controller(self) -> Optional[bool]:
         """Return is_static_update_controller."""
         return self.data.get("isStaticUpdateController")
 
     @property
-    def is_slave(self) -> bool:
+    def is_slave(self) -> Optional[bool]:
         """Return is_slave."""
         return self.data.get("isSlave")
 
     @property
-    def serial_api_version(self) -> str:
+    def serial_api_version(self) -> Optional[str]:
         """Return serial_api_version."""
         return self.data.get("serialApiVersion")
 
     @property
-    def manufacturer_id(self) -> int:
+    def manufacturer_id(self) -> Optional[int]:
         """Return manufacturer_id."""
         return self.data.get("manufacturerId")
 
     @property
-    def product_type(self) -> int:
+    def product_type(self) -> Optional[int]:
         """Return product_type."""
         return self.data.get("productType")
 
     @property
-    def product_id(self) -> int:
+    def product_id(self) -> Optional[int]:
         """Return product_id."""
         return self.data.get("productId")
 
     @property
-    def supported_function_types(self) -> List[int]:
+    def supported_function_types(self) -> Optional[List[int]]:
         """Return supported_function_types."""
         return self.data.get("supportedFunctionTypes")
 
     @property
-    def suc_node_id(self) -> int:
+    def suc_node_id(self) -> Optional[int]:
         """Return suc_node_id."""
         return self.data.get("sucNodeId")
 
     @property
-    def supports_timers(self) -> bool:
+    def supports_timers(self) -> Optional[bool]:
         """Return supports_timers."""
         return self.data.get("supportsTimers")
 
