@@ -102,7 +102,7 @@ class Client:
         event = Event(type=msg["event"]["event"], data=msg["event"])
         self.driver.receive_event(event)
 
-    def register_on_connect(self, on_connect_cb: Callable[[], Awaitable[None]]) -> None:
+    def register_on_connect(self, on_connect_cb: Callable[[], Awaitable[None]]) -> Callable:
         """Register an async on_connect callback."""
 
         def unsubscribe() -> None:
@@ -115,7 +115,7 @@ class Client:
 
     def register_on_disconnect(
         self, on_disconnect_cb: Callable[[], Awaitable[None]]
-    ) -> None:
+    ) -> Callable:
         """Register an async on_disconnect callback."""
 
         def unsubscribe() -> None:
@@ -128,7 +128,7 @@ class Client:
 
     def register_on_initialized(
         self, on_initialized_cb: Callable[[], Awaitable[None]]
-    ) -> None:
+    ) -> Callable:
         """Register an async on_initialized_cb callback."""
 
         def unsubscribe() -> None:
