@@ -220,8 +220,8 @@ class Node(EventBase):
 
         self.emit(event.type, event.data)
 
-    async def set_value(self, val: Union[Value, str], new_value: Any) -> None:
-        """Send setValue to command to Node for for given value_id."""
+    async def async_set_value(self, val: Union[Value, str], new_value: Any) -> None:
+        """Send setValue command to Node for given value (or value_id)."""
         # a value may be specified as value_id or the value itself
         if not isinstance(val, Value):
             val = self.values[val]
