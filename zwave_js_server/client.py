@@ -104,19 +104,40 @@ class Client:
 
     def register_on_connect(self, on_connect_cb: Callable[[], Awaitable[None]]) -> None:
         """Register an async on_connect callback."""
+
+        def unsubscribe() -> None:
+            """Unsubscribe listeners."""
+            if on_connect_cb in self._on_connect:
+                self._on_connect.remove(on_connect_cb)
+
         self._on_connect.append(on_connect_cb)
+        return unsubscribe
 
     def register_on_disconnect(
         self, on_disconnect_cb: Callable[[], Awaitable[None]]
     ) -> None:
         """Register an async on_disconnect callback."""
+
+        def unsubscribe() -> None:
+            """Unsubscribe listeners."""
+            if on_disconnect_cb in self._on_disconnect:
+                self._on_disconnect.remove(on_disconnect_cb)
+
         self._on_disconnect.append(on_disconnect_cb)
+        return unsubscribe
 
     def register_on_initialized(
         self, on_initialized_cb: Callable[[], Awaitable[None]]
     ) -> None:
         """Register an async on_initialized_cb callback."""
+
+        def unsubscribe() -> None:
+            """Unsubscribe listeners."""
+            if on_initialized_cb in self._on_initialized:
+                self._on_initialized.remove(on_initialized_cb)
+
         self._on_initialized.append(on_initialized_cb)
+        return unsubscribe
 
     @property
     def connected(self) -> bool:
