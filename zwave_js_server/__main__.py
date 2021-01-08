@@ -30,7 +30,7 @@ def get_arguments() -> argparse.Namespace:
     return arguments
 
 
-async def main():
+async def main() -> None:
     """Run main."""
     args = get_arguments()
     async with aiohttp.ClientSession() as session:
@@ -40,7 +40,9 @@ async def main():
             await connect(args, session)
 
 
-async def print_version(args, session):
+async def print_version(
+    args: argparse.Namespace, session: aiohttp.ClientSession
+) -> None:
     """Print the version of the server."""
     version = await get_server_version(args.url, session)
     print("Driver:", version.driver_version)
@@ -48,14 +50,14 @@ async def print_version(args, session):
     print("Home ID:", version.home_id)
 
 
-async def connect(args, session):
+async def connect(args: argparse.Namespace, session: aiohttp.ClientSession) -> None:
     """Connect to the server."""
     client = Client(args.url, session)
     asyncio.create_task(client.connect())
 
     setup = False
 
-    def log_value_updated(event):
+    def log_value_updated(event: dict) -> None:
         node = event["node"]
         value = event["value"]
 
