@@ -102,21 +102,44 @@ class Client:
         event = Event(type=msg["event"]["event"], data=msg["event"])
         self.driver.receive_event(event)
 
-    def register_on_connect(self, on_connect_cb: Callable[[], Awaitable[None]]) -> None:
+    def register_on_connect(
+        self, on_connect_cb: Callable[[], Awaitable[None]]
+    ) -> Callable:
         """Register an async on_connect callback."""
+
+        def unsubscribe() -> None:
+            """Unsubscribe listeners."""
+            if on_connect_cb in self._on_connect:
+                self._on_connect.remove(on_connect_cb)
+
         self._on_connect.append(on_connect_cb)
+        return unsubscribe
 
     def register_on_disconnect(
         self, on_disconnect_cb: Callable[[], Awaitable[None]]
-    ) -> None:
+    ) -> Callable:
         """Register an async on_disconnect callback."""
+
+        def unsubscribe() -> None:
+            """Unsubscribe listeners."""
+            if on_disconnect_cb in self._on_disconnect:
+                self._on_disconnect.remove(on_disconnect_cb)
+
         self._on_disconnect.append(on_disconnect_cb)
+        return unsubscribe
 
     def register_on_initialized(
         self, on_initialized_cb: Callable[[], Awaitable[None]]
-    ) -> None:
+    ) -> Callable:
         """Register an async on_initialized_cb callback."""
+
+        def unsubscribe() -> None:
+            """Unsubscribe listeners."""
+            if on_initialized_cb in self._on_initialized:
+                self._on_initialized.remove(on_initialized_cb)
+
         self._on_initialized.append(on_initialized_cb)
+        return unsubscribe
 
     @property
     def connected(self) -> bool:
@@ -156,15 +179,20 @@ class Client:
                 # Still adding it here to make sure we can always reconnect
                 self._logger.exception("Unexpected error")
 
-            if self.state == STATE_CONNECTED and self._on_disconnect:
-                await gather_callbacks(
-                    self._logger, "on_disconnect", self._on_disconnect
+            if self.state == STATE_CONNECTED:
+                # change state to connecting/disconnected
+                self.state = (
+                    STATE_DISCONNECTED if self.close_requested else STATE_CONNECTING
                 )
+                # notify callbacks about disconnection
+                if self._on_disconnect:
+                    await gather_callbacks(
+                        self._logger, "on_disconnect", self._on_disconnect
+                    )
 
             if self.close_requested:
                 break
 
-            self.state = STATE_CONNECTING
             self.tries += 1
 
             try:
