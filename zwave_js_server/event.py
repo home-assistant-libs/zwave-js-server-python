@@ -35,6 +35,17 @@ class EventBase:
 
         return unsubscribe
 
+    def once(self, event_name: str, callback: Callable) -> Callable:
+        """Listen for an event exactly once."""
+
+        def event_listener(data: dict) -> None:
+            unsub()
+            callback(data)
+
+        unsub = self.on(event_name, event_listener)
+
+        return unsub
+
     def emit(self, event_name: str, data: dict) -> None:
         """Run all callbacks for an event."""
         for listener in self._listeners.get(event_name, []):
