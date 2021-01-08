@@ -1,10 +1,13 @@
 """Provide a model for the Z-Wave JS node."""
-from typing import List, Optional, TypedDict
+from typing import TYPE_CHECKING, Any, List, Optional, TypedDict, Union
 
 from ..event import Event, EventBase
 from .device_class import DeviceClass, DeviceClassDataType
 from .device_config import DeviceConfig, DeviceConfigDataType
 from .value import Value, ValueDataType, value_id
+
+if TYPE_CHECKING:
+    from ..client import Client
 
 
 class NodeDataType(TypedDict, total=False):
@@ -48,9 +51,10 @@ class NodeDataType(TypedDict, total=False):
 class Node(EventBase):
     """Represent a Z-Wave JS node."""
 
-    def __init__(self, data: NodeDataType) -> None:
+    def __init__(self, client: "Client", data: NodeDataType) -> None:
         """Initialize the node."""
         super().__init__()
+        self.client = client
         self.data = data
         self.values = {value_id(self, val): Value(self, val) for val in data["values"]}
 
@@ -215,6 +219,21 @@ class Node(EventBase):
         event.data["node"] = self
 
         self.emit(event.type, event.data)
+
+    async def set_value(self, val: Union[Value, str], new_value: Any) -> None:
+        """Send setValue to command to Node for for given value_id."""
+        # a value may be specified as value_id or the value itself
+        if not isinstance(val, Value):
+            val = self.values[val]
+        # the value object needs to be send to the server
+        await self.client.async_send_json_message(
+            {
+                "command": "node.set_value",
+                "nodeId": self.node_id,
+                "valueId": val.data,
+                "value": new_value,
+            }
+        )
 
     def handle_wake_up(self, event: Event) -> None:
         """Process a node wake up event."""
