@@ -25,7 +25,7 @@ class NodeDataType(TypedDict, total=False):
     isSecure: bool  # required
     isBeaming: bool  # required
     version: int  # required
-    firmwareVersion: str  # required
+    firmwareVersion: str
     manufacturerId: int  # required
     productId: int  # required
     productType: int  # required
@@ -140,9 +140,9 @@ class Node(EventBase):
         return self.data["productType"]
 
     @property
-    def firmware_version(self) -> str:
+    def firmware_version(self) -> Optional[str]:
         """Return the firmware_version."""
-        return self.data["firmwareVersion"]
+        return self.data.get("firmwareVersion")
 
     @property
     def zwave_plus_version(self) -> Optional[int]:
