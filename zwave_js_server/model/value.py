@@ -103,7 +103,7 @@ class Value:
         return self.data.get("endpoint")
 
     @property
-    def property(self) -> str:
+    def property_(self) -> str:
         """Return property."""
         return self.data.get("property")
 
