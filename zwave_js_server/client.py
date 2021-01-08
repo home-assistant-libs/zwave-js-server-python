@@ -177,15 +177,18 @@ class Client:
                 # Still adding it here to make sure we can always reconnect
                 self._logger.exception("Unexpected error")
 
-            if self.state == STATE_CONNECTED and self._on_disconnect:
-                await gather_callbacks(
-                    self._logger, "on_disconnect", self._on_disconnect
-                )
+            if self.state == STATE_CONNECTED:
+                # change state to connecting
+                self.state = STATE_CONNECTING
+                # notify callbacks about disconnection
+                if self._on_disconnect:
+                    await gather_callbacks(
+                        self._logger, "on_disconnect", self._on_disconnect
+                    )
 
             if self.close_requested:
                 break
 
-            self.state = STATE_CONNECTING
             self.tries += 1
 
             try:
