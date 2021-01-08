@@ -4,13 +4,29 @@ Model for a Zwave Node's device config.
 https://zwave-js.github.io/node-zwave-js/#/api/node?id=deviceconfig
 """
 
-from typing import List, Optional
+from typing import Dict, List, Optional, TypedDict
+
+
+class DeviceConfigDataType(TypedDict, total=False):
+    """Represent a device config data dict type."""
+
+    manufacturer: str
+    manufacturerId: str
+    label: str
+    description: str
+    devices: List[Dict[str, str]]
+    firmwareVersion: Dict[str, str]
+    associations: Dict[str, dict]
+    supportsZWavePlus: bool
+    proprietary: dict
+    paramInformation: Dict[str, dict]
+    compat: Dict[str, dict]
 
 
 class DeviceConfig:
     """Model for a Zwave Node's device config."""
 
-    def __init__(self, data: dict) -> None:
+    def __init__(self, data: DeviceConfigDataType) -> None:
         """Initialize."""
         self.data = data
 
@@ -20,7 +36,7 @@ class DeviceConfig:
         return self.data.get("manufacturer")
 
     @property
-    def manufacturer_id(self) -> Optional[str]:
+    def manufacturer_id(self) -> Optional[str]:  # TODO: In the dump this is an int.
         """Return manufacturer id (as defined in the specs) as a 4-digit hexadecimal string."""
         return self.data.get("manufacturerId")
 
@@ -35,17 +51,17 @@ class DeviceConfig:
         return self.data.get("description")
 
     @property
-    def devices(self) -> List[dict]:
+    def devices(self) -> List[Dict[str, str]]:
         """Return list of product type and product ID combinations."""
         return self.data.get("devices", [])
 
     @property
-    def firmware_version(self) -> Optional[dict]:
+    def firmware_version(self) -> Optional[Dict[str, str]]:
         """Return firmware version range this config is valid for."""
         return self.data.get("firmwareVersion")
 
     @property
-    def associations(self) -> Optional[dict]:
+    def associations(self) -> Optional[Dict[str, dict]]:
         """Return association groups the device supports."""
         return self.data.get("associations")
 
@@ -60,11 +76,11 @@ class DeviceConfig:
         return self.data.get("proprietary")
 
     @property
-    def param_information(self) -> Optional[dict]:
+    def param_information(self) -> Optional[Dict[str, dict]]:
         """Return dictionary of the configuration parameters the device supports."""
         return self.data.get("paramInformation")
 
     @property
-    def compat(self) -> Optional[dict]:
+    def compat(self) -> Optional[Dict[str, dict]]:
         """Return compatibility flags."""
         return self.data.get("compat")
