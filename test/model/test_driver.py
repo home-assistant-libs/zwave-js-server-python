@@ -11,7 +11,7 @@ def test_from_state():
     """Test from_state method."""
     ws_msgs = load_fixture("basic_dump.txt").strip().split("\n")
 
-    driver = driver_pkg.Driver(json.loads(ws_msgs[0])["state"])
+    driver = driver_pkg.Driver(None, json.loads(ws_msgs[0])["state"])
 
     for msg in ws_msgs[1:]:
         msg = json.loads(msg)

@@ -1,8 +1,11 @@
 """Provide a model for the Z-Wave JS controller."""
-from typing import Dict, List, Optional, TypedDict
+from typing import TYPE_CHECKING, Dict, List, Optional, TypedDict
 
 from ..event import Event, EventBase
 from .node import Node
+
+if TYPE_CHECKING:
+    from ..client import Client
 
 
 class ControllerDataType(TypedDict, total=False):
@@ -30,13 +33,14 @@ class ControllerDataType(TypedDict, total=False):
 class Controller(EventBase):
     """Represent a Z-Wave JS controller."""
 
-    def __init__(self, state: dict) -> None:
+    def __init__(self, client: "Client", state: dict) -> None:
         """Initialize controller."""
         super().__init__()
+        self.client = client
         self.data: ControllerDataType = state["controller"]
         self.nodes: Dict[int, Node] = {}
         for node_state in state["nodes"]:
-            node = Node(node_state)
+            node = Node(client, node_state)
             self.nodes[node.node_id] = node
 
     @property
@@ -166,7 +170,7 @@ class Controller(EventBase):
 
     def handle_node_added(self, event: Event) -> None:
         """Process a node added event."""
-        node = event.data["node"] = Node(event.data["node"])
+        node = event.data["node"] = Node(self.client, event.data["node"])
         self.nodes[node.node_id] = node
 
     def handle_node_removed(self, event: Event) -> None:

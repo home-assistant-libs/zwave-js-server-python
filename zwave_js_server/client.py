@@ -4,7 +4,7 @@ import logging
 import pprint
 import random
 import uuid
-from typing import Any, Awaitable, Callable, List, Optional, cast
+from typing import Any, Awaitable, Callable, List, Optional, cast, Dict
 
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, client_exceptions
 
@@ -77,7 +77,7 @@ class Client:
         # Right now only result is from receiving state.
         if msg["type"] == "result":
             if self.driver is None:
-                self.driver = Driver(msg["result"]["state"])
+                self.driver = Driver(self, msg["result"]["state"])
                 self._logger.info(
                     "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
                 )
@@ -146,7 +146,9 @@ class Client:
         """Return if we're currently connected."""
         return self.state == STATE_CONNECTED
 
-    async def async_send_json_message(self, message: Any) -> None:
+    async def async_send_json_message(
+        self, message: Dict[str, Any], message_id: str = None
+    ) -> None:
         """Send a message.
 
         Raises NotConnected if client not connected.
@@ -158,6 +160,9 @@ class Client:
             self._logger.debug("Publishing message:\n%s\n", pprint.pformat(message))
 
         assert self.client
+        # include default messageId if needed
+        if message_id is None:
+            message["messageId"] = uuid.uuid4().hex
         await self.client.send_json(message)
 
     async def connect(self) -> None:
@@ -240,9 +245,7 @@ class Client:
             if self._on_connect:
                 await gather_callbacks(self._logger, "on_connect", self._on_connect)
 
-            await client.send_json(
-                {"messageId": uuid.uuid4().hex, "command": "start_listening"}
-            )
+            await self.async_send_json_message({"command": "start_listening"})
 
             while not client.closed:
                 msg = await client.receive()
