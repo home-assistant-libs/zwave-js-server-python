@@ -180,8 +180,8 @@ class Client:
                 self._logger.exception("Unexpected error")
 
             if self.state == STATE_CONNECTED:
-                # change state to connecting
-                self.state = STATE_CONNECTING
+                # change state to connecting/disconnected
+                self.state = STATE_DISCONNECTED if self.close_requested else STATE_CONNECTING
                 # notify callbacks about disconnection
                 if self._on_disconnect:
                     await gather_callbacks(
