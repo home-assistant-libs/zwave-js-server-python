@@ -1,7 +1,7 @@
 """Provide Event base classes for Z-Wave JS."""
 import logging
 from dataclasses import dataclass, field
-from typing import Callable, Dict, List
+from typing import Any, Callable, Dict, List
 
 LOGGER = logging.getLogger(__package__)
 
@@ -37,11 +37,10 @@ class EventBase:
 
     def once(self, event_name: str, callback: Callable) -> Callable:
         """Listen for an event exactly once."""
-        unsub = None
 
-        def event_listener(event):
+        def event_listener(data: dict) -> None:
             unsub()
-            callback(event)
+            callback(data)
 
         unsub = self.on(event_name, event_listener)
 
