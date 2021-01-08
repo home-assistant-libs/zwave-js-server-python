@@ -1,68 +1,98 @@
 """Basic CLI to test Z-Wave JS server."""
+import argparse
 import asyncio
 import logging
-import sys
 
 import aiohttp
 
 from .client import Client
+from .version import get_server_version
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__package__)
 
 
+def get_arguments() -> argparse.Namespace:
+    """Get parsed passed in arguments."""
+
+    parser = argparse.ArgumentParser(description="Z-Wave JS Server Python")
+    parser.add_argument(
+        "--server-version", action="store_true", help="Print the version of the server"
+    )
+    parser.add_argument(
+        "url",
+        type=str,
+        help="URL of server, ie ws://localhost:3000",
+    )
+
+    arguments = parser.parse_args()
+
+    return arguments
+
+
 async def main():
     """Run main."""
-    if len(sys.argv) < 2:
-        print("Error: pass URL to Z-Wave JS server")
-        return
-
+    args = get_arguments()
     async with aiohttp.ClientSession() as session:
-        client = Client(sys.argv[1], session)
-        asyncio.create_task(client.connect())
+        if args.server_version:
+            await print_version(args, session)
+        else:
+            await connect(args, session)
 
-        setup = False
 
-        def log_value_updated(event):
-            node = event["node"]
-            value = event["value"]
+async def print_version(args, session):
+    """Print the version of the server."""
+    version = await get_server_version(args.url, session)
+    print("Driver:", version.driver_version)
+    print("Server:", version.server_version)
+    print("Home ID:", version.home_id)
 
-            if node.device_config:
-                description = node.device_config["description"]
-            else:
-                description = f'{node.device_class["generic"]} (missing device config)'
 
-            logger.info(
-                "Node %s %s (%s) changed to %s",
-                description,
-                value.property_name or "",
-                value.value_id,
-                value.value,
-            )
+async def connect(args, session):
+    """Connect to the server."""
+    client = Client(args.url, session)
+    asyncio.create_task(client.connect())
 
-        while True:
-            try:
-                await asyncio.sleep(0.1)
+    setup = False
 
-                if not setup and client.driver:
-                    setup = True
+    def log_value_updated(event):
+        node = event["node"]
+        value = event["value"]
 
-                    # Set up listeners on new nodes
-                    client.driver.controller.on(
-                        "node added",
-                        lambda event: event["node"].on(
-                            "value updated", log_value_updated
-                        ),
-                    )
+        if node.device_config:
+            description = node.device_config["description"]
+        else:
+            description = f'{node.device_class["generic"]} (missing device config)'
 
-                    # Set up listeners on existing nodes
-                    for node in client.driver.controller.nodes.values():
-                        node.on("value updated", log_value_updated)
-            except KeyboardInterrupt:
-                logger.info("Close requested")
-                break
+        logger.info(
+            "Node %s %s (%s) changed to %s",
+            description,
+            value.property_name or "",
+            value.value_id,
+            value.value,
+        )
 
-        await client.disconnect()
+    while True:
+        try:
+            await asyncio.sleep(0.1)
+
+            if not setup and client.driver:
+                setup = True
+
+                # Set up listeners on new nodes
+                client.driver.controller.on(
+                    "node added",
+                    lambda event: event["node"].on("value updated", log_value_updated),
+                )
+
+                # Set up listeners on existing nodes
+                for node in client.driver.controller.nodes.values():
+                    node.on("value updated", log_value_updated)
+        except KeyboardInterrupt:
+            logger.info("Close requested")
+            break
+
+    await client.disconnect()
 
 
 if __name__ == "__main__":
