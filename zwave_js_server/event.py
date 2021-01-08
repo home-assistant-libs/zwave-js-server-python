@@ -1,7 +1,7 @@
 """Provide Event base classes for Z-Wave JS."""
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List
+from typing import Callable, Dict, List
 
 LOGGER = logging.getLogger(__package__)
 
