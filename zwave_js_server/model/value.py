@@ -11,7 +11,7 @@ def value_id(node: "Node", event: dict) -> str:
     """Return ID of value."""
     command_class = event.get("commandClass")
     endpoint = event.get("endpoint")
-    property_key_name = event.get("propertyKeyName") or event.get("property")
+    property_key_name = event.get("propertyKeyName") or event["property"]
     return f"{node.node_id}-{command_class}-{endpoint}-{property_key_name}"
 
 
