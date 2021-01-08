@@ -18,6 +18,7 @@ class MetaDataType(TypedDict, total=False):
     min: int
     max: int
     unit: str
+    states: Dict[int, str]
     ccSpecific: Dict[str, Any]
 
 
@@ -37,10 +38,9 @@ class ValueDataType(TypedDict, total=False):
 
 def value_id(node: "Node", event_data: ValueDataType) -> str:
     """Return ID of value."""
-    command_class = event_data.get("commandClass")
-    endpoint = event_data.get("endpoint")
-    property_key_name = event_data.get("propertyKeyName")
-    # TODO: Should we really include None items in the f-string below?
+    command_class = event_data["commandClass"]
+    endpoint = event_data.get("endpoint", "00")
+    property_key_name = event_data.get("propertyKeyName") or event_data["property"]
     return f"{node.node_id}-{command_class}-{endpoint}-{property_key_name}"
 
 
@@ -87,6 +87,10 @@ class ValueMetadata:
         return self.data.get("unit")
 
     @property
+    def states(self) -> Optional[dict]:
+        """Return (optional) states."""
+        return self.data.get("states")
+
     def cc_specific(self) -> Optional[Dict[str, Any]]:
         """Return ccSpecific."""
         return self.data.get("ccSpecific")
