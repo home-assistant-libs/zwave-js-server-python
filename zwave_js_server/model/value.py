@@ -18,6 +18,7 @@ class MetaDataType(TypedDict, total=False):
     min: int
     max: int
     unit: str
+    states: Dict[int, str]
     ccSpecific: Dict[str, Any]
 
 
