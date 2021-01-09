@@ -62,9 +62,9 @@ async def connect(args: argparse.Namespace, session: aiohttp.ClientSession) -> N
         value = event["value"]
 
         if node.device_config:
-            description = node.device_config["description"]
+            description = node.device_config.description
         else:
-            description = f'{node.device_class["generic"]} (missing device config)'
+            description = f"{node.device_class.generic} (missing device config)"
 
         logger.info(
             "Node %s %s (%s) changed to %s",
