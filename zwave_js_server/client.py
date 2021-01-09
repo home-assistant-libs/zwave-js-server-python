@@ -4,6 +4,7 @@ import logging
 import pprint
 import random
 import uuid
+from types import TracebackType
 from typing import Any, Awaitable, Callable, Dict, List, Optional, cast
 
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, client_exceptions
@@ -199,6 +200,43 @@ class Client:
         await self.client.send_json(message)
 
     async def connect(self) -> None:
+        """Connect to the websocket server."""
+        client = None
+        self._logger.debug("Trying to connect")
+        try:
+            self.client = client = await self.aiohttp_session.ws_connect(
+                self.ws_server_url,
+                heartbeat=55,
+            )
+            self.tries = 0
+
+            self.version = version = VersionInfo.from_message(
+                await client.receive_json()
+            )
+
+            # basic check for server version compatability
+            self._check_server_version(self.version.server_version)
+
+            self._logger.info(
+                "Connected to Home %s (Server %s, Driver %s)",
+                version.home_id,
+                version.server_version,
+                version.driver_version,
+            )
+            self.state = STATE_CONNECTED
+
+            if self._on_connect:
+                asyncio.create_task(
+                    gather_callbacks(self._logger, "on_connect", self._on_connect)
+                )
+
+        except client_exceptions.WSServerHandshakeError as err:
+            self._logger.warning("Unable to connect: %s", err)
+
+        except client_exceptions.ClientError as err:
+            self._logger.warning("Unable to connect: %s", err)
+
+    async def connect_retry(self) -> None:
         """Connect to the IoT broker."""
         if self.state != STATE_DISCONNECTED:
             raise RuntimeError("Connect called while not disconnected")
@@ -210,7 +248,6 @@ class Client:
 
         while not self.close_requested:
             try:
-                self._logger.debug("Trying to connect")
                 await self._handle_connection()
             except Exception:  # pylint: disable=broad-except
                 # Safety net. This should never hit.
@@ -254,43 +291,23 @@ class Client:
         await self.retry_task
         self.retry_task = None
 
-    async def _handle_connection(  # pylint: disable=too-many-branches, too-many-statements
+    async def _handle_connection(
         self,
     ) -> None:
-        """Connect to the Z-Wave JS server."""
-        client = None
+        """Connect and listen to the Z-Wave JS server."""
+        await self.connect()
+        await self.listen()
+
+    async def listen(self) -> None:  # pylint: disable=too-many-branches,
+        """Start listening to the websocket."""
         disconnect_warn = None
+        assert self.client
+
         try:
-            self.client = client = await self.aiohttp_session.ws_connect(
-                self.ws_server_url,
-                heartbeat=55,
-            )
-            self.tries = 0
-
-            self.version = version = VersionInfo.from_message(
-                await client.receive_json()
-            )
-
-            # basic check for server version compatability
-            self._check_server_version(self.version.server_version)
-
-            self._logger.info(
-                "Connected to Home %s (Server %s, Driver %s)",
-                version.home_id,
-                version.server_version,
-                version.driver_version,
-            )
-            self.state = STATE_CONNECTED
-
-            if self._on_connect:
-                asyncio.create_task(
-                    gather_callbacks(self._logger, "on_connect", self._on_connect)
-                )
-
             loop = asyncio.get_running_loop()
 
-            while not client.closed:
-                msg = await client.receive()
+            while not self.client.closed:
+                msg = await self.client.receive()
 
                 if msg.type in (WSMsgType.CLOSED, WSMsgType.CLOSING):
                     break
@@ -321,7 +338,7 @@ class Client:
 
                 except InvalidState as err:
                     disconnect_warn = f"Invalid state: {err}"
-                    await client.close()
+                    await self.client.close()
                     break
 
                 except Exception:  # pylint: disable=broad-except
@@ -334,20 +351,20 @@ class Client:
         except client_exceptions.ClientError as err:
             self._logger.warning("Unable to connect: %s", err)
 
-        except asyncio.CancelledError:
-            pass
-
         finally:
             if disconnect_warn is None:
-                self._logger.info("Connection closed")
+                self._logger.debug("Stopped listening to connection")
             else:
-                self._logger.warning("Connection closed: %s", disconnect_warn)
+                self._logger.warning(
+                    "Stopped listening to connection: %s", disconnect_warn
+                )
 
     async def disconnect(self) -> None:
         """Disconnect the client."""
         self.close_requested = True
 
         if self.client is not None:
+            self._logger.debug("Closing client connection")
             await self.client.close()
         elif self.retry_task is not None:
             self.retry_task.cancel()
@@ -386,3 +403,14 @@ class Client:
                 "Connected to a Zwave JS Server with an untested version, \
                     you may run into compatibility issues!"
             )
+
+    async def __aenter__(self) -> "Client":
+        """Connect to the websocket."""
+        await self.connect()
+        return self
+
+    async def __aexit__(
+        self, exc_type: Exception, exc_value: str, traceback: TracebackType
+    ) -> None:
+        """Disconnect from the websocket."""
+        await self.disconnect()

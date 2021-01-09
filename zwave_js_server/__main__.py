@@ -6,10 +6,9 @@ import logging
 import aiohttp
 
 from .client import Client
-from .version import get_server_version
 from .dump import dump_msgs
+from .version import get_server_version
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__package__)
 
 
@@ -17,6 +16,7 @@ def get_arguments() -> argparse.Namespace:
     """Get parsed passed in arguments."""
 
     parser = argparse.ArgumentParser(description="Z-Wave JS Server Python")
+    parser.add_argument("--debug", action="store_true", help="Log with debug level")
     parser.add_argument(
         "--server-version", action="store_true", help="Print the version of the server"
     )
@@ -41,6 +41,9 @@ def get_arguments() -> argparse.Namespace:
 async def main() -> None:
     """Run main."""
     args = get_arguments()
+    level = logging.DEBUG if args.debug else logging.INFO
+    logging.basicConfig(level=level)
+
     async with aiohttp.ClientSession() as session:
         if args.server_version:
             await print_version(args, session)
@@ -74,31 +77,38 @@ async def handle_dump_state(
 async def connect(args: argparse.Namespace, session: aiohttp.ClientSession) -> None:
     """Connect to the server."""
     client = Client(args.url, session)
-    asyncio.create_task(client.connect())
+    asyncio.create_task(register_controller_listeners(client))
 
-    def log_value_updated(event: dict) -> None:
-        node = event["node"]
-        value = event["value"]
+    async with client:
+        await client.listen()
 
-        if node.device_config:
-            description = node.device_config.description
-        else:
-            description = f"{node.device_class.generic} (missing device config)"
 
-        logger.info(
-            "Node %s %s (%s) changed to %s",
-            description,
-            value.property_name or "",
-            value.value_id,
-            value.value,
-        )
+def log_value_updated(event: dict) -> None:
+    """Log node value changes."""
+    node = event["node"]
+    value = event["value"]
 
+    if node.device_config:
+        description = node.device_config.description
+    else:
+        description = f"{node.device_class.generic} (missing device config)"
+
+    logger.info(
+        "Node %s %s (%s) changed to %s",
+        description,
+        value.property_name or "",
+        value.value_id,
+        value.value,
+    )
+
+
+async def register_controller_listeners(client: Client) -> None:
+    """Register controller listeners."""
     is_initialized = asyncio.Event()
 
     async def driver_initialized() -> None:
         """Handle driver init."""
-        assert client.driver is not None  # type
-
+        assert client.driver
         # Set up listeners on new nodes
         client.driver.controller.on(
             "node added",
@@ -113,16 +123,7 @@ async def connect(args: argparse.Namespace, session: aiohttp.ClientSession) -> N
 
     client.register_on_initialized(driver_initialized)
 
-    try:
-        await is_initialized.wait()
-
-        while True:
-            await asyncio.sleep(0.1)
-
-    except asyncio.CancelledError:
-        logger.info("Close requested")
-        await client.disconnect()
-        raise
+    await is_initialized.wait()
 
 
 if __name__ == "__main__":
