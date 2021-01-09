@@ -175,7 +175,7 @@ class Client:
         self.tries = 0
         self._disconnect_event = asyncio.Event()
 
-        while True:
+        while not self.close_requested:
             try:
                 self._logger.debug("Trying to connect")
                 await self._handle_connection()

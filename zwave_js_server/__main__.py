@@ -90,12 +90,14 @@ async def connect(args: argparse.Namespace, session: aiohttp.ClientSession) -> N
                 # Set up listeners on existing nodes
                 for node in client.driver.controller.nodes.values():
                     node.on("value updated", log_value_updated)
-        except KeyboardInterrupt:
+        except asyncio.CancelledError:
             logger.info("Close requested")
-            break
-
-    await client.disconnect()
+            await client.disconnect()
+            raise
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        pass
