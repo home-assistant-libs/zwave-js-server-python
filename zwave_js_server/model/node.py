@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any, List, Optional, TypedDict, Union
 from ..event import Event, EventBase
 from .device_class import DeviceClass, DeviceClassDataType
 from .device_config import DeviceConfig, DeviceConfigDataType
-from .value import Value, ValueDataType, value_id
+from .value import Value, ValueDataType, get_value_id
 
 if TYPE_CHECKING:
     from ..client import Client
@@ -56,7 +56,9 @@ class Node(EventBase):
         super().__init__()
         self.client = client
         self.data = data
-        self.values = {value_id(self, val): Value(self, val) for val in data["values"]}
+        self.values = {
+            get_value_id(self, val): Value(self, val) for val in data["values"]
+        }
 
     @property
     def node_id(self) -> int:
@@ -263,11 +265,14 @@ class Node(EventBase):
 
     def handle_value_updated(self, event: Event) -> None:
         """Process a node value updated event."""
-        value = self.values.get(value_id(self, event.data["args"]))
+        value = self.values.get(get_value_id(self, event.data["args"]))
         if value is None:
             # TODO decide how to handle value updated for unknown values
             print()
-            print("Value updated for unknown value", value_id(self, event.data["args"]))
+            print(
+                "Value updated for unknown value",
+                get_value_id(self, event.data["args"]),
+            )
             print("Available value IDs", ", ".join(self.values))
             print()
             value = Value(self, event.data["args"])
@@ -278,7 +283,7 @@ class Node(EventBase):
 
     def handle_value_removed(self, event: Event) -> None:
         """Process a node value removed event."""
-        event.data["value"] = self.values.pop(value_id(self, event.data["args"]))
+        event.data["value"] = self.values.pop(get_value_id(self, event.data["args"]))
 
     def handle_value_notification(self, event: Event) -> None:
         """Process a node value notification event."""
