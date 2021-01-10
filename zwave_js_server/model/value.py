@@ -36,12 +36,13 @@ class ValueDataType(TypedDict, total=False):
     metadata: MetaDataType
 
 
-def value_id(node: "Node", event_data: ValueDataType) -> str:
+def get_value_id(node: "Node", event_data: ValueDataType) -> str:
     """Return ID of value."""
     command_class = event_data["commandClass"]
     endpoint = event_data.get("endpoint", "00")
-    property_key_name = event_data.get("propertyKeyName") or event_data["property"]
-    return f"{node.node_id}-{command_class}-{endpoint}-{property_key_name}"
+    property_ = event_data["property"]
+    property_key_name = event_data.get("propertyKeyName", "00")
+    return f"{node.node_id}-{command_class}-{endpoint}-{property_}-{property_key_name}"
 
 
 class ValueMetadata:
@@ -108,7 +109,7 @@ class Value:
     @property
     def value_id(self) -> str:
         """Return value ID."""
-        return value_id(self.node, self.data)
+        return get_value_id(self.node, self.data)
 
     @property
     def metadata(self) -> ValueMetadata:
