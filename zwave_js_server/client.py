@@ -319,7 +319,7 @@ class Client:
         if self._disconnect_event is not None:
             await self._disconnect_event.wait()
 
-    async def _start_listening(self):
+    async def _start_listening(self) -> None:
         """When connected, start listening."""
         result = await self.async_send_command({"command": "start_listening"})
 
