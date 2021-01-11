@@ -7,3 +7,12 @@ Python library for communicating with zwave-js-server. Goal for this library is 
 ```shell
 python3 -m zwave_js_server ws://localhost:3000/zjs
 ```
+
+## Sending commands
+
+```python
+try:
+    result = await client.async_send_command({ "command": "start_listening" })
+except zwave_js_server.client.FailedCommand as err:
+    print("Command failed with", err.error_code)
+```
