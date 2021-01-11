@@ -68,6 +68,8 @@ class Client:
         self._on_initialized: List[Callable[[], Awaitable[None]]] = []
         self._logger = logging.getLogger(__package__)
         self._disconnect_event: Optional[asyncio.Event] = None
+        self._result_futures: Dict[str, asyncio.Future] = {}
+        self._loop = asyncio.get_running_loop()
 
     def async_handle_message(self, msg: dict) -> None:
         """Handle incoming message.
@@ -76,20 +78,19 @@ class Client:
         """
         # Right now only result is from receiving state.
         if msg["type"] == "result":
-            if self.driver is None:
-                self.driver = Driver(self, msg["result"]["state"])
-                self._logger.info(
-                    "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
-                )
-                asyncio.create_task(
-                    gather_callbacks(
-                        self._logger, "on_initialized", self._on_initialized
-                    )
-                )
-            else:
-                # TODO how do we handle reconnect?
-                pass
+            future = self._result_futures.get(msg["messageId"])
 
+            if future is None:
+                self._logger.warning(
+                    "Received result for unknown message: %s", msg["messageId"]
+                )
+                return
+
+            if msg["success"]:
+                future.set_result(msg["result"])
+                return
+
+            future.set_exception(FailedCommand(msg["messageId"], msg["errorCode"]))
             return
 
         if self.driver is None:
@@ -146,9 +147,18 @@ class Client:
         """Return if we're currently connected."""
         return self.state == STATE_CONNECTED
 
-    async def async_send_json_message(
-        self, message: Dict[str, Any], message_id: str = None
-    ) -> None:
+    async def async_send_command(self, message: Dict[str, Any]) -> dict:
+        """Send a command and get a response."""
+        future = self._loop.create_future()
+        message_id = message["messageId"] = uuid.uuid4().hex
+        self._result_futures[message_id] = future
+        await self.async_send_json_message(message)
+        try:
+            return await future
+        finally:
+            self._result_futures.pop(message_id)
+
+    async def async_send_json_message(self, message: Dict[str, Any]) -> None:
         """Send a message.
 
         Raises NotConnected if client not connected.
@@ -160,8 +170,7 @@ class Client:
             self._logger.debug("Publishing message:\n%s\n", pprint.pformat(message))
 
         assert self.client
-        # include default messageId if needed
-        if message_id is None:
+        if "messageId" not in message:
             message["messageId"] = uuid.uuid4().hex
         await self.client.send_json(message)
 
@@ -245,7 +254,7 @@ class Client:
             if self._on_connect:
                 await gather_callbacks(self._logger, "on_connect", self._on_connect)
 
-            await self.async_send_json_message({"command": "start_listening"})
+            asyncio.create_task(self._start_listening())
 
             while not client.closed:
                 msg = await client.receive()
@@ -309,3 +318,19 @@ class Client:
 
         if self._disconnect_event is not None:
             await self._disconnect_event.wait()
+
+    async def _start_listening(self):
+        """When connected, start listening."""
+        result = await self.async_send_command({"command": "start_listening"})
+
+        if self.driver is None:
+            self.driver = Driver(self, result["state"])
+            self._logger.info(
+                "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
+            )
+            asyncio.create_task(
+                gather_callbacks(self._logger, "on_initialized", self._on_initialized)
+            )
+        else:
+            # TODO how do we handle reconnect?
+            pass
