@@ -149,7 +149,7 @@ class Client:
 
     async def async_send_command(self, message: Dict[str, Any]) -> dict:
         """Send a command and get a response."""
-        future = self._loop.create_future()
+        future: asyncio.Future[dict] = self._loop.create_future()
         message_id = message["messageId"] = uuid.uuid4().hex
         self._result_futures[message_id] = future
         await self.async_send_json_message(message)
