@@ -39,9 +39,9 @@ class ValueDataType(TypedDict, total=False):
 def get_value_id(node: "Node", event_data: ValueDataType) -> str:
     """Return ID of value."""
     command_class = event_data["commandClass"]
-    endpoint = event_data.get("endpoint", "00")
+    endpoint = event_data.get("endpoint") or "00"
     property_ = event_data["property"]
-    property_key_name = event_data.get("propertyKeyName", "00")
+    property_key_name = event_data.get("propertyKeyName") or "00"
     return f"{node.node_id}-{command_class}-{endpoint}-{property_}-{property_key_name}"
 
 
