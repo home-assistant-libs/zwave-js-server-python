@@ -76,7 +76,6 @@ class Client:
 
         Run all async tasks in a wrapper to log appropriately.
         """
-        # Right now only result is from receiving state.
         if msg["type"] == "result":
             future = self._result_futures.get(msg["messageId"])
 
