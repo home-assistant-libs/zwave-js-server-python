@@ -259,8 +259,7 @@ class Node(EventBase):
             }
         )
         return [
-            Value(self, cast(ValueDataType, valueId))
-            for valueId in list(data["valueIds"])
+            Value(self, cast(ValueDataType, valueId)) for valueId in data["valueIds"]
         ]
 
     async def async_get_value_metadata(self, val: Union[Value, str]) -> ValueMetadata:
