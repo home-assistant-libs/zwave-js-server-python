@@ -106,6 +106,10 @@ class Value:
         self.data = data
         self._value = data.get("value")
 
+    def __repr__(self) -> str:
+        """Return the representation."""
+        return f"{type(self).__name__}(value_id={self.value_id})"
+
     @property
     def value_id(self) -> str:
         """Return value ID."""
