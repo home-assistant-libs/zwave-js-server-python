@@ -60,6 +60,10 @@ class Node(EventBase):
             get_value_id(self, val): Value(self, val) for val in data["values"]
         }
 
+    def __repr__(self) -> str:
+        """Return the representation."""
+        return f"{type(self).__name__}(node_id={self.node_id})"
+
     @property
     def node_id(self) -> int:
         """Return the node_id."""
