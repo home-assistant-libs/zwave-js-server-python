@@ -1,7 +1,13 @@
 """Provide a model for the Z-Wave JS controller."""
-from typing import TYPE_CHECKING, Dict, List, Optional, TypedDict, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, TypedDict, cast
 
 from ..event import Event, EventBase
+from .association import (
+    AssociationGroup,
+    AssociationGroupType,
+    Association,
+    AssociationType,
+)
 from .node import Node
 
 if TYPE_CHECKING:
@@ -161,46 +167,34 @@ class Controller(EventBase):
         )
         return bool(data["success"])
 
-    async def async_remove_failed_node(self, node: Union[Node, int]) -> None:
+    async def async_remove_failed_node(self, node_id: int) -> None:
         """Send removeFailedNode command to Controller."""
-        # a node may be specified as node_id or the node itself
-        if not isinstance(node, Node):
-            node = self.nodes[node]
-        # the node object needs to be send to the server
         await self.client.async_send_json_message(
             {
                 "command": "controller.begin_inclusion",
-                "nodeId": node.node_id,
+                "nodeId": node_id,
             }
         )
 
     async def async_replace_failed_node(
-        self, node: Union[Node, int], include_non_secure: Optional[bool] = None
+        self, node_id: int, include_non_secure: Optional[bool] = None
     ) -> bool:
         """Send replaceFailedNode command to Controller."""
-        # a node may be specified as node_id or the node itself
-        if not isinstance(node, Node):
-            node = self.nodes[node]
-        # the node_id needs to be send to the server
         data = await self.client.async_send_command(
             {
                 "command": "controller.begin_inclusion",
-                "nodeId": node.node_id,
+                "nodeId": node_id,
                 "includeNonSecure": include_non_secure,
             }
         )
         return bool(data["success"])
 
-    async def async_heal_node(self, node: Union[Node, int]) -> bool:
+    async def async_heal_node(self, node_id: int) -> bool:
         """Send healNode command to Controller."""
-        # a node may be specified as node_id or the node itself
-        if not isinstance(node, Node):
-            node = self.nodes[node]
-        # the node_id needs to be send to the server
         data = await self.client.async_send_command(
             {
                 "command": "controller.heal_node",
-                "nodeId": node.node_id,
+                "nodeId": node_id,
             }
         )
         return bool(data["success"])
@@ -223,32 +217,90 @@ class Controller(EventBase):
         )
         return bool(data["success"])
 
-    async def async_is_failed_node(self, node: Union[Node, int]) -> bool:
+    async def async_is_failed_node(self, node_id: int) -> bool:
         """Send isFailedNode command to Controller."""
-        # a node may be specified as node_id or the node itself
-        if not isinstance(node, Node):
-            node = self.nodes[node]
-        # the node_id needs to be send to the server
         data = await self.client.async_send_command(
             {
                 "command": "controller.is_failed_node",
-                "nodeId": node.node_id,
+                "nodeId": node_id,
             }
         )
         return bool(data["failed"])
 
-    async def async_remove_node_from_all_assocations(
-        self, node: Union[Node, int]
+    async def async_get_association_groups(
+        self, node_id: int
+    ) -> Dict[int, AssociationGroup]:
+        """Send getAssociationGroups command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.get_association_groups",
+                "nodeId": node_id,
+            }
+        )
+        groups = {}
+        for key, group in data["groups"].items():
+            groups[key] = AssociationGroup(cast(AssociationGroupType, group))
+        return groups
+
+    async def async_get_associations(self, node_id: int) -> Dict[int, Association]:
+        """Send getAssociations command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.get_associations",
+                "nodeId": node_id,
+            }
+        )
+        associations = {}
+        for key, association in data["associations"].items():
+            associations[key] = Association(cast(AssociationType, association))
+        return associations
+
+    async def async_is_association_allowed(
+        self, node_id: int, group: int, association: Association
+    ) -> bool:
+        """Send isAssociationAllowed command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.is_association_allowed",
+                "nodeId": node_id,
+                "group": group,
+                "association": association.data,
+            }
+        )
+        return bool(data["allowed"])
+
+    async def async_add_associations(
+        self, node_id: int, group: int, associations: List[Association]
     ) -> None:
+        """Send addAssociations command to Controller."""
+        await self.client.async_send_json_message(
+            {
+                "command": "controller.add_associations",
+                "nodeId": node_id,
+                "group": group,
+                "associations": [association.data for association in associations],
+            }
+        )
+
+    async def async_remove_associations(
+        self, node_id: int, group: int, associations: List[Association]
+    ) -> None:
+        """Send removeAssociations command to Controller."""
+        await self.client.async_send_json_message(
+            {
+                "command": "controller.remove_associations",
+                "nodeId": node_id,
+                "group": group,
+                "associations": [association.data for association in associations],
+            }
+        )
+
+    async def async_remove_node_from_all_assocations(self, node_id: int) -> None:
         """Send removeNodeFromAllAssocations command to Controller."""
-        # a node may be specified as node_id or the node itself
-        if not isinstance(node, Node):
-            node = self.nodes[node]
-        # the node_id needs to be send to the server
         await self.client.async_send_json_message(
             {
                 "command": "controller.remove_node_from_all_assocations",
-                "nodeId": node.node_id,
+                "nodeId": node_id,
             }
         )
 
