@@ -92,6 +92,7 @@ class ValueMetadata:
         """Return (optional) states."""
         return self.data.get("states")
 
+    @property
     def cc_specific(self) -> Optional[Dict[str, Any]]:
         """Return ccSpecific."""
         return self.data.get("ccSpecific")
