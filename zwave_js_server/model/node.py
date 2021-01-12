@@ -62,7 +62,7 @@ class Node(EventBase):
 
     def __repr__(self) -> str:
         """Return the representation."""
-        return f"{type(self).__name__}(client={self.client}, node_id={self.node_id})"
+        return f"{type(self).__name__}(node_id={self.node_id})"
 
     @property
     def node_id(self) -> int:

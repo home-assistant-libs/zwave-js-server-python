@@ -108,7 +108,7 @@ class Value:
 
     def __repr__(self) -> str:
         """Return the representation."""
-        return f"{type(self).__name__}(value_id={self.value_id})"
+        return f"{type(self).__name__}(value_id={self.value_id!r})"
 
     @property
     def value_id(self) -> str:

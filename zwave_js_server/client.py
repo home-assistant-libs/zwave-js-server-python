@@ -73,7 +73,7 @@ class Client:
 
     def __repr__(self) -> str:
         """Return the representation."""
-        return f"{type(self).__name__}(ws_server_url={self.ws_server_url})"
+        return f"{type(self).__name__}(ws_server_url={self.ws_server_url!r})"
 
     def async_handle_message(self, msg: dict) -> None:
         """Handle incoming message.
