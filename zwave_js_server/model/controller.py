@@ -1,5 +1,5 @@
 """Provide a model for the Z-Wave JS controller."""
-from typing import TYPE_CHECKING, Dict, List, Optional, TypedDict
+from typing import TYPE_CHECKING, Dict, List, Optional, TypedDict, Union
 
 from ..event import Event, EventBase
 from .node import Node
@@ -127,6 +127,130 @@ class Controller(EventBase):
     def supports_timers(self) -> Optional[bool]:
         """Return supports_timers."""
         return self.data.get("supportsTimers")
+
+    async def async_begin_inclusion(
+        self, include_non_secure: Optional[bool] = None
+    ) -> bool:
+        """Send beginInclusion command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.begin_inclusion",
+                "includeNonSecure": include_non_secure,
+            }
+        )
+        return bool(data["success"])
+
+    async def async_stop_inclusion(self) -> bool:
+        """Send stopInclusion command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.stop_inclusion"}
+        )
+        return bool(data["success"])
+
+    async def async_begin_exclusion(self) -> bool:
+        """Send beginExclusion command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.begin_exclusion"}
+        )
+        return bool(data["success"])
+
+    async def async_stop_exclusion(self) -> bool:
+        """Send stopExclusion command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.stop_exclusion"}
+        )
+        return bool(data["success"])
+
+    async def async_remove_failed_node(self, node: Union[Node, int]) -> None:
+        """Send removeFailedNode command to Controller."""
+        # a node may be specified as node_id or the node itself
+        if not isinstance(node, Node):
+            node = self.nodes[node]
+        # the node object needs to be send to the server
+        await self.client.async_send_json_message(
+            {
+                "command": "controller.begin_inclusion",
+                "nodeId": node.node_id,
+            }
+        )
+
+    async def async_replace_failed_node(
+        self, node: Union[Node, int], include_non_secure: Optional[bool] = None
+    ) -> bool:
+        """Send replaceFailedNode command to Controller."""
+        # a node may be specified as node_id or the node itself
+        if not isinstance(node, Node):
+            node = self.nodes[node]
+        # the node_id needs to be send to the server
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.begin_inclusion",
+                "nodeId": node.node_id,
+                "includeNonSecure": include_non_secure,
+            }
+        )
+        return bool(data["success"])
+
+    async def async_heal_node(self, node: Union[Node, int]) -> bool:
+        """Send healNode command to Controller."""
+        # a node may be specified as node_id or the node itself
+        if not isinstance(node, Node):
+            node = self.nodes[node]
+        # the node_id needs to be send to the server
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.heal_node",
+                "nodeId": node.node_id,
+            }
+        )
+        return bool(data["success"])
+
+    async def async_begin_healing_network(self) -> bool:
+        """Send beginHealingNetwork command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.begin_healing_network",
+            }
+        )
+        return bool(data["success"])
+
+    async def async_stop_healing_network(self) -> bool:
+        """Send stopHealingNetwork command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.stop_healing_network",
+            }
+        )
+        return bool(data["success"])
+
+    async def async_is_failed_node(self, node: Union[Node, int]) -> bool:
+        """Send isFailedNode command to Controller."""
+        # a node may be specified as node_id or the node itself
+        if not isinstance(node, Node):
+            node = self.nodes[node]
+        # the node_id needs to be send to the server
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.is_failed_node",
+                "nodeId": node.node_id,
+            }
+        )
+        return bool(data["failed"])
+
+    async def async_remove_node_from_all_assocations(
+        self, node: Union[Node, int]
+    ) -> None:
+        """Send removeNodeFromAllAssocations command to Controller."""
+        # a node may be specified as node_id or the node itself
+        if not isinstance(node, Node):
+            node = self.nodes[node]
+        # the node_id needs to be send to the server
+        await self.client.async_send_json_message(
+            {
+                "command": "controller.remove_node_from_all_assocations",
+                "nodeId": node.node_id,
+            }
+        )
 
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
