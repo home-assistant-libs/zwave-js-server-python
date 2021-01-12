@@ -1,10 +1,10 @@
 """Provide a model for the Z-Wave JS node."""
-from typing import TYPE_CHECKING, Any, List, Optional, TypedDict, Union
+from typing import TYPE_CHECKING, Any, List, Optional, TypedDict, Union, cast
 
 from ..event import Event, EventBase
 from .device_class import DeviceClass, DeviceClassDataType
 from .device_config import DeviceConfig, DeviceConfigDataType
-from .value import Value, ValueDataType, get_value_id, ValueMetadata
+from .value import Value, ValueDataType, ValueMetadata, MetaDataType, get_value_id
 
 if TYPE_CHECKING:
     from ..client import Client
@@ -242,7 +242,7 @@ class Node(EventBase):
         )
 
     async def async_refresh_info(self) -> None:
-        """Send refreshInfo command to Node"""
+        """Send refreshInfo command to Node."""
         await self.client.async_send_json_message(
             {
                 "command": "node.refresh_info",
@@ -251,17 +251,20 @@ class Node(EventBase):
         )
 
     async def async_get_defined_value_ids(self) -> List[Value]:
-        """Send getDefinedValueIDs command to Node"""
+        """Send getDefinedValueIDs command to Node."""
         data = await self.client.async_send_command(
             {
                 "command": "node.get_defined_value_ids",
                 "nodeId": self.node_id,
             }
         )
-        return [Value(valueId) for valueId in data.get("valueIds")]
+        return [
+            Value(self, cast(ValueDataType, valueId))
+            for valueId in list(data["valueIds"])
+        ]
 
     async def async_get_value_metadata(self, val: Union[Value, str]) -> ValueMetadata:
-        """Send getValueMetadata command to Node"""
+        """Send getValueMetadata command to Node."""
         # a value may be specified as value_id or the value itself
         if not isinstance(val, Value):
             val = self.values[val]
@@ -273,10 +276,10 @@ class Node(EventBase):
                 "valueId": val.data,
             }
         )
-        return ValueMetadata(data)
+        return ValueMetadata(cast(MetaDataType, data))
 
     async def async_abort_firmware_update(self) -> None:
-        """Send abortFirmwareUpdate command to Node"""
+        """Send abortFirmwareUpdate command to Node."""
         await self.client.async_send_json_message(
             {
                 "command": "node.abort_firmware_update",
