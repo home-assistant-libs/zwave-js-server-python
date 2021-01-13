@@ -60,18 +60,21 @@ def test_from_state():
     assert node.interview_attempts == 1
 
 
-async def test_set_value(ws_client, node, uuid4):
+async def test_set_value(client, node_multisensor_6):
     """Test set value."""
-    value_id = "52-32-00-targetValue-00"
-    value = node.values[value_id]
-    await node.async_set_value(value_id, 42)
+    client.mock_command(
+        {"command": "node.set_value", "nodeId": node_multisensor_6.node_id},
+        {"success": True},
+    )
 
-    msg = {
+    value_id = "52-32-00-targetValue-00"
+    value = node_multisensor_6.values[value_id]
+    assert await node_multisensor_6.async_set_value(value_id, 42)
+
+    assert len(client.mock_commands) == 1
+    assert client.mock_commands[0] == {
         "command": "node.set_value",
-        "nodeId": node.node_id,
+        "nodeId": node_multisensor_6.node_id,
         "valueId": value.data,
         "value": 42,
-        "messageId": uuid4,
     }
-
-    assert ws_client.send_json.call_args == call(msg)

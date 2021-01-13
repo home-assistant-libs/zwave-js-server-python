@@ -226,13 +226,13 @@ class Node(EventBase):
 
         self.emit(event.type, event.data)
 
-    async def async_set_value(self, val: Union[Value, str], new_value: Any) -> None:
+    async def async_set_value(self, val: Union[Value, str], new_value: Any) -> bool:
         """Send setValue command to Node for given value (or value_id)."""
         # a value may be specified as value_id or the value itself
         if not isinstance(val, Value):
             val = self.values[val]
         # the value object needs to be send to the server
-        await self.client.async_send_json_message(
+        result = await self.client.async_send_command(
             {
                 "command": "node.set_value",
                 "nodeId": self.node_id,
@@ -240,6 +240,7 @@ class Node(EventBase):
                 "value": new_value,
             }
         )
+        return result["success"]
 
     def handle_wake_up(self, event: Event) -> None:
         """Process a node wake up event."""

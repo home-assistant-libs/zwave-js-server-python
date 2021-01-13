@@ -1,5 +1,6 @@
 """Provide common pytest fixtures."""
 import json
+from typing import List, Tuple
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -24,39 +25,38 @@ def multisensor_6_state_fixture():
     return json.loads(load_fixture("multisensor_6_state.json"))
 
 
-@pytest.fixture(name="client_session")
-def client_session_fixture():
-    """Mock an aiohttp client session."""
-    return AsyncMock(spec_set=ClientSession)
+class MockClient(Client):
+    """Mock client."""
 
+    def __init__(self):
+        """Initialize mock client."""
+        super().__init__("ws://test.org", None)
+        self.state = STATE_CONNECTED
+        self.mock_responses: List[Tuple[dict, dict]] = []
+        self.mock_commands = []
 
-@pytest.fixture(name="ws_client")
-def ws_client_fixture():
-    """Mock a websocket client."""
-    return AsyncMock(spec_set=ClientWebSocketResponse)
+    async def async_send_command(self, message):
+        """Send a command and get a response."""
+        for match_command, response in self.mock_responses:
+            if all(message[key] == value for key, value in match_command.items()):
+                self.mock_commands.append(message)
+                return response
 
+        raise RuntimeError("Command not mocked!")
 
-@pytest.fixture(name="uuid4")
-def mock_uuid_fixture():
-    """Patch uuid4."""
-    uuid4_hex = "1234"
-    with patch("uuid.uuid4") as uuid4:
-        uuid4.return_value.hex = uuid4_hex
-        yield uuid4_hex
+    async def async_send_json_message(self, message):
+        """Send JSON message."""
+        raise RuntimeError("Method not mocked!")
+
+    def mock_command(self, match_command: dict, response: dict):
+        """Mock a command."""
+        self.mock_responses.append((match_command, response))
 
 
 @pytest.fixture(name="client")
-async def client_fixture(loop, client_session, ws_client, uuid4):
-    """Return a client with a mock websocket transport.
-
-    This fixture needs to be a coroutine function to get an event loop
-    when creating the client.
-    """
-    client_session.ws_connect.return_value = ws_client
-    client = Client("ws://test.org", client_session)
-    client.state = STATE_CONNECTED
-    client.client = ws_client
-    return client
+async def client_fixture(loop):
+    """Return a client with a mock websocket transport."""
+    return MockClient()
 
 
 @pytest.fixture(name="driver")
@@ -65,7 +65,7 @@ def driver_fixture(client, controller_state):
     return Driver(client, controller_state)
 
 
-@pytest.fixture(name="node")
+@pytest.fixture(name="node_multisensor_6")
 def node_fixture(driver, multisensor_6_state):
     """Return a node instance with a supporting client."""
     node = Node(driver.client, multisensor_6_state)
