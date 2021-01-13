@@ -55,8 +55,6 @@ async def connect(args: argparse.Namespace, session: aiohttp.ClientSession) -> N
     client = Client(args.url, session)
     asyncio.create_task(client.connect())
 
-    setup = False
-
     def log_value_updated(event: dict) -> None:
         node = event["node"]
         value = event["value"]
@@ -74,26 +72,34 @@ async def connect(args: argparse.Namespace, session: aiohttp.ClientSession) -> N
             value.value,
         )
 
-    while True:
-        try:
+    is_initialized = asyncio.Event()
+
+    async def driver_initialized():
+        """Handle driver init."""
+        # Set up listeners on new nodes
+        client.driver.controller.on(
+            "node added",
+            lambda event: event["node"].on("value updated", log_value_updated),
+        )
+
+        # Set up listeners on existing nodes
+        for node in client.driver.controller.nodes.values():
+            node.on("value updated", log_value_updated)
+
+        is_initialized.set()
+
+    client.register_on_initialized(driver_initialized)
+
+    try:
+        await is_initialized.wait()
+
+        while True:
             await asyncio.sleep(0.1)
 
-            if not setup and client.driver:
-                setup = True
-
-                # Set up listeners on new nodes
-                client.driver.controller.on(
-                    "node added",
-                    lambda event: event["node"].on("value updated", log_value_updated),
-                )
-
-                # Set up listeners on existing nodes
-                for node in client.driver.controller.nodes.values():
-                    node.on("value updated", log_value_updated)
-        except asyncio.CancelledError:
-            logger.info("Close requested")
-            await client.disconnect()
-            raise
+    except asyncio.CancelledError:
+        logger.info("Close requested")
+        await client.disconnect()
+        raise
 
 
 if __name__ == "__main__":
