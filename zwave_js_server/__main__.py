@@ -74,8 +74,10 @@ async def connect(args: argparse.Namespace, session: aiohttp.ClientSession) -> N
 
     is_initialized = asyncio.Event()
 
-    async def driver_initialized():
+    async def driver_initialized() -> None:
         """Handle driver init."""
+        assert client.driver is not None  # type
+
         # Set up listeners on new nodes
         client.driver.controller.on(
             "node added",
