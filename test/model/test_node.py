@@ -1,6 +1,5 @@
 """Test the node model."""
 import json
-from unittest.mock import call
 
 from zwave_js_server.model import node as node_pkg
 

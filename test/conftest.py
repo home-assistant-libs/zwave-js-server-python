@@ -1,10 +1,8 @@
 """Provide common pytest fixtures."""
 import json
 from typing import List, Tuple
-from unittest.mock import AsyncMock, patch
 
 import pytest
-from aiohttp import ClientSession, ClientWebSocketResponse
 
 from zwave_js_server.client import STATE_CONNECTED, Client
 from zwave_js_server.model.driver import Driver

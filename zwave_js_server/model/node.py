@@ -240,7 +240,7 @@ class Node(EventBase):
                 "value": new_value,
             }
         )
-        return result["success"]
+        return cast(bool, result["success"])
 
     def handle_wake_up(self, event: Event) -> None:
         """Process a node wake up event."""
