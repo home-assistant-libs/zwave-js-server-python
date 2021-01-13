@@ -5,12 +5,12 @@ import pprint
 import random
 import uuid
 from typing import Any, Awaitable, Callable, List, Optional, cast, Dict
-from zwave_js_server.version import VersionInfo
 
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, client_exceptions
 
 from .event import Event
 from .model.driver import Driver
+from .version import VersionInfo
 
 STATE_CONNECTING = "connecting"
 STATE_CONNECTED = "connected"
