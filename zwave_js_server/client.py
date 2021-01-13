@@ -65,7 +65,7 @@ class Client:
         # Current state of the connection
         self.state = STATE_DISCONNECTED
         # Version of the connected server
-        self.version: VersionInfo = None
+        self.version: Optional[VersionInfo] = None
         self._on_connect: List[Callable[[], Awaitable[None]]] = []
         self._on_disconnect: List[Callable[[], Awaitable[None]]] = []
         self._on_initialized: List[Callable[[], Awaitable[None]]] = []
