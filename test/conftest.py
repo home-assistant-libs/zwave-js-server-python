@@ -1,6 +1,7 @@
 """Provide common pytest fixtures."""
 import json
 from unittest.mock import AsyncMock, patch
+from typing import List, Tuple
 
 import pytest
 from aiohttp import ClientSession, ClientWebSocketResponse
@@ -57,6 +58,41 @@ async def client_fixture(loop, client_session, ws_client, uuid4):
     client.state = STATE_CONNECTED
     client.client = ws_client
     return client
+
+
+@pytest.fixture(name="mock_command")
+def mock_command_fixture(ws_client, client, uuid4):
+    """Mock a command and response."""
+    mock_responses: List[Tuple[dict, dict]] = []
+    ack_commands: List[dict] = []
+
+    def apply_mock_command(match_command: dict, response: dict) -> List[dict]:
+        """Apply the mock command and response return value to the transport.
+
+        Return the list with correctly acknowledged commands.
+        """
+        mock_responses.append((match_command, response))
+        return ack_commands
+
+    async def set_response(message):
+        """Check the message and set the mocked response if a command matches."""
+        for match_command, response in mock_responses:
+            if all(message[key] == value for key, value in match_command.items()):
+                ack_commands.append(message)
+                received_message = {
+                    "type": "result",
+                    "messageId": uuid4,
+                    "result": response,
+                    "success": response["success"],
+                }
+                client.async_handle_message(received_message)
+                return
+
+        raise RuntimeError("Command not mocked!")
+
+    ws_client.send_json.side_effect = set_response
+
+    return apply_mock_command
 
 
 @pytest.fixture(name="driver")
