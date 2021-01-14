@@ -22,6 +22,7 @@ disable=
   locally-disabled,
   too-few-public-methods,
   too-many-public-methods,
+  too-many-instance-attributes,
 
 [REPORTS]
 score=no
