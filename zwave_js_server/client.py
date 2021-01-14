@@ -10,6 +10,7 @@ from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, client_ex
 
 from .event import Event
 from .model.driver import Driver
+from .version import VersionInfo
 
 STATE_CONNECTING = "connecting"
 STATE_CONNECTED = "connected"
@@ -63,6 +64,8 @@ class Client:
         self.tries = 0
         # Current state of the connection
         self.state = STATE_DISCONNECTED
+        # Version of the connected server
+        self.version: Optional[VersionInfo] = None
         self._on_connect: List[Callable[[], Awaitable[None]]] = []
         self._on_disconnect: List[Callable[[], Awaitable[None]]] = []
         self._on_initialized: List[Callable[[], Awaitable[None]]] = []
@@ -244,13 +247,15 @@ class Client:
             )
             self.tries = 0
 
-            version_msg = await client.receive_json()
+            self.version = version = VersionInfo.from_message(
+                await client.receive_json()
+            )
 
             self._logger.info(
                 "Connected to Home %s (Server %s, Driver %s)",
-                version_msg["homeId"],
-                version_msg["serverVersion"],
-                version_msg["driverVersion"],
+                version.home_id,
+                version.server_version,
+                version.driver_version,
             )
             self.state = STATE_CONNECTED
 

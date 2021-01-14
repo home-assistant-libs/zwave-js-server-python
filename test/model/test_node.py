@@ -1,6 +1,5 @@
 """Test the node model."""
 import json
-from unittest.mock import call
 
 from zwave_js_server.model import node as node_pkg
 
@@ -60,18 +59,21 @@ def test_from_state():
     assert node.interview_attempts == 1
 
 
-async def test_set_value(ws_client, node, uuid4):
+async def test_set_value(node, uuid4, mock_command):
     """Test set value."""
+    ack_commands = mock_command(
+        {"command": "node.set_value", "nodeId": node.node_id},
+        {"success": True},
+    )
     value_id = "52-32-00-targetValue-00"
     value = node.values[value_id]
-    await node.async_set_value(value_id, 42)
+    assert await node.async_set_value(value_id, 42)
 
-    msg = {
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
         "command": "node.set_value",
         "nodeId": node.node_id,
         "valueId": value.data,
         "value": 42,
         "messageId": uuid4,
     }
-
-    assert ws_client.send_json.call_args == call(msg)
