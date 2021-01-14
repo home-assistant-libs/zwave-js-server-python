@@ -7,6 +7,7 @@ import pytest
 from aiohttp import ClientSession, ClientWebSocketResponse
 
 from zwave_js_server.client import STATE_CONNECTED, Client
+from zwave_js_server.model.controller import Controller
 from zwave_js_server.model.driver import Driver
 from zwave_js_server.model.node import Node
 
@@ -107,3 +108,10 @@ def node_fixture(driver, multisensor_6_state):
     node = Node(driver.client, multisensor_6_state)
     driver.controller.nodes[node.node_id] = node
     return node
+
+
+@pytest.fixture(name="controller")
+def controller_fixture(driver, controller_state):
+    """Return a controller instance with a supporting client."""
+    controller = Controller(driver.client, controller_state)
+    return controller

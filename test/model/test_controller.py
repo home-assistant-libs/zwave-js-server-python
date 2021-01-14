@@ -1,6 +1,7 @@
 """Test the controller model."""
 import json
-from zwave_js_server.model import controller
+from zwave_js_server.model import association as association_pkg
+from zwave_js_server.model import controller as controller_pkg
 
 from .. import load_fixture
 
@@ -9,7 +10,7 @@ def test_from_state():
     """Test from_state method."""
     state = json.loads(load_fixture("basic_dump.txt").split("\n")[0])["state"]
 
-    ctrl = controller.Controller(None, state)
+    ctrl = controller_pkg.Controller(None, state)
 
     assert ctrl.library_version == "Z-Wave 3.95"
     assert ctrl.controller_type == 1
@@ -103,3 +104,361 @@ def test_from_state():
     ]
     assert ctrl.suc_node_id == 1
     assert ctrl.supports_timers is False
+
+
+async def test_begin_inclusion(controller, uuid4, mock_command):
+    """Test begin inclusion."""
+    ack_commands = mock_command(
+        {"command": "controller.begin_inclusion"},
+        {"success": True},
+    )
+    assert await controller.async_begin_inclusion()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.begin_inclusion",
+        "includeNonSecure": None,
+        "messageId": uuid4,
+    }
+
+
+async def test_stop_inclusion(controller, uuid4, mock_command):
+    """Test stop inclusion."""
+    ack_commands = mock_command(
+        {"command": "controller.stop_inclusion"},
+        {"success": True},
+    )
+    assert await controller.async_stop_inclusion()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.stop_inclusion",
+        "messageId": uuid4,
+    }
+
+
+async def test_begin_exclusion(controller, uuid4, mock_command):
+    """Test begin exclusion."""
+    ack_commands = mock_command(
+        {"command": "controller.begin_exclusion"},
+        {"success": True},
+    )
+    assert await controller.async_begin_exclusion()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.begin_exclusion",
+        "messageId": uuid4,
+    }
+
+
+async def test_stop_exclusion(controller, uuid4, mock_command):
+    """Test stop exclusion."""
+    ack_commands = mock_command(
+        {"command": "controller.stop_exclusion"},
+        {"success": True},
+    )
+    assert await controller.async_stop_exclusion()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.stop_exclusion",
+        "messageId": uuid4,
+    }
+
+
+async def test_remove_failed_node(controller, uuid4, mock_command):
+    """Test remove failed node."""
+    ack_commands = mock_command(
+        {"command": "controller.remove_failed_node"},
+        {},
+    )
+
+    node_id = 52
+    assert await controller.async_remove_failed_node(node_id) is None
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.remove_failed_node",
+        "messageId": uuid4,
+        "nodeId": node_id,
+    }
+
+
+async def test_replace_failed_node(controller, uuid4, mock_command):
+    """Test replace failed node."""
+    ack_commands = mock_command(
+        {"command": "controller.replace_failed_node"},
+        {"success": True},
+    )
+
+    node_id = 52
+    include_non_secure = True
+    assert await controller.async_replace_failed_node(node_id, include_non_secure)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.replace_failed_node",
+        "messageId": uuid4,
+        "nodeId": node_id,
+        "includeNonSecure": include_non_secure,
+    }
+
+
+async def test_heal_node(controller, uuid4, mock_command):
+    """Test heal node."""
+    ack_commands = mock_command(
+        {"command": "controller.heal_node"},
+        {"success": True},
+    )
+
+    node_id = 52
+    assert await controller.async_heal_node(node_id)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.heal_node",
+        "messageId": uuid4,
+        "nodeId": node_id,
+    }
+
+
+async def test_begin_healing_network(controller, uuid4, mock_command):
+    """Test begin healing network."""
+    ack_commands = mock_command(
+        {"command": "controller.begin_healing_network"},
+        {"success": True},
+    )
+
+    assert await controller.async_begin_healing_network()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.begin_healing_network",
+        "messageId": uuid4,
+    }
+
+
+async def test_stop_healing_network(controller, uuid4, mock_command):
+    """Test stop healing network."""
+    ack_commands = mock_command(
+        {"command": "controller.stop_healing_network"},
+        {"success": True},
+    )
+
+    assert await controller.async_stop_healing_network()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.stop_healing_network",
+        "messageId": uuid4,
+    }
+
+
+async def test_is_failed_node(controller, uuid4, mock_command):
+    """Test is failed node."""
+    ack_commands = mock_command(
+        {"command": "controller.is_failed_node"},
+        {"failed": False},
+    )
+
+    node_id = 52
+    assert await controller.async_is_failed_node(node_id) is False
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.is_failed_node",
+        "messageId": uuid4,
+        "nodeId": node_id,
+    }
+
+
+async def test_get_association_groups(controller, uuid4, mock_command):
+    """Test get association groups."""
+
+    issued_commands = {2: [37, 43, 43], 5: [50, 114]}
+
+    ack_commands = mock_command(
+        {"command": "controller.get_association_groups"},
+        {
+            "groups": {
+                1: {
+                    "maxNodes": 10,
+                    "isLifeline": True,
+                    "multiChannel": True,
+                    "label": "Association Group 1",
+                },
+                2: {
+                    "maxNodes": 30,
+                    "isLifeline": False,
+                    "multiChannel": False,
+                    "label": "Association Group 2",
+                    "profile": 2,
+                    "issuedCommands": issued_commands,
+                },
+            }
+        },
+    )
+
+    node_id = 52
+    result = await controller.async_get_association_groups(node_id)
+
+    assert result[1].maxNodes == 10
+    assert result[1].isLifeline is True
+    assert result[1].multiChannel is True
+    assert result[1].label == "Association Group 1"
+    assert result[1].profile is None
+    assert result[1].issuedCommands is None
+
+    assert result[2].maxNodes == 30
+    assert result[2].isLifeline is False
+    assert result[2].multiChannel is False
+    assert result[2].label == "Association Group 2"
+    assert result[2].profile == 2
+    for attr, value in issued_commands.items():
+        assert result[2].issuedCommands[attr] == value
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_association_groups",
+        "messageId": uuid4,
+        "nodeId": node_id,
+    }
+
+
+async def test_get_associations(controller, uuid4, mock_command):
+    """Test get associations."""
+
+    ack_commands = mock_command(
+        {"command": "controller.get_associations"},
+        {
+            "associations": {
+                1: {
+                    "nodeId": 10,
+                },
+                2: {
+                    "nodeId": 30,
+                    "endpoint": 0,
+                },
+            }
+        },
+    )
+
+    node_id = 52
+    result = await controller.async_get_associations(node_id)
+
+    assert result[1].nodeId == 10
+    assert result[1].endpoint is None
+
+    assert result[2].nodeId == 30
+    assert result[2].endpoint == 0
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_associations",
+        "messageId": uuid4,
+        "nodeId": node_id,
+    }
+
+
+async def test_is_association_allowed(controller, uuid4, mock_command):
+    """Test is association allowed."""
+
+    ack_commands = mock_command(
+        {"command": "controller.is_association_allowed"},
+        {"allowed": True},
+    )
+
+    node_id = 52
+    group = 0
+    association = association_pkg.Association(nodeId=5, endpoint=0)
+
+    assert await controller.async_is_association_allowed(node_id, group, association)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.is_association_allowed",
+        "messageId": uuid4,
+        "nodeId": node_id,
+        "group": group,
+        "association": {"nodeId": 5, "endpoint": 0},
+    }
+
+
+async def test_add_associations(controller, uuid4, mock_command):
+    """Test add associations."""
+
+    ack_commands = mock_command(
+        {"command": "controller.add_associations"},
+        {},
+    )
+
+    node_id = 52
+    group = 0
+    associations = [
+        association_pkg.Association(nodeId=5, endpoint=0),
+        association_pkg.Association(nodeId=10),
+    ]
+
+    await controller.async_add_associations(node_id, group, associations)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.add_associations",
+        "messageId": uuid4,
+        "nodeId": node_id,
+        "group": group,
+        "associations": [
+            {"nodeId": 5, "endpoint": 0},
+            {"nodeId": 10, "endpoint": None},
+        ],
+    }
+
+
+async def test_remove_associations(controller, uuid4, mock_command):
+    """Test remove associations."""
+
+    ack_commands = mock_command(
+        {"command": "controller.remove_associations"},
+        {},
+    )
+
+    node_id = 52
+    group = 0
+    associations = [
+        association_pkg.Association(nodeId=5, endpoint=0),
+        association_pkg.Association(nodeId=10),
+    ]
+
+    await controller.async_remove_associations(node_id, group, associations)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.remove_associations",
+        "messageId": uuid4,
+        "nodeId": node_id,
+        "group": group,
+        "associations": [
+            {"nodeId": 5, "endpoint": 0},
+            {"nodeId": 10, "endpoint": None},
+        ],
+    }
+
+
+async def test_remove_node_from_all_assocations(controller, uuid4, mock_command):
+    """Test remove associations."""
+
+    ack_commands = mock_command(
+        {"command": "controller.remove_node_from_all_assocations"},
+        {},
+    )
+
+    node_id = 52
+    await controller.async_remove_node_from_all_assocations(node_id)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.remove_node_from_all_assocations",
+        "messageId": uuid4,
+        "nodeId": node_id,
+    }

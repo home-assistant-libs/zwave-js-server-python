@@ -1,23 +1,25 @@
 """Provide a model for the association."""
-from typing import Dict, List, Optional, TypedDict
+from typing import Dict, List, Optional
 from dataclasses import dataclass
 
 
 @dataclass
-class AssociationGroupType(TypedDict):
+class AssociationGroup:
     """Represent a association group dict type."""
 
     maxNodes: int  # pylint: disable=invalid-name
     isLifeline: bool  # pylint: disable=invalid-name
     multiChannel: bool  # pylint: disable=invalid-name
     label: str
-    profile: Optional[int]
-    issuedCommands: Optional[Dict[int, List[int]]]  # pylint: disable=invalid-name
+    profile: Optional[int] = None
+    issuedCommands: Optional[  # pylint: disable=invalid-name
+        Dict[int, List[int]]
+    ] = None
 
 
 @dataclass
-class AssociationType(TypedDict):
+class Association:
     """Represent a association dict type."""
 
     nodeId: int  # pylint: disable=invalid-name
-    endpoint: Optional[int]
+    endpoint: Optional[int] = None
