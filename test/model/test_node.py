@@ -143,7 +143,7 @@ async def test_get_defined_value_ids(node, uuid4, mock_command):
 
 
 async def test_get_value_metadata(node, uuid4, mock_command):
-    """Test get defined value ids."""
+    """Test get value metadata."""
     ack_commands = mock_command(
         {"command": "node.get_value_metadata", "nodeId": node.node_id},
         {
