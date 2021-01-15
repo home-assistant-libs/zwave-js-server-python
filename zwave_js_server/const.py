@@ -1,5 +1,6 @@
 """Constants for the Z-Wave JS python library."""
 from enum import IntEnum
+from typing import Dict, List
 
 
 class CommandClass(IntEnum):
@@ -130,6 +131,7 @@ class CommandClass(IntEnum):
     ZWAVEPLUS_INFO = 94
 
 
+#Lock constants
 class DoorLockMode(IntEnum):
     """Enum with all (known/used) Z-Wave lock states for CommandClass.DOOR_LOCK."""
 
@@ -156,4 +158,55 @@ LOCK_CMD_CLASS_TO_LOCKED_STATE_MAP = {
 LOCK_CMD_CLASS_TO_PROPERTY_MAP = {
     CommandClass.DOOR_LOCK: "targetMode",
     CommandClass.LOCK: "locked",
+}
+
+
+# Thermostat constants
+class ThermostatMode(IntEnum):
+    """Enum with all (known/used) Z-Wave ThermostatModes."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/ThermostatModeCC.ts#L53-L70
+    OFF = 0
+    HEAT = 1
+    COOL = 2
+    AUTO = 3
+    AUXILIARY = 4
+    RESUME_ON = 5
+    FAN = 6
+    FURNANCE = 7
+    DRY = 8
+    MOIST = 9
+    AUTO_CHANGE_OVER = 10
+    HEATING_ECON = 11
+    COOLING_ECON = 12
+    AWAY = 13
+    FULL_POWER = 15
+    MANUFACTURER_SPECIFIC = 31
+
+
+# In Z-Wave the modes and presets are both in ThermostatMode.
+# This list contains thermostatmodes we should consider a mode only
+MODES_LIST = [
+    ThermostatMode.OFF,
+    ThermostatMode.HEAT,
+    ThermostatMode.COOL,
+    ThermostatMode.AUTO,
+    ThermostatMode.AUTO_CHANGE_OVER,
+]
+
+# https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/ThermostatSetpointCC.ts#L53-L66
+MODE_SETPOINT_MAP: Dict[int, List[str]] = {
+    ThermostatMode.OFF: [],
+    ThermostatMode.HEAT: ["Heating"],
+    ThermostatMode.COOL: ["Cooling"],
+    ThermostatMode.AUTO: ["Heating", "Cooling"],
+    ThermostatMode.AUXILIARY: ["Heating"],
+    ThermostatMode.FURNANCE: ["Furnace"],
+    ThermostatMode.DRY: ["Dry Air"],
+    ThermostatMode.MOIST: ["Moist Air"],
+    ThermostatMode.AUTO_CHANGE_OVER: ["Auto Changeover"],
+    ThermostatMode.HEATING_ECON: ["Energy Save Heating"],
+    ThermostatMode.COOLING_ECON: ["Energy Save Cooling"],
+    ThermostatMode.AWAY: ["Away Heating", "Away Cooling"],
+    ThermostatMode.FULL_POWER: ["Full Power"],
 }
