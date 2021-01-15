@@ -131,11 +131,6 @@ class CommandClass(IntEnum):
     ZWAVEPLUS_INFO = 94
 
 
-# Lock constants
-STATE_LOCKED = "locked"
-STATE_UNLOCKED = "unlocked"
-
-
 class DoorLockMode(IntEnum):
     """Enum with all (known/used) Z-Wave lock states for CommandClass.DOOR_LOCK."""
 
@@ -152,25 +147,14 @@ class DoorLockMode(IntEnum):
 
 # Depending on the Commmand Class being used by the lock, the lock state is
 # different so we need a map to track it
-CMD_CLASS_TO_LOCKED_STATE_MAP = {
+LOCK_CMD_CLASS_TO_LOCKED_STATE_MAP = {
     CommandClass.DOOR_LOCK: DoorLockMode.SECURED,
     CommandClass.LOCK: 1,
 }
 
 # Depending on the Command Class being used by the lock, the locked state property
 # is different so we need a map to track it
-CMD_CLASS_TO_PROPERTY_MAP = {
+LOCK_CMD_CLASS_TO_PROPERTY_MAP = {
     CommandClass.DOOR_LOCK: "targetMode",
     CommandClass.LOCK: "locked",
-}
-
-STATE_TO_ZWAVE_MAP: Dict[int, Dict[str, Union[int, bool]]] = {
-    CommandClass.DOOR_LOCK: {
-        STATE_UNLOCKED: DoorLockMode.UNSECURED,
-        STATE_LOCKED: DoorLockMode.SECURED,
-    },
-    CommandClass.LOCK: {
-        STATE_UNLOCKED: False,
-        STATE_LOCKED: True,
-    },
 }
