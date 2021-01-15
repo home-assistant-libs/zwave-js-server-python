@@ -1,6 +1,5 @@
 """Provide a model for the Z-Wave JS controller."""
 from typing import TYPE_CHECKING, Dict, List, Optional, TypedDict, cast
-from dataclasses import asdict
 
 from ..event import Event, EventBase
 from .association import (
@@ -226,12 +225,12 @@ class Controller(EventBase):
         groups = {}
         for key, group in data["groups"].items():
             groups[key] = AssociationGroup(
-                maxNodes=group["maxNodes"],
-                isLifeline=group["isLifeline"],
-                multiChannel=group["multiChannel"],
+                max_nodes=group["maxNodes"],
+                is_lifeline=group["isLifeline"],
+                multi_channel=group["multiChannel"],
                 label=group["label"],
                 profile=group.get("profile"),
-                issuedCommands=group.get("issuedCommands"),
+                issued_commands=group.get("issuedCommands"),
             )
         return groups
 
@@ -246,7 +245,7 @@ class Controller(EventBase):
         associations = {}
         for key, association in data["associations"].items():
             associations[key] = Association(
-                nodeId=association["nodeId"], endpoint=association.get("endpoint")
+                node_id=association["nodeId"], endpoint=association.get("endpoint")
             )
         return associations
 
@@ -259,7 +258,10 @@ class Controller(EventBase):
                 "command": "controller.is_association_allowed",
                 "nodeId": node_id,
                 "group": group,
-                "association": asdict(association),
+                "association": {
+                    "nodeId": association.node_id,
+                    "endpoint": association.endpoint,
+                },
             }
         )
         return cast(bool, data["allowed"])
@@ -273,7 +275,13 @@ class Controller(EventBase):
                 "command": "controller.add_associations",
                 "nodeId": node_id,
                 "group": group,
-                "associations": [asdict(association) for association in associations],
+                "associations": [
+                    {
+                        "nodeId": association.node_id,
+                        "endpoint": association.endpoint,
+                    }
+                    for association in associations
+                ],
             }
         )
 
@@ -286,7 +294,13 @@ class Controller(EventBase):
                 "command": "controller.remove_associations",
                 "nodeId": node_id,
                 "group": group,
-                "associations": [asdict(association) for association in associations],
+                "associations": [
+                    {
+                        "nodeId": association.node_id,
+                        "endpoint": association.endpoint,
+                    }
+                    for association in associations
+                ],
             }
         )
 

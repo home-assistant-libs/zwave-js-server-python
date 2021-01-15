@@ -303,20 +303,20 @@ async def test_get_association_groups(controller, uuid4, mock_command):
     node_id = 52
     result = await controller.async_get_association_groups(node_id)
 
-    assert result[1].maxNodes == 10
-    assert result[1].isLifeline is True
-    assert result[1].multiChannel is True
+    assert result[1].max_nodes == 10
+    assert result[1].is_lifeline is True
+    assert result[1].multi_channel is True
     assert result[1].label == "Association Group 1"
     assert result[1].profile is None
-    assert result[1].issuedCommands is None
+    assert result[1].issued_commands is None
 
-    assert result[2].maxNodes == 30
-    assert result[2].isLifeline is False
-    assert result[2].multiChannel is False
+    assert result[2].max_nodes == 30
+    assert result[2].is_lifeline is False
+    assert result[2].multi_channel is False
     assert result[2].label == "Association Group 2"
     assert result[2].profile == 2
     for attr, value in issued_commands.items():
-        assert result[2].issuedCommands[attr] == value
+        assert result[2].issued_commands[attr] == value
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
@@ -347,10 +347,10 @@ async def test_get_associations(controller, uuid4, mock_command):
     node_id = 52
     result = await controller.async_get_associations(node_id)
 
-    assert result[1].nodeId == 10
+    assert result[1].node_id == 10
     assert result[1].endpoint is None
 
-    assert result[2].nodeId == 30
+    assert result[2].node_id == 30
     assert result[2].endpoint == 0
 
     assert len(ack_commands) == 1
@@ -371,7 +371,7 @@ async def test_is_association_allowed(controller, uuid4, mock_command):
 
     node_id = 52
     group = 0
-    association = association_pkg.Association(nodeId=5, endpoint=0)
+    association = association_pkg.Association(node_id=5, endpoint=0)
 
     assert await controller.async_is_association_allowed(node_id, group, association)
 
@@ -396,8 +396,8 @@ async def test_add_associations(controller, uuid4, mock_command):
     node_id = 52
     group = 0
     associations = [
-        association_pkg.Association(nodeId=5, endpoint=0),
-        association_pkg.Association(nodeId=10),
+        association_pkg.Association(node_id=5, endpoint=0),
+        association_pkg.Association(node_id=10),
     ]
 
     await controller.async_add_associations(node_id, group, associations)
@@ -426,8 +426,8 @@ async def test_remove_associations(controller, uuid4, mock_command):
     node_id = 52
     group = 0
     associations = [
-        association_pkg.Association(nodeId=5, endpoint=0),
-        association_pkg.Association(nodeId=10),
+        association_pkg.Association(node_id=5, endpoint=0),
+        association_pkg.Association(node_id=10),
     ]
 
     await controller.async_remove_associations(node_id, group, associations)

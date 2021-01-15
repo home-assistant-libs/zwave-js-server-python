@@ -7,19 +7,17 @@ from dataclasses import dataclass
 class AssociationGroup:
     """Represent a association group dict type."""
 
-    maxNodes: int  # pylint: disable=invalid-name
-    isLifeline: bool  # pylint: disable=invalid-name
-    multiChannel: bool  # pylint: disable=invalid-name
+    max_nodes: int
+    is_lifeline: bool
+    multi_channel: bool
     label: str
     profile: Optional[int] = None
-    issuedCommands: Optional[  # pylint: disable=invalid-name
-        Dict[int, List[int]]
-    ] = None
+    issued_commands: Optional[Dict[int, List[int]]] = None
 
 
 @dataclass
 class Association:
     """Represent a association dict type."""
 
-    nodeId: int  # pylint: disable=invalid-name
+    node_id: int
     endpoint: Optional[int] = None
