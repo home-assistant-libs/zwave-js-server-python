@@ -144,7 +144,6 @@ class DoorLockMode(IntEnum):
     UNKNOWN = 254
     SECURED = 255
 
-
 # Depending on the Commmand Class being used by the lock, the lock state is
 # different so we need a map to track it
 LOCK_CMD_CLASS_TO_LOCKED_STATE_MAP = {
