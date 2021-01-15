@@ -128,3 +128,30 @@ class CommandClass(IntEnum):
     ZIP_ND = 88
     ZIP_PORTAL = 97
     ZWAVEPLUS_INFO = 94
+
+class DoorLockMode(IntEnum):
+    """Enum with all (known/used) Z-Wave lock states for CommandClass.DOOR_LOCK."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/DoorLockCC.ts#L56-L65
+    UNSECURED = 0
+    UNSECURED_WITH_TIMEOUT = 1
+    INSIDE_UNSECURED = 2
+    INSIDE_UNSECURED_WITH_TIMEOUT = 3
+    OUTSIDE_UNSECURED = 4
+    OUTSIDE_UNSECURED_WITH_TIMEOUT = 5
+    UNKNOWN = 254
+    SECURED = 255
+
+# Depending on the Commmand Class being used by the lock, the lock state is
+# different so we need a map to track it
+CMD_CLASS_TO_LOCKED_STATE_MAP = {
+    CommandClass.DOOR_LOCK: DoorLockMode.SECURED,
+    CommandClass.LOCK: 1,
+}
+
+# Depending on the Command Class being used by the lock, the locked state property
+# is different so we need a map to track it
+CMD_CLASS_TO_PROPERTY_MAP = {
+    CommandClass.DOOR_LOCK: "targetMode",
+    CommandClass.LOCK: "locked",
+}
