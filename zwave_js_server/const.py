@@ -1,6 +1,5 @@
 """Constants for the Z-Wave JS python library."""
 from enum import IntEnum
-from typing import Dict, Union
 
 
 class CommandClass(IntEnum):
