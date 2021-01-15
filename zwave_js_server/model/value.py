@@ -12,7 +12,7 @@ class MetaDataType(TypedDict, total=False):
 
     type: str  # required
     readable: bool  # required
-    writable: bool  # required
+    writeable: bool  # required
     description: str
     label: str
     min: int
@@ -63,9 +63,9 @@ class ValueMetadata:
         return self.data.get("readable")
 
     @property
-    def writable(self) -> Optional[bool]:
+    def writeable(self) -> Optional[bool]:
         """Return writeable."""
-        return self.data.get("writable")
+        return self.data.get("writeable")
 
     @property
     def label(self) -> Optional[str]:

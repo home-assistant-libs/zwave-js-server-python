@@ -77,3 +77,113 @@ async def test_set_value(node, uuid4, mock_command):
         "value": 42,
         "messageId": uuid4,
     }
+
+
+async def test_refresh_info(node, uuid4, mock_command):
+    """Test refresh info."""
+    ack_commands = mock_command(
+        {"command": "node.refresh_info", "nodeId": node.node_id},
+        {},
+    )
+    assert await node.async_refresh_info() is None
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.refresh_info",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_defined_value_ids(node, uuid4, mock_command):
+    """Test get defined value ids."""
+    ack_commands = mock_command(
+        {"command": "node.get_defined_value_ids", "nodeId": node.node_id},
+        {
+            "valueIds": [
+                {
+                    "commandClassName": "Wake Up",
+                    "commandClass": 132,
+                    "endpoint": 0,
+                    "property": "wakeUpInterval",
+                    "propertyName": "wakeUpInterval",
+                },
+                {
+                    "commandClassName": "Wake Up",
+                    "commandClass": 132,
+                    "endpoint": 0,
+                    "property": "controllerNodeId",
+                    "propertyName": "controllerNodeId",
+                },
+            ]
+        },
+    )
+    result = await node.async_get_defined_value_ids()
+
+    assert len(result) == 2
+
+    assert result[0].command_class_name == "Wake Up"
+    assert result[0].command_class == 132
+    assert result[0].endpoint == 0
+    assert result[0].property_ == "wakeUpInterval"
+    assert result[0].property_name == "wakeUpInterval"
+
+    assert result[1].command_class_name == "Wake Up"
+    assert result[1].command_class == 132
+    assert result[1].endpoint == 0
+    assert result[1].property_ == "controllerNodeId"
+    assert result[1].property_name == "controllerNodeId"
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.get_defined_value_ids",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_value_metadata(node, uuid4, mock_command):
+    """Test get value metadata."""
+    ack_commands = mock_command(
+        {"command": "node.get_value_metadata", "nodeId": node.node_id},
+        {
+            "type": "any",
+            "readable": True,
+            "writeable": False,
+            "label": "Node ID of the controller",
+        },
+    )
+
+    value_id = "52-32-00-targetValue-00"
+    value = node.values[value_id]
+    result = await node.async_get_value_metadata(value)
+
+    assert result.type == "any"
+    assert result.readable is True
+    assert result.writeable is False
+    assert result.label == "Node ID of the controller"
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.get_value_metadata",
+        "nodeId": node.node_id,
+        "valueId": value.data,
+        "messageId": uuid4,
+    }
+
+
+async def test_abort_firmware_update(node, uuid4, mock_command):
+    """Test abort firmware update."""
+    ack_commands = mock_command(
+        {"command": "node.abort_firmware_update", "nodeId": node.node_id},
+        {},
+    )
+
+    assert await node.async_abort_firmware_update() is None
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.abort_firmware_update",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }

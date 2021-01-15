@@ -63,27 +63,29 @@ async def client_fixture(loop, client_session, ws_client, uuid4):
 @pytest.fixture(name="mock_command")
 def mock_command_fixture(ws_client, client, uuid4):
     """Mock a command and response."""
-    mock_responses: List[Tuple[dict, dict]] = []
+    mock_responses: List[Tuple[dict, dict, bool]] = []
     ack_commands: List[dict] = []
 
-    def apply_mock_command(match_command: dict, response: dict) -> List[dict]:
+    def apply_mock_command(
+        match_command: dict, response: dict, success: bool = True
+    ) -> List[dict]:
         """Apply the mock command and response return value to the transport.
 
         Return the list with correctly acknowledged commands.
         """
-        mock_responses.append((match_command, response))
+        mock_responses.append((match_command, response, success))
         return ack_commands
 
     async def set_response(message):
         """Check the message and set the mocked response if a command matches."""
-        for match_command, response in mock_responses:
+        for match_command, response, success in mock_responses:
             if all(message[key] == value for key, value in match_command.items()):
                 ack_commands.append(message)
                 received_message = {
                     "type": "result",
                     "messageId": uuid4,
                     "result": response,
-                    "success": response["success"],
+                    "success": success,
                 }
                 client.async_handle_message(received_message)
                 return
