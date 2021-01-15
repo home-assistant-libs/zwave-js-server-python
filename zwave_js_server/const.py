@@ -1,5 +1,6 @@
 """Constants for the Z-Wave JS python library."""
 from enum import IntEnum
+from typing import Dict, Union
 
 
 class CommandClass(IntEnum):
@@ -129,6 +130,12 @@ class CommandClass(IntEnum):
     ZIP_PORTAL = 97
     ZWAVEPLUS_INFO = 94
 
+
+# Lock constants
+STATE_LOCKED = "locked"
+STATE_UNLOCKED = "unlocked"
+
+
 class DoorLockMode(IntEnum):
     """Enum with all (known/used) Z-Wave lock states for CommandClass.DOOR_LOCK."""
 
@@ -142,6 +149,7 @@ class DoorLockMode(IntEnum):
     UNKNOWN = 254
     SECURED = 255
 
+
 # Depending on the Commmand Class being used by the lock, the lock state is
 # different so we need a map to track it
 CMD_CLASS_TO_LOCKED_STATE_MAP = {
@@ -154,4 +162,15 @@ CMD_CLASS_TO_LOCKED_STATE_MAP = {
 CMD_CLASS_TO_PROPERTY_MAP = {
     CommandClass.DOOR_LOCK: "targetMode",
     CommandClass.LOCK: "locked",
+}
+
+STATE_TO_ZWAVE_MAP: Dict[int, Dict[str, Union[int, bool]]] = {
+    CommandClass.DOOR_LOCK: {
+        STATE_UNLOCKED: DoorLockMode.UNSECURED,
+        STATE_LOCKED: DoorLockMode.SECURED,
+    },
+    CommandClass.LOCK: {
+        STATE_UNLOCKED: False,
+        STATE_LOCKED: True,
+    },
 }
