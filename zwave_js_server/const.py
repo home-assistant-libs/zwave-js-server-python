@@ -186,7 +186,7 @@ class ThermostatMode(IntEnum):
 
 # In Z-Wave the modes and presets are both in ThermostatMode.
 # This list contains thermostatmodes we should consider a mode only
-MODES_LIST = [
+THERMOSTAT_MODES = [
     ThermostatMode.OFF,
     ThermostatMode.HEAT,
     ThermostatMode.COOL,
@@ -195,7 +195,7 @@ MODES_LIST = [
 ]
 
 # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/ThermostatSetpointCC.ts#L53-L66
-MODE_SETPOINT_MAP: Dict[int, List[str]] = {
+THERMOSTAT_MODE_SETPOINT_MAP: Dict[int, List[str]] = {
     ThermostatMode.OFF: [],
     ThermostatMode.HEAT: ["Heating"],
     ThermostatMode.COOL: ["Cooling"],
