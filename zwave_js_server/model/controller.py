@@ -1,7 +1,11 @@
 """Provide a model for the Z-Wave JS controller."""
-from typing import TYPE_CHECKING, Dict, List, Optional, TypedDict
+from typing import TYPE_CHECKING, Dict, List, Optional, TypedDict, cast
 
 from ..event import Event, EventBase
+from .association import (
+    AssociationGroup,
+    Association,
+)
 from .node import Node
 
 if TYPE_CHECKING:
@@ -127,6 +131,187 @@ class Controller(EventBase):
     def supports_timers(self) -> Optional[bool]:
         """Return supports_timers."""
         return self.data.get("supportsTimers")
+
+    async def async_begin_inclusion(
+        self, include_non_secure: Optional[bool] = None
+    ) -> bool:
+        """Send beginInclusion command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.begin_inclusion",
+                "includeNonSecure": include_non_secure,
+            }
+        )
+        return cast(bool, data["success"])
+
+    async def async_stop_inclusion(self) -> bool:
+        """Send stopInclusion command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.stop_inclusion"}
+        )
+        return cast(bool, data["success"])
+
+    async def async_begin_exclusion(self) -> bool:
+        """Send beginExclusion command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.begin_exclusion"}
+        )
+        return cast(bool, data["success"])
+
+    async def async_stop_exclusion(self) -> bool:
+        """Send stopExclusion command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.stop_exclusion"}
+        )
+        return cast(bool, data["success"])
+
+    async def async_remove_failed_node(self, node_id: int) -> None:
+        """Send removeFailedNode command to Controller."""
+        await self.client.async_send_json_message(
+            {"command": "controller.remove_failed_node", "nodeId": node_id}
+        )
+
+    async def async_replace_failed_node(
+        self, node_id: int, include_non_secure: Optional[bool] = None
+    ) -> bool:
+        """Send replaceFailedNode command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.replace_failed_node",
+                "nodeId": node_id,
+                "includeNonSecure": include_non_secure,
+            }
+        )
+        return cast(bool, data["success"])
+
+    async def async_heal_node(self, node_id: int) -> bool:
+        """Send healNode command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.heal_node", "nodeId": node_id}
+        )
+        return cast(bool, data["success"])
+
+    async def async_begin_healing_network(self) -> bool:
+        """Send beginHealingNetwork command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.begin_healing_network"}
+        )
+        return cast(bool, data["success"])
+
+    async def async_stop_healing_network(self) -> bool:
+        """Send stopHealingNetwork command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.stop_healing_network"}
+        )
+        return cast(bool, data["success"])
+
+    async def async_is_failed_node(self, node_id: int) -> bool:
+        """Send isFailedNode command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.is_failed_node", "nodeId": node_id}
+        )
+        return cast(bool, data["failed"])
+
+    async def async_get_association_groups(
+        self, node_id: int
+    ) -> Dict[int, AssociationGroup]:
+        """Send getAssociationGroups command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.get_association_groups",
+                "nodeId": node_id,
+            }
+        )
+        groups = {}
+        for key, group in data["groups"].items():
+            groups[key] = AssociationGroup(
+                max_nodes=group["maxNodes"],
+                is_lifeline=group["isLifeline"],
+                multi_channel=group["multiChannel"],
+                label=group["label"],
+                profile=group.get("profile"),
+                issued_commands=group.get("issuedCommands"),
+            )
+        return groups
+
+    async def async_get_associations(self, node_id: int) -> Dict[int, Association]:
+        """Send getAssociations command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.get_associations",
+                "nodeId": node_id,
+            }
+        )
+        associations = {}
+        for key, association in data["associations"].items():
+            associations[key] = Association(
+                node_id=association["nodeId"], endpoint=association.get("endpoint")
+            )
+        return associations
+
+    async def async_is_association_allowed(
+        self, node_id: int, group: int, association: Association
+    ) -> bool:
+        """Send isAssociationAllowed command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.is_association_allowed",
+                "nodeId": node_id,
+                "group": group,
+                "association": {
+                    "nodeId": association.node_id,
+                    "endpoint": association.endpoint,
+                },
+            }
+        )
+        return cast(bool, data["allowed"])
+
+    async def async_add_associations(
+        self, node_id: int, group: int, associations: List[Association]
+    ) -> None:
+        """Send addAssociations command to Controller."""
+        await self.client.async_send_json_message(
+            {
+                "command": "controller.add_associations",
+                "nodeId": node_id,
+                "group": group,
+                "associations": [
+                    {
+                        "nodeId": association.node_id,
+                        "endpoint": association.endpoint,
+                    }
+                    for association in associations
+                ],
+            }
+        )
+
+    async def async_remove_associations(
+        self, node_id: int, group: int, associations: List[Association]
+    ) -> None:
+        """Send removeAssociations command to Controller."""
+        await self.client.async_send_json_message(
+            {
+                "command": "controller.remove_associations",
+                "nodeId": node_id,
+                "group": group,
+                "associations": [
+                    {
+                        "nodeId": association.node_id,
+                        "endpoint": association.endpoint,
+                    }
+                    for association in associations
+                ],
+            }
+        )
+
+    async def async_remove_node_from_all_assocations(self, node_id: int) -> None:
+        """Send removeNodeFromAllAssocations command to Controller."""
+        await self.client.async_send_json_message(
+            {
+                "command": "controller.remove_node_from_all_assocations",
+                "nodeId": node_id,
+            }
+        )
 
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
