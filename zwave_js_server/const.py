@@ -131,7 +131,7 @@ class CommandClass(IntEnum):
     ZWAVEPLUS_INFO = 94
 
 
-#Lock constants
+# Lock constants
 class DoorLockMode(IntEnum):
     """Enum with all (known/used) Z-Wave lock states for CommandClass.DOOR_LOCK."""
 
