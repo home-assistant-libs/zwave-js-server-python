@@ -1,6 +1,4 @@
 """Test lock utility functions."""
-from unittest.mock import patch
-
 import pytest
 
 from zwave_js_server.const import ATTR_USERCODE

@@ -14,7 +14,7 @@ from ..model.node import Node
 from ..model.value import get_value_id, Value
 
 
-def get_code_slot_value(node: Node, code_slot: int) -> Optional[Value]:
+def get_code_slot_value(node: Node, code_slot: int) -> Value:
     """Get a value."""
     value = node.values.get(
         get_value_id(
@@ -37,8 +37,8 @@ def _get_code_slots(
     node: Node, include_usercode: bool = False
 ) -> List[Dict[str, Optional[Union[int, bool, str]]]]:
     """Get all code slots on the lock and optionally include usercode."""
-    code_slot = 1
-    slots = []
+    code_slot: int = 1
+    slots: List[Dict[str, Optional[Union[int, bool, str]]]] = []
 
     # Loop until we can't find a code slot
     while True:
