@@ -44,20 +44,21 @@ def _get_code_slots(
     while True:
         try:
             value = get_code_slot_value(node, code_slot)
-            # we know that code slots will always have a property key
-            # that is an int, so we can ignore mypy
-            slot = {
-                ATTR_CODE_SLOT: int(value.property_key),  # type: ignore
-                ATTR_NAME: value.metadata.label,
-                ATTR_IN_USE: bool(value.value),
-            }
-            if include_usercode:
-                slot[ATTR_USERCODE] = value.value if value.value else None
-
-            slots.append(slot)
-            code_slot += 1
         except NotFoundError:
             return slots
+
+        # we know that code slots will always have a property key
+        # that is an int, so we can ignore mypy
+        slot = {
+            ATTR_CODE_SLOT: int(value.property_key),  # type: ignore
+            ATTR_NAME: value.metadata.label,
+            ATTR_IN_USE: bool(value.value),
+        }
+        if include_usercode:
+            slot[ATTR_USERCODE] = value.value if value.value else None
+
+        slots.append(slot)
+        code_slot += 1
 
 
 def get_code_slots(node: Node) -> List[Dict[str, Optional[Union[int, bool, str]]]]:
