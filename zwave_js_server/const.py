@@ -1,5 +1,5 @@
 """Constants for the Z-Wave JS python library."""
-from enum import IntEnum
+from enum import Enum, IntEnum
 from typing import Dict, List
 
 
@@ -163,6 +163,8 @@ LOCK_CMD_CLASS_TO_PROPERTY_MAP = {
 
 # Thermostat constants
 THERMOSTAT_SETPOINT_PROPERTY = "setpoint"
+THERMOSTAT_OPERATING_STATE_PROPERTY = "state"
+THERMOSTAT_CURRENT_TEMP_PROPERTY = "Air temperature"
 
 
 class ThermostatMode(IntEnum):
@@ -187,8 +189,8 @@ class ThermostatMode(IntEnum):
     MANUFACTURER_SPECIFIC = 31
 
 
-class ThermostatOperatingMode(IntEnum):
-    """Enum with all (known/used) Z-Wave Thermostat OperatingModes."""
+class ThermostatOperatingState(IntEnum):
+    """Enum with all (known/used) Z-Wave Thermostat OperatingStates."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/ThermostatOperatingStateCC.ts#L38-L51
     IDLE = 0
@@ -205,6 +207,24 @@ class ThermostatOperatingMode(IntEnum):
     THIRD_STAGE_AUX_HEAT = 11
 
 
+class ThermostatSetpointType(Enum):
+    """Enum with all (known/used) Z-Wave Thermostat Setpoint Types."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/ThermostatSetpointCC.ts#L53-L66
+    NA = "N/A"
+    HEATING = "Heating"
+    COOLING = "Cooling"
+    FURNACE = "Furnace"
+    DRY_AIR = "Dry Air"
+    MOIST_AIR = "Moist Air"
+    AUTO_CHANGEOVER = "Auto Changeover"
+    ENERGY_SAVE_HEATING = "Energy Save Heating"
+    ENERGY_SAVE_COOLING = "Energy Save Cooling"
+    AWAY_HEATING = "Away Heating"
+    AWAY_COOLING = "Away Cooling"
+    FULL_POWER = "Full Power"
+
+
 # In Z-Wave the modes and presets are both in ThermostatMode.
 # This list contains thermostatmodes we should consider a mode only
 THERMOSTAT_MODES = [
@@ -215,19 +235,24 @@ THERMOSTAT_MODES = [
     ThermostatMode.AUTO_CHANGE_OVER,
 ]
 
-# https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/ThermostatSetpointCC.ts#L53-L66
-THERMOSTAT_MODE_SETPOINT_MAP: Dict[int, List[str]] = {
+THERMOSTAT_MODE_SETPOINT_MAP: Dict[int, List[ThermostatSetpointType]] = {
     ThermostatMode.OFF: [],
-    ThermostatMode.HEAT: ["Heating"],
-    ThermostatMode.COOL: ["Cooling"],
-    ThermostatMode.AUTO: ["Heating", "Cooling"],
-    ThermostatMode.AUXILIARY: ["Heating"],
-    ThermostatMode.FURNANCE: ["Furnace"],
-    ThermostatMode.DRY: ["Dry Air"],
-    ThermostatMode.MOIST: ["Moist Air"],
-    ThermostatMode.AUTO_CHANGE_OVER: ["Auto Changeover"],
-    ThermostatMode.HEATING_ECON: ["Energy Save Heating"],
-    ThermostatMode.COOLING_ECON: ["Energy Save Cooling"],
-    ThermostatMode.AWAY: ["Away Heating", "Away Cooling"],
-    ThermostatMode.FULL_POWER: ["Full Power"],
+    ThermostatMode.HEAT: [ThermostatSetpointType.HEATING],
+    ThermostatMode.COOL: [ThermostatSetpointType.COOLING],
+    ThermostatMode.AUTO: [
+        ThermostatSetpointType.HEATING,
+        ThermostatSetpointType.COOLING,
+    ],
+    ThermostatMode.AUXILIARY: [ThermostatSetpointType.HEATING],
+    ThermostatMode.FURNANCE: [ThermostatSetpointType.FURNACE],
+    ThermostatMode.DRY: [ThermostatSetpointType.DRY_AIR],
+    ThermostatMode.MOIST: [ThermostatSetpointType.MOIST_AIR],
+    ThermostatMode.AUTO_CHANGE_OVER: [ThermostatSetpointType.AUTO_CHANGEOVER],
+    ThermostatMode.HEATING_ECON: [ThermostatSetpointType.ENERGY_SAVE_HEATING],
+    ThermostatMode.COOLING_ECON: [ThermostatSetpointType.ENERGY_SAVE_COOLING],
+    ThermostatMode.AWAY: [
+        ThermostatSetpointType.AWAY_HEATING,
+        ThermostatSetpointType.AWAY_COOLING,
+    ],
+    ThermostatMode.FULL_POWER: [ThermostatSetpointType.FULL_POWER],
 }
