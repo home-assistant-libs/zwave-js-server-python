@@ -160,6 +160,12 @@ LOCK_CMD_CLASS_TO_PROPERTY_MAP = {
     CommandClass.LOCK: "locked",
 }
 
+LOCK_USERCODE_PROPERTY = "userCode"
+ATTR_CODE_SLOT = "code_slot"
+ATTR_IN_USE = "in_use"
+ATTR_NAME = "name"
+ATTR_USERCODE = "usercode"
+
 
 # Thermostat constants
 THERMOSTAT_SETPOINT_PROPERTY = "setpoint"

@@ -1,7 +1,7 @@
 """Provide common pytest fixtures."""
 import json
-from unittest.mock import AsyncMock, patch
 from typing import List, Tuple
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from aiohttp import ClientSession, ClientWebSocketResponse
@@ -24,6 +24,12 @@ def controller_state_fixture():
 def multisensor_6_state_fixture():
     """Load the multisensor 6 node state fixture data."""
     return json.loads(load_fixture("multisensor_6_state.json"))
+
+
+@pytest.fixture(name="lock_schlage_be469_state", scope="session")
+def lock_schlage_be469_state_fixture():
+    """Load the schlage lock node state fixture data."""
+    return json.loads(load_fixture("lock_schlage_be469_state.json"))
 
 
 @pytest.fixture(name="client_session")
@@ -108,6 +114,14 @@ def driver_fixture(client, controller_state):
 def node_fixture(driver, multisensor_6_state):
     """Return a node instance with a supporting client."""
     node = Node(driver.client, multisensor_6_state)
+    driver.controller.nodes[node.node_id] = node
+    return node
+
+
+@pytest.fixture(name="lock_schlage_be469")
+def lock_schlage_be469_fixture(driver, lock_schlage_be469_state):
+    """Mock a schlage lock node."""
+    node = Node(driver.client, lock_schlage_be469_state)
     driver.controller.nodes[node.node_id] = node
     return node
 

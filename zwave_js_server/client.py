@@ -4,7 +4,7 @@ import logging
 import pprint
 import random
 import uuid
-from typing import Any, Awaitable, Callable, List, Optional, cast, Dict
+from typing import Any, Awaitable, Callable, Dict, List, Optional, cast
 
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, client_exceptions
 
