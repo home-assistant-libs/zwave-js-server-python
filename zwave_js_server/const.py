@@ -162,6 +162,9 @@ LOCK_CMD_CLASS_TO_PROPERTY_MAP = {
 
 
 # Thermostat constants
+THERMOSTAT_SETPOINT_PROPERTY = "setpoint"
+
+
 class ThermostatMode(IntEnum):
     """Enum with all (known/used) Z-Wave ThermostatModes."""
 
@@ -182,6 +185,24 @@ class ThermostatMode(IntEnum):
     AWAY = 13
     FULL_POWER = 15
     MANUFACTURER_SPECIFIC = 31
+
+
+class ThermostatOperatingMode(IntEnum):
+    """Enum with all (known/used) Z-Wave Thermostat OperatingModes."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/ThermostatOperatingStateCC.ts#L38-L51
+    IDLE = 0
+    HEATING = 1
+    COOLING = 2
+    FAN_ONLY = 3
+    PENDING_HEAT = 4
+    PENDING_COOL = 5
+    VENT_ECONOMIZER = 6
+    AUX_HEATING = 7
+    SECOND_STAGE_HEATING = 8
+    SECOND_STAGE_COOLING = 9
+    SECOND_STAGE_AUX_HEAT = 10
+    THIRD_STAGE_AUX_HEAT = 11
 
 
 # In Z-Wave the modes and presets are both in ThermostatMode.
