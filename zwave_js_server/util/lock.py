@@ -16,7 +16,7 @@ from ..model.value import get_value_id
 
 def _get_code_slots(
     node: Node, include_usercode: bool = False
-) -> List[Dict[str, Union[int, bool, str]]]:
+) -> List[Dict[str, Optional[Union[int, bool, str]]]]:
     """Get all code slots on the lock and optionally include usercode."""
     code_slot = 1
     slots = []
@@ -47,7 +47,7 @@ def _get_code_slots(
             return slots
 
 
-def get_code_slots(node: Node) -> List[Dict[str, Union[int, bool, str]]]:
+def get_code_slots(node: Node) -> List[Dict[str, Optional[Union[int, bool, str]]]]:
     """Get all code slots on the lock and whether or not they are used."""
     return _get_code_slots(node, False)
 
