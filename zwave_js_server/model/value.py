@@ -83,6 +83,16 @@ class ValueMetadata:
         return self.data.get("max")
 
     @property
+    def min_length(self) -> Optional[int]:
+        """Return minLength."""
+        return self.data.get("minLength")
+
+    @property
+    def max_length(self) -> Optional[int]:
+        """Return maxLength."""
+        return self.data.get("maxLength")
+
+    @property
     def unit(self) -> Optional[str]:
         """Return unit."""
         return self.data.get("unit")
