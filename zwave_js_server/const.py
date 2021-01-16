@@ -189,8 +189,8 @@ class ThermostatMode(IntEnum):
     MANUFACTURER_SPECIFIC = 31
 
 
-class ThermostatOperatingMode(IntEnum):
-    """Enum with all (known/used) Z-Wave Thermostat OperatingModes."""
+class ThermostatOperatingState(IntEnum):
+    """Enum with all (known/used) Z-Wave Thermostat OperatingStates."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/ThermostatOperatingStateCC.ts#L38-L51
     IDLE = 0
@@ -208,7 +208,7 @@ class ThermostatOperatingMode(IntEnum):
 
 
 class ThermostatSetpointType(Enum):
-    """Enuam with all (known/used) Z-Wave Thermostat Setpoint Types."""
+    """Enum with all (known/used) Z-Wave Thermostat Setpoint Types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/ThermostatSetpointCC.ts#L53-L66
     NA = "N/A"
