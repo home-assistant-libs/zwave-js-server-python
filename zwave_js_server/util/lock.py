@@ -16,13 +16,21 @@ from ..model.value import get_value_id, Value
 
 def get_code_slot_value(node: Node, code_slot: int) -> Optional[Value]:
     """Get a value."""
-    event_data = {
-        "commandClass": CommandClass.USER_CODE,
-        "property": LOCK_USERCODE_PROPERTY,
-        "propertyKeyName": str(code_slot),
-    }
+    value = node.values.get(
+        get_value_id(
+            node,
+            {
+                "commandClass": CommandClass.USER_CODE,
+                "property": LOCK_USERCODE_PROPERTY,
+                "propertyKeyName": str(code_slot),
+            },
+        )
+    )
 
-    return node.values.get(get_value_id(node, event_data))
+    if not value:
+        raise NotFoundError(f"Code slot {code_slot} not found")
+
+    return value
 
 
 def _get_code_slots(
@@ -34,8 +42,8 @@ def _get_code_slots(
 
     # Loop until we can't find a code slot
     while True:
-        value = get_code_slot_value(node, code_slot)
-        if value:
+        try:
+            value = get_code_slot_value(node, code_slot)
             # we know that code slots will always have a property key
             # that is an int, so we can ignore mypy
             slot = {
@@ -48,7 +56,7 @@ def _get_code_slots(
 
             slots.append(slot)
             code_slot += 1
-        else:
+        except NotFoundError:
             return slots
 
 
@@ -66,18 +74,12 @@ def get_usercode(node: Node, code_slot: int) -> Optional[str]:
     """Get usercode from slot X on the lock."""
     value = get_code_slot_value(node, code_slot)
 
-    if not value:
-        raise NotFoundError(f"Code slot {code_slot} not found")
-
     return str(value.value) if value.value else None
 
 
 async def set_usercode(node: Node, code_slot: int, usercode: str) -> None:
     """Set the usercode to index X on the lock."""
     value = get_code_slot_value(node, code_slot)
-
-    if not value:
-        raise NotFoundError(f"Code slot {code_slot} not found")
 
     if len(str(usercode)) < 4:
         raise ValueError("User code must be at least 4 digits")
