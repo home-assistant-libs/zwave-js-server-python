@@ -37,7 +37,7 @@ def test_get_usercode(lock_schlage_be469):
 
     # Test in use slot
     user_code = get_usercode(node, 1)
-    assert all("*" in char for char in user_code)
+    assert all(char == "*" for char in user_code)
 
     # Test unused slot
     assert get_usercode(node, 30) is None
