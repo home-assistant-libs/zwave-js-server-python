@@ -37,7 +37,7 @@ def _get_code_slots(
     node: Node, include_usercode: bool = False
 ) -> List[Dict[str, Optional[Union[int, bool, str]]]]:
     """Get all code slots on the lock and optionally include usercode."""
-    code_slot: int = 1
+    code_slot = 1
     slots: List[Dict[str, Optional[Union[int, bool, str]]]] = []
 
     # Loop until we can't find a code slot
