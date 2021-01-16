@@ -1,7 +1,7 @@
 """Provide common pytest fixtures."""
 import json
-from unittest.mock import AsyncMock, patch
 from typing import List, Tuple
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from aiohttp import ClientSession, ClientWebSocketResponse

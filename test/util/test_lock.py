@@ -1,6 +1,7 @@
 """Test lock utility functions."""
-import pytest
 from unittest.mock import patch
+
+import pytest
 
 from zwave_js_server.const import ATTR_CODE_SLOT, ATTR_IN_USE, ATTR_NAME, ATTR_USERCODE
 from zwave_js_server.exceptions import NotFoundError
