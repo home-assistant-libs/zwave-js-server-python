@@ -33,8 +33,10 @@ def _get_code_slots(
         )
         value = node.values.get(value_id)
         if value:
+            # we know that code slots will always have a property key
+            # that is an int, so we can ignore mypy
             slot = {
-                ATTR_CODE_SLOT: int(value.property_key),
+                ATTR_CODE_SLOT: int(value.property_key),  # type: ignore
                 ATTR_NAME: value.metadata.label,
                 ATTR_IN_USE: bool(value.value),
             }
