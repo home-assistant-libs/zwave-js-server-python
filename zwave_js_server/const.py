@@ -162,7 +162,7 @@ LOCK_CMD_CLASS_TO_PROPERTY_MAP = {
 
 
 # Thermostat constants
-ZWAVE_SETPOINT_PROPERTY = "setpoint"
+THERMOSTAT_SETPOINT_PROPERTY = "setpoint"
 
 class ThermostatMode(IntEnum):
     """Enum with all (known/used) Z-Wave ThermostatModes."""
