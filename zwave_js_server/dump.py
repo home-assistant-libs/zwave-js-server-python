@@ -3,7 +3,7 @@ import asyncio
 import aiohttp
 
 
-async def dump_msgs(url: str, session: aiohttp.ClientSession, timeout=None, node=None):
+async def dump_msgs(url: str, session: aiohttp.ClientSession, timeout=None):
     """Dump server state."""
     client = await session.ws_connect(url)
     msgs = []
