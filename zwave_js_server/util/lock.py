@@ -16,21 +16,21 @@ from ..model.node import Node
 from ..model.value import get_value_id, Value
 
 
-def get_code_slot_value(node: Node, code_slot: int, property: str) -> Value:
+def get_code_slot_value(node: Node, code_slot: int, property_name: str) -> Value:
     """Get a code slot value."""
     value = node.values.get(
         get_value_id(
             node,
             {
                 "commandClass": CommandClass.USER_CODE,
-                "property": property,
+                "property": property_name,
                 "propertyKeyName": str(code_slot),
             },
         )
     )
 
     if not value:
-        raise NotFoundError(f"Code slot {code_slot} not found")
+        raise NotFoundError(f"{property_name} for code slot {code_slot} not found")
 
     return value
 
