@@ -148,6 +148,7 @@ class DoorLockMode(IntEnum):
 
 class CodeSlotStatus(IntEnum):
     """Enum with all (known/used) Z-Wave code slot statuses."""
+
     AVAILABLE = 0
     ENABLED = 1
     DISABLED = 2
