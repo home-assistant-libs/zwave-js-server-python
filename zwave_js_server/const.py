@@ -146,6 +146,13 @@ class DoorLockMode(IntEnum):
     SECURED = 255
 
 
+class CodeSlotStatus(IntEnum):
+    """Enum with all (known/used) Z-Wave code slot statuses."""
+    AVAILABLE = 0
+    ENABLED = 1
+    DISABLED = 2
+
+
 # Depending on the Commmand Class being used by the lock, the lock state is
 # different so we need a map to track it
 LOCK_CMD_CLASS_TO_LOCKED_STATE_MAP = {
@@ -161,6 +168,7 @@ LOCK_CMD_CLASS_TO_PROPERTY_MAP = {
 }
 
 LOCK_USERCODE_PROPERTY = "userCode"
+LOCK_USERCODE_STATUS_PROPERTY = "userIdStatus"
 ATTR_CODE_SLOT = "code_slot"
 ATTR_IN_USE = "in_use"
 ATTR_NAME = "name"
