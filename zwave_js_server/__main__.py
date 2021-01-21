@@ -7,6 +7,7 @@ import aiohttp
 
 from .client import Client
 from .version import get_server_version
+from .dump import dump_msgs
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__package__)
@@ -18,6 +19,13 @@ def get_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Z-Wave JS Server Python")
     parser.add_argument(
         "--server-version", action="store_true", help="Print the version of the server"
+    )
+    parser.add_argument(
+        "--dump-state", action="store_true", help="Print the version of the server"
+    )
+    parser.add_argument(
+        "--event-timeout",
+        help="How long to listen for events when dumping state",
     )
     parser.add_argument(
         "url",
@@ -36,6 +44,8 @@ async def main() -> None:
     async with aiohttp.ClientSession() as session:
         if args.server_version:
             await print_version(args, session)
+        elif args.dump_state:
+            await handle_dump_state(args, session)
         else:
             await connect(args, session)
 
@@ -48,6 +58,16 @@ async def print_version(
     print("Driver:", version.driver_version)
     print("Server:", version.server_version)
     print("Home ID:", version.home_id)
+
+
+async def handle_dump_state(
+    args: argparse.Namespace, session: aiohttp.ClientSession
+) -> None:
+    """Dump the state of the server."""
+    timeout = None if args.event_timeout is None else int(args.event_timeout)
+    msgs = await dump_msgs(args.url, session, timeout=timeout)
+    for msg in msgs:
+        print(msg)
 
 
 async def connect(args: argparse.Namespace, session: aiohttp.ClientSession) -> None:
