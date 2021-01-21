@@ -64,7 +64,7 @@ async def handle_dump_state(
     args: argparse.Namespace, session: aiohttp.ClientSession
 ) -> None:
     """Dump the state of the server."""
-    timeout = None if args.event_timeout is None else int(args.event_timeout)
+    timeout = None if args.event_timeout is None else float(args.event_timeout)
     msgs = await dump_msgs(args.url, session, timeout=timeout)
     for msg in msgs:
         print(msg)
