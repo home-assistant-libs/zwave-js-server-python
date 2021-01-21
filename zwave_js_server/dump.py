@@ -25,6 +25,7 @@ async def dump_msgs(url: str, session: aiohttp.ClientSession, timeout=None, node
         event = await client.receive_str()
         msgs.append(event)
     except asyncio.CancelledError:
-        await client.close()
+        pass
 
+    await client.close()
     return msgs
