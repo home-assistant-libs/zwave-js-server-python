@@ -4,6 +4,7 @@ import pytest
 from zwave_js_server.const import ATTR_USERCODE
 from zwave_js_server.exceptions import NotFoundError
 from zwave_js_server.util.lock import (
+    clear_usercode,
     get_code_slots,
     get_usercode,
     get_usercodes,
@@ -90,6 +91,53 @@ async def test_set_usercode(lock_schlage_be469, mock_command, uuid4):
     # Test invalid code length
     with pytest.raises(ValueError):
         await set_usercode(node, 1, "123")
+
+    # assert no new command calls
+    assert len(ack_commands) == 1
+
+
+async def test_clear_usercode(lock_schlage_be469, mock_command, uuid4):
+    """Test clear_usercode utility function."""
+    node = lock_schlage_be469
+    ack_commands = mock_command(
+        {"command": "node.set_value", "nodeId": node.node_id},
+        {"success": True},
+    )
+
+    # Test valid code
+    await clear_usercode(node, 1)
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.set_value",
+        "nodeId": 20,
+        "messageId": uuid4,
+        "valueId": {
+            "commandClassName": "User Code",
+            "commandClass": 99,
+            "endpoint": 0,
+            "property": "userIdStatus",
+            "propertyName": "userIdStatus",
+            "propertyKey": 1,
+            "propertyKeyName": "1",
+            "metadata": {
+                "type": "number",
+                "readable": True,
+                "writeable": True,
+                "label": "User ID status (1)",
+                "states": {
+                    "0": "Available",
+                    "1": "Enabled",
+                    "2": "Disabled",
+                },
+            },
+            "value": 1,
+        },
+        "value": 0,
+    }
+
+    # Test invalid code slot
+    with pytest.raises(NotFoundError):
+        await clear_usercode(node, 100)
 
     # assert no new command calls
     assert len(ack_commands) == 1
