@@ -21,7 +21,7 @@ def get_arguments() -> argparse.Namespace:
         "--server-version", action="store_true", help="Print the version of the server"
     )
     parser.add_argument(
-        "--dump-state", action="store_true", help="Print the version of the server"
+        "--dump-state", action="store_true", help="Dump the driver state"
     )
     parser.add_argument(
         "--event-timeout",

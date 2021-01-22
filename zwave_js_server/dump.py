@@ -1,11 +1,12 @@
 """Dump helper."""
 import asyncio
 from typing import List
+
 import aiohttp
 
 
 async def dump_msgs(
-    url: str, session: aiohttp.ClientSession, timeout: float = None
+    url: str, session: aiohttp.ClientSession, timeout: Optional[float] = None
 ) -> List[dict]:
     """Dump server state."""
     client = await session.ws_connect(url)
