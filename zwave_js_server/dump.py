@@ -1,6 +1,6 @@
 """Dump helper."""
 import asyncio
-from typing import List
+from typing import List, Optional
 
 import aiohttp
 
