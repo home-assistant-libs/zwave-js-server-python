@@ -5,7 +5,19 @@ Python library for communicating with zwave-js-server. Goal for this library is 
 ## Trying it out
 
 ```shell
-python3 -m zwave_js_server ws://localhost:3000/zjs
+python3 -m zwave_js_server ws://localhost:3000
+```
+
+Or get the version of the server
+
+```shell
+python3 -m zwave_js_server ws://localhost:3000 --server-version
+```
+
+Or dump the state. Optionally add `--event-timeout 5` if you want to listen 5 seconds extra for events.
+
+```shell
+python3 -m zwave_js_server ws://localhost:3000 --dump-state
 ```
 
 ## Sending commands
