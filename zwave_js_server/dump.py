@@ -1,12 +1,14 @@
 """Dump helper."""
 import asyncio
 from typing import List, Optional
-
 import aiohttp
 
 
 async def dump_msgs(
-    url: str, session: aiohttp.ClientSession, timeout: Optional[float] = None
+    url: str,
+    session: aiohttp.ClientSession,
+    timeout: Optional[float] = None,
+    wait_nodes_ready=True,
 ) -> List[dict]:
     """Dump server state."""
     client = await session.ws_connect(url)
@@ -16,8 +18,24 @@ async def dump_msgs(
     msgs.append(version)
 
     await client.send_json({"command": "start_listening"})
-    state = await client.receive_json()
-    msgs.append(state)
+    msg = await client.receive_json()
+    msgs.append(msg)
+    state = msg["result"]["state"]
+
+    # If it's None, old version of the server, ignore it.
+    if wait_nodes_ready and state["driver"].get("allNodesReady") is False:
+        # Wait for nodes ready event and refetch state
+        while True:
+            msg = await client.receive_json()
+            msgs.append(msg)
+            if not (
+                msg["type"] == "event"
+                and msg["event"] == {"source": "driver", "event": "all nodes ready"}
+            ):
+                continue
+
+            await client.close()
+            return await dump_msgs(url, session, timeout)
 
     if timeout is None:
         await client.close()
@@ -27,11 +45,12 @@ async def dump_msgs(
     assert current_task is not None
     asyncio.get_running_loop().call_later(timeout, current_task.cancel)
 
-    try:
-        event = await client.receive_json()
-        msgs.append(event)
-    except asyncio.CancelledError:
-        pass
+    while True:
+        try:
+            msg = await client.receive_json()
+            msgs.append(msg)
+        except asyncio.CancelledError:
+            break
 
     await client.close()
     return msgs
