@@ -119,7 +119,9 @@ class Value:
     @property
     def metadata(self) -> Optional[ValueMetadata]:
         """Return value metadata."""
-        return ValueMetadata(self.data["metadata"]) if "metadata" in self.data else None
+        if "metadata" in self.data:
+            return ValueMetadata(self.data["metadata"])
+        return None
 
     @property
     def value(self) -> Optional[Any]:
