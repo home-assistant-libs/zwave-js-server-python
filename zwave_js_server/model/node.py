@@ -4,7 +4,14 @@ from typing import TYPE_CHECKING, Any, List, Optional, TypedDict, Union, cast
 from ..event import Event, EventBase
 from .device_class import DeviceClass, DeviceClassDataType
 from .device_config import DeviceConfig, DeviceConfigDataType
-from .value import Value, ValueDataType, ValueMetadata, MetaDataType, get_value_id
+from .value import (
+    MetaDataType,
+    Value,
+    ValueDataType,
+    ValueMetadata,
+    ValueNotification,
+    get_value_id,
+)
 
 if TYPE_CHECKING:
     from ..client import Client
@@ -337,6 +344,7 @@ class Node(EventBase):
 
     def handle_value_notification(self, event: Event) -> None:
         """Process a node value notification event."""
+        event.data["notification"] = ValueNotification.from_event(event)
 
     def handle_metadata_updated(self, event: Event) -> None:
         """Process a node metadata updated event."""
