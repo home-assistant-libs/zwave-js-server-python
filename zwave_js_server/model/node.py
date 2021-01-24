@@ -344,7 +344,7 @@ class Node(EventBase):
 
     def handle_value_notification(self, event: Event) -> None:
         """Process a node value notification event."""
-        event.data["value"] = ValueNotification.from_event(event)
+        event.data["notification"] = ValueNotification.from_event(event)
 
     def handle_metadata_updated(self, event: Event) -> None:
         """Process a node metadata updated event."""
