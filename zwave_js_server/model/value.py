@@ -117,9 +117,9 @@ class Value:
         return get_value_id(self.node, self.data)
 
     @property
-    def metadata(self) -> ValueMetadata:
+    def metadata(self) -> Optional[ValueMetadata]:
         """Return value metadata."""
-        return ValueMetadata(self.data["metadata"])
+        return ValueMetadata(self.data["metadata"]) if "metadata" in self.data else None
 
     @property
     def value(self) -> Optional[Any]:
