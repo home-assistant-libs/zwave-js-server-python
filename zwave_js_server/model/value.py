@@ -138,6 +138,11 @@ class Value:
         return self.data["commandClass"]
 
     @property
+    def cc_version(self) -> int:
+        """Return commandClass version."""
+        return self.data["ccVersion"]
+
+    @property
     def endpoint(self) -> Optional[int]:
         """Return endpoint."""
         return self.data.get("endpoint")
