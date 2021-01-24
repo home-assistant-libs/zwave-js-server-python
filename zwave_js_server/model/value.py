@@ -190,7 +190,7 @@ class ValueNotification:
     metadata: Optional[ValueMetadata] = None
 
     @classmethod
-    def from_event(cls, event: Event):  # type: ignore
+    def from_event(cls, event: Event) -> "ValueNotification":
         """Parse event message into ValueNotification."""
         return cls(
             command_class_name=event.data["args"]["commandClassName"],
@@ -199,4 +199,9 @@ class ValueNotification:
             property=event.data["args"]["property"],
             value=event.data["args"].get("value"),
             property_name=event.data["args"]["propertyName"],
+            metadata=ValueMetadata(
+                event.data["args"]["metadata"]
+                if "metadata" in event.data["args"]
+                else None
+            ),
         )
