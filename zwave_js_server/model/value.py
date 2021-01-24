@@ -35,6 +35,7 @@ class ValueDataType(TypedDict, total=False):
     propertyKeyName: str
     value: Any
     metadata: MetaDataType
+    ccVersion: int
 
 
 def get_value_id(node: "Node", event_data: ValueDataType) -> str:
