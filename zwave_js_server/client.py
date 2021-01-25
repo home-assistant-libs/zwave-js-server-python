@@ -57,7 +57,7 @@ class Client:
         ws_server_url: str,
         aiohttp_session: ClientSession,
         *,
-        start_listening_on_connect=True,
+        start_listening_on_connect: bool = True,
     ):
         """Initialize the Client class."""
         self.ws_server_url = ws_server_url
@@ -352,8 +352,8 @@ class Client:
         loop = asyncio.get_running_loop()
 
         if self.driver is None:
-            self.driver = await loop.run_in_executor(
-                None, Driver, self, result["state"]
+            self.driver = cast(
+                Driver, await loop.run_in_executor(None, Driver, self, result["state"])
             )
             self._logger.info(
                 "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
