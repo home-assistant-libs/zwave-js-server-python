@@ -8,7 +8,7 @@ async def dump_msgs(
     url: str,
     session: aiohttp.ClientSession,
     timeout: Optional[float] = None,
-    wait_nodes_ready=True,
+    wait_nodes_ready: bool = True,
 ) -> List[dict]:
     """Dump server state."""
     client = await session.ws_connect(url)
