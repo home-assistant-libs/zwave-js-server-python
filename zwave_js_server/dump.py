@@ -23,7 +23,7 @@ async def dump_msgs(
     state = msg["result"]["state"]
 
     # If it's None, old version of the server, ignore it.
-    if wait_nodes_ready and state["driver"].get("allNodesReady") is False:
+    if wait_nodes_ready and state.get("driver", {}).get("allNodesReady") is False:
         # Wait for nodes ready event and refetch state
         while True:
             msg = await client.receive_json()
