@@ -54,6 +54,7 @@ async def print_version(
     args: argparse.Namespace, session: aiohttp.ClientSession
 ) -> None:
     """Print the version of the server."""
+    logger.setLevel(logging.WARNING)
     version = await get_server_version(args.url, session)
     print("Driver:", version.driver_version)
     print("Server:", version.server_version)
