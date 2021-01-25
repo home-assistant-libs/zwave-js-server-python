@@ -9,12 +9,15 @@ from typing import Any, Awaitable, Callable, Dict, List, Optional, cast
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, client_exceptions
 
 from .event import Event
+from .model.version import VersionInfo
 from .model.driver import Driver
-from .version import VersionInfo
 
 STATE_CONNECTING = "connecting"
 STATE_CONNECTED = "connected"
 STATE_DISCONNECTED = "disconnected"
+
+
+SIZE_PARSE_JSON_EXECUTOR = 8192
 
 
 async def gather_callbacks(
@@ -49,7 +52,13 @@ class FailedCommand(Exception):
 class Client:
     """Class to manage the IoT connection."""
 
-    def __init__(self, ws_server_url: str, aiohttp_session: ClientSession):
+    def __init__(
+        self,
+        ws_server_url: str,
+        aiohttp_session: ClientSession,
+        *,
+        start_listening_on_connect: bool = True,
+    ):
         """Initialize the Client class."""
         self.ws_server_url = ws_server_url
         self.aiohttp_session = aiohttp_session
@@ -73,6 +82,9 @@ class Client:
         self._disconnect_event: Optional[asyncio.Event] = None
         self._result_futures: Dict[str, asyncio.Future] = {}
         self._loop = asyncio.get_running_loop()
+
+        if start_listening_on_connect:
+            self.register_on_connect(self._start_listening)
 
     def __repr__(self) -> str:
         """Return the representation."""
@@ -206,8 +218,10 @@ class Client:
                 )
                 # notify callbacks about disconnection
                 if self._on_disconnect:
-                    await gather_callbacks(
-                        self._logger, "on_disconnect", self._on_disconnect
+                    asyncio.create_task(
+                        gather_callbacks(
+                            self._logger, "on_disconnect", self._on_disconnect
+                        )
                     )
 
             if self.close_requested:
@@ -260,9 +274,11 @@ class Client:
             self.state = STATE_CONNECTED
 
             if self._on_connect:
-                await gather_callbacks(self._logger, "on_connect", self._on_connect)
+                asyncio.create_task(
+                    gather_callbacks(self._logger, "on_connect", self._on_connect)
+                )
 
-            asyncio.create_task(self._start_listening())
+            loop = asyncio.get_running_loop()
 
             while not client.closed:
                 msg = await client.receive()
@@ -279,7 +295,10 @@ class Client:
                     break
 
                 try:
-                    msg = msg.json()
+                    if len(msg.data) > SIZE_PARSE_JSON_EXECUTOR:
+                        msg = await loop.run_in_executor(None, msg.json)
+                    else:
+                        msg = msg.json()
                 except ValueError:
                     disconnect_warn = "Received invalid JSON."
                     break
@@ -330,9 +349,12 @@ class Client:
     async def _start_listening(self) -> None:
         """When connected, start listening."""
         result = await self.async_send_command({"command": "start_listening"})
+        loop = asyncio.get_running_loop()
 
         if self.driver is None:
-            self.driver = Driver(self, result["state"])
+            self.driver = cast(
+                Driver, await loop.run_in_executor(None, Driver, self, result["state"])
+            )
             self._logger.info(
                 "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
             )
@@ -340,5 +362,6 @@ class Client:
                 gather_callbacks(self._logger, "on_initialized", self._on_initialized)
             )
         else:
-            # TODO how do we handle reconnect?
-            pass
+            self._logger.warning(
+                "Re-connected and don't know how to handle new state yet"
+            )
