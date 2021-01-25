@@ -35,6 +35,7 @@ class ValueDataType(TypedDict, total=False):
     propertyKeyName: str
     value: Any
     metadata: MetaDataType
+    ccVersion: int
 
 
 def get_value_id(node: "Node", event_data: ValueDataType) -> str:
@@ -136,6 +137,11 @@ class Value:
     def command_class(self) -> int:
         """Return commandClass."""
         return self.data["commandClass"]
+
+    @property
+    def cc_version(self) -> int:
+        """Return commandClass version."""
+        return self.data["ccVersion"]
 
     @property
     def endpoint(self) -> Optional[int]:
