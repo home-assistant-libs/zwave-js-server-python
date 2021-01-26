@@ -62,10 +62,6 @@ class Node(EventBase):
         """Initialize the node."""
         super().__init__()
         self.client = client
-        self.update_data(data)
-
-    def update_data(self, data: NodeDataType) -> None:
-        """Update data when received."""
         self.data = data
         self.values = {
             get_value_id(self, val): Value(self, val) for val in data["values"]
@@ -319,7 +315,14 @@ class Node(EventBase):
     def handle_ready(self, event: Event) -> None:
         """Process a node ready event."""
         # the event contains a full dump of the node
-        self.update_data(event.data["nodeState"])
+        self.data.update(event.data["nodeState"])
+        # update/add values
+        for value_state in event.data["nodeState"]["values"]:
+            value = self.values.get(get_value_id(self, value_state))
+            if value is None:
+                self.values[value.value_id] = Value(self, value_state)
+            else:
+                value.update(value_state)
 
     def handle_value_added(self, event: Event) -> None:
         """Process a node value added event."""
