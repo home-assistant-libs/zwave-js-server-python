@@ -174,12 +174,13 @@ class Value:
 
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
-        self.update(event.data["args"])
+        self.data.update(event.data["args"])
+        self._value = event.data["args"].get("newValue")
 
     def update(self, data: ValueDataType) -> None:
         """Update data."""
         self.data.update(data)
-        self._value = data.get("newValue")
+        self._value = data.get("value")
 
 
 class ValueNotification(Value):

@@ -318,11 +318,9 @@ class Node(EventBase):
         self.data.update(event.data["nodeState"])
         # update/add values
         for value_state in event.data["nodeState"]["values"]:
-            value = self.values.get(get_value_id(self, value_state))
-            if value is None:
-                self.values[value.value_id] = Value(self, value_state)
-            else:
-                value.update(value_state)
+            value_id = get_value_id(self, value_state)
+            value = self.values.get(value_id, Value(self, value_state))
+            value.update(value_state)
 
     def handle_value_added(self, event: Event) -> None:
         """Process a node value added event."""
