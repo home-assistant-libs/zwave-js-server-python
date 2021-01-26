@@ -1,1 +1,2 @@
 aiohttp==3.7.3
+packaging==20.8

@@ -2,6 +2,8 @@
 from enum import Enum, IntEnum
 from typing import Dict, List
 
+MIN_SERVER_VERSION = "1.0.4"
+
 
 class CommandClass(IntEnum):
     """Enum with all known CommandClasses."""
