@@ -385,5 +385,6 @@ class Client:
             raise InvalidServerVersion
         if cur_version.minor > min_version:
             self._logger.warning(
-                "Connected to a Zwave JS Server with an untested version, you may run into compatibility issues!"
+                "Connected to a Zwave JS Server with an untested version, \
+                    you may run into compatibility issues!"
             )
