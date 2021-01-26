@@ -62,6 +62,10 @@ class Node(EventBase):
         """Initialize the node."""
         super().__init__()
         self.client = client
+        self.update_data(data)
+
+    def update_data(self, data: NodeDataType) -> None:
+        """Update data when received."""
         self.data = data
         self.values = {
             get_value_id(self, val): Value(self, val) for val in data["values"]
@@ -99,7 +103,7 @@ class Node(EventBase):
     @property
     def ready(self) -> Optional[bool]:
         """Return the ready."""
-        return self.data.get("ready")  # TODO: I can't find ready in the docs.
+        return self.data.get("ready")
 
     @property
     def device_class(self) -> DeviceClass:
@@ -314,6 +318,8 @@ class Node(EventBase):
 
     def handle_ready(self, event: Event) -> None:
         """Process a node ready event."""
+        # the event contains a full dump of the node
+        self.update_data(event.data["nodeState"])
 
     def handle_value_added(self, event: Event) -> None:
         """Process a node value added event."""
@@ -324,19 +330,12 @@ class Node(EventBase):
         """Process a node value updated event."""
         value = self.values.get(get_value_id(self, event.data["args"]))
         if value is None:
-            # TODO decide how to handle value updated for unknown values
-            print()
-            print(
-                "Value updated for unknown value",
-                get_value_id(self, event.data["args"]),
-            )
-            print("Available value IDs", ", ".join(self.values))
-            print()
-            value = Value(self, event.data["args"])
-            self.values[value.value_id] = value
+            # received update for unknown value
+            # should not happen but just in case, treat like added value
+            self.handle_value_added(event)
         else:
             value.receive_event(event)
-        event.data["value"] = value
+            event.data["value"] = value
 
     def handle_value_removed(self, event: Event) -> None:
         """Process a node value removed event."""
@@ -344,7 +343,7 @@ class Node(EventBase):
 
     def handle_value_notification(self, event: Event) -> None:
         """Process a node value notification event."""
-        event.data["notification"] = ValueNotification.from_event(event)
+        event.data["notification"] = ValueNotification(self, event.data["args"])
 
     def handle_metadata_updated(self, event: Event) -> None:
         """Process a node metadata updated event."""

@@ -1,5 +1,4 @@
 """Provide a model for the Z-Wave JS value."""
-from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Dict, Optional, TypedDict, Union
 
 from ..event import Event
@@ -179,35 +178,11 @@ class Value:
         self._value = event.data["args"].get("newValue")
 
 
-@dataclass
-class ValueNotification:
+class ValueNotification(Value):
     """
     Model for a Value Nofification message.
 
     https://zwave-js.github.io/node-zwave-js/#/api/node?id=quotvalue-notificationquot
     """
 
-    command_class_name: str
-    command_class: int
-    endpoint: int
-    property: str
-    value: Any
-    property_name: str
-    metadata: Optional[ValueMetadata] = None
-
-    @classmethod
-    def from_event(cls, event: Event) -> "ValueNotification":
-        """Parse event message into ValueNotification."""
-        return cls(
-            command_class_name=event.data["args"]["commandClassName"],
-            command_class=event.data["args"]["commandClass"],
-            endpoint=event.data["args"]["endpoint"],
-            property=event.data["args"]["property"],
-            value=event.data["args"].get("value"),
-            property_name=event.data["args"]["propertyName"],
-            metadata=ValueMetadata(
-                event.data["args"]["metadata"]
-                if "metadata" in event.data["args"]
-                else None
-            ),
-        )
+    # format is the same as a Value message, subclassed for easier identifying and future use
