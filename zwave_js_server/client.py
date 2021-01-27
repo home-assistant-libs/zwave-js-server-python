@@ -379,11 +379,9 @@ class Client:
         """Perform a basic check on the server version compatability."""
         cur_version = parse_version(server_version)
         min_version = parse_version(MIN_SERVER_VERSION)
-        if (cur_version.major != min_version.major) or (
-            cur_version.minor < min_version.minor
-        ):
+        if cur_version < min_version:
             raise InvalidServerVersion
-        if cur_version.minor > min_version:
+        if cur_version != min_version:
             self._logger.warning(
                 "Connected to a Zwave JS Server with an untested version, \
                     you may run into compatibility issues!"
