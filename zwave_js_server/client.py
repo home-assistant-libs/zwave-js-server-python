@@ -7,10 +7,12 @@ import uuid
 from typing import Any, Awaitable, Callable, Dict, List, Optional, cast
 
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, client_exceptions
+from packaging.version import parse as parse_version
 
+from .const import MIN_SERVER_VERSION
 from .event import Event
-from .model.version import VersionInfo
 from .model.driver import Driver
+from .model.version import VersionInfo
 
 STATE_CONNECTING = "connecting"
 STATE_CONNECTED = "connected"
@@ -37,6 +39,10 @@ class NotConnected(Exception):
 
 class InvalidState(Exception):
     """Exception raised when data gets in invalid state."""
+
+
+class InvalidServerVersion(Exception):
+    """Exception raised when connected to server with incompatible version."""
 
 
 class FailedCommand(Exception):
@@ -265,6 +271,9 @@ class Client:
                 await client.receive_json()
             )
 
+            # basic check for server version compatability
+            self._check_server_version(self.version.server_version)
+
             self._logger.info(
                 "Connected to Home %s (Server %s, Driver %s)",
                 version.home_id,
@@ -364,4 +373,18 @@ class Client:
         else:
             self._logger.warning(
                 "Re-connected and don't know how to handle new state yet"
+            )
+
+    def _check_server_version(self, server_version: str) -> None:
+        """Perform a basic check on the server version compatability."""
+        cur_version = parse_version(server_version)
+        min_version = parse_version(MIN_SERVER_VERSION)
+        if (cur_version.major != min_version.major) or (
+            cur_version.minor < min_version.minor
+        ):
+            raise InvalidServerVersion
+        if cur_version.minor > min_version:
+            self._logger.warning(
+                "Connected to a Zwave JS Server with an untested version, \
+                    you may run into compatibility issues!"
             )
