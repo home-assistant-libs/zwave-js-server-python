@@ -42,7 +42,7 @@ class InvalidState(Exception):
 
 
 class InvalidServerVersion(Exception):
-    """Exception raised when connected to server with incompatible major version."""
+    """Exception raised when connected to server with incompatible version."""
 
 
 class FailedCommand(Exception):
