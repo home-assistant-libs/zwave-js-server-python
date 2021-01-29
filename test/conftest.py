@@ -60,7 +60,7 @@ async def client_fixture(loop, client_session, ws_client, uuid4):
     This fixture needs to be a coroutine function to get an event loop
     when creating the client.
     """
-    client_session.ws_connect.return_value = ws_client
+    client_session.ws_connect.side_effect = AsyncMock(return_value=ws_client)
     client = Client("ws://test.org", client_session)
     client.state = STATE_CONNECTED
     client.client = ws_client
