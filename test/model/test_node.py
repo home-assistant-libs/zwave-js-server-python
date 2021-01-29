@@ -78,6 +78,24 @@ async def test_set_value(node, uuid4, mock_command):
         "messageId": uuid4,
     }
 
+async def test_poll_value(node, uuid4, mock_command):
+    """Test poll value."""
+    ack_commands = mock_command(
+        {"command": "node.poll_value", "nodeId": node.node_id},
+        {"result": "something"},
+    )
+    value_id = "52-32-00-currentValue-00"
+    value = node.values[value_id]
+    assert await node.async_poll_value(value_id)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.poll_value",
+        "nodeId": node.node_id,
+        "valueId": value.data,
+        "messageId": uuid4,
+    }
+
 
 async def test_refresh_info(node, uuid4, mock_command):
     """Test refresh info."""

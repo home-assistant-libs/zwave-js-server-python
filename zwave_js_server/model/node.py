@@ -294,6 +294,22 @@ class Node(EventBase):
             }
         )
 
+    async def async_poll_value(self, val: Union[Value, str]) -> Any:
+        """Send pollValue command to Node for given value (or value_id)."""
+        # a value may be specified as value_id or the value itself
+        if not isinstance(val, Value):
+            val = self.values[val]
+        # the value object needs to be send to the server
+        result = await self.client.async_send_command(
+            {
+                "command": "node.poll_value",
+                "nodeId": self.node_id,
+                "valueId": val.data
+            }
+        )
+        # result may or may not be there
+        return result.get("result")
+
     def handle_wake_up(self, event: Event) -> None:
         """Process a node wake up event."""
 
