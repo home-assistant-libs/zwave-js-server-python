@@ -24,25 +24,25 @@ class NodeDataType(TypedDict, total=False):
     name: str
     location: str
     status: int  # 0-4  # required
-    deviceClass: DeviceClassDataType  # required
+    deviceClass: DeviceClassDataType
     zwavePlusVersion: int
     nodeType: int
     roleType: int
-    isListening: bool  # required
-    isFrequentListening: bool  # required
-    isRouting: bool  # required
-    maxBaudRate: int  # required
-    isSecure: bool  # required
-    isBeaming: bool  # required
-    version: int  # required
+    isListening: bool
+    isFrequentListening: bool
+    isRouting: bool
+    maxBaudRate: int
+    isSecure: bool
+    isBeaming: bool
+    version: int
     firmwareVersion: str
-    manufacturerId: int  # required
-    productId: int  # required
-    productType: int  # required
+    manufacturerId: int
+    productId: int
+    productType: int
     deviceConfig: DeviceConfigDataType
-    neighbors: List[int]  # required
-    keepAwake: bool  # required
-    index: int  # TODO: I can't the below items in the docs.
+    neighbors: List[int]
+    keepAwake: bool
+    index: int
     installerIcon: int
     userIcon: int
     ready: bool
@@ -104,57 +104,57 @@ class Node(EventBase):
     @property
     def device_class(self) -> DeviceClass:
         """Return the device_class."""
-        return DeviceClass(self.data["deviceClass"])
+        return DeviceClass(self.data.get("deviceClass", {}))
 
     @property
-    def is_listening(self) -> bool:
+    def is_listening(self) -> Optional[bool]:
         """Return the is_listening."""
-        return self.data["isListening"]
+        return self.data.get("isListening")
 
     @property
-    def is_frequent_listening(self) -> bool:
+    def is_frequent_listening(self) -> Optional[bool]:
         """Return the is_frequent_listening."""
         return self.data["isFrequentListening"]
 
     @property
-    def is_routing(self) -> bool:
+    def is_routing(self) -> Optional[bool]:
         """Return the is_routing."""
-        return self.data["isRouting"]
+        return self.data.get("isRouting")
 
     @property
-    def max_baud_rate(self) -> int:
+    def max_baud_rate(self) -> Optional[int]:
         """Return the max_baud_rate."""
-        return self.data["maxBaudRate"]
+        return self.data.get("maxBaudRate")
 
     @property
-    def is_secure(self) -> bool:
+    def is_secure(self) -> Optional[bool]:
         """Return the is_secure."""
-        return self.data["isSecure"]
+        return self.data.get("isSecure")
 
     @property
-    def version(self) -> int:
+    def version(self) -> Optional[int]:
         """Return the version."""
-        return self.data["version"]
+        return self.data.get("version")
 
     @property
-    def is_beaming(self) -> bool:
+    def is_beaming(self) -> Optional[bool]:
         """Return the is_beaming."""
-        return self.data["isBeaming"]
+        return self.data.get("isBeaming")
 
     @property
-    def manufacturer_id(self) -> int:
+    def manufacturer_id(self) -> Optional[int]:
         """Return the manufacturer_id."""
-        return self.data["manufacturerId"]
+        return self.data.get("manufacturerId")
 
     @property
-    def product_id(self) -> int:
+    def product_id(self) -> Optional[int]:
         """Return the product_id."""
-        return self.data["productId"]
+        return self.data.get("productId")
 
     @property
-    def product_type(self) -> int:
+    def product_type(self) -> Optional[int]:
         """Return the product_type."""
-        return self.data["productType"]
+        return self.data.get("productType")
 
     @property
     def firmware_version(self) -> Optional[str]:
@@ -199,7 +199,7 @@ class Node(EventBase):
     @property
     def neighbors(self) -> List[int]:
         """Return the neighbors."""
-        return self.data["neighbors"]
+        return self.data.get("neighbors", [])
 
     @property
     def endpoint_count_is_dynamic(self) -> Optional[bool]:
@@ -319,8 +319,11 @@ class Node(EventBase):
         # update/add values
         for value_state in event.data["nodeState"]["values"]:
             value_id = get_value_id(self, value_state)
-            value = self.values.get(value_id, Value(self, value_state))
-            value.update(value_state)
+            value = self.values.get(value_id)
+            if value is None:
+                self.values[value_id] = Value(self, value_state)
+            else:
+                value.update(value_state)
 
     def handle_value_added(self, event: Event) -> None:
         """Process a node value added event."""

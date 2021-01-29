@@ -7,7 +7,7 @@ https://zwave-js.github.io/node-zwave-js/#/api/node?id=deviceclass
 from typing import List, Optional, TypedDict
 
 
-class DeviceClassDataType(TypedDict):
+class DeviceClassDataType(TypedDict, total=False):
     """Represent a device class data dict type."""
 
     basic: str
