@@ -2,6 +2,7 @@
 import json
 
 from zwave_js_server.model import node as node_pkg
+from zwave_js_server.event import Event
 
 from .. import load_fixture
 
@@ -187,3 +188,17 @@ async def test_abort_firmware_update(node, uuid4, mock_command):
         "nodeId": node.node_id,
         "messageId": uuid4,
     }
+
+def test_node_inclusion():
+    """Emulate a node being added."""
+    # when a node node is added, it has minimal info first
+    node = node_pkg.Node(None, {"nodeId": 52, "status": 1, "ready": False, "values": []})
+    assert node.node_id == 52
+    assert node.status == 1
+    assert not node.ready
+    assert len(node.values) == 0
+    # the ready event contains a full (and complete) dump of the node, including values
+    state = json.loads(load_fixture("multisensor_6_state.json"))
+    event = Event("ready", { "nodeState": state })
+    node.receive_event(event)
+    assert len(node.values) > 0
