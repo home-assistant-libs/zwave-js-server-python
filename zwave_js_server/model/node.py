@@ -109,7 +109,7 @@ class Node(EventBase):
     @property
     def is_listening(self) -> Optional[bool]:
         """Return the is_listening."""
-        return self.data["isListening"]
+        return self.data.get("isListening")
 
     @property
     def is_frequent_listening(self) -> Optional[bool]:
