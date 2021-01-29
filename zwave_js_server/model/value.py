@@ -106,7 +106,6 @@ class Value:
         """Initialize value."""
         self.node = node
         self.data = data
-        self._value = data.get("value")
 
     def __repr__(self) -> str:
         """Return the representation."""
@@ -125,7 +124,7 @@ class Value:
     @property
     def value(self) -> Optional[Any]:
         """Return value."""
-        return self._value
+        return self.data.get("value")
 
     @property
     def command_class_name(self) -> str:
@@ -174,13 +173,11 @@ class Value:
 
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
-        self.data.update(event.data["args"])
-        self._value = event.data["args"].get("newValue")
+        self.update(event.data["args"])
 
     def update(self, data: ValueDataType) -> None:
         """Update data."""
         self.data.update(data)
-        self._value = data.get("value")
 
 
 class ValueNotification(Value):
