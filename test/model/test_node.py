@@ -87,7 +87,8 @@ async def test_poll_value(node, uuid4, mock_command):
     )
     value_id = "52-32-00-currentValue-00"
     value = node.values[value_id]
-    assert await node.async_poll_value(value_id)
+    result = await node.async_poll_value(value_id)
+    assert result == "something"
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
