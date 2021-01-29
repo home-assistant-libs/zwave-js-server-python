@@ -301,11 +301,7 @@ class Node(EventBase):
             val = self.values[val]
         # the value object needs to be send to the server
         result = await self.client.async_send_command(
-            {
-                "command": "node.poll_value",
-                "nodeId": self.node_id,
-                "valueId": val.data
-            }
+            {"command": "node.poll_value", "nodeId": self.node_id, "valueId": val.data}
         )
         # result may or may not be there
         return result.get("result")

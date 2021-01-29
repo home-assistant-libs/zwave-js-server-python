@@ -78,6 +78,7 @@ async def test_set_value(node, uuid4, mock_command):
         "messageId": uuid4,
     }
 
+
 async def test_poll_value(node, uuid4, mock_command):
     """Test poll value."""
     ack_commands = mock_command(
