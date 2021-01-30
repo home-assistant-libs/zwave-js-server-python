@@ -38,7 +38,7 @@ def get_arguments() -> argparse.Namespace:
     return arguments
 
 
-async def main() -> None:
+async def start_cli() -> None:
     """Run main."""
     args = get_arguments()
     level = logging.DEBUG if args.debug else logging.INFO
@@ -126,8 +126,13 @@ async def register_controller_listeners(client: Client) -> None:
     await is_initialized.wait()
 
 
-if __name__ == "__main__":
+def main() -> None:
+    """Run main."""
     try:
-        asyncio.run(main())
+        asyncio.run(start_cli())
     except KeyboardInterrupt:
         pass
+
+
+if __name__ == "__main__":
+    main()
