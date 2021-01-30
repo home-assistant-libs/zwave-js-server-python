@@ -189,72 +189,70 @@ class Client:
             self.version = version = VersionInfo.from_message(
                 await client.receive_json()
             )
-
-            # basic check for server version compatability
-            self._check_server_version(self.version.server_version)
-
-            self._logger.info(
-                "Connected to Home %s (Server %s, Driver %s)",
-                version.home_id,
-                version.server_version,
-                version.driver_version,
-            )
-            self.state = STATE_CONNECTED
-
-            if self._on_connect:
-                asyncio.create_task(
-                    gather_callbacks(self._logger, "on_connect", self._on_connect)
-                )
-
         except (
             client_exceptions.WSServerHandshakeError,
             client_exceptions.ClientError,
         ) as err:
             raise CannotConnect(err) from err
 
+        # basic check for server version compatability
+        self._check_server_version(self.version.server_version)
+
+        self._logger.info(
+            "Connected to Home %s (Server %s, Driver %s)",
+            version.home_id,
+            version.server_version,
+            version.driver_version,
+        )
+        self.state = STATE_CONNECTED
+
+        if self._on_connect:
+            asyncio.create_task(
+                gather_callbacks(self._logger, "on_connect", self._on_connect)
+            )
+
     async def listen(self) -> None:
         """Start listening to the websocket."""
         assert self.client
 
-        try:
-            loop = asyncio.get_running_loop()
+        loop = asyncio.get_running_loop()
 
-            while not self.client.closed:
+        while not self.client.closed:
+            try:
                 msg = await self.client.receive()
+            except (
+                client_exceptions.WSServerHandshakeError,
+                client_exceptions.ClientError,
+            ) as err:
+                raise ConnectionFailed(err) from err
 
-                if msg.type in (WSMsgType.CLOSED, WSMsgType.CLOSING):
-                    break
+            if msg.type in (WSMsgType.CLOSED, WSMsgType.CLOSING):
+                break
 
-                if msg.type == WSMsgType.ERROR:
-                    raise ConnectionFailed()
+            if msg.type == WSMsgType.ERROR:
+                raise ConnectionFailed()
 
-                if msg.type != WSMsgType.TEXT:
-                    raise InvalidMessage(f"Received non-Text message: {msg.type}")
+            if msg.type != WSMsgType.TEXT:
+                raise InvalidMessage(f"Received non-Text message: {msg.type}")
 
-                try:
-                    if len(msg.data) > SIZE_PARSE_JSON_EXECUTOR:
-                        msg = await loop.run_in_executor(None, msg.json)
-                    else:
-                        msg = msg.json()
-                except ValueError as err:
-                    raise InvalidMessage("Received invalid JSON.") from err
+            try:
+                if len(msg.data) > SIZE_PARSE_JSON_EXECUTOR:
+                    msg = await loop.run_in_executor(None, msg.json)
+                else:
+                    msg = msg.json()
+            except ValueError as err:
+                raise InvalidMessage("Received invalid JSON.") from err
 
-                if self._logger.isEnabledFor(logging.DEBUG):
-                    self._logger.debug("Received message:\n%s\n", pprint.pformat(msg))
+            if self._logger.isEnabledFor(logging.DEBUG):
+                self._logger.debug("Received message:\n%s\n", pprint.pformat(msg))
 
-                msg_ = cast(dict, msg)
+            msg_ = cast(dict, msg)
 
-                try:
-                    self.async_handle_message(msg_)
-                except InvalidState:
-                    await self.client.close()
-                    raise
-
-        except (
-            client_exceptions.WSServerHandshakeError,
-            client_exceptions.ClientError,
-        ) as err:
-            raise ConnectionFailed(err) from err
+            try:
+                self.async_handle_message(msg_)
+            except InvalidState:
+                await self.client.close()
+                raise
 
     async def disconnect(self) -> None:
         """Disconnect the client."""
