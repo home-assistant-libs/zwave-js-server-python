@@ -66,7 +66,6 @@ class Client:
         self._on_initialized: List[Callable[[], Awaitable[None]]] = []
         self._logger = logging.getLogger(__package__)
         self._result_futures: Dict[str, asyncio.Future] = {}
-        self._loop = asyncio.get_running_loop()
 
         if start_listening_on_connect:
             self.register_on_connect(self._start_listening)
@@ -152,7 +151,8 @@ class Client:
 
     async def async_send_command(self, message: Dict[str, Any]) -> dict:
         """Send a command and get a response."""
-        future: "asyncio.Future[dict]" = self._loop.create_future()
+        loop = asyncio.get_running_loop()
+        future: "asyncio.Future[dict]" = loop.create_future()
         message_id = message["messageId"] = uuid.uuid4().hex
         self._result_futures[message_id] = future
         await self.async_send_json_message(message)
