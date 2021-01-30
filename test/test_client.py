@@ -1,5 +1,9 @@
 """Test the client."""
+from aiohttp.client_exceptions import ClientError
+import pytest
+
 from zwave_js_server.client import Client
+from zwave_js_server.exceptions import CannotConnect
 
 
 async def test_connect(client_session, ws_client, url, version_data):
@@ -10,3 +14,14 @@ async def test_connect(client_session, ws_client, url, version_data):
     await client.connect()
 
     assert client.connected
+
+
+async def test_cannot_connect(client_session, url):
+    """Test cannot connect."""
+    client_session.ws_connect.side_effect = ClientError
+    client = Client(url, client_session)
+
+    with pytest.raises(CannotConnect):
+        await client.connect()
+
+    assert not client.connected
