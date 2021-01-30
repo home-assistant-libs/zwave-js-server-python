@@ -1,4 +1,7 @@
 """Test the client."""
+import asyncio
+from unittest.mock import AsyncMock
+
 from aiohttp.client_exceptions import ClientError
 import pytest
 
@@ -35,3 +38,16 @@ async def test_invalid_server_version(client_session, url, version_data):
         await client.connect()
 
     assert not client.connected
+
+
+async def test_on_connect(client_session, url, await_other):
+    """Test client on connect callback."""
+    on_connect = AsyncMock()
+    client = Client(url, client_session, start_listening_on_connect=False)
+    client.register_on_connect(on_connect)
+
+    await client.connect()
+    await await_other(asyncio.current_task())
+
+    assert client.connected
+    on_connect.assert_awaited()

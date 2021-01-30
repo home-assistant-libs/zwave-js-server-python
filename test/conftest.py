@@ -1,4 +1,5 @@
 """Provide common pytest fixtures."""
+import asyncio
 import json
 from typing import List, Tuple
 from unittest.mock import AsyncMock, patch
@@ -89,6 +90,18 @@ async def client_fixture(loop, client_session, ws_client, uuid4):
     client.state = STATE_CONNECTED
     client.client = ws_client
     return client
+
+
+@pytest.fixture(name="await_other")
+async def await_other_fixture(loop):
+    """Await all tasks except the current task."""
+
+    async def wait_for_tasks(current_task):
+        """Await the tasks."""
+        tasks = asyncio.all_tasks() - {current_task}
+        await asyncio.gather(*tasks)
+
+    return wait_for_tasks
 
 
 @pytest.fixture(name="mock_command")
