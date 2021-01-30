@@ -3,7 +3,7 @@ from aiohttp.client_exceptions import ClientError
 import pytest
 
 from zwave_js_server.client import Client
-from zwave_js_server.exceptions import CannotConnect
+from zwave_js_server.exceptions import CannotConnect, InvalidServerVersion
 
 
 async def test_connect(client_session, ws_client, url, version_data):
@@ -22,6 +22,18 @@ async def test_cannot_connect(client_session, url):
     client = Client(url, client_session)
 
     with pytest.raises(CannotConnect):
+        await client.connect()
+
+    assert not client.connected
+
+
+async def test_invalid_server_version(client_session, ws_client, url, version_data):
+    """Test client connect with invalid server version."""
+    version_data["serverVersion"] = "invalid"
+    ws_client.receive_json.return_value = version_data
+    client = Client(url, client_session)
+
+    with pytest.raises(InvalidServerVersion):
         await client.connect()
 
     assert not client.connected
