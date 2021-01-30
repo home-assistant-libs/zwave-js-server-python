@@ -12,7 +12,15 @@ from packaging.version import parse as parse_version
 
 from .const import MIN_SERVER_VERSION
 from .event import Event
-from .exceptions import FailedCommand, InvalidServerVersion, InvalidState, NotConnected
+from .exceptions import (
+    CannotConnect,
+    ConnectionFailed,
+    FailedCommand,
+    InvalidMessage,
+    InvalidServerVersion,
+    InvalidState,
+    NotConnected,
+)
 from .model.driver import Driver
 from .model.version import VersionInfo
 
@@ -209,11 +217,11 @@ class Client:
                     gather_callbacks(self._logger, "on_connect", self._on_connect)
                 )
 
-        except client_exceptions.WSServerHandshakeError as err:
-            self._logger.warning("Unable to connect: %s", err)
-
-        except client_exceptions.ClientError as err:
-            self._logger.warning("Unable to connect: %s", err)
+        except (
+            client_exceptions.WSServerHandshakeError,
+            client_exceptions.ClientError,
+        ) as err:
+            raise CannotConnect(err) from err
 
     async def connect_retry(self) -> None:
         """Connect to the IoT broker."""
@@ -277,9 +285,8 @@ class Client:
         await self.connect()
         await self.listen()
 
-    async def listen(self) -> None:  # pylint: disable=too-many-branches,
+    async def listen(self) -> None:
         """Start listening to the websocket."""
-        disconnect_warn = None
         assert self.client
 
         try:
@@ -292,51 +299,35 @@ class Client:
                     break
 
                 if msg.type == WSMsgType.ERROR:
-                    disconnect_warn = "Connection error"
-                    break
+                    raise ConnectionFailed()
 
                 if msg.type != WSMsgType.TEXT:
-                    disconnect_warn = "Received non-Text message: {}".format(msg.type)
-                    break
+                    raise InvalidMessage(f"Received non-Text message: {msg.type}")
 
                 try:
                     if len(msg.data) > SIZE_PARSE_JSON_EXECUTOR:
                         msg = await loop.run_in_executor(None, msg.json)
                     else:
                         msg = msg.json()
-                except ValueError:
-                    disconnect_warn = "Received invalid JSON."
-                    break
+                except ValueError as err:
+                    raise InvalidMessage("Received invalid JSON.") from err
 
                 if self._logger.isEnabledFor(logging.DEBUG):
                     self._logger.debug("Received message:\n%s\n", pprint.pformat(msg))
 
                 msg_ = cast(dict, msg)
+
                 try:
                     self.async_handle_message(msg_)
-
-                except InvalidState as err:
-                    disconnect_warn = f"Invalid state: {err}"
+                except InvalidState:
                     await self.client.close()
-                    break
+                    raise
 
-                except Exception:  # pylint: disable=broad-except
-                    self._logger.exception("Unexpected error handling %s", msg)
-                    break
-
-        except client_exceptions.WSServerHandshakeError as err:
-            self._logger.warning("Unable to connect: %s", err)
-
-        except client_exceptions.ClientError as err:
-            self._logger.warning("Unable to connect: %s", err)
-
-        finally:
-            if disconnect_warn is None:
-                self._logger.debug("Stopped listening to connection")
-            else:
-                self._logger.warning(
-                    "Stopped listening to connection: %s", disconnect_warn
-                )
+        except (
+            client_exceptions.WSServerHandshakeError,
+            client_exceptions.ClientError,
+        ) as err:
+            raise ConnectionFailed(err) from err
 
     async def disconnect(self) -> None:
         """Disconnect the client."""
