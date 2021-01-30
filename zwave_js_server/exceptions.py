@@ -22,7 +22,7 @@ class CannotConnect(TransportError):
 
     def __init__(self, error: Exception) -> None:
         """Initialize a cannot connect error."""
-        super().__init__(f"Cannot connect: {error}", error)
+        super().__init__(f"{error}", error)
 
 
 class ConnectionFailed(TransportError):
@@ -33,7 +33,7 @@ class ConnectionFailed(TransportError):
         if error is None:
             super().__init__("Connection failed.")
             return
-        super().__init__(f"Connection failed: {error}", error)
+        super().__init__(f"{error}", error)
 
 
 class NotFoundError(BaseZwaveJSServerError):
