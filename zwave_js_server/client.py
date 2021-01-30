@@ -251,14 +251,13 @@ class Client:
             try:
                 self.async_handle_message(msg_)
             except InvalidState:
-                await self.client.close()
+                await self._close()
                 raise
 
     async def disconnect(self) -> None:
         """Disconnect the client."""
         if self.client is not None:
-            self._logger.debug("Closing client connection")
-            await self.client.close()
+            await self._close()
 
         self.state = STATE_DISCONNECTED
 
@@ -266,6 +265,12 @@ class Client:
             asyncio.create_task(
                 gather_callbacks(self._logger, "on_disconnect", self._on_disconnect)
             )
+
+    async def _close(self) -> None:
+        """Close the client connection."""
+        self._logger.debug("Closing client connection")
+        assert self.client
+        await self.client.close()
 
     async def _start_listening(self) -> None:
         """When connected, start listening."""
