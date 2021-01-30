@@ -271,26 +271,25 @@ class Client:
         self._logger.debug("Closing client connection")
         assert self.client
         await self.client.close()
+        self.driver = None
 
     async def _start_listening(self) -> None:
         """When connected, start listening."""
         result = await self.async_send_command({"command": "start_listening"})
-        loop = asyncio.get_running_loop()
 
-        if self.driver is None:
-            self.driver = cast(
-                Driver, await loop.run_in_executor(None, Driver, self, result["state"])
-            )
-            self._logger.info(
-                "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
-            )
-            asyncio.create_task(
-                gather_callbacks(self._logger, "on_initialized", self._on_initialized)
-            )
-        else:
-            self._logger.warning(
-                "Re-connected and don't know how to handle new state yet"
-            )
+        if self.driver is not None:
+            raise InvalidState("Re-connected with existing driver")
+
+        loop = asyncio.get_running_loop()
+        self.driver = cast(
+            Driver, await loop.run_in_executor(None, Driver, self, result["state"])
+        )
+        self._logger.info(
+            "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
+        )
+        asyncio.create_task(
+            gather_callbacks(self._logger, "on_initialized", self._on_initialized)
+        )
 
     def _check_server_version(self, server_version: str) -> None:
         """Perform a basic check on the server version compatability."""
