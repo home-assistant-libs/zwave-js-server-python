@@ -40,11 +40,13 @@ async def test_invalid_server_version(client_session, url, version_data):
     assert not client.connected
 
 
-async def test_on_connect(client_session, url, await_other):
-    """Test client on connect callback."""
+async def test_on_connect_on_disconnect(client_session, url, await_other):
+    """Test client on connect and on disconnect callback."""
     on_connect = AsyncMock()
+    on_disconnect = AsyncMock()
     client = Client(url, client_session, start_listening_on_connect=False)
     unsubscribe_on_connect = client.register_on_connect(on_connect)
+    unsubscribe_on_disconnect = client.register_on_disconnect(on_disconnect)
 
     await client.connect()
     await await_other(asyncio.current_task())
@@ -55,16 +57,27 @@ async def test_on_connect(client_session, url, await_other):
     on_connect.reset_mock()
 
     await client.disconnect()
+    await await_other(asyncio.current_task())
 
     assert not client.connected
+    on_disconnect.assert_awaited()
+
+    on_disconnect.reset_mock()
 
     unsubscribe_on_connect()
+    unsubscribe_on_disconnect()
 
     await client.connect()
     await await_other(asyncio.current_task())
 
     assert client.connected
     on_connect.assert_not_awaited()
+
+    await client.disconnect()
+    await await_other(asyncio.current_task())
+
+    assert not client.connected
+    on_disconnect.assert_not_awaited()
 
 
 async def test_on_connect_exception(client_session, url, await_other, caplog):
