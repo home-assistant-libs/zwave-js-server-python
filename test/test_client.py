@@ -55,13 +55,13 @@ async def test_on_connect(client_session, url, await_other):
 
 async def test_on_connect_exception(client_session, url, await_other, caplog):
     """Test client on connect callback."""
-    on_connect_test = AsyncMock(side_effect=Exception("Boom"))
+    on_connect = AsyncMock(side_effect=Exception("Boom"))
     client = Client(url, client_session, start_listening_on_connect=False)
-    client.register_on_connect(on_connect_test)
+    client.register_on_connect(on_connect)
 
     await client.connect()
     await await_other(asyncio.current_task())
 
     assert client.connected
-    on_connect_test.assert_awaited()
+    on_connect.assert_awaited()
     assert "Unexpected error in on_connect" in caplog.text
