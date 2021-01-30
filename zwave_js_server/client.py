@@ -12,6 +12,7 @@ from packaging.version import parse as parse_version
 
 from .const import MIN_SERVER_VERSION
 from .event import Event
+from .exceptions import FailedCommand, InvalidServerVersion, InvalidState, NotConnected
 from .model.driver import Driver
 from .model.version import VersionInfo
 
@@ -32,28 +33,6 @@ async def gather_callbacks(
         if not isinstance(result, Exception):
             continue
         logger.error("Unexpected error in %s %s", name, callback, exc_info=result)
-
-
-class NotConnected(Exception):
-    """Exception raised when trying to handle unknown handler."""
-
-
-class InvalidState(Exception):
-    """Exception raised when data gets in invalid state."""
-
-
-class InvalidServerVersion(Exception):
-    """Exception raised when connected to server with incompatible version."""
-
-
-class FailedCommand(Exception):
-    """When a command has failed."""
-
-    def __init__(self, message_id: str, error_code: str):
-        """Initialize a failed command error."""
-        super().__init__(f"Command failed: {error_code}")
-        self.message_id = message_id
-        self.error_code = error_code
 
 
 class Client:
