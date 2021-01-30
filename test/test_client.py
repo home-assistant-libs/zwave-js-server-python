@@ -44,13 +44,27 @@ async def test_on_connect(client_session, url, await_other):
     """Test client on connect callback."""
     on_connect = AsyncMock()
     client = Client(url, client_session, start_listening_on_connect=False)
-    client.register_on_connect(on_connect)
+    unsubscribe_on_connect = client.register_on_connect(on_connect)
 
     await client.connect()
     await await_other(asyncio.current_task())
 
     assert client.connected
     on_connect.assert_awaited()
+
+    on_connect.reset_mock()
+
+    await client.disconnect()
+
+    assert not client.connected
+
+    unsubscribe_on_connect()
+
+    await client.connect()
+    await await_other(asyncio.current_task())
+
+    assert client.connected
+    on_connect.assert_not_awaited()
 
 
 async def test_on_connect_exception(client_session, url, await_other, caplog):
