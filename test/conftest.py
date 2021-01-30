@@ -7,6 +7,7 @@ import pytest
 from aiohttp import ClientSession, ClientWebSocketResponse
 
 from zwave_js_server.client import STATE_CONNECTED, Client
+from zwave_js_server.const import MIN_SERVER_VERSION
 from zwave_js_server.model.controller import Controller
 from zwave_js_server.model.driver import Driver
 from zwave_js_server.model.node import Node
@@ -14,6 +15,8 @@ from zwave_js_server.model.node import Node
 from . import load_fixture
 
 # pylint: disable=unused-argument
+
+TEST_URL = "ws://test.org:3000"
 
 
 @pytest.fixture(name="controller_state", scope="session")
@@ -35,15 +38,33 @@ def lock_schlage_be469_state_fixture():
 
 
 @pytest.fixture(name="client_session")
-def client_session_fixture():
+def client_session_fixture(ws_client):
     """Mock an aiohttp client session."""
-    return AsyncMock(spec_set=ClientSession)
+    client_session = AsyncMock(spec_set=ClientSession)
+    client_session.ws_connect.side_effect = AsyncMock(return_value=ws_client)
+    return client_session
 
 
 @pytest.fixture(name="ws_client")
 def ws_client_fixture():
     """Mock a websocket client."""
     return AsyncMock(spec_set=ClientWebSocketResponse)
+
+
+@pytest.fixture(name="version_data")
+def version_data_fixture():
+    """Return mock version data."""
+    return {
+        "driverVersion": "test_driver_version",
+        "serverVersion": MIN_SERVER_VERSION,
+        "homeId": "test_home_id",
+    }
+
+
+@pytest.fixture(name="url")
+def url_fixture():
+    """Return a test url."""
+    return TEST_URL
 
 
 @pytest.fixture(name="uuid4")
@@ -62,7 +83,6 @@ async def client_fixture(loop, client_session, ws_client, uuid4):
     This fixture needs to be a coroutine function to get an event loop
     when creating the client.
     """
-    client_session.ws_connect.side_effect = AsyncMock(return_value=ws_client)
     client = Client("ws://test.org", client_session)
     client.state = STATE_CONNECTED
     client.client = ws_client
