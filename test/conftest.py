@@ -46,9 +46,11 @@ def client_session_fixture(ws_client):
 
 
 @pytest.fixture(name="ws_client")
-def ws_client_fixture():
+def ws_client_fixture(version_data):
     """Mock a websocket client."""
-    return AsyncMock(spec_set=ClientWebSocketResponse)
+    ws_client = AsyncMock(spec_set=ClientWebSocketResponse)
+    ws_client.receive_json.return_value = version_data
+    return ws_client
 
 
 @pytest.fixture(name="version_data")
