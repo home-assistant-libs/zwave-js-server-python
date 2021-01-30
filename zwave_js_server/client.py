@@ -26,7 +26,6 @@ from .model.version import VersionInfo
 STATE_CONNECTED = "connected"
 STATE_DISCONNECTED = "disconnected"
 
-
 SIZE_PARSE_JSON_EXECUTOR = 8192
 
 
