@@ -2,7 +2,6 @@
 import asyncio
 import logging
 import pprint
-import random
 import uuid
 from types import TracebackType
 from typing import Any, Awaitable, Callable, Dict, List, Optional, cast
@@ -24,7 +23,6 @@ from .exceptions import (
 from .model.driver import Driver
 from .model.version import VersionInfo
 
-STATE_CONNECTING = "connecting"
 STATE_CONNECTED = "connected"
 STATE_DISCONNECTED = "disconnected"
 
@@ -59,12 +57,6 @@ class Client:
         self.driver: Optional[Driver] = None
         # The WebSocket client
         self.client: Optional[ClientWebSocketResponse] = None
-        # Scheduled sleep task till next connection retry
-        self.retry_task: Optional[asyncio.Task] = None
-        # Boolean to indicate if we wanted the connection to close
-        self.close_requested = False
-        # The current number of attempts to connect, impacts wait time
-        self.tries = 0
         # Current state of the connection
         self.state = STATE_DISCONNECTED
         # Version of the connected server
@@ -73,7 +65,6 @@ class Client:
         self._on_disconnect: List[Callable[[], Awaitable[None]]] = []
         self._on_initialized: List[Callable[[], Awaitable[None]]] = []
         self._logger = logging.getLogger(__package__)
-        self._disconnect_event: Optional[asyncio.Event] = None
         self._result_futures: Dict[str, asyncio.Future] = {}
         self._loop = asyncio.get_running_loop()
 
@@ -195,7 +186,6 @@ class Client:
                 self.ws_server_url,
                 heartbeat=55,
             )
-            self.tries = 0
 
             self.version = version = VersionInfo.from_message(
                 await client.receive_json()
@@ -222,68 +212,6 @@ class Client:
             client_exceptions.ClientError,
         ) as err:
             raise CannotConnect(err) from err
-
-    async def connect_retry(self) -> None:
-        """Connect to the IoT broker."""
-        if self.state != STATE_DISCONNECTED:
-            raise RuntimeError("Connect called while not disconnected")
-
-        self.close_requested = False
-        self.state = STATE_CONNECTING
-        self.tries = 0
-        self._disconnect_event = asyncio.Event()
-
-        while not self.close_requested:
-            try:
-                await self._handle_connection()
-            except Exception:  # pylint: disable=broad-except
-                # Safety net. This should never hit.
-                # Still adding it here to make sure we can always reconnect
-                self._logger.exception("Unexpected error")
-
-            if self.state == STATE_CONNECTED:
-                # change state to connecting/disconnected
-                self.state = (
-                    STATE_DISCONNECTED if self.close_requested else STATE_CONNECTING
-                )
-                # notify callbacks about disconnection
-                if self._on_disconnect:
-                    asyncio.create_task(
-                        gather_callbacks(
-                            self._logger, "on_disconnect", self._on_disconnect
-                        )
-                    )
-
-            if self.close_requested:
-                break
-
-            self.tries += 1
-
-            try:
-                await self._wait_retry()
-            except asyncio.CancelledError:
-                # Happens if disconnect called
-                break
-
-        self.state = STATE_DISCONNECTED
-        self._disconnect_event.set()
-        self._disconnect_event = None
-
-    async def _wait_retry(self) -> None:
-        """Wait until it's time till the next retry."""
-        # Sleep 2^tries + 0…tries*3 seconds between retries
-        self.retry_task = asyncio.create_task(
-            asyncio.sleep(2 ** min(9, self.tries) + random.randint(0, self.tries * 3))
-        )
-        await self.retry_task
-        self.retry_task = None
-
-    async def _handle_connection(
-        self,
-    ) -> None:
-        """Connect and listen to the Z-Wave JS server."""
-        await self.connect()
-        await self.listen()
 
     async def listen(self) -> None:
         """Start listening to the websocket."""
@@ -331,16 +259,16 @@ class Client:
 
     async def disconnect(self) -> None:
         """Disconnect the client."""
-        self.close_requested = True
-
         if self.client is not None:
             self._logger.debug("Closing client connection")
             await self.client.close()
-        elif self.retry_task is not None:
-            self.retry_task.cancel()
 
-        if self._disconnect_event is not None:
-            await self._disconnect_event.wait()
+        self.state = STATE_DISCONNECTED
+
+        if self._on_disconnect:
+            asyncio.create_task(
+                gather_callbacks(self._logger, "on_disconnect", self._on_disconnect)
+            )
 
     async def _start_listening(self) -> None:
         """When connected, start listening."""
