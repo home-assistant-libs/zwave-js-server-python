@@ -66,7 +66,6 @@ async def test_on_connect_on_disconnect(client_session, url, await_other):
 
     unsubscribe_on_connect()
     unsubscribe_on_disconnect()
-
     await client.connect()
     await await_other(asyncio.current_task())
 
@@ -92,3 +91,35 @@ async def test_on_connect_exception(client_session, url, await_other, caplog):
     assert client.connected
     on_connect.assert_awaited()
     assert "Unexpected error in on_connect" in caplog.text
+
+
+async def test_listen(client_session, url, await_other):
+    """Test client listen."""
+    on_initialization = AsyncMock()
+    client = Client(url, client_session, start_listening_on_connect=True)
+    unsubscribe_on_initialization = client.register_on_initialized(on_initialization)
+
+    assert not client.driver
+
+    await client.connect()
+    await client.listen()
+    await await_other(asyncio.current_task())
+
+    assert client.connected
+    assert client.driver
+    on_initialization.assert_awaited()
+
+    on_initialization.reset_mock()
+
+    await client.disconnect()
+    await await_other(asyncio.current_task())
+
+    assert not client.connected
+
+    unsubscribe_on_initialization()
+    await client.connect()
+    await client.listen()
+    await await_other(asyncio.current_task())
+
+    assert client.connected
+    on_initialization.assert_not_awaited()

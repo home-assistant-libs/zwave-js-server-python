@@ -2,10 +2,11 @@
 import asyncio
 import json
 from typing import List, Tuple
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 from aiohttp import ClientSession, ClientWebSocketResponse
+from aiohttp.http_websocket import WSMessage, WSMsgType
 
 from zwave_js_server.client import STATE_CONNECTED, Client
 from zwave_js_server.const import MIN_SERVER_VERSION
@@ -47,10 +48,37 @@ def client_session_fixture(ws_client):
 
 
 @pytest.fixture(name="ws_client")
-def ws_client_fixture(version_data):
-    """Mock a websocket client."""
-    ws_client = AsyncMock(spec_set=ClientWebSocketResponse)
+async def ws_client_fixture(loop, version_data, ws_message):
+    """Mock a websocket client.
+
+    This fixture only allows a single message to be received.
+    """
+    ws_client = AsyncMock(spec_set=ClientWebSocketResponse, closed=False)
     ws_client.receive_json.return_value = version_data
+    receive_event = asyncio.Event()
+
+    async def receive():
+        """Return a websocket message."""
+        await asyncio.sleep(0)
+        await receive_event.wait()
+        return ws_message
+
+    ws_client.receive.side_effect = receive
+
+    def close_client(*args):
+        """Close the client."""
+        ws_client.closed = True
+        receive_event.set()
+
+    ws_client.send_json.side_effect = close_client
+
+    async def reset_close():
+        """Reset the websocket client close method."""
+        ws_client.closed = False
+        receive_event.clear()
+
+    ws_client.close.side_effect = reset_close
+
     return ws_client
 
 
@@ -68,6 +96,27 @@ def version_data_fixture():
 def url_fixture():
     """Return a test url."""
     return TEST_URL
+
+
+@pytest.fixture(name="result")
+def result_fixture(controller_state, uuid4):
+    """Return a server result message."""
+    return {
+        "type": "result",
+        "success": True,
+        "result": {"state": controller_state},
+        "messageId": uuid4,
+    }
+
+
+@pytest.fixture(name="ws_message")
+def ws_message_fixture(result):
+    """Return a mock WSMessage."""
+    message = Mock(spec_set=WSMessage)
+    message.type = WSMsgType.TEXT
+    message.data = json.dumps(result)
+    message.json.return_value = result
+    return message
 
 
 @pytest.fixture(name="uuid4")
