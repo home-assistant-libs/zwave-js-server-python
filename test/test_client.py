@@ -1,12 +1,18 @@
 """Test the client."""
 import asyncio
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, Mock
 
-from aiohttp.client_exceptions import ClientError
+from aiohttp.client_exceptions import ClientError, WSServerHandshakeError
+from aiohttp.client_reqrep import ClientResponse, RequestInfo
 import pytest
 
 from zwave_js_server.client import Client
-from zwave_js_server.exceptions import CannotConnect, InvalidServerVersion, NotConnected
+from zwave_js_server.exceptions import (
+    CannotConnect,
+    ConnectionFailed,
+    InvalidServerVersion,
+    NotConnected,
+)
 
 
 async def test_connect(client_session, url):
@@ -18,9 +24,13 @@ async def test_connect(client_session, url):
     assert client.connected
 
 
-async def test_cannot_connect(client_session, url):
+@pytest.mark.parametrize(
+    "error",
+    [ClientError, WSServerHandshakeError(Mock(RequestInfo), (Mock(ClientResponse),))],
+)
+async def test_cannot_connect(client_session, url, error):
     """Test cannot connect."""
-    client_session.ws_connect.side_effect = ClientError
+    client_session.ws_connect.side_effect = error
     client = Client(url, client_session, start_listening_on_connect=False)
 
     with pytest.raises(CannotConnect):
@@ -133,3 +143,18 @@ async def test_listen(client_session, url, await_other):
 
     assert client.connected
     on_initialization.assert_not_awaited()
+
+
+@pytest.mark.parametrize(
+    "error",
+    [ClientError, WSServerHandshakeError(Mock(RequestInfo), (Mock(ClientResponse),))],
+)
+async def test_listen_client_error(client_session, url, ws_client, error):
+    """Test websocket error on listen."""
+    client = Client(url, client_session, start_listening_on_connect=True)
+    await client.connect()
+
+    ws_client.receive.side_effect = error
+
+    with pytest.raises(ConnectionFailed):
+        await client.listen()
