@@ -1,5 +1,5 @@
 """Provide a model for the Z-Wave JS node."""
-from typing import TYPE_CHECKING, Any, List, Optional, TypedDict, Union, cast
+from typing import Dict, TYPE_CHECKING, Any, List, Optional, TypedDict, Union, cast
 
 from ..event import Event, EventBase
 from .device_class import DeviceClass, DeviceClassDataType
@@ -48,7 +48,7 @@ class NodeDataType(TypedDict, total=False):
     userIcon: int
     ready: bool
     label: str
-    endpoints: List[int]
+    endpoints: List[Dict[str, int]]
     endpointCountIsDynamic: bool
     endpointsHaveIdenticalCapabilities: bool
     individualEndpointCount: int
