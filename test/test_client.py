@@ -213,26 +213,68 @@ async def test_listen_invalid_state(client_session, url, result):
     """Test missing driver state on listen."""
     result["type"] = "event"
     result["event"] = {
-        "event": {
-            "source": "node",
-            "event": "value updated",
-            "nodeId": 52,
-            "args": {
-                "commandClassName": "Basic",
-                "commandClass": 32,
-                "endpoint": 0,
-                "property": "currentValue",
-                "newValue": 255,
-                "prevValue": 255,
-                "propertyName": "currentValue",
-            },
-        }
+        "source": "node",
+        "event": "value updated",
+        "nodeId": 52,
+        "args": {
+            "commandClassName": "Basic",
+            "commandClass": 32,
+            "endpoint": 0,
+            "property": "currentValue",
+            "newValue": 255,
+            "prevValue": 255,
+            "propertyName": "currentValue",
+        },
     }
     client = Client(url, client_session, start_listening_on_connect=True)
     await client.connect()
 
     with pytest.raises(InvalidState):
         await client.listen()
+
+
+async def test_listen_event(
+    client_session, url, ws_client, ws_message, result, await_other
+):
+    """Test receiving event result type on listen."""
+    client = Client(url, client_session, start_listening_on_connect=True)
+    await client.connect()
+    await client.listen()
+    await await_other(asyncio.current_task())
+
+    assert client.connected
+    assert client.driver
+
+    result.clear()
+    result["type"] = "event"
+    result["event"] = {
+        "source": "node",
+        "event": "value updated",
+        "nodeId": 52,
+        "args": {
+            "commandClassName": "Basic",
+            "commandClass": 32,
+            "endpoint": 0,
+            "property": "currentValue",
+            "newValue": 255,
+            "prevValue": 255,
+            "propertyName": "currentValue",
+        },
+    }
+
+    ws_client.receive.reset_mock()
+    ws_client.closed = False
+
+    async def receive():
+        """Return a websocket message."""
+        ws_client.closed = True
+        return ws_message
+
+    ws_client.receive.side_effect = receive
+
+    await client.listen()
+
+    ws_client.receive.assert_awaited()
 
 
 async def test_listen_unknown_result_type(
