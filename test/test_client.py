@@ -2,10 +2,10 @@
 import asyncio
 from unittest.mock import AsyncMock, Mock
 
+import pytest
 from aiohttp.client_exceptions import ClientError, WSServerHandshakeError
 from aiohttp.client_reqrep import ClientResponse, RequestInfo
 from aiohttp.http_websocket import WSMsgType
-import pytest
 
 from zwave_js_server.client import Client
 from zwave_js_server.exceptions import (
@@ -13,6 +13,7 @@ from zwave_js_server.exceptions import (
     ConnectionFailed,
     InvalidMessage,
     InvalidServerVersion,
+    InvalidState,
     NotConnected,
 )
 
@@ -203,4 +204,30 @@ async def test_listen_invalid_message_data(client_session, url, ws_message):
     ws_message.json.side_effect = ValueError("Boom")
 
     with pytest.raises(InvalidMessage):
+        await client.listen()
+
+
+async def test_listen_invalid_state(client_session, url, result):
+    """Test missing driver state on listen."""
+    result["type"] = "event"
+    result["event"] = {
+        "event": {
+            "source": "node",
+            "event": "value updated",
+            "nodeId": 52,
+            "args": {
+                "commandClassName": "Basic",
+                "commandClass": 32,
+                "endpoint": 0,
+                "property": "currentValue",
+                "newValue": 255,
+                "prevValue": 255,
+                "propertyName": "currentValue",
+            },
+        }
+    }
+    client = Client(url, client_session, start_listening_on_connect=True)
+    await client.connect()
+
+    with pytest.raises(InvalidState):
         await client.listen()
