@@ -44,7 +44,7 @@ async def test_cannot_connect(client_session, url, error):
     assert not client.connected
 
 
-async def test_invalid_server_version(client_session, url, version_data):
+async def test_invalid_server_version(client_session, url, version_data, caplog):
     """Test client connect with invalid server version."""
     version_data["serverVersion"] = "invalid"
     client = Client(url, client_session, start_listening_on_connect=False)
@@ -53,6 +53,13 @@ async def test_invalid_server_version(client_session, url, version_data):
         await client.connect()
 
     assert not client.connected
+
+    version_data["serverVersion"] = "99999.0.0"
+
+    await client.connect()
+
+    assert client.connected
+    assert "Connected to a Zwave JS Server with an untested version" in caplog.text
 
 
 async def test_send_json_when_disconnected(client_session, url):
