@@ -4,7 +4,7 @@ from typing import Dict, TYPE_CHECKING, Any, List, Optional, TypedDict, Union, c
 from ..event import Event, EventBase
 from .device_class import DeviceClass, DeviceClassDataType
 from .device_config import DeviceConfig, DeviceConfigDataType
-from .endpoint import Endpoint
+from .endpoint import Endpoint, EndpointDataType
 from .value import (
     MetaDataType,
     Value,
@@ -48,7 +48,7 @@ class NodeDataType(TypedDict, total=False):
     userIcon: int
     ready: bool
     label: str
-    endpoints: List[Dict[str, int]]
+    endpoints: List[EndpointDataType]
     endpointCountIsDynamic: bool
     endpointsHaveIdenticalCapabilities: bool
     individualEndpointCount: int
