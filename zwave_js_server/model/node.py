@@ -1,5 +1,5 @@
 """Provide a model for the Z-Wave JS node."""
-from typing import Dict, TYPE_CHECKING, Any, List, Optional, TypedDict, Union, cast
+from typing import TYPE_CHECKING, Any, List, Optional, TypedDict, Union, cast
 
 from ..event import Event, EventBase
 from .device_class import DeviceClass, DeviceClassDataType
