@@ -4,12 +4,14 @@ from unittest.mock import AsyncMock, Mock
 
 from aiohttp.client_exceptions import ClientError, WSServerHandshakeError
 from aiohttp.client_reqrep import ClientResponse, RequestInfo
+from aiohttp.http_websocket import WSMsgType
 import pytest
 
 from zwave_js_server.client import Client
 from zwave_js_server.exceptions import (
     CannotConnect,
     ConnectionFailed,
+    InvalidMessage,
     InvalidServerVersion,
     NotConnected,
 )
@@ -157,4 +159,21 @@ async def test_listen_client_error(client_session, url, ws_client, error):
     ws_client.receive.side_effect = error
 
     with pytest.raises(ConnectionFailed):
+        await client.listen()
+
+
+@pytest.mark.parametrize(
+    "message_type, exception",
+    [(WSMsgType.ERROR, ConnectionFailed), (WSMsgType.BINARY, InvalidMessage)],
+)
+async def test_listen_error_message_types(
+    client_session, url, ws_message, message_type, exception
+):
+    """Test different websocket message types that should raise on listen."""
+    client = Client(url, client_session, start_listening_on_connect=True)
+    await client.connect()
+
+    ws_message.type = message_type
+
+    with pytest.raises(exception):
         await client.listen()
