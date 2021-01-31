@@ -125,6 +125,32 @@ async def test_on_connect_exception(client_session, url, await_other, caplog):
     assert "Unexpected error in on_connect" in caplog.text
 
 
+async def test_connect_with_existing_driver(
+    client_session, url, ws_client, await_other
+):
+    """Test connecting again with an existing driver raises."""
+    client = Client(url, client_session, start_listening_on_connect=True)
+    assert not client.connected
+    assert not client.driver
+
+    await client.connect()
+    await client.listen()
+    await await_other(asyncio.current_task())
+
+    assert client.connected
+    assert client.driver
+
+    ws_client.receive.reset_mock()
+    ws_client.closed = False
+
+    await client.connect()
+    await client.listen()
+    with pytest.raises(InvalidState):
+        await await_other(asyncio.current_task())
+
+    ws_client.receive.assert_awaited()
+
+
 async def test_listen(client_session, url, await_other):
     """Test client listen."""
     on_initialization = AsyncMock()
