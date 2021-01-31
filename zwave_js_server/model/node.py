@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any, List, Optional, TypedDict, Union, cast
 from ..event import Event, EventBase
 from .device_class import DeviceClass, DeviceClassDataType
 from .device_config import DeviceConfig, DeviceConfigDataType
+from .endpoint import Endpoint
 from .value import (
     MetaDataType,
     Value,
@@ -47,6 +48,7 @@ class NodeDataType(TypedDict, total=False):
     userIcon: int
     ready: bool
     label: str
+    endpoints: List[int]
     endpointCountIsDynamic: bool
     endpointsHaveIdenticalCapabilities: bool
     individualEndpointCount: int
@@ -200,6 +202,11 @@ class Node(EventBase):
     def neighbors(self) -> List[int]:
         """Return the neighbors."""
         return self.data.get("neighbors", [])
+        
+    @property
+    def endpoints(self) -> Optional[List[Endpoint]]:
+        """Return the endpoints."""
+        return [Endpoint(endpoint) for endpoint in self.data.get("endpoints", [])]
 
     @property
     def endpoint_count_is_dynamic(self) -> Optional[bool]:

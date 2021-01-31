@@ -58,6 +58,9 @@ def test_from_state():
     assert node.label == "ZW090"
     assert node.neighbors == [31, 32, 33, 36, 37, 39, 52]
     assert node.interview_attempts == 1
+    assert len(node.endpoints) == 1
+    assert node.endpoints[0].nodeId == 1
+    assert node.endpoints[0].index == 0
 
 
 async def test_set_value(node, uuid4, mock_command):
