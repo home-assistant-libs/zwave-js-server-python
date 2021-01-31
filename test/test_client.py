@@ -6,7 +6,7 @@ from aiohttp.client_exceptions import ClientError
 import pytest
 
 from zwave_js_server.client import Client
-from zwave_js_server.exceptions import CannotConnect, InvalidServerVersion
+from zwave_js_server.exceptions import CannotConnect, InvalidServerVersion, NotConnected
 
 
 async def test_connect(client_session, url):
@@ -38,6 +38,16 @@ async def test_invalid_server_version(client_session, url, version_data):
         await client.connect()
 
     assert not client.connected
+
+
+async def test_send_json_when_disconnected(client_session, url):
+    """Test send json message when disconnected."""
+    client = Client(url, client_session, start_listening_on_connect=False)
+
+    assert not client.connected
+
+    with pytest.raises(NotConnected):
+        await client.async_send_json_message({"test": None})
 
 
 async def test_on_connect_on_disconnect(client_session, url, await_other):
