@@ -83,7 +83,7 @@ class Client:
 
             if future is None:
                 self._logger.warning(
-                    "Received result for unknown message: %s", msg["messageId"]
+                    "Received result for unknown message with ID: %s", msg["messageId"]
                 )
                 return
 
@@ -99,6 +99,10 @@ class Client:
 
         if msg["type"] != "event":
             # Can't handle
+            self._logger.debug(
+                "Received message with unknown result type with ID: %s",
+                msg["messageId"],
+            )
             return
 
         event = Event(type=msg["event"]["event"], data=msg["event"])
