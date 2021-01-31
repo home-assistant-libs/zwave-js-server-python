@@ -33,6 +33,8 @@ class ValueDataType(TypedDict, total=False):
     propertyKey: Union[str, int]
     propertyKeyName: str
     value: Any
+    newValue: Any
+    prevValue: Any
     metadata: MetaDataType
     ccVersion: int
 
