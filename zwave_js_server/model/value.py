@@ -33,6 +33,8 @@ class ValueDataType(TypedDict, total=False):
     propertyKey: Union[str, int]
     propertyKeyName: str
     value: Any
+    newValue: Any
+    prevValue: Any
     metadata: MetaDataType
     ccVersion: int
 
@@ -106,6 +108,7 @@ class Value:
         """Initialize value."""
         self.node = node
         self.data = data
+        self._value = data.get("newValue", data.get("value"))
 
     def __repr__(self) -> str:
         """Return the representation."""
@@ -124,7 +127,7 @@ class Value:
     @property
     def value(self) -> Optional[Any]:
         """Return value."""
-        return self.data.get("value")
+        return self._value
 
     @property
     def command_class_name(self) -> str:
@@ -178,6 +181,7 @@ class Value:
     def update(self, data: ValueDataType) -> None:
         """Update data."""
         self.data.update(data)
+        self._value = data.get("newValue", data.get("value"))
 
 
 class ValueNotification(Value):
