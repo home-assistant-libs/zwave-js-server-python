@@ -177,3 +177,19 @@ async def test_listen_error_message_types(
 
     with pytest.raises(exception):
         await client.listen()
+
+
+@pytest.mark.parametrize("message_type", [WSMsgType.CLOSED, WSMsgType.CLOSING])
+async def test_listen_disconnect_message_types(
+    client_session, url, ws_client, ws_message, message_type
+):
+    """Test different websocket message types that stop listen."""
+    ws_message.type = message_type
+
+    # This should break out of the listen loop before handling the received message.
+    # Otherwise there will be an error.
+    async with Client(url, client_session, start_listening_on_connect=True) as client:
+        await client.listen()
+
+    # Assert that we received a message.
+    ws_client.receive.assert_awaited()
