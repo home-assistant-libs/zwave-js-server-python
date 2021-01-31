@@ -24,7 +24,7 @@ class Endpoint:
         self.data = data
 
     @property
-    def nodeId(self) -> int:
+    def node_id(self) -> int:
         """Return node ID property."""
         return self.data["nodeId"]
 
@@ -34,11 +34,11 @@ class Endpoint:
         return self.data["index"]
 
     @property
-    def installerIcon(self) -> Optional[int]:
+    def installer_icon(self) -> Optional[int]:
         """Return installer icon property."""
         return self.data.get("installerIcon")
 
     @property
-    def userIcon(self) -> Optional[int]:
+    def user_icon(self) -> Optional[int]:
         """Return user icon property."""
         return self.data.get("userIcon")

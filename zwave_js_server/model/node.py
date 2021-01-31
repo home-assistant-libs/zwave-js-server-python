@@ -202,7 +202,7 @@ class Node(EventBase):
     def neighbors(self) -> List[int]:
         """Return the neighbors."""
         return self.data.get("neighbors", [])
-        
+
     @property
     def endpoints(self) -> Optional[List[Endpoint]]:
         """Return the endpoints."""
