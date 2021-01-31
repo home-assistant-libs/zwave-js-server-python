@@ -193,3 +193,14 @@ async def test_listen_disconnect_message_types(
 
     # Assert that we received a message.
     ws_client.receive.assert_awaited()
+
+
+async def test_listen_invalid_message_data(client_session, url, ws_message):
+    """Test websocket message data that should raise on listen."""
+    client = Client(url, client_session, start_listening_on_connect=True)
+    await client.connect()
+
+    ws_message.json.side_effect = ValueError("Boom")
+
+    with pytest.raises(InvalidMessage):
+        await client.listen()
