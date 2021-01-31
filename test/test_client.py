@@ -11,6 +11,7 @@ from zwave_js_server.client import Client
 from zwave_js_server.exceptions import (
     CannotConnect,
     ConnectionFailed,
+    FailedCommand,
     InvalidMessage,
     InvalidServerVersion,
     InvalidState,
@@ -240,6 +241,18 @@ async def test_listen_invalid_message_data(client_session, url, ws_message):
 
     with pytest.raises(InvalidMessage):
         await client.listen()
+
+
+async def test_listen_not_success(client_session, url, result, await_other):
+    """Test receive result message with success False on listen."""
+    result["success"] = False
+    result["errorCode"] = "error_code"
+    client = Client(url, client_session, start_listening_on_connect=True)
+    await client.connect()
+
+    await client.listen()
+    with pytest.raises(FailedCommand):
+        await await_other(asyncio.current_task())
 
 
 async def test_listen_invalid_state(client_session, url, result):
