@@ -374,7 +374,9 @@ class Node(EventBase):
 
     def handle_notification(self, event: Event) -> None:
         """Process a node notification event."""
-        event.data["notification"] = Notification(self, cast(NotificationDataType, event.data))
+        event.data["notification"] = Notification(
+            self, cast(NotificationDataType, event.data)
+        )
 
     def handle_firmware_update_progress(self, event: Event) -> None:
         """Process a node firmware update progress event."""
