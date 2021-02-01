@@ -13,9 +13,9 @@ if TYPE_CHECKING:
 class NotificationDataType(TypedDict, total=False):
     """Represent a notification event data dict type."""
 
-    nodeId: int
-    notificationLabel: str
-    parameters: Optional[Dict[str, Any]]
+    nodeId: int  # required
+    notificationLabel: str  # required
+    parameters: Dict[str, Any]
 
 
 class Notification:
@@ -25,6 +25,11 @@ class Notification:
         """Initialize."""
         self.node = node
         self.data = data
+
+    @property
+    def node_id(self) -> int:
+        """Return node ID property."""
+        return self.data["nodeId"]
 
     @property
     def notification_label(self) -> str:
