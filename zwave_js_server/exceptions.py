@@ -25,6 +25,14 @@ class CannotConnect(TransportError):
         super().__init__(f"{error}", error)
 
 
+class ConnectionClosed(TransportError):
+    """Exception raised when the connection is closed by the server."""
+
+    def __init__(self) -> None:
+        """Initialize a connection closed error."""
+        super().__init__("Connection closed by server.")
+
+
 class ConnectionFailed(TransportError):
     """Exception raised when an established connection fails."""
 

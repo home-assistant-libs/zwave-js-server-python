@@ -13,6 +13,7 @@ from .const import MIN_SERVER_VERSION
 from .event import Event
 from .exceptions import (
     CannotConnect,
+    ConnectionClosed,
     ConnectionFailed,
     FailedCommand,
     InvalidMessage,
@@ -232,6 +233,9 @@ class Client:
 
             if msg.type in (WSMsgType.CLOSED, WSMsgType.CLOSING):
                 break
+
+            if msg.type == WSMsgType.CLOSE:
+                raise ConnectionClosed()
 
             if msg.type == WSMsgType.ERROR:
                 raise ConnectionFailed()
