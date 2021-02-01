@@ -10,10 +10,10 @@ from typing import Optional, TypedDict
 class EndpointDataType(TypedDict, total=False):
     """Represent an endpoint data dict type."""
 
-    nodeId: int
-    index: int
-    installerIcon: Optional[int]
-    userIcon: Optional[int]
+    nodeId: int  # required
+    index: int  # required
+    installerIcon: int
+    userIcon: int
 
 
 class Endpoint:
