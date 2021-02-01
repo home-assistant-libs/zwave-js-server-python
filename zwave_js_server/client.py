@@ -4,7 +4,7 @@ import logging
 import pprint
 import uuid
 from types import TracebackType
-from typing import Any, Awaitable, Callable, Dict, List, Optional, cast
+from typing import Any, Dict, Optional, cast
 
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, client_exceptions
 from packaging.version import parse as parse_version
@@ -30,27 +30,10 @@ STATE_DISCONNECTED = "disconnected"
 SIZE_PARSE_JSON_EXECUTOR = 8192
 
 
-async def gather_callbacks(
-    logger: logging.Logger, name: str, callbacks: List[Callable[[], Awaitable[None]]]
-) -> None:
-    """Gather callbacks."""
-    results = await asyncio.gather(*[cb() for cb in callbacks], return_exceptions=True)
-    for result, callback in zip(results, callbacks):
-        if not isinstance(result, Exception):
-            continue
-        logger.error("Unexpected error in %s %s", name, callback, exc_info=result)
-
-
 class Client:
     """Class to manage the IoT connection."""
 
-    def __init__(
-        self,
-        ws_server_url: str,
-        aiohttp_session: ClientSession,
-        *,
-        start_listening_on_connect: bool = True,
-    ):
+    def __init__(self, ws_server_url: str, aiohttp_session: ClientSession):
         """Initialize the Client class."""
         self.ws_server_url = ws_server_url
         self.aiohttp_session = aiohttp_session
@@ -61,15 +44,9 @@ class Client:
         self.state = STATE_DISCONNECTED
         # Version of the connected server
         self.version: Optional[VersionInfo] = None
-        self._on_connect: List[Callable[[], Awaitable[None]]] = []
-        self._on_disconnect: List[Callable[[], Awaitable[None]]] = []
-        self._on_initialized: List[Callable[[], Awaitable[None]]] = []
         self._logger = logging.getLogger(__package__)
         self._loop = asyncio.get_running_loop()
         self._result_futures: Dict[str, asyncio.Future] = {}
-
-        if start_listening_on_connect:
-            self.register_on_connect(self._start_listening)
 
     def __repr__(self) -> str:
         """Return the representation."""
@@ -111,45 +88,6 @@ class Client:
         event = Event(type=msg["event"]["event"], data=msg["event"])
         self.driver.receive_event(event)
 
-    def register_on_connect(
-        self, on_connect_cb: Callable[[], Awaitable[None]]
-    ) -> Callable:
-        """Register an async on_connect callback."""
-
-        def unsubscribe() -> None:
-            """Unsubscribe listeners."""
-            if on_connect_cb in self._on_connect:
-                self._on_connect.remove(on_connect_cb)
-
-        self._on_connect.append(on_connect_cb)
-        return unsubscribe
-
-    def register_on_disconnect(
-        self, on_disconnect_cb: Callable[[], Awaitable[None]]
-    ) -> Callable:
-        """Register an async on_disconnect callback."""
-
-        def unsubscribe() -> None:
-            """Unsubscribe listeners."""
-            if on_disconnect_cb in self._on_disconnect:
-                self._on_disconnect.remove(on_disconnect_cb)
-
-        self._on_disconnect.append(on_disconnect_cb)
-        return unsubscribe
-
-    def register_on_initialized(
-        self, on_initialized_cb: Callable[[], Awaitable[None]]
-    ) -> Callable:
-        """Register an async on_initialized_cb callback."""
-
-        def unsubscribe() -> None:
-            """Unsubscribe listeners."""
-            if on_initialized_cb in self._on_initialized:
-                self._on_initialized.remove(on_initialized_cb)
-
-        self._on_initialized.append(on_initialized_cb)
-        return unsubscribe
-
     @property
     def connected(self) -> bool:
         """Return if we're currently connected."""
@@ -184,6 +122,9 @@ class Client:
 
     async def connect(self) -> None:
         """Connect to the websocket server."""
+        if self.driver is not None:
+            raise InvalidState("Re-connected with existing driver")
+
         client = None
         self._logger.debug("Trying to connect")
         try:
@@ -212,13 +153,26 @@ class Client:
         )
         self.state = STATE_CONNECTED
 
-        if self._on_connect:
-            asyncio.create_task(
-                gather_callbacks(self._logger, "on_connect", self._on_connect)
-            )
+        listen_task = asyncio.create_task(self.listen())
+        result = await self.async_send_command({"command": "start_listening"})
+
+        self.driver = cast(
+            Driver,
+            await self._loop.run_in_executor(None, Driver, self, result["state"]),
+        )
+
+        listen_task.cancel()
+        await listen_task
+
+        self._logger.info(
+            "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
+        )
 
     async def listen(self) -> None:
         """Start listening to the websocket."""
+        if self.state != STATE_CONNECTED:
+            raise InvalidState("Not connected when start listening")
+
         assert self.client
 
         while not self.client.closed:
@@ -265,35 +219,12 @@ class Client:
 
         self.state = STATE_DISCONNECTED
 
-        if self._on_disconnect:
-            asyncio.create_task(
-                gather_callbacks(self._logger, "on_disconnect", self._on_disconnect)
-            )
-
     async def _close(self) -> None:
         """Close the client connection."""
         self._logger.debug("Closing client connection")
         assert self.client
         await self.client.close()
         self.driver = None
-
-    async def _start_listening(self) -> None:
-        """When connected, start listening."""
-        result = await self.async_send_command({"command": "start_listening"})
-
-        if self.driver is not None:
-            raise InvalidState("Re-connected with existing driver")
-
-        self.driver = cast(
-            Driver,
-            await self._loop.run_in_executor(None, Driver, self, result["state"]),
-        )
-        self._logger.info(
-            "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
-        )
-        asyncio.create_task(
-            gather_callbacks(self._logger, "on_initialized", self._on_initialized)
-        )
 
     def _check_server_version(self, server_version: str) -> None:
         """Perform a basic check on the server version compatability."""

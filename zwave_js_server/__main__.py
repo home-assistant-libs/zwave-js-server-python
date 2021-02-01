@@ -76,10 +76,19 @@ async def handle_dump_state(
 
 async def connect(args: argparse.Namespace, session: aiohttp.ClientSession) -> None:
     """Connect to the server."""
-    client = Client(args.url, session)
-    asyncio.create_task(register_controller_listeners(client))
+    async with Client(args.url, session) as client:
 
-    async with client:
+        assert client.driver
+        # Set up listeners on new nodes
+        client.driver.controller.on(
+            "node added",
+            lambda event: event["node"].on("value updated", log_value_updated),
+        )
+
+        # Set up listeners on existing nodes
+        for node in client.driver.controller.nodes.values():
+            node.on("value updated", log_value_updated)
+
         await client.listen()
 
 
@@ -100,30 +109,6 @@ def log_value_updated(event: dict) -> None:
         value.value_id,
         value.value,
     )
-
-
-async def register_controller_listeners(client: Client) -> None:
-    """Register controller listeners."""
-    is_initialized = asyncio.Event()
-
-    async def driver_initialized() -> None:
-        """Handle driver init."""
-        assert client.driver
-        # Set up listeners on new nodes
-        client.driver.controller.on(
-            "node added",
-            lambda event: event["node"].on("value updated", log_value_updated),
-        )
-
-        # Set up listeners on existing nodes
-        for node in client.driver.controller.nodes.values():
-            node.on("value updated", log_value_updated)
-
-        is_initialized.set()
-
-    client.register_on_initialized(driver_initialized)
-
-    await is_initialized.wait()
 
 
 def main() -> None:
