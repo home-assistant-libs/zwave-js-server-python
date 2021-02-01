@@ -1,11 +1,11 @@
 """Provide a model for the Z-Wave JS node."""
 from typing import TYPE_CHECKING, Any, List, Optional, TypedDict, Union, cast
-from zwave_js_server.model.notification import Notification
 
 from ..event import Event, EventBase
 from .device_class import DeviceClass, DeviceClassDataType
 from .device_config import DeviceConfig, DeviceConfigDataType
 from .endpoint import Endpoint, EndpointDataType
+from .notification import Notification, NotificationDataType
 from .value import (
     MetaDataType,
     Value,
@@ -374,7 +374,7 @@ class Node(EventBase):
 
     def handle_notification(self, event: Event) -> None:
         """Process a node notification event."""
-        event.data["notification"] = Notification(self, event.data)
+        event.data["notification"] = Notification(self, cast(NotificationDataType, event.data))
 
     def handle_firmware_update_progress(self, event: Event) -> None:
         """Process a node firmware update progress event."""
