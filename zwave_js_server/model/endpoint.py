@@ -24,6 +24,11 @@ class Endpoint:
         self.data = data
 
     @property
+    def node_id(self) -> int:
+        """Return node ID property."""
+        return self.data["nodeId"]
+
+    @property
     def index(self) -> int:
         """Return index property."""
         return self.data["index"]
