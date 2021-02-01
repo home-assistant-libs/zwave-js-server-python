@@ -224,11 +224,8 @@ class Client:
         while not self.client.closed:
             try:
                 msg = await self.client.receive()
-            except (
-                client_exceptions.WSServerHandshakeError,
-                client_exceptions.ClientError,
-            ) as err:
-                raise ConnectionFailed(err) from err
+            except asyncio.CancelledError:
+                break
 
             if msg.type in (WSMsgType.CLOSED, WSMsgType.CLOSING):
                 break

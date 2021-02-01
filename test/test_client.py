@@ -184,19 +184,15 @@ async def test_listen(client_session, url, await_other):
     on_initialization.assert_not_awaited()
 
 
-@pytest.mark.parametrize(
-    "error",
-    [ClientError, WSServerHandshakeError(Mock(RequestInfo), (Mock(ClientResponse),))],
-)
-async def test_listen_client_error(client_session, url, ws_client, error):
+async def test_listen_client_error(client_session, url, ws_client, ws_message):
     """Test websocket error on listen."""
-    client = Client(url, client_session, start_listening_on_connect=True)
-    await client.connect()
+    ws_client.receive.side_effect = asyncio.CancelledError()
 
-    ws_client.receive.side_effect = error
-
-    with pytest.raises(ConnectionFailed):
+    # This should break out of the listen loop before any message is received.
+    async with Client(url, client_session, start_listening_on_connect=True) as client:
         await client.listen()
+
+    assert not ws_message.json.called
 
 
 @pytest.mark.parametrize(
