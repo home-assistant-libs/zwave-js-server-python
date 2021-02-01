@@ -5,6 +5,7 @@ from ..event import Event, EventBase
 from .device_class import DeviceClass, DeviceClassDataType
 from .device_config import DeviceConfig, DeviceConfigDataType
 from .endpoint import Endpoint, EndpointDataType
+from .notification import Notification, NotificationDataType
 from .value import (
     MetaDataType,
     Value,
@@ -366,13 +367,16 @@ class Node(EventBase):
 
     def handle_value_notification(self, event: Event) -> None:
         """Process a node value notification event."""
-        event.data["notification"] = ValueNotification(self, event.data["args"])
+        event.data["value_notification"] = ValueNotification(self, event.data["args"])
 
     def handle_metadata_updated(self, event: Event) -> None:
         """Process a node metadata updated event."""
 
     def handle_notification(self, event: Event) -> None:
         """Process a node notification event."""
+        event.data["notification"] = Notification(
+            self, cast(NotificationDataType, event.data)
+        )
 
     def handle_firmware_update_progress(self, event: Event) -> None:
         """Process a node firmware update progress event."""
