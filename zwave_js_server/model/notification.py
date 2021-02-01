@@ -4,7 +4,7 @@ Model for a Zwave Node's Notification Event.
 https://zwave-js.github.io/node-zwave-js/#/api/node?id=quotnotificationquot
 """
 
-from typing import TYPE_CHECKING, Any, Dict, Optional, TypedDict
+from typing import Literal, TYPE_CHECKING, Any, Dict, Optional, TypedDict
 
 if TYPE_CHECKING:
     from .node import Node
@@ -13,6 +13,8 @@ if TYPE_CHECKING:
 class NotificationDataType(TypedDict, total=False):
     """Represent a notification event data dict type."""
 
+    source: Literal["node"]  # required
+    event: Literal["notification"]  # required
     nodeId: int  # required
     notificationLabel: str  # required
     parameters: Dict[str, Any]
