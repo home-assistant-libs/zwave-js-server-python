@@ -326,7 +326,7 @@ async def test_listen_event(
 async def test_listen_unknown_result_type(
     client_session, url, ws_client, ws_message, result, await_other
 ):
-    """Test websocket message with unknown result on listen."""
+    """Test websocket message with unknown type on listen."""
     client = Client(url, client_session, start_listening_on_connect=True)
     await client.connect()
     await client.listen()
@@ -346,7 +346,7 @@ async def test_listen_unknown_result_type(
     ws_client.receive.side_effect = receive
     result["type"] = "unknown"
 
-    # Receiving an unknown result type should not error.
+    # Receiving an unknown message type should not error.
     await client.listen()
 
     ws_client.receive.assert_awaited()

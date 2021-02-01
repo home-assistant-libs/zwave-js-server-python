@@ -101,8 +101,9 @@ class Client:
         if msg["type"] != "event":
             # Can't handle
             self._logger.debug(
-                "Received message with unknown result type with ID: %s",
-                msg["messageId"],
+                "Received message with unknown type '%s': %s",
+                msg["type"],
+                msg,
             )
             return
 
