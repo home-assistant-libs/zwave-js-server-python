@@ -65,6 +65,7 @@ class Client:
         self._on_disconnect: List[Callable[[], Awaitable[None]]] = []
         self._on_initialized: List[Callable[[], Awaitable[None]]] = []
         self._logger = logging.getLogger(__package__)
+        self._loop = asyncio.get_running_loop()
         self._result_futures: Dict[str, asyncio.Future] = {}
 
         if start_listening_on_connect:
@@ -156,8 +157,7 @@ class Client:
 
     async def async_send_command(self, message: Dict[str, Any]) -> dict:
         """Send a command and get a response."""
-        loop = asyncio.get_running_loop()
-        future: "asyncio.Future[dict]" = loop.create_future()
+        future: "asyncio.Future[dict]" = self._loop.create_future()
         message_id = message["messageId"] = uuid.uuid4().hex
         self._result_futures[message_id] = future
         await self.async_send_json_message(message)
@@ -221,8 +221,6 @@ class Client:
         """Start listening to the websocket."""
         assert self.client
 
-        loop = asyncio.get_running_loop()
-
         while not self.client.closed:
             try:
                 msg = await self.client.receive()
@@ -246,7 +244,7 @@ class Client:
 
             try:
                 if len(msg.data) > SIZE_PARSE_JSON_EXECUTOR:
-                    msg = await loop.run_in_executor(None, msg.json)
+                    msg = await self._loop.run_in_executor(None, msg.json)
                 else:
                     msg = msg.json()
             except ValueError as err:
@@ -289,9 +287,9 @@ class Client:
         if self.driver is not None:
             raise InvalidState("Re-connected with existing driver")
 
-        loop = asyncio.get_running_loop()
         self.driver = cast(
-            Driver, await loop.run_in_executor(None, Driver, self, result["state"])
+            Driver,
+            await self._loop.run_in_executor(None, Driver, self, result["state"]),
         )
         self._logger.info(
             "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
