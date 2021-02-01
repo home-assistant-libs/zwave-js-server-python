@@ -204,9 +204,9 @@ class Node(EventBase):
         return self.data.get("neighbors", [])
 
     @property
-    def endpoints(self) -> Optional[List[Endpoint]]:
+    def endpoints(self) -> List[Endpoint]:
         """Return the endpoints."""
-        return [Endpoint(endpoint) for endpoint in self.data.get("endpoints", [])]
+        return [Endpoint(endpoint) for endpoint in self.data["endpoints"]]
 
     @property
     def endpoint_count_is_dynamic(self) -> Optional[bool]:
