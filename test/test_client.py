@@ -218,6 +218,15 @@ async def test_listen_invalid_state(client_session, url, result):
     assert client.connected
 
 
+async def test_listen_without_connect(client_session, url):
+    """Test listen without first being connected."""
+    client = Client(url, client_session)
+    assert not client.connected
+
+    with pytest.raises(InvalidState):
+        await client.listen()
+
+
 async def test_listen_event(client_session, url, ws_client, ws_message, result):
     """Test receiving event result type on listen."""
     client = Client(url, client_session)
