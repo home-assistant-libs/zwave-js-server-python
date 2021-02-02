@@ -13,7 +13,6 @@ from .const import MIN_SERVER_VERSION
 from .event import Event
 from .exceptions import (
     CannotConnect,
-    ConnectionClosed,
     ConnectionFailed,
     FailedCommand,
     InvalidMessage,
@@ -39,7 +38,7 @@ class Client:
         self.aiohttp_session = aiohttp_session
         self.driver: Optional[Driver] = None
         # The WebSocket client
-        self.client: Optional[ClientWebSocketResponse] = None
+        self._client: Optional[ClientWebSocketResponse] = None
         # Current state of the connection
         self.state = STATE_DISCONNECTED
         # Version of the connected server
@@ -47,11 +46,13 @@ class Client:
         self._logger = logging.getLogger(__package__)
         self._loop = asyncio.get_running_loop()
         self._result_futures: Dict[str, asyncio.Future] = {}
-        self._start_listen_task: Optional[asyncio.Task] = None
+        self._shutdown_complete_event: Optional[asyncio.Event] = None
 
     def __repr__(self) -> str:
         """Return the representation."""
-        return f"{type(self).__name__}(ws_server_url={self.ws_server_url!r})"
+        return (
+            f"{type(self).__name__}(ws_server_url={self.ws_server_url!r}, {self.state})"
+        )
 
     @property
     def connected(self) -> bool:
@@ -77,7 +78,7 @@ class Client:
         client = None
         self._logger.debug("Trying to connect")
         try:
-            self.client = client = await self.aiohttp_session.ws_connect(
+            self._client = client = await self.aiohttp_session.ws_connect(
                 self.ws_server_url,
                 heartbeat=55,
             )
@@ -107,80 +108,82 @@ class Client:
         if self.state != STATE_CONNECTED:
             raise InvalidState("Not connected when start listening")
 
-        self._start_listen_task = asyncio.create_task(self._start_listen(driver_ready))
+        start_listen_task = asyncio.create_task(self._start_listen(driver_ready))
 
-        assert self.client
+        assert self._client
 
-        while not self.client.closed:
+        try:
+            while not self._client.closed:
+                msg = await self._client.receive()
+
+                if msg.type in (WSMsgType.CLOSE, WSMsgType.CLOSED, WSMsgType.CLOSING):
+                    break
+
+                if msg.type == WSMsgType.ERROR:
+                    await self._client.close()
+                    raise ConnectionFailed()
+
+                if msg.type != WSMsgType.TEXT:
+                    raise InvalidMessage(f"Received non-Text message: {msg.type}")
+
+                try:
+                    if len(msg.data) > SIZE_PARSE_JSON_EXECUTOR:
+                        msg: dict = await self._loop.run_in_executor(None, msg.json)
+                    else:
+                        msg = msg.json()
+                except ValueError as err:
+                    raise InvalidMessage("Received invalid JSON.") from err
+
+                if self._logger.isEnabledFor(logging.DEBUG):
+                    self._logger.debug("Received message:\n%s\n", pprint.pformat(msg))
+
+                self._handle_incoming_message(msg)
+
+        finally:
+            self._logger.debug("Listen completed. Cleaning up")
+
+            for future in self._result_futures.values():
+                future.cancel()
+
+            start_listen_task.cancel()
             try:
-                msg = await self.client.receive()
+                await start_listen_task
             except asyncio.CancelledError:
-                break
+                pass
 
-            if msg.type in (WSMsgType.CLOSED, WSMsgType.CLOSING):
-                await self._close()
-                break
+            if not self._client.closed:
+                await self._client.close()
 
-            if msg.type == WSMsgType.CLOSE:
-                raise ConnectionClosed()
+            self.state = STATE_DISCONNECTED
 
-            if msg.type == WSMsgType.ERROR:
-                raise ConnectionFailed()
-
-            if msg.type != WSMsgType.TEXT:
-                raise InvalidMessage(f"Received non-Text message: {msg.type}")
-
-            try:
-                if len(msg.data) > SIZE_PARSE_JSON_EXECUTOR:
-                    msg = await self._loop.run_in_executor(None, msg.json)
-                else:
-                    msg = msg.json()
-            except ValueError as err:
-                raise InvalidMessage("Received invalid JSON.") from err
-
-            if self._logger.isEnabledFor(logging.DEBUG):
-                self._logger.debug("Received message:\n%s\n", pprint.pformat(msg))
-
-            msg_ = cast(dict, msg)
-
-            self._handle_incoming_message(msg_)
+            if self._shutdown_complete_event:
+                self._shutdown_complete_event.set()
 
     async def disconnect(self) -> None:
         """Disconnect the client."""
-        if self.client is not None:
-            await self._close()
-
-        self.state = STATE_DISCONNECTED
-
-    async def _close(self) -> None:
-        """Close the client connection."""
         self._logger.debug("Closing client connection")
-        assert self.client
-        await self.client.close()
-        if self._start_listen_task:
-            self._start_listen_task.cancel()
-            await self._start_listen_task
-        for future in self._result_futures.values():
-            future.cancel()
-        self.driver = None
+
+        if self._client is None or self._client.closed:
+            return
+
+        self._shutdown_complete_event = asyncio.Event()
+        await self._client.close()
+        await self._shutdown_complete_event.wait()
 
     async def _start_listen(self, driver_ready: asyncio.Event) -> None:
         """Send start_listening command to initialize the driver."""
-        try:
-            result = await self.async_send_command({"command": "start_listening"})
-        except asyncio.CancelledError:
-            return
+        result = await self.async_send_command({"command": "start_listening"})
 
         self.driver = cast(
             Driver,
             await self._loop.run_in_executor(None, Driver, self, result["state"]),
         )
+
         driver_ready.set()
 
         self._logger.info(
             "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
         )
-        self._start_listen_task = None
 
     def _check_server_version(self, server_version: str) -> None:
         """Perform a basic check on the server version compatability."""
@@ -215,8 +218,12 @@ class Client:
             future.set_exception(FailedCommand(msg["messageId"], msg["errorCode"]))
             return
 
+        # Cannot happen but testing just in case.
         if self.driver is None:
-            raise InvalidState("Did not receive state as first message")
+            self._logger.error(
+                "Did not receive state as first message. Closing connection."
+            )
+            asyncio.create_task(self._client.close())
 
         if msg["type"] != "event":
             # Can't handle
@@ -241,10 +248,10 @@ class Client:
         if self._logger.isEnabledFor(logging.DEBUG):
             self._logger.debug("Publishing message:\n%s\n", pprint.pformat(message))
 
-        assert self.client
-        if "messageId" not in message:
-            message["messageId"] = uuid.uuid4().hex
-        await self.client.send_json(message)
+        assert self._client
+        assert "messageId" in message
+
+        await self._client.send_json(message)
 
     async def __aenter__(self) -> "Client":
         """Connect to the websocket."""

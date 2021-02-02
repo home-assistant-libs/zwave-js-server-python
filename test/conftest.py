@@ -1,6 +1,7 @@
 """Provide common pytest fixtures."""
 import asyncio
 import json
+import logging
 from typing import List, Tuple
 from unittest.mock import AsyncMock, Mock, patch
 
@@ -15,6 +16,8 @@ from zwave_js_server.model.driver import Driver
 from zwave_js_server.model.node import Node
 
 from . import load_fixture
+
+logging.basicConfig(level=logging.DEBUG)
 
 # pylint: disable=unused-argument
 
@@ -156,7 +159,7 @@ async def client_fixture(loop, client_session, ws_client, uuid4):
     """
     client = Client("ws://test.org", client_session)
     client.state = STATE_CONNECTED
-    client.client = ws_client
+    client._client = ws_client
     return client
 
 
@@ -224,3 +227,41 @@ def controller_fixture(driver, controller_state):
     """Return a controller instance with a supporting client."""
     controller = Controller(driver.client, controller_state)
     return controller
+
+
+@pytest.fixture
+async def messages_to_receive():
+    return asyncio.Queue()
+
+
+@pytest.fixture
+async def messages_sent():
+    return []
+
+
+@pytest.fixture
+async def ws_client2(
+    loop, version_data, messages_to_receive, messages_sent, ws_message
+):
+    ws_client = AsyncMock(spec_set=ClientWebSocketResponse, closed=False)
+    ws_client.receive_json.return_value = version_data
+
+    ws_client.receive = messages_to_receive.get
+
+    async def send_json(msg):
+        messages_sent.append(msg)
+
+        if msg["command"] == "start_listening":
+            messages_to_receive.put_nowait(ws_message)
+
+    ws_client.send_json = send_json
+
+    return ws_client
+
+
+@pytest.fixture(name="client_session2")
+def client_session2_fixture(ws_client2):
+    """Mock an aiohttp client session."""
+    client_session = AsyncMock(spec_set=ClientSession)
+    client_session.ws_connect.side_effect = AsyncMock(return_value=ws_client2)
+    return client_session

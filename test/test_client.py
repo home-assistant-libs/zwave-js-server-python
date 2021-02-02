@@ -10,7 +10,6 @@ from aiohttp.http_websocket import WSMsgType
 from zwave_js_server.client import Client
 from zwave_js_server.exceptions import (
     CannotConnect,
-    ConnectionClosed,
     ConnectionFailed,
     FailedCommand,
     InvalidMessage,
@@ -99,9 +98,9 @@ async def test_connect_with_existing_driver(
     ws_client.receive.assert_not_awaited()
 
 
-async def test_listen(client_session, url, driver_ready, await_other):
+async def test_listen(client_session2, url, driver_ready):
     """Test client listen."""
-    client = Client(url, client_session)
+    client = Client(url, client_session2)
 
     assert not client.driver
 
@@ -109,13 +108,11 @@ async def test_listen(client_session, url, driver_ready, await_other):
 
     assert client.connected
 
-    await client.listen(driver_ready)
-    await await_other(asyncio.current_task())
-
+    asyncio.create_task(client.listen(driver_ready))
+    await driver_ready.wait()
     assert client.driver
 
     await client.disconnect()
-
     assert not client.connected
 
 
@@ -132,7 +129,8 @@ async def test_listen_client_error(
     ws_client.closed = False
 
     # This should break out of the listen loop before any message is received.
-    await client.listen(driver_ready)
+    with pytest.raises(asyncio.CancelledError):
+        await client.listen(driver_ready)
 
     assert not ws_message.json.called
 
@@ -142,7 +140,6 @@ async def test_listen_client_error(
     [
         (WSMsgType.ERROR, ConnectionFailed),
         (WSMsgType.BINARY, InvalidMessage),
-        (WSMsgType.CLOSE, ConnectionClosed),
     ],
 )
 async def test_listen_error_message_types(
@@ -173,7 +170,6 @@ async def test_listen_disconnect_message_types(
         # This should break out of the listen loop before handling the received message.
         # Otherwise there will be an error.
         await client.listen(driver_ready)
-        await await_other(asyncio.current_task())
 
     # Assert that we received a message.
     ws_client.receive.assert_awaited()
