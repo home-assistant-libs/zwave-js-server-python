@@ -181,7 +181,10 @@ class Value:
     def update(self, data: ValueDataType) -> None:
         """Update data."""
         self.data.update(data)
-        self._value = data.get("newValue", data.get("value"))
+        if "newValue" in data:
+            self._value = data["newValue"]
+        if "value" in data:
+            self._value = data["value"]
 
 
 class ValueNotification(Value):
