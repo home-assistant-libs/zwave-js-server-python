@@ -153,6 +153,7 @@ async def test_listen_disconnect_message_types(
     async with Client(url, client_session) as client:
         assert client.connected
         ws_message.type = message_type
+        ws_client.closed = False
 
         # This should break out of the listen loop before handling the received message.
         # Otherwise there will be an error.
