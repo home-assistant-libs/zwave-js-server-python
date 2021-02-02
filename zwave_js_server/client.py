@@ -154,7 +154,7 @@ class Client:
         self.state = STATE_CONNECTED
 
         listen_task = asyncio.create_task(self.listen())
-        start_listen_task = asyncio.create_task(self._start_listen())
+        start_listen_task = asyncio.create_task(self._start_listen(listen_task))
 
         try:
             await asyncio.gather(listen_task, start_listen_task)
@@ -221,7 +221,7 @@ class Client:
             future.cancel()
         self.driver = None
 
-    async def _start_listen(self) -> None:
+    async def _start_listen(self, listen_task: asyncio.Task) -> None:
         """Send start_listening command to initialize the driver."""
         result = await self.async_send_command({"command": "start_listening"})
 
@@ -229,6 +229,8 @@ class Client:
             Driver,
             await self._loop.run_in_executor(None, Driver, self, result["state"]),
         )
+        listen_task.cancel()
+        await listen_task
 
         self._logger.info(
             "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
