@@ -187,7 +187,7 @@ def mock_command_fixture(ws_client, client, uuid4):
                     "result": response,
                     "success": success,
                 }
-                client.async_handle_message(received_message)
+                client._handle_incoming_message(received_message)
                 return
 
         raise RuntimeError("Command not mocked!")

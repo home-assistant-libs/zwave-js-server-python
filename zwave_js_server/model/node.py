@@ -259,7 +259,7 @@ class Node(EventBase):
 
     async def async_refresh_info(self) -> None:
         """Send refreshInfo command to Node."""
-        await self.client.async_send_json_message(
+        await self.client.async_send_command(
             {
                 "command": "node.refresh_info",
                 "nodeId": self.node_id,
@@ -295,7 +295,7 @@ class Node(EventBase):
 
     async def async_abort_firmware_update(self) -> None:
         """Send abortFirmwareUpdate command to Node."""
-        await self.client.async_send_json_message(
+        await self.client.async_send_command(
             {
                 "command": "node.abort_firmware_update",
                 "nodeId": self.node_id,

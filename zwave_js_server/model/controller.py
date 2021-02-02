@@ -167,7 +167,7 @@ class Controller(EventBase):
 
     async def async_remove_failed_node(self, node_id: int) -> None:
         """Send removeFailedNode command to Controller."""
-        await self.client.async_send_json_message(
+        await self.client.async_send_command(
             {"command": "controller.remove_failed_node", "nodeId": node_id}
         )
 
@@ -270,7 +270,7 @@ class Controller(EventBase):
         self, node_id: int, group: int, associations: List[Association]
     ) -> None:
         """Send addAssociations command to Controller."""
-        await self.client.async_send_json_message(
+        await self.client.async_send_command(
             {
                 "command": "controller.add_associations",
                 "nodeId": node_id,
@@ -289,7 +289,7 @@ class Controller(EventBase):
         self, node_id: int, group: int, associations: List[Association]
     ) -> None:
         """Send removeAssociations command to Controller."""
-        await self.client.async_send_json_message(
+        await self.client.async_send_command(
             {
                 "command": "controller.remove_associations",
                 "nodeId": node_id,
@@ -306,7 +306,7 @@ class Controller(EventBase):
 
     async def async_remove_node_from_all_assocations(self, node_id: int) -> None:
         """Send removeNodeFromAllAssocations command to Controller."""
-        await self.client.async_send_json_message(
+        await self.client.async_send_command(
             {
                 "command": "controller.remove_node_from_all_assocations",
                 "nodeId": node_id,

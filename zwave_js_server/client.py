@@ -53,42 +53,6 @@ class Client:
         """Return the representation."""
         return f"{type(self).__name__}(ws_server_url={self.ws_server_url!r})"
 
-    def async_handle_message(self, msg: dict) -> None:
-        """Handle incoming message.
-
-        Run all async tasks in a wrapper to log appropriately.
-        """
-        if msg["type"] == "result":
-            future = self._result_futures.get(msg["messageId"])
-
-            if future is None:
-                self._logger.warning(
-                    "Received result for unknown message with ID: %s", msg["messageId"]
-                )
-                return
-
-            if msg["success"]:
-                future.set_result(msg["result"])
-                return
-
-            future.set_exception(FailedCommand(msg["messageId"], msg["errorCode"]))
-            return
-
-        if self.driver is None:
-            raise InvalidState("Did not receive state as first message")
-
-        if msg["type"] != "event":
-            # Can't handle
-            self._logger.debug(
-                "Received message with unknown type '%s': %s",
-                msg["type"],
-                msg,
-            )
-            return
-
-        event = Event(type=msg["event"]["event"], data=msg["event"])
-        self.driver.receive_event(event)
-
     @property
     def connected(self) -> bool:
         """Return if we're currently connected."""
@@ -99,27 +63,11 @@ class Client:
         future: "asyncio.Future[dict]" = self._loop.create_future()
         message_id = message["messageId"] = uuid.uuid4().hex
         self._result_futures[message_id] = future
-        await self.async_send_json_message(message)
+        await self._send_json_message(message)
         try:
             return await future
         finally:
             self._result_futures.pop(message_id)
-
-    async def async_send_json_message(self, message: Dict[str, Any]) -> None:
-        """Send a message.
-
-        Raises NotConnected if client not connected.
-        """
-        if self.state != STATE_CONNECTED:
-            raise NotConnected
-
-        if self._logger.isEnabledFor(logging.DEBUG):
-            self._logger.debug("Publishing message:\n%s\n", pprint.pformat(message))
-
-        assert self.client
-        if "messageId" not in message:
-            message["messageId"] = uuid.uuid4().hex
-        await self.client.send_json(message)
 
     async def connect(self) -> None:
         """Connect to the websocket server."""
@@ -195,7 +143,7 @@ class Client:
 
             msg_ = cast(dict, msg)
 
-            self.async_handle_message(msg_)
+            self._handle_incoming_message(msg_)
 
     async def disconnect(self) -> None:
         """Disconnect the client."""
@@ -245,6 +193,58 @@ class Client:
                 "Connected to a Zwave JS Server with an untested version, \
                     you may run into compatibility issues!"
             )
+
+    def _handle_incoming_message(self, msg: dict) -> None:
+        """Handle incoming message.
+
+        Run all async tasks in a wrapper to log appropriately.
+        """
+        if msg["type"] == "result":
+            future = self._result_futures.get(msg["messageId"])
+
+            if future is None:
+                self._logger.warning(
+                    "Received result for unknown message with ID: %s", msg["messageId"]
+                )
+                return
+
+            if msg["success"]:
+                future.set_result(msg["result"])
+                return
+
+            future.set_exception(FailedCommand(msg["messageId"], msg["errorCode"]))
+            return
+
+        if self.driver is None:
+            raise InvalidState("Did not receive state as first message")
+
+        if msg["type"] != "event":
+            # Can't handle
+            self._logger.debug(
+                "Received message with unknown type '%s': %s",
+                msg["type"],
+                msg,
+            )
+            return
+
+        event = Event(type=msg["event"]["event"], data=msg["event"])
+        self.driver.receive_event(event)
+
+    async def _send_json_message(self, message: Dict[str, Any]) -> None:
+        """Send a message.
+
+        Raises NotConnected if client not connected.
+        """
+        if self.state != STATE_CONNECTED:
+            raise NotConnected
+
+        if self._logger.isEnabledFor(logging.DEBUG):
+            self._logger.debug("Publishing message:\n%s\n", pprint.pformat(message))
+
+        assert self.client
+        if "messageId" not in message:
+            message["messageId"] = uuid.uuid4().hex
+        await self.client.send_json(message)
 
     async def __aenter__(self) -> "Client":
         """Connect to the websocket."""
