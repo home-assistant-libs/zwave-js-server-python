@@ -47,6 +47,7 @@ class Client:
         self._logger = logging.getLogger(__package__)
         self._loop = asyncio.get_running_loop()
         self._result_futures: Dict[str, asyncio.Future] = {}
+        self._start_listen_task: Optional[asyncio.Task] = None
 
     def __repr__(self) -> str:
         """Return the representation."""
@@ -153,22 +154,12 @@ class Client:
         )
         self.state = STATE_CONNECTED
 
-        listen_task = asyncio.create_task(self.listen())
-        start_listen_task = asyncio.create_task(self._start_listen(listen_task))
-
-        try:
-            await asyncio.gather(listen_task, start_listen_task)
-        except Exception:
-            listen_task.cancel()
-            start_listen_task.cancel()
-            await listen_task
-            await start_listen_task
-            raise
-
-    async def listen(self) -> None:
+    async def listen(self, driver_ready: asyncio.Event) -> None:
         """Start listening to the websocket."""
         if self.state != STATE_CONNECTED:
             raise InvalidState("Not connected when start listening")
+
+        self._start_listen_task = asyncio.create_task(self._start_listen(driver_ready))
 
         assert self.client
 
@@ -179,6 +170,7 @@ class Client:
                 break
 
             if msg.type in (WSMsgType.CLOSED, WSMsgType.CLOSING):
+                await self._close()
                 break
 
             if msg.type == WSMsgType.CLOSE:
@@ -217,24 +209,30 @@ class Client:
         self._logger.debug("Closing client connection")
         assert self.client
         await self.client.close()
+        if self._start_listen_task:
+            self._start_listen_task.cancel()
+            await self._start_listen_task
         for future in self._result_futures.values():
             future.cancel()
         self.driver = None
 
-    async def _start_listen(self, listen_task: asyncio.Task) -> None:
+    async def _start_listen(self, driver_ready: asyncio.Event) -> None:
         """Send start_listening command to initialize the driver."""
-        result = await self.async_send_command({"command": "start_listening"})
+        try:
+            result = await self.async_send_command({"command": "start_listening"})
+        except asyncio.CancelledError:
+            return
 
         self.driver = cast(
             Driver,
             await self._loop.run_in_executor(None, Driver, self, result["state"]),
         )
-        listen_task.cancel()
-        await listen_task
+        driver_ready.set()
 
         self._logger.info(
             "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
         )
+        self._start_listen_task = None
 
     def _check_server_version(self, server_version: str) -> None:
         """Perform a basic check on the server version compatability."""

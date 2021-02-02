@@ -78,18 +78,26 @@ async def connect(args: argparse.Namespace, session: aiohttp.ClientSession) -> N
     """Connect to the server."""
     async with Client(args.url, session) as client:
 
-        assert client.driver
-        # Set up listeners on new nodes
-        client.driver.controller.on(
-            "node added",
-            lambda event: event["node"].on("value updated", log_value_updated),
-        )
+        driver_ready = asyncio.Event()
+        asyncio.create_task(on_driver_ready(client, driver_ready))
 
-        # Set up listeners on existing nodes
-        for node in client.driver.controller.nodes.values():
-            node.on("value updated", log_value_updated)
+        await client.listen(driver_ready)
 
-        await client.listen()
+
+async def on_driver_ready(client: Client, driver_ready: asyncio.Event) -> None:
+    """Act on driver ready."""
+    await driver_ready.wait()
+
+    assert client.driver
+    # Set up listeners on new nodes
+    client.driver.controller.on(
+        "node added",
+        lambda event: event["node"].on("value updated", log_value_updated),
+    )
+
+    # Set up listeners on existing nodes
+    for node in client.driver.controller.nodes.values():
+        node.on("value updated", log_value_updated)
 
 
 def log_value_updated(event: dict) -> None:
