@@ -21,6 +21,9 @@ setup(
     packages=find_packages(exclude=["test.*", "test"]),
     python_requires=">=3.8",
     install_requires=["aiohttp>3", "packaging"],
+    entry_points={
+        "console_scripts": ["zwave-js-server-python = zwave_js_server.__main__:main"]
+    },
     include_package_data=True,
     zip_safe=False,
     classifiers=[

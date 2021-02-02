@@ -1,17 +1,24 @@
 """Provide common pytest fixtures."""
+import asyncio
 import json
 from typing import List, Tuple
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 from aiohttp import ClientSession, ClientWebSocketResponse
+from aiohttp.http_websocket import WSMessage, WSMsgType
 
 from zwave_js_server.client import STATE_CONNECTED, Client
+from zwave_js_server.const import MIN_SERVER_VERSION
 from zwave_js_server.model.controller import Controller
 from zwave_js_server.model.driver import Driver
 from zwave_js_server.model.node import Node
 
 from . import load_fixture
+
+# pylint: disable=unused-argument
+
+TEST_URL = "ws://test.org:3000"
 
 
 @pytest.fixture(name="controller_state", scope="session")
@@ -33,15 +40,102 @@ def lock_schlage_be469_state_fixture():
 
 
 @pytest.fixture(name="client_session")
-def client_session_fixture():
+def client_session_fixture(ws_client):
     """Mock an aiohttp client session."""
-    return AsyncMock(spec_set=ClientSession)
+    client_session = AsyncMock(spec_set=ClientSession)
+    client_session.ws_connect.side_effect = AsyncMock(return_value=ws_client)
+    return client_session
 
 
 @pytest.fixture(name="ws_client")
-def ws_client_fixture():
-    """Mock a websocket client."""
-    return AsyncMock(spec_set=ClientWebSocketResponse)
+async def ws_client_fixture(loop, version_data, ws_message):
+    """Mock a websocket client.
+
+    This fixture only allows a single message to be received.
+    """
+    ws_client = AsyncMock(spec_set=ClientWebSocketResponse, closed=False)
+    ws_client.receive_json.return_value = version_data
+    receive_event = asyncio.Event()
+
+    async def receive():
+        """Return a websocket message."""
+        await asyncio.sleep(0)
+        await receive_event.wait()
+        return ws_message
+
+    ws_client.receive.side_effect = receive
+
+    async def close_client(*args):
+        """Close the client."""
+        await asyncio.sleep(0)
+        ws_client.closed = True
+        receive_event.set()
+
+    ws_client.send_json.side_effect = close_client
+
+    async def reset_close():
+        """Reset the websocket client close method."""
+        ws_client.closed = False
+        receive_event.clear()
+
+    ws_client.close.side_effect = reset_close
+
+    return ws_client
+
+
+@pytest.fixture(name="await_other")
+async def await_other_fixture(loop):
+    """Await all other task but the current task."""
+
+    async def wait_for_tasks(current_task):
+        """Wait for the tasks."""
+        tasks = asyncio.all_tasks() - {current_task}
+        await asyncio.gather(*tasks)
+
+    return wait_for_tasks
+
+
+@pytest.fixture(name="driver_ready")
+async def driver_ready_fixture(loop):
+    """Return an asyncio.Event for driver ready."""
+    return asyncio.Event()
+
+
+@pytest.fixture(name="version_data")
+def version_data_fixture():
+    """Return mock version data."""
+    return {
+        "driverVersion": "test_driver_version",
+        "serverVersion": MIN_SERVER_VERSION,
+        "homeId": "test_home_id",
+    }
+
+
+@pytest.fixture(name="url")
+def url_fixture():
+    """Return a test url."""
+    return TEST_URL
+
+
+@pytest.fixture(name="result")
+def result_fixture(controller_state, uuid4):
+    """Return a server result message."""
+    return {
+        "type": "result",
+        "success": True,
+        "result": {"state": controller_state},
+        "messageId": uuid4,
+    }
+
+
+@pytest.fixture(name="ws_message")
+def ws_message_fixture(result):
+    """Return a mock WSMessage."""
+    message = Mock(spec_set=WSMessage)
+    message.type = WSMsgType.TEXT
+    message.data = json.dumps(result)
+    message.json.return_value = result
+    return message
 
 
 @pytest.fixture(name="uuid4")
@@ -60,7 +154,6 @@ async def client_fixture(loop, client_session, ws_client, uuid4):
     This fixture needs to be a coroutine function to get an event loop
     when creating the client.
     """
-    client_session.ws_connect.side_effect = AsyncMock(return_value=ws_client)
     client = Client("ws://test.org", client_session)
     client.state = STATE_CONNECTED
     client.client = ws_client

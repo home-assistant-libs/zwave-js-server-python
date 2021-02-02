@@ -6,10 +6,9 @@ import logging
 import aiohttp
 
 from .client import Client
-from .version import get_server_version
 from .dump import dump_msgs
+from .version import get_server_version
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__package__)
 
 
@@ -17,6 +16,7 @@ def get_arguments() -> argparse.Namespace:
     """Get parsed passed in arguments."""
 
     parser = argparse.ArgumentParser(description="Z-Wave JS Server Python")
+    parser.add_argument("--debug", action="store_true", help="Log with debug level")
     parser.add_argument(
         "--server-version", action="store_true", help="Print the version of the server"
     )
@@ -38,9 +38,12 @@ def get_arguments() -> argparse.Namespace:
     return arguments
 
 
-async def main() -> None:
+async def start_cli() -> None:
     """Run main."""
     args = get_arguments()
+    level = logging.DEBUG if args.debug else logging.INFO
+    logging.basicConfig(level=level)
+
     async with aiohttp.ClientSession() as session:
         if args.server_version:
             await print_version(args, session)
@@ -73,60 +76,56 @@ async def handle_dump_state(
 
 async def connect(args: argparse.Namespace, session: aiohttp.ClientSession) -> None:
     """Connect to the server."""
-    client = Client(args.url, session)
-    asyncio.create_task(client.connect())
+    async with Client(args.url, session) as client:
 
-    def log_value_updated(event: dict) -> None:
-        node = event["node"]
-        value = event["value"]
+        driver_ready = asyncio.Event()
+        asyncio.create_task(on_driver_ready(client, driver_ready))
 
-        if node.device_config:
-            description = node.device_config.description
-        else:
-            description = f"{node.device_class.generic} (missing device config)"
+        await client.listen(driver_ready)
 
-        logger.info(
-            "Node %s %s (%s) changed to %s",
-            description,
-            value.property_name or "",
-            value.value_id,
-            value.value,
-        )
 
-    is_initialized = asyncio.Event()
+async def on_driver_ready(client: Client, driver_ready: asyncio.Event) -> None:
+    """Act on driver ready."""
+    await driver_ready.wait()
 
-    async def driver_initialized() -> None:
-        """Handle driver init."""
-        assert client.driver is not None  # type
+    assert client.driver
+    # Set up listeners on new nodes
+    client.driver.controller.on(
+        "node added",
+        lambda event: event["node"].on("value updated", log_value_updated),
+    )
 
-        # Set up listeners on new nodes
-        client.driver.controller.on(
-            "node added",
-            lambda event: event["node"].on("value updated", log_value_updated),
-        )
+    # Set up listeners on existing nodes
+    for node in client.driver.controller.nodes.values():
+        node.on("value updated", log_value_updated)
 
-        # Set up listeners on existing nodes
-        for node in client.driver.controller.nodes.values():
-            node.on("value updated", log_value_updated)
 
-        is_initialized.set()
+def log_value_updated(event: dict) -> None:
+    """Log node value changes."""
+    node = event["node"]
+    value = event["value"]
 
-    client.register_on_initialized(driver_initialized)
+    if node.device_config:
+        description = node.device_config.description
+    else:
+        description = f"{node.device_class.generic} (missing device config)"
 
+    logger.info(
+        "Node %s %s (%s) changed to %s",
+        description,
+        value.property_name or "",
+        value.value_id,
+        value.value,
+    )
+
+
+def main() -> None:
+    """Run main."""
     try:
-        await is_initialized.wait()
-
-        while True:
-            await asyncio.sleep(0.1)
-
-    except asyncio.CancelledError:
-        logger.info("Close requested")
-        await client.disconnect()
-        raise
+        asyncio.run(start_cli())
+    except KeyboardInterrupt:
+        pass
 
 
 if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        pass
+    main()
