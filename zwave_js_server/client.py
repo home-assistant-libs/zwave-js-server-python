@@ -154,26 +154,16 @@ class Client:
         self.state = STATE_CONNECTED
 
         listen_task = asyncio.create_task(self.listen())
+        start_listen_task = asyncio.create_task(self._start_listen())
 
         try:
-            result = await self.async_send_command({"command": "start_listening"})
-        except (asyncio.CancelledError, Exception):
+            await asyncio.gather(listen_task, start_listen_task)
+        except Exception:
             listen_task.cancel()
+            start_listen_task.cancel()
             await listen_task
+            await start_listen_task
             raise
-
-        self.driver = cast(
-            Driver,
-            await self._loop.run_in_executor(None, Driver, self, result["state"]),
-        )
-
-        if not listen_task.done():
-            listen_task.cancel()
-        await listen_task
-
-        self._logger.info(
-            "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
-        )
 
     async def listen(self) -> None:
         """Start listening to the websocket."""
@@ -213,11 +203,7 @@ class Client:
 
             msg_ = cast(dict, msg)
 
-            try:
-                self.async_handle_message(msg_)
-            except InvalidState as err:
-                await self._close(err)
-                raise
+            self.async_handle_message(msg_)
 
     async def disconnect(self) -> None:
         """Disconnect the client."""
@@ -226,17 +212,27 @@ class Client:
 
         self.state = STATE_DISCONNECTED
 
-    async def _close(self, exception: Optional[Exception] = None) -> None:
+    async def _close(self) -> None:
         """Close the client connection."""
         self._logger.debug("Closing client connection")
         assert self.client
         await self.client.close()
         for future in self._result_futures.values():
-            if exception:
-                future.set_exception(exception)
-            else:
-                future.cancel()
+            future.cancel()
         self.driver = None
+
+    async def _start_listen(self) -> None:
+        """Send start_listening command to initialize the driver."""
+        result = await self.async_send_command({"command": "start_listening"})
+
+        self.driver = cast(
+            Driver,
+            await self._loop.run_in_executor(None, Driver, self, result["state"]),
+        )
+
+        self._logger.info(
+            "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
+        )
 
     def _check_server_version(self, server_version: str) -> None:
         """Perform a basic check on the server version compatability."""
