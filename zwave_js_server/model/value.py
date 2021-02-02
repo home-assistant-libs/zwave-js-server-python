@@ -122,7 +122,7 @@ class Value:
     @property
     def metadata(self) -> ValueMetadata:
         """Return value metadata."""
-        return ValueMetadata(self.data["metadata"])
+        return ValueMetadata(self.data.get("metadata", {"type": "unknown"}))
 
     @property
     def value(self) -> Optional[Any]:
