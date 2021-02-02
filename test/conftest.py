@@ -65,8 +65,9 @@ async def ws_client_fixture(loop, version_data, ws_message):
 
     ws_client.receive.side_effect = receive
 
-    def close_client(*args):
+    async def close_client(*args):
         """Close the client."""
+        await asyncio.sleep(0)
         ws_client.closed = True
         receive_event.set()
 
@@ -139,18 +140,6 @@ async def client_fixture(loop, client_session, ws_client, uuid4):
     client.state = STATE_CONNECTED
     client.client = ws_client
     return client
-
-
-@pytest.fixture(name="await_other")
-async def await_other_fixture(loop):
-    """Await all tasks except the current task."""
-
-    async def wait_for_tasks(current_task):
-        """Await the tasks."""
-        tasks = asyncio.all_tasks() - {current_task}
-        await asyncio.gather(*tasks)
-
-    return wait_for_tasks
 
 
 @pytest.fixture(name="mock_command")

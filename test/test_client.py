@@ -1,6 +1,6 @@
 """Test the client."""
 import asyncio
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import Mock
 
 import pytest
 from aiohttp.client_exceptions import ClientError, WSServerHandshakeError
@@ -21,13 +21,12 @@ from zwave_js_server.exceptions import (
 # pylint: disable=too-many-arguments
 
 
-async def test_connect(client_session, url):
-    """Test client connect."""
-    client = Client(url, client_session, start_listening_on_connect=False)
+async def test_connect_disconnect(client_session, url):
+    """Test client connect and disconnect."""
+    async with Client(url, client_session) as client:
+        assert client.connected
 
-    await client.connect()
-
-    assert client.connected
+    assert not client.connected
 
 
 @pytest.mark.parametrize(
@@ -37,7 +36,7 @@ async def test_connect(client_session, url):
 async def test_cannot_connect(client_session, url, error):
     """Test cannot connect."""
     client_session.ws_connect.side_effect = error
-    client = Client(url, client_session, start_listening_on_connect=False)
+    client = Client(url, client_session)
 
     with pytest.raises(CannotConnect):
         await client.connect()
@@ -48,7 +47,7 @@ async def test_cannot_connect(client_session, url, error):
 async def test_invalid_server_version(client_session, url, version_data, caplog):
     """Test client connect with invalid server version."""
     version_data["serverVersion"] = "invalid"
-    client = Client(url, client_session, start_listening_on_connect=False)
+    client = Client(url, client_session)
 
     with pytest.raises(InvalidServerVersion):
         await client.connect()
@@ -65,7 +64,7 @@ async def test_invalid_server_version(client_session, url, version_data, caplog)
 
 async def test_send_json_when_disconnected(client_session, url):
     """Test send json message when disconnected."""
-    client = Client(url, client_session, start_listening_on_connect=False)
+    client = Client(url, client_session)
 
     assert not client.connected
 
@@ -73,70 +72,13 @@ async def test_send_json_when_disconnected(client_session, url):
         await client.async_send_json_message({"test": None})
 
 
-async def test_on_connect_on_disconnect(client_session, url, await_other):
-    """Test client on connect and on disconnect callback."""
-    on_connect = AsyncMock()
-    on_disconnect = AsyncMock()
-    client = Client(url, client_session, start_listening_on_connect=False)
-    unsubscribe_on_connect = client.register_on_connect(on_connect)
-    unsubscribe_on_disconnect = client.register_on_disconnect(on_disconnect)
-
-    await client.connect()
-    await await_other(asyncio.current_task())
-
-    assert client.connected
-    on_connect.assert_awaited()
-
-    on_connect.reset_mock()
-
-    await client.disconnect()
-    await await_other(asyncio.current_task())
-
-    assert not client.connected
-    on_disconnect.assert_awaited()
-
-    on_disconnect.reset_mock()
-
-    unsubscribe_on_connect()
-    unsubscribe_on_disconnect()
-    await client.connect()
-    await await_other(asyncio.current_task())
-
-    assert client.connected
-    on_connect.assert_not_awaited()
-
-    await client.disconnect()
-    await await_other(asyncio.current_task())
-
-    assert not client.connected
-    on_disconnect.assert_not_awaited()
-
-
-async def test_on_connect_exception(client_session, url, await_other, caplog):
-    """Test client on connect callback."""
-    on_connect = AsyncMock(side_effect=Exception("Boom"))
-    client = Client(url, client_session, start_listening_on_connect=False)
-    client.register_on_connect(on_connect)
-
-    await client.connect()
-    await await_other(asyncio.current_task())
-
-    assert client.connected
-    on_connect.assert_awaited()
-    assert "Unexpected error in on_connect" in caplog.text
-
-
-async def test_connect_with_existing_driver(
-    client_session, url, ws_client, await_other
-):
+async def test_connect_with_existing_driver(client_session, url, ws_client):
     """Test connecting again with an existing driver raises."""
-    client = Client(url, client_session, start_listening_on_connect=True)
+    client = Client(url, client_session)
     assert not client.connected
     assert not client.driver
 
     await client.connect()
-    await client.listen()
-    await await_other(asyncio.current_task())
 
     assert client.connected
     assert client.driver
@@ -144,53 +86,41 @@ async def test_connect_with_existing_driver(
     ws_client.receive.reset_mock()
     ws_client.closed = False
 
-    await client.connect()
-    await client.listen()
     with pytest.raises(InvalidState):
-        await await_other(asyncio.current_task())
+        await client.connect()
 
-    ws_client.receive.assert_awaited()
+    ws_client.receive.assert_not_awaited()
 
 
-async def test_listen(client_session, url, await_other):
+async def test_listen(client_session, url):
     """Test client listen."""
-    on_initialization = AsyncMock()
-    client = Client(url, client_session, start_listening_on_connect=True)
-    unsubscribe_on_initialization = client.register_on_initialized(on_initialization)
+    client = Client(url, client_session)
 
     assert not client.driver
 
     await client.connect()
-    await client.listen()
-    await await_other(asyncio.current_task())
 
     assert client.connected
     assert client.driver
-    on_initialization.assert_awaited()
 
-    on_initialization.reset_mock()
+    await client.listen()
 
     await client.disconnect()
-    await await_other(asyncio.current_task())
 
     assert not client.connected
-
-    unsubscribe_on_initialization()
-    await client.connect()
-    await client.listen()
-    await await_other(asyncio.current_task())
-
-    assert client.connected
-    on_initialization.assert_not_awaited()
 
 
 async def test_listen_client_error(client_session, url, ws_client, ws_message):
     """Test websocket error on listen."""
+    client = Client(url, client_session)
+    await client.connect()
+    assert client.connected
+
     ws_client.receive.side_effect = asyncio.CancelledError()
+    ws_message.reset_mock()
 
     # This should break out of the listen loop before any message is received.
-    async with Client(url, client_session, start_listening_on_connect=True) as client:
-        await client.listen()
+    await client.listen()
 
     assert not ws_message.json.called
 
@@ -200,13 +130,15 @@ async def test_listen_client_error(client_session, url, ws_client, ws_message):
     [(WSMsgType.ERROR, ConnectionFailed), (WSMsgType.BINARY, InvalidMessage)],
 )
 async def test_listen_error_message_types(
-    client_session, url, ws_message, message_type, exception
+    client_session, url, ws_client, ws_message, message_type, exception
 ):
     """Test different websocket message types that should raise on listen."""
-    client = Client(url, client_session, start_listening_on_connect=True)
+    client = Client(url, client_session)
     await client.connect()
+    assert client.connected
 
     ws_message.type = message_type
+    ws_client.closed = False
 
     with pytest.raises(exception):
         await client.listen()
@@ -217,38 +149,41 @@ async def test_listen_disconnect_message_types(
     client_session, url, ws_client, ws_message, message_type
 ):
     """Test different websocket message types that stop listen."""
-    ws_message.type = message_type
+    async with Client(url, client_session) as client:
+        assert client.connected
+        ws_message.type = message_type
 
-    # This should break out of the listen loop before handling the received message.
-    # Otherwise there will be an error.
-    async with Client(url, client_session, start_listening_on_connect=True) as client:
+        # This should break out of the listen loop before handling the received message.
+        # Otherwise there will be an error.
         await client.listen()
 
     # Assert that we received a message.
     ws_client.receive.assert_awaited()
 
 
-async def test_listen_invalid_message_data(client_session, url, ws_message):
+async def test_listen_invalid_message_data(client_session, url, ws_client, ws_message):
     """Test websocket message data that should raise on listen."""
-    client = Client(url, client_session, start_listening_on_connect=True)
+    client = Client(url, client_session)
     await client.connect()
+    assert client.connected
 
     ws_message.json.side_effect = ValueError("Boom")
+    ws_client.closed = False
 
     with pytest.raises(InvalidMessage):
         await client.listen()
 
 
-async def test_listen_not_success(client_session, url, result, await_other):
+async def test_listen_not_success(client_session, url, result):
     """Test receive result message with success False on listen."""
     result["success"] = False
     result["errorCode"] = "error_code"
-    client = Client(url, client_session, start_listening_on_connect=True)
-    await client.connect()
+    client = Client(url, client_session)
 
-    await client.listen()
     with pytest.raises(FailedCommand):
-        await await_other(asyncio.current_task())
+        await client.connect()
+
+    assert client.connected
 
 
 async def test_listen_invalid_state(client_session, url, result):
@@ -275,14 +210,11 @@ async def test_listen_invalid_state(client_session, url, result):
         await client.listen()
 
 
-async def test_listen_event(
-    client_session, url, ws_client, ws_message, result, await_other
-):
+
+async def test_listen_event(client_session, url, ws_client, ws_message, result):
     """Test receiving event result type on listen."""
-    client = Client(url, client_session, start_listening_on_connect=True)
+    client = Client(url, client_session)
     await client.connect()
-    await client.listen()
-    await await_other(asyncio.current_task())
 
     assert client.connected
     assert client.driver
@@ -320,13 +252,11 @@ async def test_listen_event(
 
 
 async def test_listen_unknown_result_type(
-    client_session, url, ws_client, ws_message, result, await_other
+    client_session, url, ws_client, ws_message, result
 ):
     """Test websocket message with unknown type on listen."""
-    client = Client(url, client_session, start_listening_on_connect=True)
+    client = Client(url, client_session)
     await client.connect()
-    await client.listen()
-    await await_other(asyncio.current_task())
 
     assert client.connected
     assert client.driver
