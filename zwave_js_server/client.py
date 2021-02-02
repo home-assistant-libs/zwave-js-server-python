@@ -154,14 +154,21 @@ class Client:
         self.state = STATE_CONNECTED
 
         listen_task = asyncio.create_task(self.listen())
-        result = await self.async_send_command({"command": "start_listening"})
+
+        try:
+            result = await self.async_send_command({"command": "start_listening"})
+        except (asyncio.CancelledError, Exception):
+            listen_task.cancel()
+            await listen_task
+            raise
 
         self.driver = cast(
             Driver,
             await self._loop.run_in_executor(None, Driver, self, result["state"]),
         )
 
-        listen_task.cancel()
+        if not listen_task.done():
+            listen_task.cancel()
         await listen_task
 
         self._logger.info(
@@ -208,8 +215,8 @@ class Client:
 
             try:
                 self.async_handle_message(msg_)
-            except InvalidState:
-                await self._close()
+            except InvalidState as err:
+                await self._close(err)
                 raise
 
     async def disconnect(self) -> None:
@@ -219,11 +226,16 @@ class Client:
 
         self.state = STATE_DISCONNECTED
 
-    async def _close(self) -> None:
+    async def _close(self, exception: Optional[Exception] = None) -> None:
         """Close the client connection."""
         self._logger.debug("Closing client connection")
         assert self.client
         await self.client.close()
+        for future in self._result_futures.values():
+            if exception:
+                future.set_exception(exception)
+            else:
+                future.cancel()
         self.driver = None
 
     def _check_server_version(self, server_version: str) -> None:

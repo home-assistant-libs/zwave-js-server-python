@@ -203,12 +203,12 @@ async def test_listen_invalid_state(client_session, url, result):
             "propertyName": "currentValue",
         },
     }
-    client = Client(url, client_session, start_listening_on_connect=True)
-    await client.connect()
+    client = Client(url, client_session)
 
     with pytest.raises(InvalidState):
-        await client.listen()
+        await client.connect()
 
+    assert client.connected
 
 
 async def test_listen_event(client_session, url, ws_client, ws_message, result):
