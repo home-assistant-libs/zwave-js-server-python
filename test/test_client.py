@@ -118,6 +118,7 @@ async def test_listen_client_error(client_session, url, ws_client, ws_message):
 
     ws_client.receive.side_effect = asyncio.CancelledError()
     ws_message.reset_mock()
+    ws_client.closed = False
 
     # This should break out of the listen loop before any message is received.
     await client.listen()
