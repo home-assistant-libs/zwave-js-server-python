@@ -83,6 +83,24 @@ async def ws_client_fixture(loop, version_data, ws_message):
     return ws_client
 
 
+@pytest.fixture(name="await_other")
+async def await_other_fixture(loop):
+    """Await all other task but the current task."""
+
+    async def wait_for_tasks(current_task):
+        """Wait for the tasks."""
+        tasks = asyncio.all_tasks() - {current_task}
+        await asyncio.gather(*tasks)
+
+    return wait_for_tasks
+
+
+@pytest.fixture(name="driver_ready")
+async def driver_ready_fixture(loop):
+    """Return an asyncio.Event for driver ready."""
+    return asyncio.Event()
+
+
 @pytest.fixture(name="version_data")
 def version_data_fixture():
     """Return mock version data."""
