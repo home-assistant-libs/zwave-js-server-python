@@ -10,6 +10,7 @@ from aiohttp.http_websocket import WSMsgType
 from zwave_js_server.client import Client
 from zwave_js_server.exceptions import (
     CannotConnect,
+    ConnectionClosed,
     ConnectionFailed,
     FailedCommand,
     InvalidMessage,
@@ -128,7 +129,11 @@ async def test_listen_client_error(client_session, url, ws_client, ws_message):
 
 @pytest.mark.parametrize(
     "message_type, exception",
-    [(WSMsgType.ERROR, ConnectionFailed), (WSMsgType.BINARY, InvalidMessage)],
+    [
+        (WSMsgType.ERROR, ConnectionFailed),
+        (WSMsgType.BINARY, InvalidMessage),
+        (WSMsgType.CLOSE, ConnectionClosed),
+    ],
 )
 async def test_listen_error_message_types(
     client_session, url, ws_client, ws_message, message_type, exception
