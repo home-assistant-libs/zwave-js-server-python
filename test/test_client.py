@@ -70,7 +70,7 @@ async def test_send_json_when_disconnected(client_session, url):
     assert not client.connected
 
     with pytest.raises(NotConnected):
-        await client.async_send_json_message({"test": None})
+        await client._send_json_message({"test": None})
 
 
 async def test_connect_with_existing_driver(
