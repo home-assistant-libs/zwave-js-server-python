@@ -57,7 +57,7 @@ class Client:
     @property
     def connected(self) -> bool:
         """Return if we're currently connected."""
-        return self.state == STATE_CONNECTED
+        return self._client is not None and not self._client.closed
 
     async def async_send_command(self, message: Dict[str, Any]) -> dict:
         """Send a command and get a response."""
@@ -75,16 +75,15 @@ class Client:
         if self.driver is not None:
             raise InvalidState("Re-connected with existing driver")
 
-        client = None
         self._logger.debug("Trying to connect")
         try:
-            self._client = client = await self.aiohttp_session.ws_connect(
+            self._client = await self.aiohttp_session.ws_connect(
                 self.ws_server_url,
                 heartbeat=55,
             )
 
             self.version = version = VersionInfo.from_message(
-                await client.receive_json()
+                await self._client.receive_json()
             )
         except (
             client_exceptions.WSServerHandshakeError,
@@ -93,7 +92,16 @@ class Client:
             raise CannotConnect(err) from err
 
         # basic check for server version compatability
-        self._check_server_version(self.version.server_version)
+        cur_version = parse_version(self.version.server_version)
+        min_version = parse_version(MIN_SERVER_VERSION)
+        if cur_version < min_version:
+            await self._client.close()
+            raise InvalidServerVersion
+        if cur_version != min_version:
+            self._logger.warning(
+                "Connected to a Zwave JS Server with an untested version, \
+                    you may run into compatibility issues!"
+            )
 
         self._logger.info(
             "Connected to Home %s (Server %s, Driver %s)",
@@ -108,7 +116,27 @@ class Client:
         if self.state != STATE_CONNECTED:
             raise InvalidState("Not connected when start listening")
 
-        start_listen_task = asyncio.create_task(self._start_listen(driver_ready))
+        await self._send_json_message(
+            {"command": "start_listening", "messageId": "listen-id"}
+        )
+
+        msg = await self._client.receive_json()
+
+        if not msg["success"]:
+            raise FailedCommand(msg["messageId"], msg["errorCode"])
+
+        self.driver = cast(
+            Driver,
+            await self._loop.run_in_executor(
+                None, Driver, self, msg["result"]["state"]
+            ),
+        )
+
+        driver_ready.set()
+
+        self._logger.info(
+            "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
+        )
 
         assert self._client
 
@@ -145,12 +173,6 @@ class Client:
             for future in self._result_futures.values():
                 future.cancel()
 
-            start_listen_task.cancel()
-            try:
-                await start_listen_task
-            except asyncio.CancelledError:
-                pass
-
             if not self._client.closed:
                 await self._client.close()
 
@@ -166,36 +188,19 @@ class Client:
         if self._client is None or self._client.closed:
             return
 
+        # 'listen' was never called
+        if self.driver is None:
+            await self._client.close()
+            self.state = STATE_DISCONNECTED
+
         self._shutdown_complete_event = asyncio.Event()
         await self._client.close()
-        await self._shutdown_complete_event.wait()
 
-    async def _start_listen(self, driver_ready: asyncio.Event) -> None:
-        """Send start_listening command to initialize the driver."""
-        result = await self.async_send_command({"command": "start_listening"})
-
-        self.driver = cast(
-            Driver,
-            await self._loop.run_in_executor(None, Driver, self, result["state"]),
-        )
-
-        driver_ready.set()
-
-        self._logger.info(
-            "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
-        )
-
-    def _check_server_version(self, server_version: str) -> None:
-        """Perform a basic check on the server version compatability."""
-        cur_version = parse_version(server_version)
-        min_version = parse_version(MIN_SERVER_VERSION)
-        if cur_version < min_version:
-            raise InvalidServerVersion
-        if cur_version != min_version:
-            self._logger.warning(
-                "Connected to a Zwave JS Server with an untested version, \
-                    you may run into compatibility issues!"
-            )
+        # Driver is set if we made it into "listen"
+        if self.driver is not None:
+            await self._shutdown_complete_event.wait()
+        else:
+            self.state = STATE_DISCONNECTED
 
     def _handle_incoming_message(self, msg: dict) -> None:
         """Handle incoming message.
@@ -217,13 +222,6 @@ class Client:
 
             future.set_exception(FailedCommand(msg["messageId"], msg["errorCode"]))
             return
-
-        # Cannot happen but testing just in case.
-        if self.driver is None:
-            self._logger.error(
-                "Did not receive state as first message. Closing connection."
-            )
-            asyncio.create_task(self._client.close())
 
         if msg["type"] != "event":
             # Can't handle

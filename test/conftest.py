@@ -51,35 +51,35 @@ def client_session_fixture(ws_client):
 
 
 @pytest.fixture(name="ws_client")
-async def ws_client_fixture(loop, version_data, ws_message):
+async def ws_client_fixture(loop, version_data, ws_message, result):
     """Mock a websocket client.
 
     This fixture only allows a single message to be received.
     """
     ws_client = AsyncMock(spec_set=ClientWebSocketResponse, closed=False)
-    ws_client.receive_json.return_value = version_data
-    receive_event = asyncio.Event()
+    ws_client.receive_json.side_effect = (version_data, result)
 
     async def receive():
         """Return a websocket message."""
         await asyncio.sleep(0)
-        await receive_event.wait()
+        ws_client.closed = True
         return ws_message
 
     ws_client.receive.side_effect = receive
 
-    async def close_client(*args):
+    async def close_client(msg):
         """Close the client."""
+        if msg["command"] == "start_listening":
+            return
+
         await asyncio.sleep(0)
         ws_client.closed = True
-        receive_event.set()
 
     ws_client.send_json.side_effect = close_client
 
     async def reset_close():
         """Reset the websocket client close method."""
-        ws_client.closed = False
-        receive_event.clear()
+        ws_client.closed = True
 
     ws_client.close.side_effect = reset_close
 
@@ -227,41 +227,3 @@ def controller_fixture(driver, controller_state):
     """Return a controller instance with a supporting client."""
     controller = Controller(driver.client, controller_state)
     return controller
-
-
-@pytest.fixture
-async def messages_to_receive():
-    return asyncio.Queue()
-
-
-@pytest.fixture
-async def messages_sent():
-    return []
-
-
-@pytest.fixture
-async def ws_client2(
-    loop, version_data, messages_to_receive, messages_sent, ws_message
-):
-    ws_client = AsyncMock(spec_set=ClientWebSocketResponse, closed=False)
-    ws_client.receive_json.return_value = version_data
-
-    ws_client.receive = messages_to_receive.get
-
-    async def send_json(msg):
-        messages_sent.append(msg)
-
-        if msg["command"] == "start_listening":
-            messages_to_receive.put_nowait(ws_message)
-
-    ws_client.send_json = send_json
-
-    return ws_client
-
-
-@pytest.fixture(name="client_session2")
-def client_session2_fixture(ws_client2):
-    """Mock an aiohttp client session."""
-    client_session = AsyncMock(spec_set=ClientSession)
-    client_session.ws_connect.side_effect = AsyncMock(return_value=ws_client2)
-    return client_session

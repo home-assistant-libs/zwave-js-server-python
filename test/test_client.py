@@ -54,7 +54,11 @@ async def test_invalid_server_version(client_session, url, version_data, caplog)
 
     assert not client.connected
 
+
+async def test_newer_server_version(client_session, url, version_data, caplog):
+    """Test client connect with invalid server version."""
     version_data["serverVersion"] = "99999.0.0"
+    client = Client(url, client_session)
 
     await client.connect()
 
@@ -72,35 +76,9 @@ async def test_send_json_when_disconnected(client_session, url):
         await client._send_json_message({"test": None})
 
 
-async def test_connect_with_existing_driver(
-    client_session, url, ws_client, driver_ready, await_other
-):
-    """Test connecting again with an existing driver raises."""
-    client = Client(url, client_session)
-    assert not client.connected
-    assert not client.driver
-
-    await client.connect()
-
-    assert client.connected
-
-    await client.listen(driver_ready)
-    await await_other(asyncio.current_task())
-
-    assert client.driver
-
-    ws_client.receive.reset_mock()
-    ws_client.closed = False
-
-    with pytest.raises(InvalidState):
-        await client.connect()
-
-    ws_client.receive.assert_not_awaited()
-
-
-async def test_listen(client_session2, url, driver_ready):
+async def test_listen(client_session, url, driver_ready):
     """Test client listen."""
-    client = Client(url, client_session2)
+    client = Client(url, client_session)
 
     assert not client.driver
 
@@ -165,7 +143,6 @@ async def test_listen_disconnect_message_types(
     async with Client(url, client_session) as client:
         assert client.connected
         ws_message.type = message_type
-        # ws_client.closed = False
 
         # This should break out of the listen loop before handling the received message.
         # Otherwise there will be an error.
@@ -190,9 +167,7 @@ async def test_listen_invalid_message_data(
         await client.listen(driver_ready)
 
 
-async def test_listen_not_success(
-    client_session, url, result, driver_ready, await_other
-):
+async def test_listen_not_success(client_session, url, result, driver_ready):
     """Test receive result message with success False on listen."""
     result["success"] = False
     result["errorCode"] = "error_code"
@@ -201,36 +176,6 @@ async def test_listen_not_success(
 
     with pytest.raises(FailedCommand):
         await client.listen(driver_ready)
-        await await_other(asyncio.current_task())
-
-    assert client.connected
-
-
-async def test_listen_invalid_state(
-    client_session, url, result, driver_ready, await_other
-):
-    """Test missing driver state on listen."""
-    result["type"] = "event"
-    result["event"] = {
-        "source": "node",
-        "event": "value updated",
-        "nodeId": 52,
-        "args": {
-            "commandClassName": "Basic",
-            "commandClass": 32,
-            "endpoint": 0,
-            "property": "currentValue",
-            "newValue": 255,
-            "prevValue": 255,
-            "propertyName": "currentValue",
-        },
-    }
-    client = Client(url, client_session)
-    await client.connect()
-
-    with pytest.raises(InvalidState):
-        await client.listen(driver_ready)
-        await await_other(asyncio.current_task())
 
     assert client.connected
 
@@ -252,11 +197,7 @@ async def test_listen_event(
     await client.connect()
 
     assert client.connected
-    await client.listen(driver_ready)
-    await await_other(asyncio.current_task())
-    assert client.driver
 
-    result.clear()
     result["type"] = "event"
     result["event"] = {
         "source": "node",
@@ -273,18 +214,7 @@ async def test_listen_event(
         },
     }
 
-    ws_client.receive.reset_mock()
-    ws_client.closed = False
-
-    async def receive():
-        """Return a websocket message."""
-        ws_client.closed = True
-        return ws_message
-
-    ws_client.receive.side_effect = receive
-
     await client.listen(driver_ready)
-
     ws_client.receive.assert_awaited()
 
 
