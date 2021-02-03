@@ -23,9 +23,6 @@ from .exceptions import (
 from .model.driver import Driver
 from .model.version import VersionInfo
 
-STATE_CONNECTED = "connected"
-STATE_DISCONNECTED = "disconnected"
-
 SIZE_PARSE_JSON_EXECUTOR = 8192
 
 
@@ -40,7 +37,6 @@ class Client:
         # The WebSocket client
         self._client: Optional[ClientWebSocketResponse] = None
         # Current state of the connection
-        self.state = STATE_DISCONNECTED
         # Version of the connected server
         self.version: Optional[VersionInfo] = None
         self._logger = logging.getLogger(__package__)
@@ -50,9 +46,8 @@ class Client:
 
     def __repr__(self) -> str:
         """Return the representation."""
-        return (
-            f"{type(self).__name__}(ws_server_url={self.ws_server_url!r}, {self.state})"
-        )
+        conn_prefix = "" if self.connected else "not "
+        return f"{type(self).__name__}(ws_server_url={self.ws_server_url!r}, {conn_prefix}connected)"
 
     @property
     def connected(self) -> bool:
@@ -109,26 +104,28 @@ class Client:
             version.server_version,
             version.driver_version,
         )
-        self.state = STATE_CONNECTED
 
     async def listen(self, driver_ready: asyncio.Event) -> None:
         """Start listening to the websocket."""
-        if self.state != STATE_CONNECTED:
+        if not self.connected:
             raise InvalidState("Not connected when start listening")
+
+        assert self._client
 
         await self._send_json_message(
             {"command": "start_listening", "messageId": "listen-id"}
         )
 
-        msg = await self._client.receive_json()
+        state_msg = await self._client.receive_json()
 
-        if not msg["success"]:
-            raise FailedCommand(msg["messageId"], msg["errorCode"])
+        if not state_msg["success"]:
+            await self._client.close()
+            raise FailedCommand(state_msg["messageId"], state_msg["errorCode"])
 
         self.driver = cast(
             Driver,
             await self._loop.run_in_executor(
-                None, Driver, self, msg["result"]["state"]
+                None, Driver, self, state_msg["result"]["state"]
             ),
         )
 
@@ -137,8 +134,6 @@ class Client:
         self._logger.info(
             "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
         )
-
-        assert self._client
 
         try:
             while not self._client.closed:
@@ -155,16 +150,16 @@ class Client:
 
                 try:
                     if len(msg.data) > SIZE_PARSE_JSON_EXECUTOR:
-                        msg: dict = await self._loop.run_in_executor(None, msg.json)
+                        data: dict = await self._loop.run_in_executor(None, msg.json)
                     else:
-                        msg = msg.json()
+                        data = msg.json()
                 except ValueError as err:
                     raise InvalidMessage("Received invalid JSON.") from err
 
                 if self._logger.isEnabledFor(logging.DEBUG):
                     self._logger.debug("Received message:\n%s\n", pprint.pformat(msg))
 
-                self._handle_incoming_message(msg)
+                self._handle_incoming_message(data)
 
         finally:
             self._logger.debug("Listen completed. Cleaning up")
@@ -175,8 +170,6 @@ class Client:
             if not self._client.closed:
                 await self._client.close()
 
-            self.state = STATE_DISCONNECTED
-
             if self._shutdown_complete_event:
                 self._shutdown_complete_event.set()
 
@@ -184,13 +177,15 @@ class Client:
         """Disconnect the client."""
         self._logger.debug("Closing client connection")
 
-        if self._client is None or self._client.closed:
+        if not self.connected:
             return
+
+        assert self._client
 
         # 'listen' was never called
         if self.driver is None:
             await self._client.close()
-            self.state = STATE_DISCONNECTED
+            return
 
         self._shutdown_complete_event = asyncio.Event()
         await self._client.close()
@@ -227,14 +222,14 @@ class Client:
             return
 
         event = Event(type=msg["event"]["event"], data=msg["event"])
-        self.driver.receive_event(event)
+        self.driver.receive_event(event)  # type: ignore
 
     async def _send_json_message(self, message: Dict[str, Any]) -> None:
         """Send a message.
 
         Raises NotConnected if client not connected.
         """
-        if self.state != STATE_CONNECTED:
+        if not self.connected:
             raise NotConnected
 
         if self._logger.isEnabledFor(logging.DEBUG):

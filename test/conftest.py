@@ -9,7 +9,7 @@ import pytest
 from aiohttp import ClientSession, ClientWebSocketResponse
 from aiohttp.http_websocket import WSMessage, WSMsgType
 
-from zwave_js_server.client import STATE_CONNECTED, Client
+from zwave_js_server.client import Client
 from zwave_js_server.const import MIN_SERVER_VERSION
 from zwave_js_server.model.controller import Controller
 from zwave_js_server.model.driver import Driver
@@ -158,7 +158,6 @@ async def client_fixture(loop, client_session, ws_client, uuid4):
     when creating the client.
     """
     client = Client("ws://test.org", client_session)
-    client.state = STATE_CONNECTED
     client._client = ws_client
     return client
 

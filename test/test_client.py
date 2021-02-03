@@ -177,7 +177,7 @@ async def test_listen_not_success(client_session, url, result, driver_ready):
     with pytest.raises(FailedCommand):
         await client.listen(driver_ready)
 
-    assert client.connected
+    assert not client.connected
 
 
 async def test_listen_without_connect(client_session, url, driver_ready):
