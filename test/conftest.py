@@ -1,7 +1,6 @@
 """Provide common pytest fixtures."""
 import asyncio
 import json
-import logging
 from typing import List, Tuple
 from unittest.mock import AsyncMock, Mock, patch
 
@@ -16,8 +15,6 @@ from zwave_js_server.model.driver import Driver
 from zwave_js_server.model.node import Node
 
 from . import load_fixture
-
-logging.basicConfig(level=logging.DEBUG)
 
 # pylint: disable=unused-argument
 
