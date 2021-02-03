@@ -148,7 +148,6 @@ class Client:
                     break
 
                 if msg.type == WSMsgType.ERROR:
-                    await self._client.close()
                     raise ConnectionFailed()
 
                 if msg.type != WSMsgType.TEXT:
@@ -195,12 +194,7 @@ class Client:
 
         self._shutdown_complete_event = asyncio.Event()
         await self._client.close()
-
-        # Driver is set if we made it into "listen"
-        if self.driver is not None:
-            await self._shutdown_complete_event.wait()
-        else:
-            self.state = STATE_DISCONNECTED
+        await self._shutdown_complete_event.wait()
 
     def _handle_incoming_message(self, msg: dict) -> None:
         """Handle incoming message.
