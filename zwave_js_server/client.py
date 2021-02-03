@@ -46,8 +46,8 @@ class Client:
 
     def __repr__(self) -> str:
         """Return the representation."""
-        conn_prefix = "" if self.connected else "not "
-        return f"{type(self).__name__}(ws_server_url={self.ws_server_url!r}, {conn_prefix}connected)"
+        prefix = "" if self.connected else "not "
+        return f"{type(self).__name__}(ws_server_url={self.ws_server_url!r}, {prefix}connected)"
 
     @property
     def connected(self) -> bool:
