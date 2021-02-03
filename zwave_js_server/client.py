@@ -36,7 +36,6 @@ class Client:
         self.driver: Optional[Driver] = None
         # The WebSocket client
         self._client: Optional[ClientWebSocketResponse] = None
-        # Current state of the connection
         # Version of the connected server
         self.version: Optional[VersionInfo] = None
         self._logger = logging.getLogger(__package__)
