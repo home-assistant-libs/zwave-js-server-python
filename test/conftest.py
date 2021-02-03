@@ -8,7 +8,7 @@ import pytest
 from aiohttp import ClientSession, ClientWebSocketResponse
 from aiohttp.http_websocket import WSMessage, WSMsgType
 
-from zwave_js_server.client import STATE_CONNECTED, Client
+from zwave_js_server.client import Client
 from zwave_js_server.const import MIN_SERVER_VERSION
 from zwave_js_server.model.controller import Controller
 from zwave_js_server.model.driver import Driver
@@ -48,35 +48,35 @@ def client_session_fixture(ws_client):
 
 
 @pytest.fixture(name="ws_client")
-async def ws_client_fixture(loop, version_data, ws_message):
+async def ws_client_fixture(loop, version_data, ws_message, result):
     """Mock a websocket client.
 
     This fixture only allows a single message to be received.
     """
     ws_client = AsyncMock(spec_set=ClientWebSocketResponse, closed=False)
-    ws_client.receive_json.return_value = version_data
-    receive_event = asyncio.Event()
+    ws_client.receive_json.side_effect = (version_data, result)
 
     async def receive():
         """Return a websocket message."""
         await asyncio.sleep(0)
-        await receive_event.wait()
+        ws_client.closed = True
         return ws_message
 
     ws_client.receive.side_effect = receive
 
-    async def close_client(*args):
+    async def close_client(msg):
         """Close the client."""
+        if msg["command"] == "start_listening":
+            return
+
         await asyncio.sleep(0)
         ws_client.closed = True
-        receive_event.set()
 
     ws_client.send_json.side_effect = close_client
 
     async def reset_close():
         """Reset the websocket client close method."""
-        ws_client.closed = False
-        receive_event.clear()
+        ws_client.closed = True
 
     ws_client.close.side_effect = reset_close
 
@@ -155,8 +155,7 @@ async def client_fixture(loop, client_session, ws_client, uuid4):
     when creating the client.
     """
     client = Client("ws://test.org", client_session)
-    client.state = STATE_CONNECTED
-    client.client = ws_client
+    client._client = ws_client
     return client
 
 
