@@ -7,7 +7,7 @@ from types import TracebackType
 from typing import Any, Dict, Optional, cast
 
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, client_exceptions
-from awesomeversion import AwesomeVersion, AwesomeVersionException
+from awesomeversion import AwesomeVersion
 from awesomeversion.strategy import AwesomeVersionStrategy
 
 from .const import MAX_SERVER_VERSION, MIN_SERVER_VERSION
