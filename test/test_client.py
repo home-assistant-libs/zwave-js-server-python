@@ -60,10 +60,10 @@ async def test_newer_server_version(client_session, url, version_data, caplog):
     version_data["serverVersion"] = "99999.0.0"
     client = Client(url, client_session)
 
-    await client.connect()
+    with pytest.raises(InvalidServerVersion):
+        await client.connect()
 
-    assert client.connected
-    assert "Connected to a Zwave JS Server with an untested version" in caplog.text
+    assert not client.connected
 
 
 async def test_send_json_when_disconnected(client_session, url):

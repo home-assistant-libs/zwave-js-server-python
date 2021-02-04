@@ -20,7 +20,7 @@ setup(
     long_description_content_type="text/markdown",
     packages=find_packages(exclude=["test.*", "test"]),
     python_requires=">=3.8",
-    install_requires=["aiohttp>3", "packaging"],
+    install_requires=["aiohttp>3", "awesomeversion"],
     entry_points={
         "console_scripts": ["zwave-js-server-python = zwave_js_server.__main__:main"]
     },
