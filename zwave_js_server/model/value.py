@@ -91,14 +91,14 @@ class ValueMetadata:
         return self.data.get("unit")
 
     @property
-    def states(self) -> Optional[dict]:
+    def states(self) -> dict:
         """Return (optional) states."""
-        return self.data.get("states")
+        return self.data.get("states", {})
 
     @property
-    def cc_specific(self) -> Optional[Dict[str, Any]]:
+    def cc_specific(self) -> Dict[str, Any]:
         """Return ccSpecific."""
-        return self.data.get("ccSpecific")
+        return self.data.get("ccSpecific", {})
 
 
 class Value:

@@ -118,9 +118,9 @@ class Controller(EventBase):
         return self.data.get("productId")
 
     @property
-    def supported_function_types(self) -> Optional[List[int]]:
+    def supported_function_types(self) -> List[int]:
         """Return supported_function_types."""
-        return self.data.get("supportedFunctionTypes")
+        return self.data.get("supportedFunctionTypes", [])
 
     @property
     def suc_node_id(self) -> Optional[int]:
@@ -230,7 +230,7 @@ class Controller(EventBase):
                 multi_channel=group["multiChannel"],
                 label=group["label"],
                 profile=group.get("profile"),
-                issued_commands=group.get("issuedCommands"),
+                issued_commands=group.get("issuedCommands", {}),
             )
         return groups
 

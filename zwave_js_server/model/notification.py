@@ -4,7 +4,7 @@ Model for a Zwave Node's Notification Event.
 https://zwave-js.github.io/node-zwave-js/#/api/node?id=quotnotificationquot
 """
 
-from typing import Literal, TYPE_CHECKING, Any, Dict, Optional, TypedDict
+from typing import Literal, TYPE_CHECKING, Any, Dict, TypedDict
 
 if TYPE_CHECKING:
     from .node import Node
@@ -39,6 +39,6 @@ class Notification:
         return self.data["notificationLabel"]
 
     @property
-    def parameters(self) -> Optional[Dict[str, Any]]:
+    def parameters(self) -> Dict[str, Any]:
         """Return installer icon property."""
-        return self.data.get("parameters")
+        return self.data.get("parameters", {})

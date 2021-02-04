@@ -308,7 +308,7 @@ async def test_get_association_groups(controller, uuid4, mock_command):
     assert result[1].multi_channel is True
     assert result[1].label == "Association Group 1"
     assert result[1].profile is None
-    assert result[1].issued_commands is None
+    assert result[1].issued_commands == {}
 
     assert result[2].max_nodes == 30
     assert result[2].is_lifeline is False
