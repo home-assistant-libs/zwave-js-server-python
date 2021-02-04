@@ -7,9 +7,10 @@ from types import TracebackType
 from typing import Any, Dict, Optional, cast
 
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, client_exceptions
-from packaging.version import parse as parse_version
+from awesomeversion import AwesomeVersion, AwesomeVersionException
+from awesomeversion.strategy import AwesomeVersionStrategy
 
-from .const import MIN_SERVER_VERSION
+from .const import MAX_SERVER_VERSION, MIN_SERVER_VERSION
 from .event import Event
 from .exceptions import (
     CannotConnect,
@@ -86,16 +87,19 @@ class Client:
             raise CannotConnect(err) from err
 
         # basic check for server version compatability
-        cur_version = parse_version(self.version.server_version)
-        min_version = parse_version(MIN_SERVER_VERSION)
-        if cur_version < min_version:
+        cur_version = AwesomeVersion(self.version.server_version)
+        bad_version = None
+
+        if cur_version.strategy != AwesomeVersionStrategy.SEMVER:
+            bad_version = f"Failed to parse Z-Wave JS Server version {self.version.server_version}"
+        elif cur_version < AwesomeVersion(MIN_SERVER_VERSION):
+            bad_version = f"Z-Wave JS Server needs to be at least version {MIN_SERVER_VERSION}. Found {self.version.server_version}"
+        elif cur_version >= AwesomeVersion(MAX_SERVER_VERSION):
+            bad_version = f"Z-Wave JS Server is newer or equal to {MAX_SERVER_VERSION}. Found {self.version.server_version}"
+
+        if bad_version:
             await self._client.close()
-            raise InvalidServerVersion
-        if cur_version != min_version:
-            self._logger.warning(
-                "Connected to a Zwave JS Server with an untested version, \
-                    you may run into compatibility issues!"
-            )
+            raise InvalidServerVersion(bad_version)
 
         self._logger.info(
             "Connected to Home %s (Server %s, Driver %s)",

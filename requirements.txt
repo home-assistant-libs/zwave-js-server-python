@@ -1,2 +1,2 @@
 aiohttp==3.7.3
-packaging==20.9
+awesomeversion==21.2.1
