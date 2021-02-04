@@ -56,14 +56,14 @@ class DeviceConfig:
         return self.data.get("devices", [])
 
     @property
-    def firmware_version(self) -> Optional[Dict[str, str]]:
+    def firmware_version(self) -> Dict[str, str]:
         """Return firmware version range this config is valid for."""
-        return self.data.get("firmwareVersion")
+        return self.data.get("firmwareVersion", {})
 
     @property
-    def associations(self) -> Optional[Dict[str, dict]]:
+    def associations(self) -> Dict[str, dict]:
         """Return association groups the device supports."""
-        return self.data.get("associations")
+        return self.data.get("associations", {})
 
     @property
     def supports_zwave_plus(self) -> Optional[bool]:
@@ -71,16 +71,16 @@ class DeviceConfig:
         return self.data.get("supportsZWavePlus")
 
     @property
-    def proprietary(self) -> Optional[dict]:
+    def proprietary(self) -> dict:
         """Return dictionary of settings for the proprietary CC."""
-        return self.data.get("proprietary")
+        return self.data.get("proprietary", {})
 
     @property
-    def param_information(self) -> Optional[Dict[str, dict]]:
+    def param_information(self) -> Dict[str, dict]:
         """Return dictionary of the configuration parameters the device supports."""
-        return self.data.get("paramInformation")
+        return self.data.get("paramInformation", {})
 
     @property
-    def compat(self) -> Optional[Dict[str, dict]]:
+    def compat(self) -> Dict[str, dict]:
         """Return compatibility flags."""
-        return self.data.get("compat")
+        return self.data.get("compat", {})

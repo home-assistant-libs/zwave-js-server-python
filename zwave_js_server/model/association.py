@@ -1,6 +1,6 @@
 """Provide a model for the association."""
 from typing import Dict, List, Optional
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -12,7 +12,7 @@ class AssociationGroup:
     multi_channel: bool
     label: str
     profile: Optional[int] = None
-    issued_commands: Optional[Dict[int, List[int]]] = None
+    issued_commands: Dict[int, List[int]] = field(default_factory=dict)
 
 
 @dataclass
