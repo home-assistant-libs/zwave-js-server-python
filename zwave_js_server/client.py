@@ -91,11 +91,20 @@ class Client:
         bad_version = None
 
         if cur_version.strategy != AwesomeVersionStrategy.SEMVER:
-            bad_version = f"Failed to parse Z-Wave JS Server version {self.version.server_version}"
+            bad_version = (
+                "Failed to parse Z-Wave JS Server version "
+                f"{self.version.server_version}"
+            )
         elif cur_version < AwesomeVersion(MIN_SERVER_VERSION):
-            bad_version = f"Z-Wave JS Server needs to be at least version {MIN_SERVER_VERSION}. Found {self.version.server_version}"
+            bad_version = (
+                f"Z-Wave JS Server needs to be at least version {MIN_SERVER_VERSION}. "
+                f"Found {self.version.server_version}"
+            )
         elif cur_version >= AwesomeVersion(MAX_SERVER_VERSION):
-            bad_version = f"Z-Wave JS Server is newer or equal to {MAX_SERVER_VERSION}. Found {self.version.server_version}"
+            bad_version = (
+                f"Z-Wave JS Server is newer or equal to {MAX_SERVER_VERSION}. "
+                f"Found {self.version.server_version}"
+            )
 
         if bad_version:
             await self._client.close()
