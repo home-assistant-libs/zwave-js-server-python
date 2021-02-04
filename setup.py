@@ -23,7 +23,7 @@ setup(
     install_requires=[
         "aiohttp>3",
         # We rely on a feature introduced in this version
-        "awesomeversion>=21.2.1"
+        "awesomeversion>=21.2.1",
     ],
     entry_points={
         "console_scripts": ["zwave-js-server-python = zwave_js_server.__main__:main"]
