@@ -39,6 +39,12 @@ def lock_schlage_be469_state_fixture():
     return json.loads(load_fixture("lock_schlage_be469_state.json"))
 
 
+@pytest.fixture(name="climate_radio_thermostat_ct100_plus_state", scope="session")
+def climate_radio_thermostat_ct100_plus_state():
+    """Load the radio thermostat node state fixture data."""
+    return json.loads(load_fixture("climate_radio_thermostat_ct100_plus_state.json"))
+
+
 @pytest.fixture(name="client_session")
 def client_session_fixture(ws_client):
     """Mock an aiohttp client session."""
@@ -214,6 +220,16 @@ def node_fixture(driver, multisensor_6_state):
 def lock_schlage_be469_fixture(driver, lock_schlage_be469_state):
     """Mock a schlage lock node."""
     node = Node(driver.client, lock_schlage_be469_state)
+    driver.controller.nodes[node.node_id] = node
+    return node
+
+
+@pytest.fixture(name="climate_radio_thermostat_ct100_plus")
+def climate_radio_thermostat_ct100_plus_fixture(
+    driver, climate_radio_thermostat_ct100_plus_state
+):
+    """Mock a radio thermostat node."""
+    node = Node(driver.client, climate_radio_thermostat_ct100_plus_state)
     driver.controller.nodes[node.node_id] = node
     return node
 

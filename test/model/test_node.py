@@ -1,6 +1,11 @@
 """Test the node model."""
 import json
+import logging
 
+import pytest
+
+from zwave_js_server.model.value import ConfigurationValue
+from zwave_js_server.const import CommandClass
 from zwave_js_server.model import node as node_pkg
 from zwave_js_server.event import Event
 
@@ -28,6 +33,8 @@ DEVICE_CONFIG_FIXTURE = {
     "associations": {},
     "param_information": {"_map": {}},
 }
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def test_from_state():
@@ -60,6 +67,22 @@ def test_from_state():
     assert node.interview_attempts == 1
     assert len(node.endpoints) == 1
     assert node.endpoints[0].index == 0
+
+
+async def test_command_class_values(climate_radio_thermostat_ct100_plus):
+    """Test node methods to get command class values."""
+    node = climate_radio_thermostat_ct100_plus
+    assert node.node_id == 13
+    switch_values = node.get_command_class_values(CommandClass.SENSOR_MULTILEVEL)
+    assert len(switch_values) == 2
+    config_values = node.get_configuration_values()
+    assert len(config_values) == 12
+
+    for value in config_values.values():
+        assert isinstance(value, ConfigurationValue)
+
+    with pytest.raises(TypeError):
+        await node.async_set_value("13-112-00-2-00", 1)
 
 
 async def test_set_value(node, uuid4, mock_command):

@@ -1,5 +1,6 @@
 """Provide a model for the Z-Wave JS node."""
-from typing import TYPE_CHECKING, Any, List, Optional, TypedDict, Union, cast
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
+from zwave_js_server.const import CommandClass, ConfigurationValueType
 
 from ..event import Event, EventBase
 from .device_class import DeviceClass, DeviceClassDataType
@@ -7,6 +8,7 @@ from .device_config import DeviceConfig, DeviceConfigDataType
 from .endpoint import Endpoint, EndpointDataType
 from .notification import Notification, NotificationDataType
 from .value import (
+    ConfigurationValue,
     MetaDataType,
     Value,
     ValueDataType,
@@ -66,9 +68,13 @@ class Node(EventBase):
         super().__init__()
         self.client = client
         self.data = data
-        self.values = {
-            get_value_id(self, val): Value(self, val) for val in data["values"]
-        }
+        self.values = {}
+        for val in data["values"]:
+            value_id = get_value_id(self, val)
+            if val["commandClass"] == CommandClass.CONFIGURATION:
+                self.values[value_id] = ConfigurationValue(self, val)
+            else:
+                self.values[value_id] = Value(self, val)
 
     def __repr__(self) -> str:
         """Return the representation."""
@@ -234,6 +240,25 @@ class Node(EventBase):
         """Return the interview_attempts."""
         return self.data.get("interviewAttempts")
 
+    def get_command_class_values(
+        self, command_class: CommandClass, endpoint: int = None
+    ) -> Optional[Dict[str, Value]]:
+        """Return all values for a given command class."""
+        return {
+            value_id: value
+            for value_id, value in self.values.items()
+            if value.command_class == command_class
+            and (endpoint is None or value.endpoint == endpoint)
+        }
+
+    def get_configuration_values(
+        self, endpoint: int = None
+    ) -> Optional[Dict[str, ConfigurationValue]]:
+        """Return all configuration values for a node."""
+        return self.get_command_class_values(
+            CommandClass.CONFIGURATION, endpoint=endpoint
+        )
+
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
         self._handle_event_protocol(event)
@@ -246,6 +271,19 @@ class Node(EventBase):
         # a value may be specified as value_id or the value itself
         if not isinstance(val, Value):
             val = self.values[val]
+
+        if not val.metadata.writeable:
+            raise TypeError("This configuration value is read only")
+
+        if (
+            isinstance(val, ConfigurationValue)
+            and val.type == ConfigurationValueType.UNDEFINED
+        ):
+            # We need to use the Configuration CC API to set the value for this type
+            raise NotImplementedError(
+                "Configuration values of undefined type can't be set"
+            )
+
         # the value object needs to be send to the server
         result = await self.client.async_send_command(
             {

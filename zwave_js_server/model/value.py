@@ -1,6 +1,7 @@
 """Provide a model for the Z-Wave JS value."""
 from typing import TYPE_CHECKING, Any, Dict, Optional, TypedDict, Union
 
+from ..const import ConfigurationValueType
 from ..event import Event
 
 if TYPE_CHECKING:
@@ -195,3 +196,20 @@ class ValueNotification(Value):
     """
 
     # format is the same as a Value message, subclassed for easier identifying and future use
+
+
+class ConfigurationValue(Value):
+    """Model for a Configuration Value."""
+
+    @property
+    def type(self) -> ConfigurationValueType:
+        """Return configuration value type."""
+        if self.metadata.type == "number":
+            if self.metadata.states:
+                return ConfigurationValueType.ENUM
+            elif (
+                self.metadata.max is not None or self.metadata.min is not None
+            ) and not self.metadata.max == self.metadata.min == 0:
+                return ConfigurationValueType.RANGE
+
+        return ConfigurationValueType.UNDEFINED
