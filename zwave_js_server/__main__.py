@@ -2,6 +2,7 @@
 import argparse
 import asyncio
 import logging
+import sys
 
 import aiohttp
 
@@ -125,6 +126,8 @@ def main() -> None:
         asyncio.run(start_cli())
     except KeyboardInterrupt:
         pass
+
+    sys.exit(0)
 
 
 if __name__ == "__main__":
