@@ -2,6 +2,7 @@
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
 from zwave_js_server.const import CommandClass, ConfigurationValueType
 
+from ..exceptions import UnwriteableValue
 from ..event import Event, EventBase
 from .device_class import DeviceClass, DeviceClassDataType
 from .device_config import DeviceConfig, DeviceConfigDataType
@@ -273,7 +274,7 @@ class Node(EventBase):
             val = self.values[val]
 
         if not val.metadata.writeable:
-            raise TypeError("This configuration value is read only")
+            raise UnwriteableValue
 
         if (
             isinstance(val, ConfigurationValue)
