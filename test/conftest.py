@@ -16,7 +16,7 @@ from zwave_js_server.model.node import Node
 
 from . import load_fixture
 
-# pylint: disable=unused-argument
+# pylint: disable=protected-access, unused-argument
 
 TEST_URL = "ws://test.org:3000"
 
