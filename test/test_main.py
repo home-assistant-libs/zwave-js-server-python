@@ -58,7 +58,7 @@ def test_dump_state(client_session, url, ws_client, result, capsys):
 
 
 def test_connect(client_session, url, ws_client):
-    """Test dump state."""
+    """Test connect."""
     with patch.object(sys, "argv", ["zwave_js_server", url]), pytest.raises(
         SystemExit
     ) as sys_exit:
