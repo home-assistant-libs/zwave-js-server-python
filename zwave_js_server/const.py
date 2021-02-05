@@ -281,6 +281,6 @@ THERMOSTAT_MODE_SETPOINT_MAP: Dict[int, List[ThermostatSetpointType]] = {
 class ConfigurationValueType(Enum):
     """Enum for configuration value types."""
 
-    ENUM = "enum"
+    ENUMERATED = "enumerated"
     RANGE = "range"
     UNDEFINED = "undefined"

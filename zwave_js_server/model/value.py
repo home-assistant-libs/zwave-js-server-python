@@ -206,8 +206,8 @@ class ConfigurationValue(Value):
         """Return configuration value type."""
         if self.metadata.type == "number":
             if self.metadata.states:
-                return ConfigurationValueType.ENUM
-            elif (
+                return ConfigurationValueType.ENUMERATED
+            if (
                 self.metadata.max is not None or self.metadata.min is not None
             ) and not self.metadata.max == self.metadata.min == 0:
                 return ConfigurationValueType.RANGE

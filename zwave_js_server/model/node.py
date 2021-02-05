@@ -242,7 +242,7 @@ class Node(EventBase):
 
     def get_command_class_values(
         self, command_class: CommandClass, endpoint: int = None
-    ) -> Dict[str, Value]:
+    ) -> Dict[str, Union[ConfigurationValue, Value]]:
         """Return all values for a given command class."""
         return {
             value_id: value
