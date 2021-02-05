@@ -105,6 +105,7 @@ async def driver_ready_fixture(loop):
 def version_data_fixture():
     """Return mock version data."""
     return {
+        "type": "version",
         "driverVersion": "test_driver_version",
         "serverVersion": MIN_SERVER_VERSION,
         "homeId": "test_home_id",

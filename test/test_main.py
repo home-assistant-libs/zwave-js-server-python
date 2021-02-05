@@ -37,4 +37,21 @@ def test_server_version(client_session, url, ws_client, capsys):
     assert ws_client.receive_json.call_count == 1
     assert ws_client.close.call_count == 1
 
+
+@pytest.mark.parametrize("result", ["test_result"])
+def test_dump_state(client_session, url, ws_client, result, capsys):
+    """Test dump state."""
+    with patch.object(
+        sys, "argv", ["zwave_js_server", url, "--dump-state"]
+    ), pytest.raises(SystemExit) as sys_exit:
+        main()
+
+    assert sys_exit.value.code == 0
+    captured = capsys.readouterr()
+    assert captured.out == (
+        "{'type': 'version', 'driverVersion': 'test_driver_version', "
+        f"'serverVersion': '{MIN_SERVER_VERSION}', 'homeId': 'test_home_id'}}\n"
+        "test_result\n"
+    )
+    assert ws_client.receive_json.call_count == 2
     assert ws_client.close.call_count == 1
