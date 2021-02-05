@@ -253,7 +253,7 @@ class Node(EventBase):
 
     def get_configuration_values(
         self, endpoint: int = None
-    ) -> Optional[Dict[str, ConfigurationValue]]:
+    ) -> Dict[str, ConfigurationValue]:
         """Return all configuration values for a node."""
         return self.get_command_class_values(
             CommandClass.CONFIGURATION, endpoint=endpoint
