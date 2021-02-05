@@ -1,6 +1,5 @@
 """Test the node model."""
 import json
-import logging
 
 import pytest
 
@@ -33,8 +32,6 @@ DEVICE_CONFIG_FIXTURE = {
     "associations": {},
     "param_information": {"_map": {}},
 }
-
-_LOGGER = logging.getLogger(__name__)
 
 
 def test_from_state():
