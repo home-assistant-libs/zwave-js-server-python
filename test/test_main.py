@@ -20,7 +20,7 @@ def client_session_fixture(ws_client):
         yield session
 
 
-def test_server_version(client_session, url, ws_client, capsys):
+def test_server_version(client_session, url, ws_client, result, capsys):
     """Test print server version."""
     with patch.object(
         sys, "argv", ["zwave_js_server", url, "--server-version"]
@@ -55,3 +55,14 @@ def test_dump_state(client_session, url, ws_client, result, capsys):
     )
     assert ws_client.receive_json.call_count == 2
     assert ws_client.close.call_count == 1
+
+
+def test_connect(client_session, url, ws_client):
+    """Test dump state."""
+    with patch.object(sys, "argv", ["zwave_js_server", url]), pytest.raises(
+        SystemExit
+    ) as sys_exit:
+        main()
+
+    assert sys_exit.value.code == 0
+    assert ws_client.receive.call_count == 1
