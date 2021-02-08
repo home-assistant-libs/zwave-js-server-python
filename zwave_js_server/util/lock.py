@@ -75,12 +75,12 @@ def _get_code_slots(
                         or parsed_val["type"] != "Buffer"
                         or "data" not in parsed_val
                     ):
-                        raise ValueError
+                        raise ValueError("JSON string does not match expected schema")
                     slot[ATTR_USERCODE] = "".join([chr(x) for x in parsed_val["data"]])
-                except (ValueError, json.decoder.JSONDecodeError):
+                except (ValueError, json.decoder.JSONDecodeError) as err:
                     raise UnparseableValue(
                         f"Unparseable value for code slot {code_slot}: {value.value}"
-                    )
+                    ) from err
 
         slots.append(slot)
         code_slot += 1
