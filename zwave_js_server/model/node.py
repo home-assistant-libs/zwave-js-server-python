@@ -277,7 +277,7 @@ class Node(EventBase):
         if not isinstance(val, Value):
             val = self.values[val]
 
-        if not val.metadata.writeable:
+        if val.metadata.writeable is False:
             raise UnwriteableValue
 
         # Raise an exception if we are setting an invalid value on a configuration value
