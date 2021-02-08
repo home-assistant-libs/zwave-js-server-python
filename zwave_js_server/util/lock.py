@@ -1,4 +1,4 @@
-"""Utility functions for OpenZWave locks."""
+"""Utility functions for Z-Wave JS locks."""
 from typing import Dict, List, Optional, Union
 
 from ..const import (

@@ -276,3 +276,11 @@ THERMOSTAT_MODE_SETPOINT_MAP: Dict[int, List[ThermostatSetpointType]] = {
     ],
     ThermostatMode.FULL_POWER: [ThermostatSetpointType.FULL_POWER],
 }
+
+
+class ConfigurationValueType(Enum):
+    """Enum for configuration value types."""
+
+    ENUMERATED = "enumerated"
+    RANGE = "range"
+    UNDEFINED = "undefined"

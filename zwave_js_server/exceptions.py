@@ -64,3 +64,11 @@ class FailedCommand(BaseZwaveJSServerError):
         super().__init__(f"Command failed: {error_code}")
         self.message_id = message_id
         self.error_code = error_code
+
+
+class UnwriteableValue(BaseZwaveJSServerError):
+    """Exception raised when trying to change a read only Value."""
+
+
+class InvalidNewValue(BaseZwaveJSServerError):
+    """Exception raised when target new value is invalid based on Value metadata."""

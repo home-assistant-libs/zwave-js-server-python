@@ -1,12 +1,16 @@
 """Provide a model for the Z-Wave JS node."""
-from typing import TYPE_CHECKING, Any, List, Optional, TypedDict, Union, cast
+import json
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
+from zwave_js_server.const import CommandClass, ConfigurationValueType
 
+from ..exceptions import InvalidNewValue, UnwriteableValue
 from ..event import Event, EventBase
 from .device_class import DeviceClass, DeviceClassDataType
 from .device_config import DeviceConfig, DeviceConfigDataType
 from .endpoint import Endpoint, EndpointDataType
 from .notification import Notification, NotificationDataType
 from .value import (
+    ConfigurationValue,
     MetaDataType,
     Value,
     ValueDataType,
@@ -66,9 +70,13 @@ class Node(EventBase):
         super().__init__()
         self.client = client
         self.data = data
-        self.values = {
-            get_value_id(self, val): Value(self, val) for val in data["values"]
-        }
+        self.values: Dict[str, Union[Value, ConfigurationValue]] = {}
+        for val in data["values"]:
+            value_id = get_value_id(self, val)
+            if val["commandClass"] == CommandClass.CONFIGURATION:
+                self.values[value_id] = ConfigurationValue(self, val)
+            else:
+                self.values[value_id] = Value(self, val)
 
     def __repr__(self) -> str:
         """Return the representation."""
@@ -234,6 +242,28 @@ class Node(EventBase):
         """Return the interview_attempts."""
         return self.data.get("interviewAttempts")
 
+    def get_command_class_values(
+        self, command_class: CommandClass, endpoint: int = None
+    ) -> Dict[str, Union[ConfigurationValue, Value]]:
+        """Return all values for a given command class."""
+        return {
+            value_id: value
+            for value_id, value in self.values.items()
+            if value.command_class == command_class
+            and (endpoint is None or value.endpoint == endpoint)
+        }
+
+    def get_configuration_values(
+        self, endpoint: int = None
+    ) -> Dict[str, ConfigurationValue]:
+        """Return all configuration values for a node."""
+        return cast(
+            Dict[str, ConfigurationValue],
+            self.get_command_class_values(
+                CommandClass.CONFIGURATION, endpoint=endpoint
+            ),
+        )
+
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
         self._handle_event_protocol(event)
@@ -246,6 +276,42 @@ class Node(EventBase):
         # a value may be specified as value_id or the value itself
         if not isinstance(val, Value):
             val = self.values[val]
+
+        if val.metadata.writeable is False:
+            raise UnwriteableValue
+
+        # Raise an exception if we are setting an invalid value on a configuration value
+        if isinstance(val, ConfigurationValue):
+            if val.type == ConfigurationValueType.UNDEFINED:
+                # We need to use the Configuration CC API to set the value for this type
+                raise NotImplementedError(
+                    "Configuration values of undefined type can't be set"
+                )
+
+            max_ = val.metadata.max
+            min_ = val.metadata.min
+            if val.type == ConfigurationValueType.RANGE and (
+                (max_ is not None and new_value > max_)
+                or (min_ is not None and new_value < min_)
+            ):
+                bounds = []
+                if min_ is not None:
+                    bounds.append(f"Min: {min_}")
+                if max_ is not None:
+                    bounds.append(f"Max: {max_}")
+                raise InvalidNewValue(
+                    f"Must provide a value within the target range ({', '.join(bounds)})"
+                )
+
+            if (
+                val.type == ConfigurationValueType.ENUMERATED
+                and str(new_value) not in val.metadata.states
+            ):
+                raise InvalidNewValue(
+                    "Must provide a value that represents a valid state "
+                    f"({json.dumps(val.metadata.states)})"
+                )
+
         # the value object needs to be send to the server
         result = await self.client.async_send_command(
             {
