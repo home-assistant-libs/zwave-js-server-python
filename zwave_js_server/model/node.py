@@ -305,7 +305,7 @@ class Node(EventBase):
 
             if (
                 val.type == ConfigurationValueType.ENUMERATED
-                and str(new_value) != val.metadata.states
+                and str(new_value) not in val.metadata.states
             ):
                 raise InvalidNewValue(
                     f"Must provide a value that represents a valid state ({json.dumps(val.metadata.states)})"
