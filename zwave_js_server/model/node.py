@@ -288,19 +288,19 @@ class Node(EventBase):
                     "Configuration values of undefined type can't be set"
                 )
 
-            max = val.metadata.max
-            min = val.metadata.min
+            max_ = val.metadata.max
+            min_ = val.metadata.min
             if val.type == ConfigurationValueType.RANGE and (
-                (max is not None and new_value > max)
-                or (min is not None and new_value < min)
+                (max_ is not None and new_value > max_)
+                or (min_ is not None and new_value < min_)
             ):
                 bounds = []
-                if min is not None:
-                    bounds.append(f"Min: {min}")
-                if max is not None:
-                    bounds.append(f"Max: {max}")
+                if min_ is not None:
+                    bounds.append(f"Min: {min_}")
+                if max_ is not None:
+                    bounds.append(f"Max: {max_}")
                 raise InvalidNewValue(
-                    f"Must provide a value within the target range ({", ".join(bounds)})"
+                    f"Must provide a value within the target range ({', '.join(bounds)})"
                 )
 
             if (
@@ -308,7 +308,8 @@ class Node(EventBase):
                 and str(new_value) not in val.metadata.states
             ):
                 raise InvalidNewValue(
-                    f"Must provide a value that represents a valid state ({json.dumps(val.metadata.states)})"
+                    "Must provide a value that represents a valid state "
+                    f"({json.dumps(val.metadata.states)})"
                 )
 
         # the value object needs to be send to the server
