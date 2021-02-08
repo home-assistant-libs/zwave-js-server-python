@@ -1,4 +1,5 @@
 """Utility functions for Z-Wave JS locks."""
+import json
 from typing import Dict, List, Optional, Union
 
 from ..const import (
@@ -11,7 +12,7 @@ from ..const import (
     CodeSlotStatus,
     CommandClass,
 )
-from ..exceptions import NotFoundError
+from ..exceptions import NotFoundError, UnparseableValue
 from ..model.node import Node
 from ..model.value import get_value_id, Value
 
@@ -52,15 +53,34 @@ def _get_code_slots(
         except NotFoundError:
             return slots
 
+        code_slot = int(value.property_key)  # type: ignore
+
         # we know that code slots will always have a property key
         # that is an int, so we can ignore mypy
         slot = {
-            ATTR_CODE_SLOT: int(value.property_key),  # type: ignore
+            ATTR_CODE_SLOT: code_slot,
             ATTR_NAME: value.metadata.label,
             ATTR_IN_USE: status_value.value == CodeSlotStatus.ENABLED,
         }
         if include_usercode:
-            slot[ATTR_USERCODE] = value.value if value.value else None
+            if not value.value:
+                slot[ATTR_USERCODE] = None
+            elif value.value[0] == "{":
+                try:
+                    parsed_val = json.loads(value.value)
+                    if (
+                        "type" not in parsed_val
+                        or parsed_val["type"] != "Buffer"
+                        or "data" not in parsed_val
+                    ):
+                        raise ValueError
+                    slot[ATTR_USERCODE] = "".join([chr(x) for x in parsed_val["data"]])
+                except (ValueError, json.decoder.JSONDecodeError):
+                    raise UnparseableValue(
+                        f"Unparseable value for code slot {code_slot}: {value.value}"
+                    )
+            else:
+                slot[ATTR_USERCODE] = value.value
 
         slots.append(slot)
         code_slot += 1
