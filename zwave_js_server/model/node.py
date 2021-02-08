@@ -69,7 +69,7 @@ class Node(EventBase):
         super().__init__()
         self.client = client
         self.data = data
-        self.values = {}
+        self.values: Dict[str, Union[Value, ConfigurationValue]] = {}
         for val in data["values"]:
             value_id = get_value_id(self, val)
             if val["commandClass"] == CommandClass.CONFIGURATION:
@@ -256,8 +256,11 @@ class Node(EventBase):
         self, endpoint: int = None
     ) -> Dict[str, ConfigurationValue]:
         """Return all configuration values for a node."""
-        return self.get_command_class_values(
-            CommandClass.CONFIGURATION, endpoint=endpoint
+        return cast(
+            Dict[str, ConfigurationValue],
+            self.get_command_class_values(
+                CommandClass.CONFIGURATION, endpoint=endpoint
+            ),
         )
 
     def receive_event(self, event: Event) -> None:
