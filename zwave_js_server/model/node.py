@@ -1,8 +1,9 @@
 """Provide a model for the Z-Wave JS node."""
+import json
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
 from zwave_js_server.const import CommandClass, ConfigurationValueType
 
-from ..exceptions import UnwriteableValue
+from ..exceptions import InvalidNewValue, UnwriteableValue
 from ..event import Event, EventBase
 from .device_class import DeviceClass, DeviceClassDataType
 from .device_config import DeviceConfig, DeviceConfigDataType
@@ -279,14 +280,36 @@ class Node(EventBase):
         if not val.metadata.writeable:
             raise UnwriteableValue
 
-        if (
-            isinstance(val, ConfigurationValue)
-            and val.type == ConfigurationValueType.UNDEFINED
-        ):
-            # We need to use the Configuration CC API to set the value for this type
-            raise NotImplementedError(
-                "Configuration values of undefined type can't be set"
-            )
+        # Raise an exception if we are setting an invalid value on a configuration value
+        if isinstance(val, ConfigurationValue):
+            if val.type == ConfigurationValueType.UNDEFINED:
+                # We need to use the Configuration CC API to set the value for this type
+                raise NotImplementedError(
+                    "Configuration values of undefined type can't be set"
+                )
+
+            max = val.metadata.max
+            min = val.metadata.min
+            if val.type == ConfigurationValueType.RANGE and (
+                (max is not None and new_value > max)
+                or (min is not None and new_value < min)
+            ):
+                msg = ""
+                if min is not None:
+                    msg += f"Min: {min}, "
+                if max is not None:
+                    msg += f"Max: {max}"
+                raise InvalidNewValue(
+                    f"Must provide a value within the target range ({msg.strip()})"
+                )
+
+            if (
+                val.type == ConfigurationValueType.ENUMERATED
+                and str(new_value) != val.metadata.states
+            ):
+                raise InvalidNewValue(
+                    f"Must provide a value that represents a valid state ({json.dumps(val.metadata.states)})"
+                )
 
         # the value object needs to be send to the server
         result = await self.client.async_send_command(

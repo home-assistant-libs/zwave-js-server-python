@@ -5,7 +5,7 @@ import pytest
 
 from zwave_js_server.model.value import ConfigurationValue
 from zwave_js_server.const import CommandClass
-from zwave_js_server.exceptions import UnwriteableValue
+from zwave_js_server.exceptions import InvalidNewValue, UnwriteableValue
 from zwave_js_server.model import node as node_pkg
 from zwave_js_server.event import Event
 
@@ -81,6 +81,12 @@ async def test_command_class_values(climate_radio_thermostat_ct100_plus):
 
     with pytest.raises(UnwriteableValue):
         await node.async_set_value("13-112-00-2-00", 1)
+
+    with pytest.raises(InvalidNewValue):
+        await node.async_set_value("13-112-00-1-00", 5)
+
+    with pytest.raises(InvalidNewValue):
+        await node.async_set_value("13-112-00-10-00", 200)
 
 
 async def test_set_value(node, uuid4, mock_command):

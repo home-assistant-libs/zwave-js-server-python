@@ -68,3 +68,7 @@ class FailedCommand(BaseZwaveJSServerError):
 
 class UnwriteableValue(BaseZwaveJSServerError):
     """Exception raised when trying to change a read only Value."""
+
+
+class InvalidNewValue(BaseZwaveJSServerError):
+    """Exception raised when target new value is invalid based on Value metadata."""
