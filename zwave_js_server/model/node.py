@@ -294,13 +294,13 @@ class Node(EventBase):
                 (max is not None and new_value > max)
                 or (min is not None and new_value < min)
             ):
-                msg = ""
+                bounds = []
                 if min is not None:
-                    msg += f"Min: {min}, "
+                    bounds.append(f"Min: {min}")
                 if max is not None:
-                    msg += f"Max: {max}"
+                    bounds.append(f"Max: {max}")
                 raise InvalidNewValue(
-                    f"Must provide a value within the target range ({msg.strip()})"
+                    f"Must provide a value within the target range ({", ".join(bounds)})"
                 )
 
             if (
