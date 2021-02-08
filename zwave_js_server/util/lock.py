@@ -65,7 +65,9 @@ def _get_code_slots(
         if include_usercode:
             if not value.value:
                 slot[ATTR_USERCODE] = None
-            elif value.value[0] == "{":
+            elif value.value[0] != "{":
+                slot[ATTR_USERCODE] = value.value
+            else:
                 try:
                     parsed_val = json.loads(value.value)
                     if (
@@ -79,8 +81,6 @@ def _get_code_slots(
                     raise UnparseableValue(
                         f"Unparseable value for code slot {code_slot}: {value.value}"
                     )
-            else:
-                slot[ATTR_USERCODE] = value.value
 
         slots.append(slot)
         code_slot += 1
