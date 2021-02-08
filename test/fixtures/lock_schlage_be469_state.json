@@ -391,7 +391,7 @@
                     "2": "Disabled"
                 }
             },
-            "value": 0
+            "value": 1
         },
         {
             "commandClassName": "User Code",
@@ -409,7 +409,7 @@
                 "maxLength": 10,
                 "label": "User Code (4)"
             },
-            "value": ""
+            "value": "{ \"type\": \"Buffer\", \"data\": [55, 48, 51, 48, 10, 13] }"
         },
         {
             "commandClassName": "User Code",

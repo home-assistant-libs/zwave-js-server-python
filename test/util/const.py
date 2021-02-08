@@ -23,9 +23,9 @@ CODE_SLOTS = [
     },
     {
         ATTR_CODE_SLOT: 4,
-        ATTR_IN_USE: False,
+        ATTR_IN_USE: True,
         ATTR_NAME: "User Code (4)",
-        ATTR_USERCODE: None,
+        ATTR_USERCODE: "7030\n\r",
     },
     {
         ATTR_CODE_SLOT: 5,
