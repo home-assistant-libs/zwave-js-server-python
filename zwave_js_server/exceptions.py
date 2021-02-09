@@ -17,6 +17,10 @@ class TransportError(BaseZwaveJSServerError):
         self.error = error
 
 
+class ConnectionClosed(TransportError):
+    """Exception raised when the connection is closed."""
+
+
 class CannotConnect(TransportError):
     """Exception raised when failed to connect the client."""
 
@@ -41,7 +45,7 @@ class NotFoundError(BaseZwaveJSServerError):
 
 
 class NotConnected(BaseZwaveJSServerError):
-    """Exception raised when trying to handle unknown handler."""
+    """Exception raised when not connected to client."""
 
 
 class InvalidState(BaseZwaveJSServerError):

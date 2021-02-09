@@ -14,6 +14,7 @@ from .const import MAX_SERVER_VERSION, MIN_SERVER_VERSION
 from .event import Event
 from .exceptions import (
     CannotConnect,
+    ConnectionClosed,
     ConnectionFailed,
     FailedCommand,
     InvalidMessage,
@@ -76,15 +77,15 @@ class Client:
                 self.ws_server_url,
                 heartbeat=55,
             )
-
-            self.version = version = VersionInfo.from_message(
-                await self._client.receive_json()
-            )
         except (
             client_exceptions.WSServerHandshakeError,
             client_exceptions.ClientError,
         ) as err:
             raise CannotConnect(err) from err
+
+        self.version = version = VersionInfo.from_message(
+            await self._receive_json_or_raise()
+        )
 
         # basic check for server version compatability
         cur_version = AwesomeVersion(self.version.server_version)
@@ -124,54 +125,36 @@ class Client:
 
         assert self._client
 
-        await self._send_json_message(
-            {"command": "start_listening", "messageId": "listen-id"}
-        )
-
-        state_msg = await self._client.receive_json()
-
-        if not state_msg["success"]:
-            await self._client.close()
-            raise FailedCommand(state_msg["messageId"], state_msg["errorCode"])
-
-        self.driver = cast(
-            Driver,
-            await self._loop.run_in_executor(
-                None, Driver, self, state_msg["result"]["state"]
-            ),
-        )
-
-        driver_ready.set()
-
-        self._logger.info(
-            "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
-        )
-
         try:
+            await self._send_json_message(
+                {"command": "start_listening", "messageId": "listen-id"}
+            )
+
+            state_msg = await self._receive_json_or_raise()
+
+            if not state_msg["success"]:
+                await self._client.close()
+                raise FailedCommand(state_msg["messageId"], state_msg["errorCode"])
+
+            self.driver = cast(
+                Driver,
+                await self._loop.run_in_executor(
+                    None, Driver, self, state_msg["result"]["state"]
+                ),
+            )
+
+            driver_ready.set()
+
+            self._logger.info(
+                "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
+            )
+
             while not self._client.closed:
-                msg = await self._client.receive()
-
-                if msg.type in (WSMsgType.CLOSE, WSMsgType.CLOSED, WSMsgType.CLOSING):
-                    break
-
-                if msg.type == WSMsgType.ERROR:
-                    raise ConnectionFailed()
-
-                if msg.type != WSMsgType.TEXT:
-                    raise InvalidMessage(f"Received non-Text message: {msg.type}")
-
-                try:
-                    if len(msg.data) > SIZE_PARSE_JSON_EXECUTOR:
-                        data: dict = await self._loop.run_in_executor(None, msg.json)
-                    else:
-                        data = msg.json()
-                except ValueError as err:
-                    raise InvalidMessage("Received invalid JSON.") from err
-
-                if self._logger.isEnabledFor(logging.DEBUG):
-                    self._logger.debug("Received message:\n%s\n", pprint.pformat(msg))
+                data = await self._receive_json_or_raise()
 
                 self._handle_incoming_message(data)
+        except ConnectionClosed:
+            pass
 
         finally:
             self._logger.debug("Listen completed. Cleaning up")
@@ -202,6 +185,33 @@ class Client:
         self._shutdown_complete_event = asyncio.Event()
         await self._client.close()
         await self._shutdown_complete_event.wait()
+
+    async def _receive_json_or_raise(self) -> dict:
+        """Receive json or raise InvalidMessage."""
+        assert self._client
+        msg = await self._client.receive()
+
+        if msg.type in (WSMsgType.CLOSE, WSMsgType.CLOSED, WSMsgType.CLOSING):
+            raise ConnectionClosed("Connection was closed.")
+
+        if msg.type == WSMsgType.ERROR:
+            raise ConnectionFailed()
+
+        if msg.type != WSMsgType.TEXT:
+            raise InvalidMessage(f"Received non-Text message: {msg.type}")
+
+        try:
+            if len(msg.data) > SIZE_PARSE_JSON_EXECUTOR:
+                data: dict = await self._loop.run_in_executor(None, msg.json)
+            else:
+                data = msg.json()
+        except ValueError as err:
+            raise InvalidMessage("Received invalid JSON.") from err
+
+        if self._logger.isEnabledFor(logging.DEBUG):
+            self._logger.debug("Received message:\n%s\n", pprint.pformat(msg))
+
+        return data
 
     def _handle_incoming_message(self, msg: dict) -> None:
         """Handle incoming message.
