@@ -1,5 +1,4 @@
 """Utility functions for Z-Wave JS locks."""
-import json
 from typing import Dict, List, Optional, Union
 
 from ..const import (
@@ -12,7 +11,7 @@ from ..const import (
     CodeSlotStatus,
     CommandClass,
 )
-from ..exceptions import NotFoundError, UnparseableValue
+from ..exceptions import NotFoundError
 from ..model.node import Node
 from ..model.value import get_value_id, Value
 
@@ -63,24 +62,7 @@ def _get_code_slots(
             ATTR_IN_USE: status_value.value == CodeSlotStatus.ENABLED,
         }
         if include_usercode:
-            if not value.value:
-                slot[ATTR_USERCODE] = None
-            elif value.value[0] != "{":
-                slot[ATTR_USERCODE] = value.value
-            else:
-                try:
-                    parsed_val = json.loads(value.value)
-                    if (
-                        "type" not in parsed_val
-                        or parsed_val["type"] != "Buffer"
-                        or "data" not in parsed_val
-                    ):
-                        raise ValueError("JSON string does not match expected schema")
-                    slot[ATTR_USERCODE] = "".join([chr(x) for x in parsed_val["data"]])
-                except ValueError as err:
-                    raise UnparseableValue(
-                        f"Unparseable value for code slot {code_slot}: {value.value}"
-                    ) from err
+            slot[ATTR_USERCODE] = value.value if value.value else None
 
         slots.append(slot)
         code_slot += 1
