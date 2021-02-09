@@ -1,6 +1,7 @@
 """Provide common pytest fixtures."""
 import asyncio
 import json
+from collections import deque
 from typing import List, Tuple
 from unittest.mock import AsyncMock, Mock, patch
 
@@ -47,20 +48,41 @@ def client_session_fixture(ws_client):
     return client_session
 
 
+def create_ws_message(result):
+    """Return a mock WSMessage."""
+    message = Mock(spec_set=WSMessage)
+    message.type = WSMsgType.TEXT
+    message.data = json.dumps(result)
+    message.json.return_value = result
+    return message
+
+
+@pytest.fixture(name="messages")
+def messages_fixture():
+    """Return a message buffer for the WS client."""
+    return deque()
+
+
 @pytest.fixture(name="ws_client")
-async def ws_client_fixture(loop, version_data, ws_message, result):
+async def ws_client_fixture(loop, version_data, ws_message, result, messages):
     """Mock a websocket client.
 
     This fixture only allows a single message to be received.
     """
     ws_client = AsyncMock(spec_set=ClientWebSocketResponse, closed=False)
     ws_client.receive_json.side_effect = (version_data, result)
+    for data in (version_data, result):
+        messages.append(create_ws_message(data))
 
     async def receive():
         """Return a websocket message."""
         await asyncio.sleep(0)
-        ws_client.closed = True
-        return ws_message
+
+        message = messages.popleft()
+        if not messages:
+            ws_client.closed = True
+
+        return message
 
     ws_client.receive.side_effect = receive
 
@@ -132,11 +154,7 @@ def result_fixture(controller_state, uuid4):
 @pytest.fixture(name="ws_message")
 def ws_message_fixture(result):
     """Return a mock WSMessage."""
-    message = Mock(spec_set=WSMessage)
-    message.type = WSMsgType.TEXT
-    message.data = json.dumps(result)
-    message.json.return_value = result
-    return message
+    return create_ws_message(result)
 
 
 @pytest.fixture(name="uuid4")
