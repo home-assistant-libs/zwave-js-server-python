@@ -31,7 +31,11 @@ async def test_connect_disconnect(client_session, url):
 
 @pytest.mark.parametrize(
     "error",
-    [ClientError, WSServerHandshakeError(Mock(RequestInfo), (Mock(ClientResponse),))],
+    [
+        ClientError,
+        WSServerHandshakeError(Mock(RequestInfo), (Mock(ClientResponse),)),
+        TypeError,
+    ],
 )
 async def test_cannot_connect(client_session, url, error):
     """Test cannot connect."""
