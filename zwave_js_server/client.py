@@ -83,7 +83,6 @@ class Client:
         except (
             client_exceptions.WSServerHandshakeError,
             client_exceptions.ClientError,
-            TypeError,  # TypeError if the client receives non string
         ) as err:
             raise CannotConnect(err) from err
 
