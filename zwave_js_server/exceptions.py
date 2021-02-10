@@ -66,6 +66,10 @@ class FailedCommand(BaseZwaveJSServerError):
         self.error_code = error_code
 
 
+class UnparseableValue(BaseZwaveJSServerError):
+    """Exception raised when a value can't be parsed."""
+
+
 class UnwriteableValue(BaseZwaveJSServerError):
     """Exception raised when trying to change a read only Value."""
 

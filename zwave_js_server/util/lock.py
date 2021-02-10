@@ -52,10 +52,12 @@ def _get_code_slots(
         except NotFoundError:
             return slots
 
+        code_slot = int(value.property_key)  # type: ignore
+
         # we know that code slots will always have a property key
         # that is an int, so we can ignore mypy
         slot = {
-            ATTR_CODE_SLOT: int(value.property_key),  # type: ignore
+            ATTR_CODE_SLOT: code_slot,
             ATTR_NAME: value.metadata.label,
             ATTR_IN_USE: status_value.value == CodeSlotStatus.ENABLED,
         }

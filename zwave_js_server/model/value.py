@@ -1,7 +1,9 @@
 """Provide a model for the Z-Wave JS value."""
+import json
 from typing import TYPE_CHECKING, Any, Dict, Optional, TypedDict, Union
 
 from ..const import ConfigurationValueType
+from ..exceptions import UnparseableValue
 from ..event import Event
 
 if TYPE_CHECKING:
@@ -110,6 +112,20 @@ class Value:
         self.node = node
         self.data = data
         self._value = data.get("newValue", data.get("value"))
+        if self.metadata.type == "string" and self._value and self._value[0] == "{":
+            try:
+                parsed_val = json.loads(self._value)
+                if (
+                    "type" not in parsed_val
+                    or parsed_val["type"] != "Buffer"
+                    or "data" not in parsed_val
+                ):
+                    raise ValueError("JSON string does not match expected schema")
+                self._value = "".join([chr(x) for x in parsed_val["data"]])
+            except ValueError as err:
+                raise UnparseableValue(
+                    f"Unparseable value {self}: {self.value}"
+                ) from err
 
     def __repr__(self) -> str:
         """Return the representation."""
