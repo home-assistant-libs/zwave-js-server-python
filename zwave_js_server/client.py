@@ -187,7 +187,7 @@ class Client:
         await self._shutdown_complete_event.wait()
 
     async def _receive_json_or_raise(self) -> dict:
-        """Receive json or raise InvalidMessage."""
+        """Receive json or raise."""
         assert self._client
         msg = await self._client.receive()
 
