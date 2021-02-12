@@ -218,7 +218,7 @@ class ConfigurationValue(Value):
     """Model for a Configuration Value."""
 
     @property
-    def type(self) -> ConfigurationValueType:
+    def configuration_value_type(self) -> ConfigurationValueType:
         """Return configuration value type."""
         if self.metadata.type == "number":
             if self.metadata.states:
