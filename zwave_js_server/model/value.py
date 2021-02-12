@@ -79,6 +79,11 @@ class ValueMetadata:
         return self.data.get("label")
 
     @property
+    def description(self) -> Optional[str]:
+        """Return description."""
+        return self.data.get("description")
+
+    @property
     def min(self) -> Optional[int]:
         """Return min."""
         return self.data.get("min")
