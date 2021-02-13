@@ -282,7 +282,7 @@ class Node(EventBase):
 
         # Raise an exception if we are setting an invalid value on a configuration value
         if isinstance(val, ConfigurationValue):
-            if val.type == ConfigurationValueType.UNDEFINED:
+            if val.configuration_value_type == ConfigurationValueType.UNDEFINED:
                 # We need to use the Configuration CC API to set the value for this type
                 raise NotImplementedError(
                     "Configuration values of undefined type can't be set"
@@ -290,7 +290,7 @@ class Node(EventBase):
 
             max_ = val.metadata.max
             min_ = val.metadata.min
-            if val.type == ConfigurationValueType.RANGE and (
+            if val.configuration_value_type == ConfigurationValueType.RANGE and (
                 (max_ is not None and new_value > max_)
                 or (min_ is not None and new_value < min_)
             ):
@@ -304,7 +304,7 @@ class Node(EventBase):
                 )
 
             if (
-                val.type == ConfigurationValueType.ENUMERATED
+                val.configuration_value_type == ConfigurationValueType.ENUMERATED
                 and str(new_value) not in val.metadata.states
             ):
                 raise InvalidNewValue(
