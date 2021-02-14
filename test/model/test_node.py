@@ -201,6 +201,7 @@ async def test_get_value_metadata(node, uuid4, mock_command):
             "readable": True,
             "writeable": False,
             "label": "Node ID of the controller",
+            "description": "Description of the value metadata",
         },
     )
 
@@ -212,6 +213,7 @@ async def test_get_value_metadata(node, uuid4, mock_command):
     assert result.readable is True
     assert result.writeable is False
     assert result.label == "Node ID of the controller"
+    assert result.description == "Description of the value metadata"
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
