@@ -92,7 +92,8 @@ async def test_command_class_values(climate_radio_thermostat_ct100_plus):
 async def test_set_value(node, uuid4, mock_command):
     """Test set value."""
     ack_commands = mock_command(
-        {"command": "node.set_value", "nodeId": node.node_id}, {"success": True},
+        {"command": "node.set_value", "nodeId": node.node_id},
+        {"success": True},
     )
     value_id = "52-32-00-targetValue-00"
     value = node.values[value_id]
@@ -111,7 +112,8 @@ async def test_set_value(node, uuid4, mock_command):
 async def test_poll_value(node, uuid4, mock_command):
     """Test poll value."""
     ack_commands = mock_command(
-        {"command": "node.poll_value", "nodeId": node.node_id}, {"result": "something"},
+        {"command": "node.poll_value", "nodeId": node.node_id},
+        {"result": "something"},
     )
     value_id = "52-32-00-currentValue-00"
     value = node.values[value_id]
@@ -130,7 +132,8 @@ async def test_poll_value(node, uuid4, mock_command):
 async def test_refresh_info(node, uuid4, mock_command):
     """Test refresh info."""
     ack_commands = mock_command(
-        {"command": "node.refresh_info", "nodeId": node.node_id}, {},
+        {"command": "node.refresh_info", "nodeId": node.node_id},
+        {},
     )
     assert await node.async_refresh_info() is None
 
@@ -224,7 +227,8 @@ async def test_get_value_metadata(node, uuid4, mock_command):
 async def test_abort_firmware_update(node, uuid4, mock_command):
     """Test abort firmware update."""
     ack_commands = mock_command(
-        {"command": "node.abort_firmware_update", "nodeId": node.node_id}, {},
+        {"command": "node.abort_firmware_update", "nodeId": node.node_id},
+        {},
     )
 
     assert await node.async_abort_firmware_update() is None
