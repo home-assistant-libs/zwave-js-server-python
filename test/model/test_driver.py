@@ -24,7 +24,7 @@ def test_from_state():
 
 
 async def test_update_log_config(driver, uuid4, mock_command):
-    """Test set value."""
+    """Test update log config."""
     ack_commands = mock_command(
         {"command": "update_log_config", "config": {"level": 0}},
         {"success": True},
