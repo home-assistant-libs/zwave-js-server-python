@@ -75,3 +75,30 @@ async def test_update_log_config(driver, uuid4, mock_command):
         },
         "messageId": uuid4,
     }
+
+
+async def test_get_log_config(driver, uuid4, mock_command):
+    """Test set value."""
+    ack_commands = mock_command(
+        {"command": "get_log_config"},
+        {
+            "success": True,
+            "config": {
+                "enabled": True,
+                "level": 0,
+                "logToFile": False,
+                "filename": "/test.txt",
+                "forceConsole": False,
+            },
+        },
+    )
+    log_config = await driver.async_get_log_config()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {"command": "get_log_config", "messageId": uuid4}
+
+    assert log_config.enabled
+    assert log_config.level == LogLevel.ERROR
+    assert log_config.log_to_file is False
+    assert log_config.filename == "/test.txt"
+    assert log_config.force_console is False
