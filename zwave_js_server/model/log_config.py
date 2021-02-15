@@ -1,11 +1,10 @@
 """Provide a model for the log config."""
-from dataclasses import dataclass
+from typing import TypedDict
 
 from ..const import LogLevel
 
 
-@dataclass
-class LogConfig:
+class LogConfig(TypedDict, total=False):
     """Represent a log config dict type."""
 
     # TODO: Is support for `transports` needed? If so, add support
