@@ -7,6 +7,21 @@ MIN_SERVER_VERSION = "1.0.0-beta.2"
 MAX_SERVER_VERSION = "2.0.0"
 
 
+class LogLevel(IntEnum):
+    """Enum for log levels used by node-zwave-js."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/log/shared.ts#L12
+    # https://github.com/winstonjs/triple-beam/blame/master/config/npm.js#L14
+    ERROR = 0
+    WARN = 1
+    WARNING = WARN
+    INFO = 2
+    HTTP = 3
+    VERBOSE = 4
+    DEBUG = 5
+    SILLY = 6
+
+
 class CommandClass(IntEnum):
     """Enum with all known CommandClasses."""
 
