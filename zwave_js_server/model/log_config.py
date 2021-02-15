@@ -9,8 +9,9 @@ from ..const import LogLevel
 class LogConfig:
     """Represent a log config dict type."""
 
-    # TODO: Is support for `transports` needed? If so, add support
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/log/shared.ts#L85
     # Must include at least one key
+    # TODO: Is support for `transports` needed? If so, add support
     enabled: Optional[bool] = None
     level: Optional[LogLevel] = None
     log_to_file: Optional[bool] = None
