@@ -1,8 +1,10 @@
 """Provide a model for the Z-Wave JS Driver."""
+import dataclasses
 from typing import TYPE_CHECKING, cast
 from zwave_js_server.model.log_config import LogConfig
 
 from ..event import Event, EventBase
+from ..helpers import snake_to_camel_case
 from .controller import Controller
 
 if TYPE_CHECKING:
@@ -36,7 +38,11 @@ class Driver(EventBase):
         result = await self.client.async_send_command(
             {
                 "command": "update_log_config",
-                "config": log_config,
+                "config": {
+                    snake_to_camel_case(field.name): getattr(log_config, field.name)
+                    for field in dataclasses.fields(log_config)
+                    if getattr(log_config, field.name) is not None
+                },
             }
         )
 

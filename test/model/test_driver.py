@@ -3,7 +3,7 @@ import json
 
 from zwave_js_server.const import LogLevel
 from zwave_js_server.event import Event
-from zwave_js_server.model import driver as driver_pkg
+from zwave_js_server.model import driver as driver_pkg, log_config as log_config_pkg
 
 from .. import load_fixture
 
@@ -26,14 +26,16 @@ def test_from_state():
 async def test_update_log_config(driver, uuid4, mock_command):
     """Test set value."""
     ack_commands = mock_command(
-        {"command": "update_log_config", "config": {"logLevel": 0}},
+        {"command": "update_log_config", "config": {"level": 0}},
         {"success": True},
     )
-    assert await driver.async_update_log_config({"logLevel": LogLevel.ERROR})
+    assert await driver.async_update_log_config(
+        log_config_pkg.LogConfig(level=LogLevel.ERROR)
+    )
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "update_log_config",
-        "config": {"logLevel": 0},
+        "config": {"level": 0},
         "messageId": uuid4,
     }
