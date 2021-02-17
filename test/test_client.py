@@ -44,7 +44,7 @@ async def test_cannot_connect(client_session, url, error):
     assert not client.connected
 
 
-async def test_invalid_server_version(client_session, url, version_data, caplog):
+async def test_invalid_server_version(client_session, url, version_data):
     """Test client connect with invalid server version."""
     version_data["serverVersion"] = "invalid"
     client = Client(url, client_session)
@@ -55,7 +55,7 @@ async def test_invalid_server_version(client_session, url, version_data, caplog)
     assert not client.connected
 
 
-async def test_newer_server_version(client_session, url, version_data, caplog):
+async def test_newer_server_version(client_session, url, version_data):
     """Test client connect with invalid server version."""
     version_data["serverVersion"] = "99999.0.0"
     client = Client(url, client_session)
@@ -73,7 +73,7 @@ async def test_send_json_when_disconnected(client_session, url):
     assert not client.connected
 
     with pytest.raises(NotConnected):
-        await client._send_json_message({"test": None})
+        await client.async_send_command({"test": None})
 
 
 async def test_listen(client_session, url, driver_ready):
@@ -95,16 +95,16 @@ async def test_listen(client_session, url, driver_ready):
 
 
 async def test_listen_client_error(
-    client_session, url, ws_client, ws_message, driver_ready
+    client_session, url, ws_client, messages, ws_message, driver_ready
 ):
     """Test websocket error on listen."""
     client = Client(url, client_session)
     await client.connect()
     assert client.connected
 
+    messages.append(ws_message)
+
     ws_client.receive.side_effect = asyncio.CancelledError()
-    ws_message.reset_mock()
-    ws_client.closed = False
 
     # This should break out of the listen loop before any message is received.
     with pytest.raises(asyncio.CancelledError):
@@ -121,7 +121,7 @@ async def test_listen_client_error(
     ],
 )
 async def test_listen_error_message_types(
-    client_session, url, ws_client, ws_message, message_type, exception, driver_ready
+    client_session, url, messages, ws_message, message_type, exception, driver_ready
 ):
     """Test different websocket message types that should raise on listen."""
     client = Client(url, client_session)
@@ -129,20 +129,23 @@ async def test_listen_error_message_types(
     assert client.connected
 
     ws_message.type = message_type
-    ws_client.closed = False
+    messages.append(ws_message)
 
     with pytest.raises(exception):
         await client.listen(driver_ready)
 
 
-@pytest.mark.parametrize("message_type", [WSMsgType.CLOSED, WSMsgType.CLOSING])
+@pytest.mark.parametrize(
+    "message_type", [WSMsgType.CLOSE, WSMsgType.CLOSED, WSMsgType.CLOSING]
+)
 async def test_listen_disconnect_message_types(
-    client_session, url, ws_client, ws_message, message_type, driver_ready, await_other
+    client_session, url, ws_client, messages, ws_message, message_type, driver_ready
 ):
     """Test different websocket message types that stop listen."""
     async with Client(url, client_session) as client:
         assert client.connected
         ws_message.type = message_type
+        messages.append(ws_message)
 
         # This should break out of the listen loop before handling the received message.
         # Otherwise there will be an error.
@@ -153,7 +156,7 @@ async def test_listen_disconnect_message_types(
 
 
 async def test_listen_invalid_message_data(
-    client_session, url, ws_client, ws_message, driver_ready
+    client_session, url, messages, ws_message, driver_ready
 ):
     """Test websocket message data that should raise on listen."""
     client = Client(url, client_session)
@@ -161,7 +164,7 @@ async def test_listen_invalid_message_data(
     assert client.connected
 
     ws_message.json.side_effect = ValueError("Boom")
-    ws_client.closed = False
+    messages.append(ws_message)
 
     with pytest.raises(InvalidMessage):
         await client.listen(driver_ready)
@@ -190,7 +193,7 @@ async def test_listen_without_connect(client_session, url, driver_ready):
 
 
 async def test_listen_event(
-    client_session, url, ws_client, ws_message, result, driver_ready, await_other
+    client_session, url, ws_client, messages, ws_message, result, driver_ready
 ):
     """Test receiving event result type on listen."""
     client = Client(url, client_session)
@@ -213,6 +216,7 @@ async def test_listen_event(
             "propertyName": "currentValue",
         },
     }
+    messages.append(ws_message)
 
     await client.listen(driver_ready)
     ws_client.receive.assert_awaited()
