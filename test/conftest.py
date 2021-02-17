@@ -209,9 +209,9 @@ def driver_fixture(client, controller_state):
     return Driver(client, controller_state)
 
 
-@pytest.fixture(name="node")
-def node_fixture(driver, multisensor_6_state):
-    """Return a node instance with a supporting client."""
+@pytest.fixture(name="multisensor_6")
+def multisensor_6_fixture(driver, multisensor_6_state):
+    """Mock a multisensor 6 node."""
     node = Node(driver.client, multisensor_6_state)
     driver.controller.nodes[node.node_id] = node
     return node
@@ -221,14 +221,6 @@ def node_fixture(driver, multisensor_6_state):
 def lock_schlage_be469_fixture(driver, lock_schlage_be469_state):
     """Mock a schlage lock node."""
     node = Node(driver.client, lock_schlage_be469_state)
-    driver.controller.nodes[node.node_id] = node
-    return node
-
-
-@pytest.fixture(name="multisensor_6")
-def multisensor_6_fixture(driver, multisensor_6_state):
-    """Mock a multisensor 6 node."""
-    node = Node(driver.client, multisensor_6_state)
     driver.controller.nodes[node.node_id] = node
     return node
 

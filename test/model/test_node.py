@@ -96,8 +96,9 @@ async def test_command_class_values(climate_radio_thermostat_ct100_plus):
         await node.async_set_value("13-112-00-10-00", 200)
 
 
-async def test_set_value(node, uuid4, mock_command):
+async def test_set_value(multisensor_6, uuid4, mock_command):
     """Test set value."""
+    node = multisensor_6
     ack_commands = mock_command(
         {"command": "node.set_value", "nodeId": node.node_id},
         {"success": True},
@@ -116,8 +117,9 @@ async def test_set_value(node, uuid4, mock_command):
     }
 
 
-async def test_poll_value(node, uuid4, mock_command):
+async def test_poll_value(multisensor_6, uuid4, mock_command):
     """Test poll value."""
+    node = multisensor_6
     ack_commands = mock_command(
         {"command": "node.poll_value", "nodeId": node.node_id},
         {"result": "something"},
@@ -136,8 +138,9 @@ async def test_poll_value(node, uuid4, mock_command):
     }
 
 
-async def test_refresh_info(node, uuid4, mock_command):
+async def test_refresh_info(multisensor_6, uuid4, mock_command):
     """Test refresh info."""
+    node = multisensor_6
     ack_commands = mock_command(
         {"command": "node.refresh_info", "nodeId": node.node_id},
         {},
@@ -152,8 +155,9 @@ async def test_refresh_info(node, uuid4, mock_command):
     }
 
 
-async def test_get_defined_value_ids(node, uuid4, mock_command):
+async def test_get_defined_value_ids(multisensor_6, uuid4, mock_command):
     """Test get defined value ids."""
+    node = multisensor_6
     ack_commands = mock_command(
         {"command": "node.get_defined_value_ids", "nodeId": node.node_id},
         {
@@ -199,8 +203,9 @@ async def test_get_defined_value_ids(node, uuid4, mock_command):
     }
 
 
-async def test_get_value_metadata(node, uuid4, mock_command):
+async def test_get_value_metadata(multisensor_6, uuid4, mock_command):
     """Test get value metadata."""
+    node = multisensor_6
     ack_commands = mock_command(
         {"command": "node.get_value_metadata", "nodeId": node.node_id},
         {
@@ -231,8 +236,9 @@ async def test_get_value_metadata(node, uuid4, mock_command):
     }
 
 
-async def test_abort_firmware_update(node, uuid4, mock_command):
+async def test_abort_firmware_update(multisensor_6, uuid4, mock_command):
     """Test abort firmware update."""
+    node = multisensor_6
     ack_commands = mock_command(
         {"command": "node.abort_firmware_update", "nodeId": node.node_id},
         {},
