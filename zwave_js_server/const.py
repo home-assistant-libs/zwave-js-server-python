@@ -14,7 +14,6 @@ class LogLevel(IntEnum):
     # https://github.com/winstonjs/triple-beam/blame/master/config/npm.js#L14
     ERROR = 0
     WARN = 1
-    WARNING = WARN
     INFO = 2
     HTTP = 3
     VERBOSE = 4
