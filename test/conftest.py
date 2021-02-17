@@ -225,6 +225,14 @@ def lock_schlage_be469_fixture(driver, lock_schlage_be469_state):
     return node
 
 
+@pytest.fixture(name="multisensor_6")
+def multisensor_6_fixture(driver, multisensor_6_state):
+    """Mock a multisensor 6 node."""
+    node = Node(driver.client, multisensor_6_state)
+    driver.controller.nodes[node.node_id] = node
+    return node
+
+
 @pytest.fixture(name="climate_radio_thermostat_ct100_plus")
 def climate_radio_thermostat_ct100_plus_fixture(
     driver, climate_radio_thermostat_ct100_plus_state

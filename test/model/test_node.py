@@ -67,6 +67,13 @@ def test_from_state():
     assert node.endpoints[0].index == 0
 
 
+async def test_values_without_property_key_name(multisensor_6):
+    """Test that values with property key and without property key name can be found."""
+    node = multisensor_6
+    assert "52-112-00-101-1" in node.values
+    assert "52-112-00-101-16" in node.values
+
+
 async def test_command_class_values(climate_radio_thermostat_ct100_plus):
     """Test node methods to get command class values."""
     node = climate_radio_thermostat_ct100_plus
