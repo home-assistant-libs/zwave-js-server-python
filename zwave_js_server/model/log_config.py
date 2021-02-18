@@ -6,7 +6,7 @@ from ..const import LogLevel
 
 
 class LogConfigDataType(TypedDict, total=False):
-    """"Represent a log config data dict type."""
+    """Represent a log config data dict type."""
 
     enabled: bool
     level: LogLevel
