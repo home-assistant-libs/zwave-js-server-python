@@ -1,6 +1,6 @@
 """Provide a model for the log config."""
 from dataclasses import dataclass
-from typing import Optional, TypedDict
+from typing import Optional, TypedDict, cast
 
 from ..const import LogLevel
 
@@ -36,7 +36,7 @@ class LogConfig:
             "filename": self.filename,
             "forceConsole": self.force_console,
         }
-        return {k: v for k, v in data.items() if v is not None}
+        return cast(LogConfigDataType, {k: v for k, v in data.items() if v is not None})
 
     @staticmethod
     def from_dict(data: LogConfigDataType) -> "LogConfig":
