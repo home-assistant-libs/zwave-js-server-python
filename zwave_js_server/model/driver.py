@@ -1,5 +1,4 @@
 """Provide a model for the Z-Wave JS Driver."""
-import dataclasses
 from typing import TYPE_CHECKING, cast
 from zwave_js_server.model.log_config import LogConfig
 
