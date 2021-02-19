@@ -1,6 +1,6 @@
 """Utility functions for Z-Wave JS nodes."""
 import json
-from typing import Optional, Union, cast
+from typing import Optional, Union
 
 from ..const import CommandClass, ConfigurationValueType
 from ..exceptions import InvalidNewValue, NotFoundError
@@ -37,16 +37,12 @@ async def async_set_config_parameter(
                 f"{property_or_property_name} could not be found"
             ) from None
     else:
-        evt_data = {
-            "commandClass": CommandClass.CONFIGURATION,
-            "property": property_or_property_name,
-            "propertyKey": property_key,
-        }
         value_id = get_value_id(
             node,
-            cast(
-                ValueDataType, {k: v for k, v in evt_data.items() if v is not None}
-            ),
+            CommandClass.CONFIGURATION,
+            property_or_property_name,
+            endpoint=0,
+            property_key=property_key
         )
 
         try:
