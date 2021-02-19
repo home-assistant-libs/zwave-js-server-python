@@ -1,5 +1,5 @@
 """Constants for the Z-Wave JS python library."""
-from dataclasses import dataclass, make_dataclass
+from dataclasses import dataclass
 from enum import Enum, IntEnum
 from typing import Dict, List
 
