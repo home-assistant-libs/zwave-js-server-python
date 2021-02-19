@@ -83,7 +83,9 @@ class Node(EventBase):
             except UnparseableValue:
                 # If we can't parse the value, don't store it but log it for later
                 _LOGGER.info(
-                    "Skipping unparseable value %s (raw value data: %s)", value_id, val
+                    "Unable to parse value %s (%s) so it will not be stored",
+                    value_id,
+                    val,
                 )
 
     def __repr__(self) -> str:
