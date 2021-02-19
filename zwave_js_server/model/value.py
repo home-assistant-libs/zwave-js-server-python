@@ -69,7 +69,8 @@ def get_value_id(
         property_key = "00"
     property_key_name = property_key_name or "00"
     return (
-        f"{node.node_id}-{command_class}-{endpoint}-{property_}-{property_key}-{property_key_name}"
+        f"{node.node_id}-{command_class}-{endpoint}-"
+        f"{property_}-{property_key}-{property_key_name}"
     )
 
 
