@@ -25,6 +25,7 @@ class LogLevel(IntEnum):
 @dataclass
 class PropertyKey:
     """Class to represent a property key and its name."""
+
     key: int
     name: str
 
