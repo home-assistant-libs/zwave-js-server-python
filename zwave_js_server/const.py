@@ -321,3 +321,18 @@ class BarrierState(IntEnum):
     STOPPED = 253
     OPENING = 254
     OPEN = 255
+
+
+class ColorComponent(Enum):
+    """Enum with all (known/used) Color Switch CC colors."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/ColorSwitchCC.ts#L62
+    WARM_WHITE = (0, "Warm White")
+    COLOR_WHITE = (1, "Cold White")
+    RED = (2, "Red")
+    GREEN = (3, "Green")
+    BLUE = (4, "Blue")
+    AMBER = (5, "Amber")
+    CYAN = (6, "Cyan")
+    PURPLE = (7, "Purple")
+    INDEX = (8, "Index")
