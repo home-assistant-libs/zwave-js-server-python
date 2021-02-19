@@ -1,4 +1,5 @@
 """Constants for the Z-Wave JS python library."""
+from dataclasses import dataclass, make_dataclass
 from enum import Enum, IntEnum
 from typing import Dict, List
 
@@ -19,6 +20,13 @@ class LogLevel(IntEnum):
     VERBOSE = 4
     DEBUG = 5
     SILLY = 6
+
+
+@dataclass
+class PropertyKey:
+    """Class to represent a property key and its name."""
+    key: int
+    name: str
 
 
 class CommandClass(IntEnum):
@@ -249,18 +257,18 @@ class ThermostatSetpointType(Enum):
     """
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/ThermostatSetpointCC.ts#L53-L66
-    NA = (0, "N/A")
-    HEATING = (1, "Heating")
-    COOLING = (2, "Cooling")
-    FURNACE = (7, "Furnace")
-    DRY_AIR = (8, "Dry Air")
-    MOIST_AIR = (9, "Moist Air")
-    AUTO_CHANGEOVER = (10, "Auto Changeover")
-    ENERGY_SAVE_HEATING = (11, "Energy Save Heating")
-    ENERGY_SAVE_COOLING = (12, "Energy Save Cooling")
-    AWAY_HEATING = (13, "Away Heating")
-    AWAY_COOLING = (14, "Away Cooling")
-    FULL_POWER = (15, "Full Power")
+    NA = PropertyKey(0, "N/A")
+    HEATING = PropertyKey(1, "Heating")
+    COOLING = PropertyKey(2, "Cooling")
+    FURNACE = PropertyKey(7, "Furnace")
+    DRY_AIR = PropertyKey(8, "Dry Air")
+    MOIST_AIR = PropertyKey(9, "Moist Air")
+    AUTO_CHANGEOVER = PropertyKey(10, "Auto Changeover")
+    ENERGY_SAVE_HEATING = PropertyKey(11, "Energy Save Heating")
+    ENERGY_SAVE_COOLING = PropertyKey(12, "Energy Save Cooling")
+    AWAY_HEATING = PropertyKey(13, "Away Heating")
+    AWAY_COOLING = PropertyKey(14, "Away Cooling")
+    FULL_POWER = PropertyKey(15, "Full Power")
 
 
 # In Z-Wave the modes and presets are both in ThermostatMode.
@@ -327,12 +335,12 @@ class ColorComponent(Enum):
     """Enum with all (known/used) Color Switch CC colors."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/ColorSwitchCC.ts#L62
-    WARM_WHITE = (0, "Warm White")
-    COLD_WHITE = (1, "Cold White")
-    RED = (2, "Red")
-    GREEN = (3, "Green")
-    BLUE = (4, "Blue")
-    AMBER = (5, "Amber")
-    CYAN = (6, "Cyan")
-    PURPLE = (7, "Purple")
-    INDEX = (8, "Index")
+    WARM_WHITE = PropertyKey(0, "Warm White")
+    COLD_WHITE = PropertyKey(1, "Cold White")
+    RED = PropertyKey(2, "Red")
+    GREEN = PropertyKey(3, "Green")
+    BLUE = PropertyKey(4, "Blue")
+    AMBER = PropertyKey(5, "Amber")
+    CYAN = PropertyKey(6, "Cyan")
+    PURPLE = PropertyKey(7, "Purple")
+    INDEX = PropertyKey(8, "Index")
