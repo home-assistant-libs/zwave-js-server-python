@@ -228,7 +228,11 @@ class ThermostatOperatingState(IntEnum):
 
 
 class ThermostatSetpointType(Enum):
-    """Enum with all (known/used) Z-Wave Thermostat Setpoint Types."""
+    """
+    Enum with all (known/used) Z-Wave Thermostat Setpoint Types.
+    
+    Returns tuple of (property_key, property_key_name).
+    """
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/ThermostatSetpointCC.ts#L53-L66
     NA = (0, "N/A")
