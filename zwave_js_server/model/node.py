@@ -1,9 +1,8 @@
 """Provide a model for the Z-Wave JS node."""
-import json
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
-from zwave_js_server.const import CommandClass, ConfigurationValueType
+from zwave_js_server.const import CommandClass
 
-from ..exceptions import InvalidNewValue, UnwriteableValue
+from ..exceptions import UnwriteableValue
 from ..event import Event, EventBase
 from .device_class import DeviceClass, DeviceClassDataType
 from .device_config import DeviceConfig, DeviceConfigDataType
@@ -253,15 +252,11 @@ class Node(EventBase):
             and (endpoint is None or value.endpoint == endpoint)
         }
 
-    def get_configuration_values(
-        self, endpoint: int = None
-    ) -> Dict[str, ConfigurationValue]:
+    def get_configuration_values(self) -> Dict[str, ConfigurationValue]:
         """Return all configuration values for a node."""
         return cast(
             Dict[str, ConfigurationValue],
-            self.get_command_class_values(
-                CommandClass.CONFIGURATION, endpoint=endpoint
-            ),
+            self.get_command_class_values(CommandClass.CONFIGURATION),
         )
 
     def receive_event(self, event: Event) -> None:
@@ -279,38 +274,6 @@ class Node(EventBase):
 
         if val.metadata.writeable is False:
             raise UnwriteableValue
-
-        # Raise an exception if we are setting an invalid value on a configuration value
-        if isinstance(val, ConfigurationValue):
-            if val.configuration_value_type == ConfigurationValueType.UNDEFINED:
-                # We need to use the Configuration CC API to set the value for this type
-                raise NotImplementedError(
-                    "Configuration values of undefined type can't be set"
-                )
-
-            max_ = val.metadata.max
-            min_ = val.metadata.min
-            if val.configuration_value_type == ConfigurationValueType.RANGE and (
-                (max_ is not None and new_value > max_)
-                or (min_ is not None and new_value < min_)
-            ):
-                bounds = []
-                if min_ is not None:
-                    bounds.append(f"Min: {min_}")
-                if max_ is not None:
-                    bounds.append(f"Max: {max_}")
-                raise InvalidNewValue(
-                    f"Must provide a value within the target range ({', '.join(bounds)})"
-                )
-
-            if (
-                val.configuration_value_type == ConfigurationValueType.ENUMERATED
-                and str(new_value) not in val.metadata.states
-            ):
-                raise InvalidNewValue(
-                    "Must provide a value that represents a valid state "
-                    f"({json.dumps(val.metadata.states)})"
-                )
 
         # the value object needs to be send to the server
         result = await self.client.async_send_command(
