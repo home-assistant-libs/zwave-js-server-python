@@ -16,7 +16,6 @@ from .value import (
     ValueDataType,
     ValueMetadata,
     ValueNotification,
-    get_value_id,
     get_value_id_from_dict,
 )
 

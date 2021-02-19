@@ -2,7 +2,7 @@
 import json
 from typing import TYPE_CHECKING, Any, Dict, Optional, TypedDict, Union
 
-from ..const import CommandClass, ConfigurationValueType
+from ..const import ConfigurationValueType
 from ..exceptions import UnparseableValue
 from ..event import Event
 
