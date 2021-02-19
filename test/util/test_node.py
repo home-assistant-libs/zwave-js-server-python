@@ -40,7 +40,7 @@ async def test_configuration_parameter_values(
     with pytest.raises(NotFoundError):
         await async_set_config_parameter(node, 5, "fake configuration parameter name")
 
-    # Test configuration parameter not found when using an invalid state label
+    # Test using an invalid state label to set a value
     with pytest.raises(InvalidNewValue):
         await async_set_config_parameter(node, "fake state label", 1)
 
