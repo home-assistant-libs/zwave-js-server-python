@@ -42,7 +42,7 @@ async def async_set_config_parameter(
             CommandClass.CONFIGURATION,
             property_or_property_name,
             endpoint=0,
-            property_key=property_key
+            property_key=property_key,
         )
 
         try:
@@ -81,9 +81,7 @@ async def async_set_config_parameter(
 
     if zwave_value.configuration_value_type == ConfigurationValueType.UNDEFINED:
         # We need to use the Configuration CC API to set the value for this type
-        raise NotImplementedError(
-            "Configuration values of undefined type can't be set"
-        )
+        raise NotImplementedError("Configuration values of undefined type can't be set")
 
     # Validate that new value for range configuration parameter is within bounds
     max_ = zwave_value.metadata.max
