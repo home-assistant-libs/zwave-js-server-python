@@ -58,18 +58,17 @@ def get_value_id(
     node: "Node",
     command_class: int,
     property_: Union[str, int],
-    endpoint: Optional[Union[str, int]] = None,
+    endpoint: Optional[int] = None,
     property_key: Optional[Union[str, int]] = None,
     property_key_name: Optional[str] = None,
 ) -> str:
     """Return ID of value."""
-    if endpoint is None:
-        endpoint = "00"
+    endpoint_ = "00" if endpoint is None else endpoint
     if property_key is None:
         property_key = "00"
     property_key_name = property_key_name or "00"
     return (
-        f"{node.node_id}-{command_class}-{endpoint}-"
+        f"{node.node_id}-{command_class}-{endpoint_}-"
         f"{property_}-{property_key}-{property_key_name}"
     )
 
