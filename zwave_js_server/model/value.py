@@ -58,7 +58,7 @@ def get_value_id(
     node: "Node",
     command_class: int,
     property_: Union[str, int],
-    endpoint: int = None,
+    endpoint: Optional[int] = None,
     property_key: Union[str, int] = None,
     property_key_name: str = None,
 ) -> str:
