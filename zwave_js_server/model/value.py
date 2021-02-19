@@ -2,7 +2,7 @@
 import json
 from typing import TYPE_CHECKING, Any, Dict, Optional, TypedDict, Union
 
-from ..const import ConfigurationValueType
+from ..const import CommandClass, ConfigurationValueType
 from ..exceptions import UnparseableValue
 from ..event import Event
 
@@ -42,17 +42,31 @@ class ValueDataType(TypedDict, total=False):
     ccVersion: int
 
 
-def get_value_id(node: "Node", event_data: ValueDataType) -> str:
-    """Return ID of value."""
-    command_class = event_data["commandClass"]
-    endpoint = event_data.get("endpoint") or "00"
-    property_ = event_data["property"]
-    # Some values that have a property key don't have a property key name, so we will
-    # fall back to property key if it exists
-    property_key = (
-        event_data.get("propertyKeyName") or event_data.get("propertyKey") or "00"
+def get_value_id_from_dict(node: "Node", val: ValueDataType):
+    """Return ID of value from ValueDataType dict."""
+    return get_value_id(
+        node,
+        val["commandClass"],
+        val["property"],
+        val.get("endpoint"),
+        val.get("propertyKey"),
+        val.get("propertyKeyName"),
     )
-    return f"{node.node_id}-{command_class}-{endpoint}-{property_}-{property_key}"
+
+
+def get_value_id(
+    node: "Node",
+    command_class: CommandClass,
+    property_: Union[str, int],
+    endpoint: int = None,
+    property_key: Union[str, int] = None,
+    property_key_name: str = None,
+) -> str:
+    """Return ID of value."""
+    endpoint = endpoint or "00"
+    property_key = property_key or "00"
+    property_key_name = property_key_name or "00"
+    return f"{node.node_id}-{command_class}-{endpoint}-{property_}-{property_key}-{property_key_name}"
 
 
 class ValueMetadata:
@@ -143,7 +157,7 @@ class Value:
     @property
     def value_id(self) -> str:
         """Return value ID."""
-        return get_value_id(self.node, self.data)
+        return get_value_id_from_dict(self.node, self.data)
 
     @property
     def metadata(self) -> ValueMetadata:

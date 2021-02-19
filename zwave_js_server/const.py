@@ -231,18 +231,18 @@ class ThermostatSetpointType(Enum):
     """Enum with all (known/used) Z-Wave Thermostat Setpoint Types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/ThermostatSetpointCC.ts#L53-L66
-    NA = "N/A"
-    HEATING = "Heating"
-    COOLING = "Cooling"
-    FURNACE = "Furnace"
-    DRY_AIR = "Dry Air"
-    MOIST_AIR = "Moist Air"
-    AUTO_CHANGEOVER = "Auto Changeover"
-    ENERGY_SAVE_HEATING = "Energy Save Heating"
-    ENERGY_SAVE_COOLING = "Energy Save Cooling"
-    AWAY_HEATING = "Away Heating"
-    AWAY_COOLING = "Away Cooling"
-    FULL_POWER = "Full Power"
+    NA = (0, "N/A")
+    HEATING = (1, "Heating")
+    COOLING = (2, "Cooling")
+    FURNACE = (7, "Furnace")
+    DRY_AIR = (8, "Dry Air")
+    MOIST_AIR = (9, "Moist Air")
+    AUTO_CHANGEOVER = (10, "Auto Changeover")
+    ENERGY_SAVE_HEATING = (11, "Energy Save Heating")
+    ENERGY_SAVE_COOLING = (12, "Energy Save Cooling")
+    AWAY_HEATING = (13, "Away Heating")
+    AWAY_COOLING = (14, "Away Cooling")
+    FULL_POWER = (15, "Full Power")
 
 
 # In Z-Wave the modes and presets are both in ThermostatMode.

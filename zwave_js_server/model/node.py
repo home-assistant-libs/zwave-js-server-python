@@ -17,6 +17,7 @@ from .value import (
     ValueMetadata,
     ValueNotification,
     get_value_id,
+    get_value_id_from_dict,
 )
 
 if TYPE_CHECKING:
@@ -72,7 +73,7 @@ class Node(EventBase):
         self.data = data
         self.values: Dict[str, Union[Value, ConfigurationValue]] = {}
         for val in data["values"]:
-            value_id = get_value_id(self, val)
+            value_id = get_value_id_from_dict(self, val)
             if val["commandClass"] == CommandClass.CONFIGURATION:
                 self.values[value_id] = ConfigurationValue(self, val)
             else:
@@ -404,7 +405,7 @@ class Node(EventBase):
         self.data.update(event.data["nodeState"])
         # update/add values
         for value_state in event.data["nodeState"]["values"]:
-            value_id = get_value_id(self, value_state)
+            value_id = get_value_id_from_dict(self, value_state)
             value = self.values.get(value_id)
             if value is None:
                 self.values[value_id] = Value(self, value_state)
@@ -418,7 +419,7 @@ class Node(EventBase):
 
     def handle_value_updated(self, event: Event) -> None:
         """Process a node value updated event."""
-        value = self.values.get(get_value_id(self, event.data["args"]))
+        value = self.values.get(get_value_id_from_dict(self, event.data["args"]))
         if value is None:
             # received update for unknown value
             # should not happen but just in case, treat like added value
@@ -429,12 +430,14 @@ class Node(EventBase):
 
     def handle_value_removed(self, event: Event) -> None:
         """Process a node value removed event."""
-        event.data["value"] = self.values.pop(get_value_id(self, event.data["args"]))
+        event.data["value"] = self.values.pop(
+            get_value_id_from_dict(self, event.data["args"])
+        )
 
     def handle_value_notification(self, event: Event) -> None:
         """Process a node value notification event."""
         # append metadata if value metadata is available
-        value = self.values.get(get_value_id(self, event.data["args"]))
+        value = self.values.get(get_value_id_from_dict(self, event.data["args"]))
         if value and value.data.get("metadata"):
             event.data["args"]["metadata"] = value.data["metadata"]
         event.data["value_notification"] = ValueNotification(self, event.data["args"])

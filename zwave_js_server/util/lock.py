@@ -21,11 +21,10 @@ def get_code_slot_value(node: Node, code_slot: int, property_name: str) -> Value
     value = node.values.get(
         get_value_id(
             node,
-            {
-                "commandClass": CommandClass.USER_CODE,
-                "property": property_name,
-                "propertyKeyName": str(code_slot),
-            },
+            CommandClass.USER_CODE,
+            property_name,
+            property_key=code_slot,
+            property_key_name=str(code_slot),
         )
     )
 
