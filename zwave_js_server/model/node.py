@@ -1,4 +1,5 @@
 """Provide a model for the Z-Wave JS node."""
+import logging
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
 from zwave_js_server.const import CommandClass
 
@@ -20,6 +21,8 @@ from .value import (
 
 if TYPE_CHECKING:
     from ..client import Client
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class NodeDataType(TypedDict, total=False):
@@ -78,8 +81,10 @@ class Node(EventBase):
                 else:
                     self.values[value_id] = Value(self, val)
             except UnparseableValue:
-                # If we can't parse the value, don't store it
-                pass
+                # If we can't parse the value, don't store it but log it for later
+                _LOGGER.info(
+                    "Skipping unparseable value %s (raw value data: %s)", value_id, val
+                )
 
     def __repr__(self) -> str:
         """Return the representation."""
