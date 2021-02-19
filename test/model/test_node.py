@@ -80,7 +80,7 @@ async def test_command_class_values(climate_radio_thermostat_ct100_plus):
     switch_values = node.get_command_class_values(CommandClass.SENSOR_MULTILEVEL)
     assert len(switch_values) == 2
 
-    with pytest.raises(UnwriteableValue):	
+    with pytest.raises(UnwriteableValue):
         await node.async_set_value("13-112-0-2-00-00", 1)
 
 
