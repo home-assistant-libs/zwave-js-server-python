@@ -13,7 +13,7 @@ async def async_set_config_parameter(
     new_value: Union[int, str],
     property_or_property_name: Union[int, str],
     property_key: Optional[Union[int, str]] = None,
-) -> Optional[ConfigurationValue]:
+) -> ConfigurationValue:
     """
     Set a value for a config parameter on this node.
 
