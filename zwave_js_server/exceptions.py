@@ -80,3 +80,12 @@ class UnwriteableValue(BaseZwaveJSServerError):
 
 class InvalidNewValue(BaseZwaveJSServerError):
     """Exception raised when target new value is invalid based on Value metadata."""
+
+
+class SetValueFailed(BaseZwaveJSServerError):
+    """
+    Exception raise when setting a value fails.
+
+    Refer to https://zwave-js.github.io/node-zwave-js/#/api/node?id=setvalue for
+    possible reasons.
+    """

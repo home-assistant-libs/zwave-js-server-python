@@ -3,7 +3,7 @@ import json
 from typing import Optional, Union
 
 from ..const import CommandClass, ConfigurationValueType
-from ..exceptions import InvalidNewValue, NotFoundError
+from ..exceptions import InvalidNewValue, NotFoundError, SetValueFailed
 from ..model.node import Node
 from ..model.value import ConfigurationValue, get_value_id
 
@@ -101,6 +101,6 @@ async def async_set_config_parameter(
 
     # Finally attempt to set the value and return the Value object if successful
     if not await node.async_set_value(zwave_value, new_value):
-        return None
+        raise SetValueFailed
 
     return zwave_value
