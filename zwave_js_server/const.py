@@ -328,7 +328,7 @@ class ColorComponent(Enum):
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/ColorSwitchCC.ts#L62
     WARM_WHITE = (0, "Warm White")
-    COLOR_WHITE = (1, "Cold White")
+    COLD_WHITE = (1, "Cold White")
     RED = (2, "Red")
     GREEN = (3, "Green")
     BLUE = (4, "Blue")
