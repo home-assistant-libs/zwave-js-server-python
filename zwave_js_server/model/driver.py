@@ -41,3 +41,8 @@ class Driver(EventBase):
         )
 
         return cast(bool, result["success"])
+
+    async def async_get_log_config(self) -> LogConfig:
+        """Return current log config for driver."""
+        result = await self.client.async_send_command({"command": "get_log_config"})
+        return LogConfig.from_dict(result["config"])
