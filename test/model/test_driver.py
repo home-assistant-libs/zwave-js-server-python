@@ -1,8 +1,9 @@
 """Test the driver model."""
 import json
 
+from zwave_js_server.const import LogLevel
 from zwave_js_server.event import Event
-from zwave_js_server.model import driver as driver_pkg
+from zwave_js_server.model import driver as driver_pkg, log_config as log_config_pkg
 
 from .. import load_fixture
 
@@ -20,3 +21,57 @@ def test_from_state():
         driver.receive_event(event)
 
     assert len(driver.controller.nodes) == 8
+
+
+async def test_update_log_config(driver, uuid4, mock_command):
+    """Test update log config."""
+    ack_commands = mock_command(
+        {"command": "update_log_config", "config": {"level": 0}},
+        {"success": True},
+    )
+    assert await driver.async_update_log_config(
+        log_config_pkg.LogConfig(level=LogLevel.ERROR)
+    )
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "update_log_config",
+        "config": {"level": 0},
+        "messageId": uuid4,
+    }
+
+    ack_commands = mock_command(
+        {
+            "command": "update_log_config",
+            "config": {
+                "enabled": True,
+                "level": 0,
+                "logToFile": True,
+                "filename": "/test.txt",
+                "forceConsole": True,
+            },
+        },
+        {"success": True},
+    )
+    assert await driver.async_update_log_config(
+        log_config_pkg.LogConfig(
+            enabled=True,
+            level=LogLevel.ERROR,
+            log_to_file=True,
+            filename="/test.txt",
+            force_console=True,
+        )
+    )
+
+    assert len(ack_commands) == 2
+    assert ack_commands[1] == {
+        "command": "update_log_config",
+        "config": {
+            "enabled": True,
+            "level": 0,
+            "logToFile": True,
+            "filename": "/test.txt",
+            "forceConsole": True,
+        },
+        "messageId": uuid4,
+    }
