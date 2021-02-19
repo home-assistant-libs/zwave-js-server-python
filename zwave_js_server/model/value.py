@@ -42,7 +42,7 @@ class ValueDataType(TypedDict, total=False):
     ccVersion: int
 
 
-def get_value_id_from_dict(node: "Node", val: ValueDataType) -> str:
+def _get_value_id_from_dict(node: "Node", val: ValueDataType) -> str:
     """Return ID of value from ValueDataType dict."""
     return get_value_id(
         node,
@@ -58,15 +58,17 @@ def get_value_id(
     node: "Node",
     command_class: int,
     property_: Union[str, int],
-    endpoint: Optional[int] = None,
-    property_key: Union[str, int] = None,
-    property_key_name: str = None,
+    endpoint: Optional[Union[str, int]] = None,
+    property_key: Optional[Union[str, int]] = None,
+    property_key_name: Optional[str] = None,
 ) -> str:
     """Return ID of value."""
-    endpoint_ = endpoint or "00"
-    property_key = property_key or "00"
+    if endpoint is None:
+        endpoint = "00"
+    if property_key is None:
+        property_key = "00"
     property_key_name = property_key_name or "00"
-    return f"{node.node_id}-{command_class}-{endpoint_}-{property_}-{property_key}-{property_key_name}"
+    return f"{node.node_id}-{command_class}-{endpoint}-{property_}-{property_key}-{property_key_name}"
 
 
 class ValueMetadata:
@@ -157,7 +159,7 @@ class Value:
     @property
     def value_id(self) -> str:
         """Return value ID."""
-        return get_value_id_from_dict(self.node, self.data)
+        return _get_value_id_from_dict(self.node, self.data)
 
     @property
     def metadata(self) -> ValueMetadata:
