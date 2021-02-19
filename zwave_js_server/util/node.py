@@ -101,6 +101,10 @@ async def async_set_config_parameter(
 
     # Finally attempt to set the value and return the Value object if successful
     if not await node.async_set_value(zwave_value, new_value):
-        raise SetValueFailed
+        raise SetValueFailed(
+            "Unable to set value, refer to "
+            "https://zwave-js.github.io/node-zwave-js/#/api/node?id=setvalue for "
+            "possible reasons"
+        )
 
     return zwave_value
