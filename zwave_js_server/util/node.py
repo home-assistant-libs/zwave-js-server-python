@@ -74,8 +74,8 @@ async def async_set_config_parameter(
         new_value = int(
             next(
                 key
-                for key in zwave_value.metadata.states
-                if zwave_value.metadata.states[key] == new_value
+                for key, label in zwave_value.metadata.states.items()
+                if label == new_value
             )
         )
 
