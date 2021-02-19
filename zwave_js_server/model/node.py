@@ -2,7 +2,7 @@
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
 from zwave_js_server.const import CommandClass
 
-from ..exceptions import UnwriteableValue
+from ..exceptions import UnparseableValue, UnwriteableValue
 from ..event import Event, EventBase
 from .device_class import DeviceClass, DeviceClassDataType
 from .device_config import DeviceConfig, DeviceConfigDataType
@@ -72,10 +72,14 @@ class Node(EventBase):
         self.values: Dict[str, Union[Value, ConfigurationValue]] = {}
         for val in data["values"]:
             value_id = _get_value_id_from_dict(self, val)
-            if val["commandClass"] == CommandClass.CONFIGURATION:
-                self.values[value_id] = ConfigurationValue(self, val)
-            else:
-                self.values[value_id] = Value(self, val)
+            try:
+                if val["commandClass"] == CommandClass.CONFIGURATION:
+                    self.values[value_id] = ConfigurationValue(self, val)
+                else:
+                    self.values[value_id] = Value(self, val)
+            except UnparseableValue:
+                # If we can't parse the value, don't store it
+                pass
 
     def __repr__(self) -> str:
         """Return the representation."""
