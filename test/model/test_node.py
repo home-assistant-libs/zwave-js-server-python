@@ -1,10 +1,7 @@
 """Test the node model."""
 import json
 
-import pytest
-
 from zwave_js_server.const import CommandClass
-from zwave_js_server.exceptions import InvalidNewValue, UnwriteableValue
 from zwave_js_server.model import node as node_pkg
 from zwave_js_server.event import Event
 

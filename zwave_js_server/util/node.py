@@ -5,7 +5,7 @@ from typing import Optional, Union
 from ..const import CommandClass, ConfigurationValueType
 from ..exceptions import InvalidNewValue, NotFoundError
 from ..model.node import Node
-from ..model.value import ConfigurationValue, ValueDataType, get_value_id
+from ..model.value import ConfigurationValue, get_value_id
 
 
 async def async_set_config_parameter(
