@@ -230,7 +230,7 @@ class ThermostatOperatingState(IntEnum):
 class ThermostatSetpointType(Enum):
     """
     Enum with all (known/used) Z-Wave Thermostat Setpoint Types.
-    
+
     Returns tuple of (property_key, property_key_name).
     """
 
