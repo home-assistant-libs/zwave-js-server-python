@@ -7,6 +7,8 @@ MIN_SERVER_VERSION = "1.0.0-beta.8"
 # Will be checked _excluding_
 MAX_SERVER_VERSION = "2.0.0"
 
+VALUE_UNKNOWN = "unknown"
+
 
 class LogLevel(IntEnum):
     """Enum for log levels used by node-zwave-js."""

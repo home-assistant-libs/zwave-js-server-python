@@ -66,6 +66,19 @@ def test_from_state():
     assert node.endpoints[0].index == 0
 
 
+async def test_unknown_values(cover_qubino_shutter):
+    """Test that values that are unknown return as None."""
+    node = cover_qubino_shutter
+    assert (
+        "5-38-0-currentValue-00-00" in node.values
+        and node.values["5-38-0-currentValue-00-00"].value is None
+    )
+    assert (
+        "5-37-0-currentValue-00-00" in node.values
+        and node.values["5-37-0-currentValue-00-00"].value is None
+    )
+
+
 async def test_values_without_property_key_name(multisensor_6):
     """Test that values with property key and without property key name can be found."""
     node = multisensor_6
