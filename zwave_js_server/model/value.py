@@ -2,7 +2,7 @@
 import json
 from typing import TYPE_CHECKING, Any, Dict, Optional, TypedDict, Union
 
-from ..const import ConfigurationValueType
+from ..const import ConfigurationValueType, VALUE_UNKNOWN
 from ..exceptions import UnparseableValue
 from ..event import Event
 
@@ -171,6 +171,9 @@ class Value:
     @property
     def value(self) -> Optional[Any]:
         """Return value."""
+        # Treat unknown values like they are None
+        if self._value == VALUE_UNKNOWN:
+            return None
         return self._value
 
     @property

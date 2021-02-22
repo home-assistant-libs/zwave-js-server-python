@@ -41,9 +41,15 @@ def lock_schlage_be469_state_fixture():
 
 
 @pytest.fixture(name="climate_radio_thermostat_ct100_plus_state", scope="session")
-def climate_radio_thermostat_ct100_plus_state():
+def climate_radio_thermostat_ct100_plus_state_fixture():
     """Load the radio thermostat node state fixture data."""
     return json.loads(load_fixture("climate_radio_thermostat_ct100_plus_state.json"))
+
+
+@pytest.fixture(name="cover_qubino_shutter_state", scope="session")
+def cover_qubino_shutter_state_fixture():
+    """Load the qubino shutter cover node state fixture data."""
+    return json.loads(load_fixture("cover_qubino_shutter_state.json"))
 
 
 @pytest.fixture(name="client_session")
@@ -249,6 +255,14 @@ def climate_radio_thermostat_ct100_plus_fixture(
 ):
     """Mock a radio thermostat node."""
     node = Node(driver.client, climate_radio_thermostat_ct100_plus_state)
+    driver.controller.nodes[node.node_id] = node
+    return node
+
+
+@pytest.fixture(name="cover_qubino_shutter")
+def cover_qubino_shutter_fixture(driver, cover_qubino_shutter_state):
+    """Mock a qubino shutter cover node."""
+    node = Node(driver.client, cover_qubino_shutter_state)
     driver.controller.nodes[node.node_id] = node
     return node
 
