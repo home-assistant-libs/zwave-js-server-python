@@ -17,6 +17,7 @@ max-attributes=15
 # import-outside-toplevel - TODO
 disable=
   bad-continuation,
+  duplicate-code,
   fixme,
   import-outside-toplevel,
   locally-disabled,
