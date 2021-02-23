@@ -84,13 +84,13 @@ class Node(EventBase):
     def __repr__(self) -> str:
         """Return the representation."""
         assert self.client.driver
-        controller = repr(self.client.driver.controller)
-        return f"{type(self).__name__}(controller={controller}, node_id={self.node_id})"
+        home_id = self.client.driver.controller.home_id
+        return f"{type(self).__name__}(home_id={home_id}, node_id={self.node_id})"
 
     def __hash__(self) -> int:
         """Return the hash."""
         assert self.client.driver
-        return hash(self.client.driver.controller) + hash(self.node_id)
+        return hash((self.client.driver.controller, self.node_id))
 
     def __eq__(self, other: object) -> bool:
         """Return whether this instance equals another."""
