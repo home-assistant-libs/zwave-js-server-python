@@ -83,7 +83,8 @@ class Node(EventBase):
 
     def __repr__(self) -> str:
         """Return the representation."""
-        return f"{type(self).__name__}(node_id={self.node_id})"
+        controller = repr(self.client.driver.controller)
+        return f"{type(self).__name__}(controller={controller}, node_id={self.node_id})"
 
     @property
     def node_id(self) -> int:

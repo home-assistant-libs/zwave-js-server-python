@@ -47,6 +47,10 @@ class Controller(EventBase):
             node = Node(client, node_state)
             self.nodes[node.node_id] = node
 
+    def __repr__(self) -> str:
+        """Return the representation."""
+        return f"{type(self).__name__}(home_id={self.home_id})"
+
     @property
     def library_version(self) -> Optional[str]:
         """Return library_version."""
