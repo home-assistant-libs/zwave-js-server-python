@@ -55,8 +55,10 @@ class Controller(EventBase):
         """Return the hash."""
         return hash(self.home_id)
 
-    def __eq__(self, other: "Controller") -> bool:
+    def __eq__(self, other: object) -> bool:
         """Return whether this instance equals another."""
+        if not isinstance(other, Controller):
+            return False
         return self.home_id == other.home_id
 
     @property

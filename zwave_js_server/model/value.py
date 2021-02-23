@@ -160,10 +160,12 @@ class Value:
 
     def __hash__(self) -> int:
         """Return the hash."""
-        return hash(self.node, self.value_id)
+        return hash(self.node) + hash(self.value_id)
 
-    def __eq__(self, other: "Value") -> bool:
+    def __eq__(self, other: object) -> bool:
         """Return whether this instance equals another."""
+        if not isinstance(other, Value):
+            return False
         return self.node == other.node and self.value_id == other.value_id
 
     @property
