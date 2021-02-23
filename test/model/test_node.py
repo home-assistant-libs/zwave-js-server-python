@@ -86,6 +86,12 @@ async def test_values_without_property_key_name(multisensor_6):
     assert "52-112-0-101-16-00" in node.values
 
 
+async def test_hash(climate_radio_thermostat_ct100_plus):
+    """Test node hash."""
+    node = climate_radio_thermostat_ct100_plus
+    assert hash(node) == hash((node.client.driver, node.node_id))
+
+
 async def test_command_class_values(climate_radio_thermostat_ct100_plus):
     """Test node methods to get command class values."""
     node = climate_radio_thermostat_ct100_plus

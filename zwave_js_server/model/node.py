@@ -85,6 +85,18 @@ class Node(EventBase):
         """Return the representation."""
         return f"{type(self).__name__}(node_id={self.node_id})"
 
+    def __hash__(self) -> int:
+        """Return the hash."""
+        return hash((self.client.driver, self.node_id))
+
+    def __eq__(self, other: object) -> bool:
+        """Return whether this instance equals another."""
+        if not isinstance(other, Node):
+            return False
+        return (
+            self.client.driver == other.client.driver and self.node_id == other.node_id
+        )
+
     @property
     def node_id(self) -> int:
         """Return the node_id."""

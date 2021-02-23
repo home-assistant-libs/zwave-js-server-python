@@ -47,6 +47,20 @@ class Controller(EventBase):
             node = Node(client, node_state)
             self.nodes[node.node_id] = node
 
+    def __repr__(self) -> str:
+        """Return the representation."""
+        return f"{type(self).__name__}(home_id={self.home_id})"
+
+    def __hash__(self) -> int:
+        """Return the hash."""
+        return hash(self.home_id)
+
+    def __eq__(self, other: object) -> bool:
+        """Return whether this instance equals another."""
+        if not isinstance(other, Controller):
+            return False
+        return self.home_id == other.home_id
+
     @property
     def library_version(self) -> Optional[str]:
         """Return library_version."""

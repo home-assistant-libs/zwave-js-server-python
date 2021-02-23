@@ -167,6 +167,11 @@ async def test_stop_exclusion(controller, uuid4, mock_command):
     }
 
 
+async def test_hash(controller):
+    """Test node hash."""
+    assert hash(controller) == hash(controller.home_id)
+
+
 async def test_remove_failed_node(controller, uuid4, mock_command):
     """Test remove failed node."""
     ack_commands = mock_command(

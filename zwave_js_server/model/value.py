@@ -158,6 +158,16 @@ class Value:
         """Return the representation."""
         return f"{type(self).__name__}(value_id={self.value_id!r})"
 
+    def __hash__(self) -> int:
+        """Return the hash."""
+        return hash((self.node, self.value_id))
+
+    def __eq__(self, other: object) -> bool:
+        """Return whether this instance equals another."""
+        if not isinstance(other, Value):
+            return False
+        return self.node == other.node and self.value_id == other.value_id
+
     @property
     def value_id(self) -> str:
         """Return value ID."""
