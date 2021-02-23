@@ -18,6 +18,16 @@ class Driver(EventBase):
         self.client = client
         self.controller = Controller(client, state)
 
+    def __hash__(self) -> int:
+        """Return the hash."""
+        return hash(self.controller)
+
+    def __eq__(self, other: object) -> bool:
+        """Return whether this instance equals another."""
+        if not isinstance(other, Driver):
+            return False
+        return self.controller == other.controller
+
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
         if event.data["source"] != "driver":

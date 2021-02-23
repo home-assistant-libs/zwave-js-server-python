@@ -156,7 +156,7 @@ class Value:
 
     def __repr__(self) -> str:
         """Return the representation."""
-        return f"{type(self).__name__}(node={self.node!r}, value_id={self.value_id!r})"
+        return f"{type(self).__name__}(value_id={self.value_id!r})"
 
     def __hash__(self) -> int:
         """Return the hash."""
