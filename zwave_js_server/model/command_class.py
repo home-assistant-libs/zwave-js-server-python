@@ -9,7 +9,7 @@ from ..const import CommandClass
 
 
 class CommandClassInfoDataType(TypedDict):
-    """Represent a device class data dict type."""
+    """Represent a command class info data dict type."""
 
     id: int
     name: str
@@ -18,7 +18,7 @@ class CommandClassInfoDataType(TypedDict):
 
 
 class CommandClassInfo:
-    """Model for a Zwave Node's device class."""
+    """Model for a Zwave CommandClass Info."""
 
     def __init__(self, data: CommandClassInfoDataType) -> None:
         """Initialize."""
