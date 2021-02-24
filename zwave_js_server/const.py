@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from enum import Enum, IntEnum
 from typing import Dict, List
 
-MIN_SERVER_VERSION = "1.0.0-beta.9"
+MIN_SERVER_VERSION = "1.0.0"
 # Will be checked _excluding_
 MAX_SERVER_VERSION = "2.0.0"
 
