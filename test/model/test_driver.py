@@ -25,12 +25,17 @@ def test_from_state():
 
 async def test_update_log_config(driver, uuid4, mock_command):
     """Test update log config."""
+    # Update log level
     ack_commands = mock_command(
         {"command": "update_log_config", "config": {"level": 0}},
         {"success": True},
     )
-    assert await driver.async_update_log_config(
-        log_config_pkg.LogConfig(level=LogLevel.ERROR)
+
+    assert (
+        await driver.async_update_log_config(
+            log_config_pkg.LogConfig(level=LogLevel.ERROR)
+        )
+        is None
     )
 
     assert len(ack_commands) == 1
@@ -40,6 +45,7 @@ async def test_update_log_config(driver, uuid4, mock_command):
         "messageId": uuid4,
     }
 
+    # Update all parameters
     ack_commands = mock_command(
         {
             "command": "update_log_config",
@@ -53,14 +59,17 @@ async def test_update_log_config(driver, uuid4, mock_command):
         },
         {"success": True},
     )
-    assert await driver.async_update_log_config(
-        log_config_pkg.LogConfig(
-            enabled=True,
-            level=LogLevel.ERROR,
-            log_to_file=True,
-            filename="/test.txt",
-            force_console=True,
+    assert (
+        await driver.async_update_log_config(
+            log_config_pkg.LogConfig(
+                enabled=True,
+                level=LogLevel.ERROR,
+                log_to_file=True,
+                filename="/test.txt",
+                force_console=True,
+            )
         )
+        is None
     )
 
     assert len(ack_commands) == 2

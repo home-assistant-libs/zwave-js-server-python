@@ -1,5 +1,5 @@
 """Provide a model for the Z-Wave JS Driver."""
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 from zwave_js_server.model.log_config import LogConfig
 
 from ..event import Event, EventBase
@@ -41,16 +41,14 @@ class Driver(EventBase):
     def handle_all_nodes_ready(self, event: Event) -> None:
         """Process a driver all nodes ready event."""
 
-    async def async_update_log_config(self, log_config: LogConfig) -> bool:
+    async def async_update_log_config(self, log_config: LogConfig) -> None:
         """Update log config for driver."""
-        result = await self.client.async_send_command(
+        await self.client.async_send_command(
             {
                 "command": "update_log_config",
                 "config": log_config.to_dict(),
             }
         )
-
-        return cast(bool, result["success"])
 
     async def async_get_log_config(self) -> LogConfig:
         """Return current log config for driver."""
