@@ -284,7 +284,7 @@ class Node(EventBase):
 
     async def async_set_value(
         self, val: Union[Value, str], new_value: Any, no_wait: bool = False
-    ) -> bool:
+    ) -> Optional[bool]:
         """Send setValue command to Node for given value (or value_id)."""
         # a value may be specified as value_id or the value itself
         if not isinstance(val, Value):
