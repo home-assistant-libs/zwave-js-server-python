@@ -4,6 +4,7 @@ from zwave_js_server.const import CommandClass
 
 from ..exceptions import UnparseableValue, UnwriteableValue
 from ..event import Event, EventBase
+from .command_class import CommandClassInfo, CommandClassInfoDataType
 from .device_class import DeviceClass, DeviceClassDataType
 from .device_config import DeviceConfig, DeviceConfigDataType
 from .endpoint import Endpoint, EndpointDataType
@@ -58,6 +59,8 @@ class NodeDataType(TypedDict, total=False):
     individualEndpointCount: int
     aggregatedEndpointCount: int
     interviewAttempts: int
+    interviewStage: int
+    commandClasses: List[CommandClassInfoDataType]
     values: List[ValueDataType]
 
 
@@ -130,7 +133,7 @@ class Node(EventBase):
     @property
     def device_class(self) -> DeviceClass:
         """Return the device_class."""
-        return DeviceClass(self.data.get("deviceClass", {}))
+        return DeviceClass(self.data["deviceClass"])
 
     @property
     def is_listening(self) -> Optional[bool]:
@@ -256,6 +259,16 @@ class Node(EventBase):
     def interview_attempts(self) -> Optional[int]:
         """Return the interview_attempts."""
         return self.data.get("interviewAttempts")
+
+    @property
+    def interview_stage(self) -> Optional[int]:
+        """Return the interview_stage."""
+        return self.data.get("interviewStage")
+
+    @property
+    def command_classes(self) -> List[CommandClassInfo]:
+        """Return all CommandClasses supported on this node."""
+        return [CommandClassInfo(cc) for cc in self.data["commandClasses"]]
 
     def get_command_class_values(
         self, command_class: CommandClass, endpoint: int = None
