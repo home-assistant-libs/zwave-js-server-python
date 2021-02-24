@@ -282,7 +282,9 @@ class Node(EventBase):
 
         self.emit(event.type, event.data)
 
-    async def async_set_value(self, val: Union[Value, str], new_value: Any) -> None:
+    async def async_set_value(
+        self, val: Union[Value, str], new_value: Any, wait_for_result: bool = False
+    ) -> Optional[bool]:
         """Send setValue command to Node for given value (or value_id)."""
         # a value may be specified as value_id or the value itself
         if not isinstance(val, Value):
@@ -292,14 +294,16 @@ class Node(EventBase):
             raise UnwriteableValue
 
         # the value object needs to be send to the server
-        await self.client.async_send_command_no_wait(
-            {
-                "command": "node.set_value",
-                "nodeId": self.node_id,
-                "valueId": val.data,
-                "value": new_value,
-            }
-        )
+        args = {
+            "command": "node.set_value",
+            "nodeId": self.node_id,
+            "valueId": val.data,
+            "value": new_value,
+        }
+        if wait_for_result:
+            result = await self.client.async_send_command(args)
+            return cast(bool, result)
+        await self.client.async_send_command_no_wait(args)
 
     async def async_refresh_info(self) -> None:
         """Send refreshInfo command to Node."""
