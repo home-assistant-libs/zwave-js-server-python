@@ -41,7 +41,7 @@ class Driver(EventBase):
     def handle_all_nodes_ready(self, event: Event) -> None:
         """Process a driver all nodes ready event."""
 
-    async def async_update_log_config(self, log_config: LogConfig) -> bool:
+    async def async_update_log_config(self, log_config: LogConfig) -> None:
         """Update log config for driver."""
         await self.client.async_send_command(
             {
@@ -49,8 +49,6 @@ class Driver(EventBase):
                 "config": log_config.to_dict(),
             }
         )
-
-        return True
 
     async def async_get_log_config(self) -> LogConfig:
         """Return current log config for driver."""
