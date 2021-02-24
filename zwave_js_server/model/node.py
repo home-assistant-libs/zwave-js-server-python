@@ -302,7 +302,7 @@ class Node(EventBase):
         }
         if no_wait:
             await self.client.async_send_command_no_wait(args)
-            return
+            return None
         result = await self.client.async_send_command(args)
         return cast(bool, result["success"])
 
