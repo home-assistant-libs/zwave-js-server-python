@@ -38,7 +38,6 @@ class NodeStatus(IntEnum):
     ALIVE = 4
 
 
-
 class NodeDataType(TypedDict, total=False):
     """Represent a node data dict type."""
 
