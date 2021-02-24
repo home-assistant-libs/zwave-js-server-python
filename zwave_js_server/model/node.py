@@ -304,6 +304,7 @@ class Node(EventBase):
             result = await self.client.async_send_command(args)
             return cast(bool, result)
         await self.client.async_send_command_no_wait(args)
+        return None
 
     async def async_refresh_info(self) -> None:
         """Send refreshInfo command to Node."""
