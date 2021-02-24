@@ -31,9 +31,12 @@ async def test_update_log_config(driver, uuid4, mock_command):
         {"success": True},
     )
 
-    assert await driver.async_update_log_config(
-        log_config_pkg.LogConfig(level=LogLevel.ERROR)
-    ) is None
+    assert (
+        await driver.async_update_log_config(
+            log_config_pkg.LogConfig(level=LogLevel.ERROR)
+        )
+        is None
+    )
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
@@ -56,15 +59,18 @@ async def test_update_log_config(driver, uuid4, mock_command):
         },
         {"success": True},
     )
-    assert await driver.async_update_log_config(
-        log_config_pkg.LogConfig(
-            enabled=True,
-            level=LogLevel.ERROR,
-            log_to_file=True,
-            filename="/test.txt",
-            force_console=True,
+    assert (
+        await driver.async_update_log_config(
+            log_config_pkg.LogConfig(
+                enabled=True,
+                level=LogLevel.ERROR,
+                log_to_file=True,
+                filename="/test.txt",
+                force_console=True,
+            )
         )
-    ) is None
+        is None
+    )
 
     assert len(ack_commands) == 2
     assert ack_commands[1] == {
