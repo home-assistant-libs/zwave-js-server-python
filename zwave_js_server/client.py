@@ -66,6 +66,11 @@ class Client:
         finally:
             self._result_futures.pop(message_id)
 
+    async def async_send_command_no_wait(self, message: Dict[str, Any]) -> None:
+        """Send a command without waiting for the response."""
+        message["messageId"] = uuid.uuid4().hex
+        await self._send_json_message(message)
+
     async def connect(self) -> None:
         """Connect to the websocket server."""
         if self.driver is not None:
@@ -222,9 +227,7 @@ class Client:
             future = self._result_futures.get(msg["messageId"])
 
             if future is None:
-                self._logger.warning(
-                    "Received result for unknown message with ID: %s", msg["messageId"]
-                )
+                # no listener for this result
                 return
 
             if msg["success"]:

@@ -106,7 +106,7 @@ async def test_set_value(multisensor_6, uuid4, mock_command):
     )
     value_id = "52-32-0-targetValue-00-00"
     value = node.values[value_id]
-    assert await node.async_set_value(value_id, 42)
+    assert await node.async_set_value(value_id, 42) is None
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
@@ -127,8 +127,7 @@ async def test_poll_value(multisensor_6, uuid4, mock_command):
     )
     value_id = "52-32-0-currentValue-00-00"
     value = node.values[value_id]
-    result = await node.async_poll_value(value_id)
-    assert result == "something"
+    assert await node.async_poll_value(value_id) is None
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {

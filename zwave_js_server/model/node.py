@@ -295,7 +295,9 @@ class Node(EventBase):
 
         self.emit(event.type, event.data)
 
-    async def async_set_value(self, val: Union[Value, str], new_value: Any) -> bool:
+    async def async_set_value(
+        self, val: Union[Value, str], new_value: Any, wait_for_result: bool = False
+    ) -> Optional[bool]:
         """Send setValue command to Node for given value (or value_id)."""
         # a value may be specified as value_id or the value itself
         if not isinstance(val, Value):
@@ -305,19 +307,21 @@ class Node(EventBase):
             raise UnwriteableValue
 
         # the value object needs to be send to the server
-        result = await self.client.async_send_command(
-            {
-                "command": "node.set_value",
-                "nodeId": self.node_id,
-                "valueId": val.data,
-                "value": new_value,
-            }
-        )
-        return cast(bool, result["success"])
+        args = {
+            "command": "node.set_value",
+            "nodeId": self.node_id,
+            "valueId": val.data,
+            "value": new_value,
+        }
+        if wait_for_result:
+            result = await self.client.async_send_command(args)
+            return cast(bool, result)
+        await self.client.async_send_command_no_wait(args)
+        return None
 
     async def async_refresh_info(self) -> None:
         """Send refreshInfo command to Node."""
-        await self.client.async_send_command(
+        await self.client.async_send_command_no_wait(
             {
                 "command": "node.refresh_info",
                 "nodeId": self.node_id,
@@ -353,24 +357,22 @@ class Node(EventBase):
 
     async def async_abort_firmware_update(self) -> None:
         """Send abortFirmwareUpdate command to Node."""
-        await self.client.async_send_command(
+        await self.client.async_send_command_no_wait(
             {
                 "command": "node.abort_firmware_update",
                 "nodeId": self.node_id,
             }
         )
 
-    async def async_poll_value(self, val: Union[Value, str]) -> Any:
+    async def async_poll_value(self, val: Union[Value, str]) -> None:
         """Send pollValue command to Node for given value (or value_id)."""
         # a value may be specified as value_id or the value itself
         if not isinstance(val, Value):
             val = self.values[val]
         # the value object needs to be send to the server
-        result = await self.client.async_send_command(
+        await self.client.async_send_command_no_wait(
             {"command": "node.poll_value", "nodeId": self.node_id, "valueId": val.data}
         )
-        # result may or may not be there
-        return result.get("result")
 
     def handle_wake_up(self, event: Event) -> None:
         """Process a node wake up event."""
