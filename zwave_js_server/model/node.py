@@ -1,10 +1,11 @@
 """Provide a model for the Z-Wave JS node."""
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
-from zwave_js_server.const import CommandClass
 from enum import IntEnum
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
 
-from ..exceptions import UnparseableValue, UnwriteableValue
+from zwave_js_server.const import CommandClass
+
 from ..event import Event, EventBase
+from ..exceptions import UnparseableValue, UnwriteableValue
 from .command_class import CommandClassInfo, CommandClassInfoDataType
 from .device_class import DeviceClass, DeviceClassDataType
 from .device_config import DeviceConfig, DeviceConfigDataType
