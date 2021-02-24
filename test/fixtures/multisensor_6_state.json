@@ -6,10 +6,10 @@
   "status": 1,
   "ready": true,
   "deviceClass": {
-    "basic": "Static Controller",
-    "generic": "Multilevel Sensor",
-    "specific": "Routing Multilevel Sensor",
-    "mandatorySupportedCCs": ["Basic", "Multilevel Sensor"],
+    "basic": { "key": 1, "label": "Static Controller" },
+    "generic": { "key": 2, "label": "Multilevel Sensor" },
+    "specific": { "key": 3, "label": "Routing Multilevel Sensor" },
+    "mandatorySupportedCCs": [],
     "mandatoryControlCCs": []
   },
   "isListening": true,
@@ -64,6 +64,7 @@
       "userIcon": 3079
     }
   ],
+  "commandClasses": [],
   "values": [
     {
       "commandClassName": "Basic",

@@ -10,14 +10,6 @@ from zwave_js_server.event import Event
 
 from .. import load_fixture
 
-DEVICE_CLASS_FIXTURE = {
-    "basic": "Routing Slave",
-    "generic": "Static Controller",
-    "specific": "PC Controller",
-    "mandatory_supported_ccs": [],
-    "mandatory_controlled_ccs": ["Basic"],
-}
-
 DEVICE_CONFIG_FIXTURE = {
     "manufacturer_id": 134,
     "manufacturer": "AEON Labs",
@@ -44,8 +36,10 @@ def test_from_state():
     assert node.index == 0
     assert node.status == 4
     assert node.ready is True
-    for attr, value in DEVICE_CLASS_FIXTURE.items():
-        assert getattr(node.device_class, attr) == value
+    assert node.device_class.basic.key == 2
+    assert node.device_class.generic.label == "Static Controller"
+    assert node.device_class.mandatory_supported_ccs == []
+    assert node.device_class.mandatory_controlled_ccs == [32]
 
     assert node.is_listening is True
     assert node.is_frequent_listening is False
