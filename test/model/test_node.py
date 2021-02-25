@@ -7,6 +7,7 @@ from zwave_js_server.const import CommandClass
 from zwave_js_server.exceptions import UnwriteableValue
 from zwave_js_server.model import node as node_pkg
 from zwave_js_server.event import Event
+from zwave_js_server.model.node import NodeStatus
 
 from .. import load_fixture
 
@@ -269,3 +270,27 @@ def test_node_inclusion():
     event = Event("ready", {"nodeState": state})
     node.receive_event(event)
     assert len(node.values) > 0
+
+
+async def test_node_status_events(multisensor_6):
+    """Test set value."""
+    node = multisensor_6
+    assert node.status == NodeStatus.ASLEEP
+    # mock node wake up event
+    event = Event(type="wake up")
+    node.handle_wake_up(event)
+    assert node.status == NodeStatus.AWAKE
+    # mock node dead event
+    event = Event(type="dead")
+    node.handle_dead(event)
+    assert node.status == NodeStatus.DEAD
+    # mock node alive event
+    event = Event(type="alive")
+    node.handle_alive(event)
+    assert node.status == NodeStatus.ALIVE
+    # mock node sleep event
+    event = Event(type="sleep")
+    node.handle_sleep(event)
+    assert node.status == NodeStatus.ASLEEP
+
+    
