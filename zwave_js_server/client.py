@@ -162,9 +162,7 @@ class Client:
             await self._send_json_message(
                 {
                     "command": "start_listening",
-                    "messageId": "listen-id",
-                    # note: we already check for incompatible schemas in the connect call
-                    "schemaVersion": self.schema_version,
+                    "messageId": "listen-id"
                 }
             )
 
