@@ -47,7 +47,7 @@ async def test_cannot_connect(client_session, url, error):
 async def test_send_command_schema(
     client_session, url, ws_client, result, driver_ready, driver
 ):
-    """Test websocket message with unknown type on listen."""
+    """Test sending unsupported command."""
     client = Client(url, client_session)
     await client.connect()
     assert client.connected
@@ -63,6 +63,10 @@ async def test_send_command_schema(
     # send command of unsupported schema version should fail
     with pytest.raises(InvalidServerVersion):
         await client.async_send_command(
+            {"command": "test"}, require_schema=client.schema_version + 2
+        )
+    with pytest.raises(InvalidServerVersion):
+        await client.async_send_command_no_wait(
             {"command": "test"}, require_schema=client.schema_version + 2
         )
 
