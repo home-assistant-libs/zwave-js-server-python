@@ -8,7 +8,7 @@ from typing import Any, Dict, Optional, cast
 
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, client_exceptions
 
-from .const import MAX_SERVER_SCHEME_VERSION, MIN_SERVER_SCHEME_VERSION
+from .const import MAX_SERVER_SCHEMA_VERSION, MIN_SERVER_SCHEMA_VERSION
 from .event import Event
 from .exceptions import (
     CannotConnect,
@@ -38,7 +38,7 @@ class Client:
         self._client: Optional[ClientWebSocketResponse] = None
         # Version of the connected server
         self.version: Optional[VersionInfo] = None
-        self.scheme_version: int = 0
+        self.schema_version: int = 0
         self._logger = logging.getLogger(__package__)
         self._loop = asyncio.get_running_loop()
         self._result_futures: Dict[str, asyncio.Future] = {}
@@ -57,10 +57,10 @@ class Client:
     async def async_send_command(
         self,
         message: Dict[str, Any],
-        require_scheme: Optional[int] = None,
+        require_schema: Optional[int] = None,
     ) -> dict:
         """Send a command and get a response."""
-        if require_scheme is not None and require_scheme > self.scheme_version:
+        if require_schema is not None and require_schema > self.schema_version:
             raise InvalidServerVersion(
                 "This command is not available, please update Z-Wave Server to a newer version."
             )
@@ -74,10 +74,10 @@ class Client:
             self._result_futures.pop(message_id)
 
     async def async_send_command_no_wait(
-        self, message: Dict[str, Any], require_scheme: Optional[int] = None
+        self, message: Dict[str, Any], require_schema: Optional[int] = None
     ) -> None:
         """Send a command without waiting for the response."""
-        if require_scheme is not None and require_scheme > self.scheme_version:
+        if require_schema is not None and require_schema > self.schema_version:
             raise InvalidServerVersion(
                 "This command is not available, please update Z-Wave Server to a newer version."
             )
@@ -105,30 +105,30 @@ class Client:
             await self._receive_json_or_raise()
         )
 
-        # basic check for server scheme version compatability
+        # basic check for server schema version compatability
         if (
-            self.version.min_scheme_version > MIN_SERVER_SCHEME_VERSION
-            or self.version.max_scheme_version < MIN_SERVER_SCHEME_VERSION
+            self.version.min_schema_version > MIN_SERVER_SCHEMA_VERSION
+            or self.version.max_schema_version < MIN_SERVER_SCHEMA_VERSION
         ):
             await self._client.close()
             raise InvalidServerVersion(
                 "Z-Wave JS Server version is incompatible "
                 f"{self.version.server_version}"
             )
-        # store the (highest possible) scheme version we're going to use/request
+        # store the (highest possible) schema version we're going to use/request
         # this is a bit future proof as we might decide to use a pinned version at some point
-        # for now we just negotiate the highest available scheme version and
-        # guard incompatability with the MIN_SERVER_SCHEME_VERSION
-        self.scheme_version = MAX_SERVER_SCHEME_VERSION
-        if self.version.max_scheme_version < MAX_SERVER_SCHEME_VERSION:
-            self.scheme_version = self.version.max_scheme_version
+        # for now we just negotiate the highest available schema version and
+        # guard incompatability with the MIN_SERVER_SCHEMA_VERSION
+        self.schema_version = MAX_SERVER_SCHEMA_VERSION
+        if self.version.max_schema_version < MAX_SERVER_SCHEMA_VERSION:
+            self.schema_version = self.version.max_schema_version
 
         self._logger.info(
-            "Connected to Home %s (Server %s, Driver %s, Using Scheme %s)",
+            "Connected to Home %s (Server %s, Driver %s, Using Schema %s)",
             version.home_id,
             version.server_version,
             version.driver_version,
-            self.scheme_version,
+            self.schema_version,
         )
 
     async def listen(self, driver_ready: asyncio.Event) -> None:
@@ -143,8 +143,8 @@ class Client:
                 {
                     "command": "start_listening",
                     "messageId": "listen-id",
-                    # note: we already check for incompatible schemes in the connect call
-                    "schemeVersion": self.scheme_version,
+                    # note: we already check for incompatible schemas in the connect call
+                    "schemaVersion": self.schema_version,
                 }
             )
 

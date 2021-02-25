@@ -3,10 +3,10 @@ from dataclasses import dataclass
 from enum import Enum, IntEnum
 from typing import Dict, List
 
-# minimal server scheme version we can handle
-MIN_SERVER_SCHEME_VERSION = 1
-# max server scheme version we can handle (and our code is compatible with)
-MAX_SERVER_SCHEME_VERSION = 1
+# minimal server schema version we can handle
+MIN_SERVER_SCHEMA_VERSION = 1
+# max server schema version we can handle (and our code is compatible with)
+MAX_SERVER_SCHEMA_VERSION = 1
 
 VALUE_UNKNOWN = "unknown"
 
@@ -132,7 +132,7 @@ class CommandClass(IntEnum):
     SCREEN_MD = 146
     SECURITY = 152
     SECURITY_2 = 159
-    SECURITY_SCHEME0_MARK = 61696
+    SECURITY_SCHEMA0_MARK = 61696
     SENSOR_CONFIGURATION = 158
     SIMPLE_AV_CONTROL = 148
     SOUND_SWITCH = 121
