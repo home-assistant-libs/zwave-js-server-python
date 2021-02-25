@@ -35,8 +35,8 @@ async def test_dump(client_session, result, url, version_data, ws_client):
     """Test the dump function."""
     messages = await dump_msgs(url, client_session)
 
-    assert ws_client.receive_json.call_count == 2
-    assert ws_client.send_json.call_count == 1
+    assert ws_client.receive_json.call_count == 3
+    assert ws_client.send_json.call_count == 2
     assert ws_client.send_json.call_args == call({"command": "start_listening"})
     assert ws_client.close.call_count == 1
     assert messages
@@ -50,7 +50,7 @@ async def test_dump_timeout(
 ):
     """Test the dump function with timeout."""
     to_receive = asyncio.Queue()
-    for message in (version_data, result, event):
+    for message in (version_data, {"success": True}, result, event):
         to_receive.put_nowait(message)
 
     async def receive_json():
@@ -59,8 +59,8 @@ async def test_dump_timeout(
     ws_client.receive_json = AsyncMock(side_effect=receive_json)
     messages = await dump_msgs(url, client_session, 0.05)
 
-    assert ws_client.receive_json.call_count == 4
-    assert ws_client.send_json.call_count == 1
+    assert ws_client.receive_json.call_count == 5
+    assert ws_client.send_json.call_count == 2
     assert ws_client.send_json.call_args == call({"command": "start_listening"})
     assert ws_client.close.call_count == 1
     assert messages

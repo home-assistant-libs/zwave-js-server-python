@@ -160,10 +160,7 @@ class Client:
             # send start_listening command to the server
             # we will receive a full state dump and from now on get events
             await self._send_json_message(
-                {
-                    "command": "start_listening",
-                    "messageId": "listen-id"
-                }
+                {"command": "start_listening", "messageId": "listen-id"}
             )
 
             state_msg = await self._receive_json_or_raise()

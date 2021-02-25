@@ -75,14 +75,16 @@ def messages_fixture():
 
 
 @pytest.fixture(name="ws_client")
-async def ws_client_fixture(loop, version_data, ws_message, result, messages):
+async def ws_client_fixture(
+    loop, version_data, ws_message, result, messages, set_api_schema_data
+):
     """Mock a websocket client.
 
     This fixture only allows a single message to be received.
     """
     ws_client = AsyncMock(spec_set=ClientWebSocketResponse, closed=False)
-    ws_client.receive_json.side_effect = (version_data, result)
-    for data in (version_data, result):
+    ws_client.receive_json.side_effect = (version_data, set_api_schema_data, result)
+    for data in (version_data, set_api_schema_data, result):
         messages.append(create_ws_message(data))
 
     async def receive():
@@ -99,7 +101,7 @@ async def ws_client_fixture(loop, version_data, ws_message, result, messages):
 
     async def close_client(msg):
         """Close the client."""
-        if msg["command"] == "start_listening":
+        if msg["command"] in ("set_api_schema", "start_listening"):
             return
 
         await asyncio.sleep(0)
@@ -145,6 +147,12 @@ def version_data_fixture():
         "minSchemaVersion": 0,
         "maxSchemaVersion": 1,
     }
+
+
+@pytest.fixture(name="set_api_schema_data")
+def set_api_schema_data_fixture():
+    """Return mock set_api_schema data."""
+    return {"success": True}
 
 
 @pytest.fixture(name="url")

@@ -54,7 +54,7 @@ def test_dump_state(client_session, url, ws_client, result, capsys):
         "test_result\n"
     )
 
-    assert ws_client.receive_json.call_count == 2
+    assert ws_client.receive_json.call_count == 3
     assert ws_client.close.call_count == 1
 
 
@@ -66,4 +66,4 @@ def test_connect(client_session, url, ws_client):
         main()
 
     assert sys_exit.value.code == 0
-    assert ws_client.receive.call_count == 2
+    assert ws_client.receive.call_count == 3
