@@ -14,12 +14,10 @@ def is_json_string(value: Any) -> bool:
 
 def parse_buffer(value: Dict[str, Any]) -> str:
     """Parse value dictionary from a buffer data type."""
-    if (
-        "type" not in value
-        or value["type"] != "Buffer"
-        or "data" not in value
-    ):
-        raise UnparseableValue("Unparseable value: JSON does not match expected schema")
+    if "type" not in value or value["type"] != "Buffer" or "data" not in value:
+        raise UnparseableValue(f"Unparseable value: {value}") from ValueError(
+            "JSON does not match expected schema"
+        )
     return "".join([chr(x) for x in value["data"]])
 
 
