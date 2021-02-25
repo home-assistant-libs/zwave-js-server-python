@@ -114,8 +114,9 @@ class Client:
         ):
             await self._client.close()
             raise InvalidServerVersion(
-                "Z-Wave JS Server version is incompatible "
-                f"{self.version.server_version}"
+                f"Z-Wave JS Server version is incompatible: {self.version.server_version} "
+                "a version is required that supports at least "
+                f"api schema {MIN_SERVER_SCHEMA_VERSION}"
             )
         # store the (highest possible) schema version we're going to use/request
         # this is a bit future proof as we might decide to use a pinned version at some point
