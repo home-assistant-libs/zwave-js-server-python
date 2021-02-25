@@ -136,8 +136,8 @@ class Value:
     def __init__(self, node: "Node", data: ValueDataType) -> None:
         """Initialize value."""
         self.node = node
-        self.data = {}
-        self._value = None
+        self.data: ValueDataType = {}
+        self._value: Any = None
         self.update(data)
 
     def __repr__(self) -> str:
