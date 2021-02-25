@@ -62,7 +62,8 @@ class Client:
         """Send a command and get a response."""
         if require_schema is not None and require_schema > self.schema_version:
             raise InvalidServerVersion(
-                "This command is not available, please update Z-Wave Server to a newer version."
+                "Command not available due to incompatible server version. Update the Z-Wave "
+                f"JS Server to a version that supports at least api schema {require_schema}."
             )
         future: "asyncio.Future[dict]" = self._loop.create_future()
         message_id = message["messageId"] = uuid.uuid4().hex
@@ -79,7 +80,8 @@ class Client:
         """Send a command without waiting for the response."""
         if require_schema is not None and require_schema > self.schema_version:
             raise InvalidServerVersion(
-                "This command is not available, please update Z-Wave Server to a newer version."
+                "Command not available due to incompatible server version. Update the Z-Wave "
+                f"JS Server to a version that supports at least api schema {require_schema}."
             )
         message["messageId"] = uuid.uuid4().hex
         await self._send_json_message(message)
