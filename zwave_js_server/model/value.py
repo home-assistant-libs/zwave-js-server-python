@@ -1,10 +1,9 @@
 """Provide a model for the Z-Wave JS value."""
-import json
 from typing import TYPE_CHECKING, Any, Dict, Optional, TypedDict, Union
 
-from ..const import ConfigurationValueType, VALUE_UNKNOWN
-from ..exceptions import UnparseableValue
+from ..const import VALUE_UNKNOWN, ConfigurationValueType
 from ..event import Event
+from ..util.helpers import is_json_string, parse_buffer_from_json
 
 if TYPE_CHECKING:
     from .node import Node
@@ -137,22 +136,9 @@ class Value:
     def __init__(self, node: "Node", data: ValueDataType) -> None:
         """Initialize value."""
         self.node = node
-        self.data = data
-        self._value = data.get("newValue", data.get("value"))
-        if self.metadata.type == "string" and self._value and self._value[0] == "{":
-            try:
-                parsed_val = json.loads(self._value)
-                if (
-                    "type" not in parsed_val
-                    or parsed_val["type"] != "Buffer"
-                    or "data" not in parsed_val
-                ):
-                    raise ValueError("JSON string does not match expected schema")
-                self._value = "".join([chr(x) for x in parsed_val["data"]])
-            except ValueError as err:
-                raise UnparseableValue(
-                    f"Unparseable value {self}: {self.value}"
-                ) from err
+        self.data: ValueDataType = {}
+        self._value: Any = None
+        self.update(data)
 
     def __repr__(self) -> str:
         """Return the representation."""
@@ -242,6 +228,9 @@ class Value:
             self._value = data["newValue"]
         if "value" in data:
             self._value = data["value"]
+        # handle json string in value
+        if self.metadata.type == "string" and is_json_string(self._value):
+            self._value = parse_buffer_from_json(self._value)
 
 
 class ValueNotification(Value):

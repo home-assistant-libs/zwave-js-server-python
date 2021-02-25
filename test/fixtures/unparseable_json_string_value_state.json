@@ -1,0 +1,74 @@
+{
+  "nodeId": 20,
+  "index": 0,
+  "status": 4,
+  "ready": true,
+  "deviceClass": {
+    "basic": { "key": 1, "label": "Static Controller" },
+    "generic": { "key": 2, "label": "Entry Control" },
+    "specific": { "key": 3, "label": "Secure Keypad Door Lock" },
+    "mandatorySupportedCCs": [],
+    "mandatoryControlCCs": []
+  },
+  "isListening": false,
+  "isFrequentListening": true,
+  "isRouting": true,
+  "maxBaudRate": 40000,
+  "isSecure": true,
+  "version": 4,
+  "isBeaming": true,
+  "manufacturerId": 59,
+  "productId": 20548,
+  "productType": 25409,
+  "firmwareVersion": "113.22",
+  "deviceConfig": {
+    "manufacturerId": 59,
+    "manufacturer": "Allegion",
+    "label": "BE469",
+    "description": "Touchscreen Deadbolt",
+    "devices": [
+      {
+        "productType": "0x6341",
+        "productId": "0x5044"
+      }
+    ],
+    "firmwareVersion": {
+      "min": "0.0",
+      "max": "255.255"
+    },
+    "associations": {},
+    "paramInformation": {
+      "_map": {}
+    }
+  },
+  "label": "BE469",
+  "neighbors": [1, 2, 3, 4, 13],
+  "interviewAttempts": 1,
+  "endpoints": [
+    {
+      "nodeId": 20,
+      "index": 0
+    }
+  ],
+  "commandClasses": [],
+  "values": [
+    {
+      "commandClassName": "User Code",
+      "commandClass": 99,
+      "endpoint": 0,
+      "property": "userCode",
+      "propertyKey": 4,
+      "propertyName": "userCode",
+      "propertyKeyName": "4",
+      "metadata": {
+        "type": "string",
+        "readable": true,
+        "writeable": true,
+        "minLength": 4,
+        "maxLength": 10,
+        "label": "User Code (4)"
+      },
+      "value": "{ \"type\": \"Unparseable\", \"data\": [55, 48, 51, 48, 10, 13] }"
+    }
+  ]
+}
