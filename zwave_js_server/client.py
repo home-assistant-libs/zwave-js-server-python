@@ -141,6 +141,24 @@ class Client:
         assert self._client
 
         try:
+            # set preferred schema version on the server
+            # note: we already check for (in)compatible schemas in the connect call
+            await self._send_json_message(
+                {
+                    "command": "set_api_schema",
+                    "messageId": "api-schema-id",
+                    "schemaVersion": self.schema_version,
+                }
+            )
+            state_msg = await self._receive_json_or_raise()
+
+            if not state_msg["success"]:
+                # this should not happen, but just in case
+                await self._client.close()
+                raise FailedCommand(state_msg["messageId"], state_msg["errorCode"])
+
+            # send start_listening command to the server
+            # we will receive a full state dump and from now on get events
             await self._send_json_message(
                 {
                     "command": "start_listening",
