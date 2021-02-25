@@ -4,9 +4,9 @@ import json
 import pytest
 
 from zwave_js_server.const import CommandClass
+from zwave_js_server.event import Event
 from zwave_js_server.exceptions import UnwriteableValue
 from zwave_js_server.model import node as node_pkg
-from zwave_js_server.event import Event
 from zwave_js_server.model.node import NodeStatus
 
 from .. import load_fixture
@@ -292,5 +292,3 @@ async def test_node_status_events(multisensor_6):
     event = Event(type="sleep")
     node.handle_sleep(event)
     assert node.status == NodeStatus.ASLEEP
-
-    
