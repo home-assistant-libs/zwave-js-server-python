@@ -8,7 +8,7 @@ from typing import Any, Dict, Optional, cast
 
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, client_exceptions
 
-from .const import MIN_SERVER_SCHEME_VERSION
+from .const import MAX_SERVER_SCHEME_VERSION, MIN_SERVER_SCHEME_VERSION
 from .event import Event
 from .exceptions import (
     CannotConnect,
@@ -119,7 +119,9 @@ class Client:
         # this is a bit future proof as we might decide to use a pinned version at some point
         # for now we just negotiate the highest available scheme version and
         # guard incompatability with the MIN_SERVER_SCHEME_VERSION
-        self.scheme_version = self.version.max_scheme_version
+        self.scheme_version = MAX_SERVER_SCHEME_VERSION
+        if self.version.max_scheme_version < MAX_SERVER_SCHEME_VERSION:
+            self.scheme_version = self.version.max_scheme_version
 
         self._logger.info(
             "Connected to Home %s (Server %s, Driver %s, Using Scheme %s)",

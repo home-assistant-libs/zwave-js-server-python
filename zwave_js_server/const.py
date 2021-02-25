@@ -5,6 +5,8 @@ from typing import Dict, List
 
 # minimal server scheme version we can handle
 MIN_SERVER_SCHEME_VERSION = 1
+# max server scheme version we can handle (and our code is compatible with)
+MAX_SERVER_SCHEME_VERSION = 1
 
 VALUE_UNKNOWN = "unknown"
 
