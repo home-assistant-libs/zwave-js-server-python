@@ -25,5 +25,5 @@ class VersionInfo:
             # at some point in time (when we stop supporting schema version 0),
             # we could adjust this code and assume the keys are there.
             min_schema_version=msg.get("minSchemaVersion", 0),
-            max_schema_version=msg.get("maxSchemaVersion", 0)
+            max_schema_version=msg.get("maxSchemaVersion", 0),
         )

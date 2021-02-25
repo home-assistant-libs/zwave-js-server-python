@@ -30,7 +30,9 @@ def test_server_version(client_session, url, ws_client, result, capsys):
     assert sys_exit.value.code == 0
     captured = capsys.readouterr()
     assert captured.out == (
-        "Driver: test_driver_version\n" "Server: test_server_version\n" "Home ID: test_home_id\n"
+        "Driver: test_driver_version\n"
+        "Server: test_server_version\n"
+        "Home ID: test_home_id\n"
     )
     assert ws_client.receive_json.call_count == 1
     assert ws_client.close.call_count == 1
