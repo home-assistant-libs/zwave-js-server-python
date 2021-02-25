@@ -12,7 +12,7 @@ def is_json_string(value: Any) -> bool:
     return isinstance(value, str) and value.startswith("{") and value.endswith("}")
 
 
-def parse_buffer_from_json(value: Any) -> str:
+def parse_buffer_from_json(value: str) -> str:
     """Parse value from a buffer data type."""
     try:
         parsed_val = json.loads(value)
