@@ -141,10 +141,10 @@ def version_data_fixture():
     return {
         "type": "version",
         "driverVersion": "test_driver_version",
-        "serverVersion": "1.0.0",
+        "serverVersion": "test_server_version",
         "homeId": "test_home_id",
-        "minSchemaVersion":0,
-        "maxSchemaVersion":1
+        "minSchemaVersion": 0,
+        "maxSchemaVersion": 1,
     }
 
 

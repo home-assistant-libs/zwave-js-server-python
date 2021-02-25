@@ -38,7 +38,7 @@ class Client:
         self._client: Optional[ClientWebSocketResponse] = None
         # Version of the connected server
         self.version: Optional[VersionInfo] = None
-        self.schema_version: int = 0
+        self.schema_version: int = MAX_SERVER_SCHEMA_VERSION
         self._logger = logging.getLogger(__package__)
         self._loop = asyncio.get_running_loop()
         self._result_futures: Dict[str, asyncio.Future] = {}
@@ -122,7 +122,6 @@ class Client:
         # this is a bit future proof as we might decide to use a pinned version at some point
         # for now we just negotiate the highest available schema version and
         # guard incompatability with the MIN_SERVER_SCHEMA_VERSION
-        self.schema_version = MAX_SERVER_SCHEMA_VERSION
         if self.version.max_schema_version < MAX_SERVER_SCHEMA_VERSION:
             self.schema_version = self.version.max_schema_version
 

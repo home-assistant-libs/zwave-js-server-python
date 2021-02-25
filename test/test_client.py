@@ -44,9 +44,9 @@ async def test_cannot_connect(client_session, url, error):
     assert not client.connected
 
 
-async def test_invalid_server_version(client_session, url, version_data):
-    """Test client connect with invalid server version."""
-    version_data["serverVersion"] = "invalid"
+async def test_min_schema_version(client_session, url, version_data):
+    """Test client connect with invalid schema version."""
+    version_data["minSchemaVersion"] = 3
     client = Client(url, client_session)
 
     with pytest.raises(InvalidServerVersion):
@@ -55,9 +55,9 @@ async def test_invalid_server_version(client_session, url, version_data):
     assert not client.connected
 
 
-async def test_newer_server_version(client_session, url, version_data):
-    """Test client connect with invalid server version."""
-    version_data["serverVersion"] = "99999.0.0"
+async def test_max_schema_version(client_session, url, version_data):
+    """Test client connect with invalid schema version."""
+    version_data["maxSchemaVersion"] = 0
     client = Client(url, client_session)
 
     with pytest.raises(InvalidServerVersion):
