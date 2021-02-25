@@ -6,6 +6,7 @@ import pytest
 from aiohttp.client_exceptions import ClientError, WSServerHandshakeError
 from aiohttp.client_reqrep import ClientResponse, RequestInfo
 from aiohttp.http_websocket import WSMsgType
+from zwave_js_server.const import MAX_SERVER_SCHEMA_VERSION
 
 from zwave_js_server.client import Client
 from zwave_js_server.exceptions import (
@@ -45,7 +46,7 @@ async def test_cannot_connect(client_session, url, error):
 
 
 async def test_send_command_schema(
-    client_session, url, ws_client, result, driver_ready, driver
+    client_session, url, ws_client, driver_ready, driver
 ):
     """Test sending unsupported command."""
     client = Client(url, client_session)
@@ -54,6 +55,10 @@ async def test_send_command_schema(
     client.driver = driver
     await client.listen(driver_ready)
     ws_client.receive.assert_awaited()
+
+    # test schema version is at server maximum
+    if client.version.max_schema_version < MAX_SERVER_SCHEMA_VERSION:
+        assert client.schema_version == client.version.max_schema_version
 
     # send command of current schema version should not fail
     with pytest.raises(NotConnected):
