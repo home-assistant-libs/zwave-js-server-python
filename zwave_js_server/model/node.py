@@ -1,9 +1,11 @@
 """Provide a model for the Z-Wave JS node."""
+from enum import IntEnum
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
+
 from zwave_js_server.const import CommandClass
 
-from ..exceptions import UnparseableValue, UnwriteableValue
 from ..event import Event, EventBase
+from ..exceptions import UnparseableValue, UnwriteableValue
 from .command_class import CommandClassInfo, CommandClassInfoDataType
 from .device_class import DeviceClass, DeviceClassDataType
 from .device_config import DeviceConfig, DeviceConfigDataType
@@ -21,6 +23,19 @@ from .value import (
 
 if TYPE_CHECKING:
     from ..client import Client
+
+
+class NodeStatus(IntEnum):
+    """Enum with all Node status values.
+
+    https://zwave-js.github.io/node-zwave-js/#/api/node?id=status
+    """
+
+    UNKNOWN = 0
+    ASLEEP = 1
+    AWAKE = 2
+    DEAD = 3
+    ALIVE = 4
 
 
 class NodeDataType(TypedDict, total=False):
@@ -121,9 +136,9 @@ class Node(EventBase):
         return self.data.get("userIcon")
 
     @property
-    def status(self) -> int:
+    def status(self) -> NodeStatus:
         """Return the status."""
-        return self.data["status"]
+        return NodeStatus(self.data["status"])
 
     @property
     def ready(self) -> Optional[bool]:
@@ -376,15 +391,23 @@ class Node(EventBase):
 
     def handle_wake_up(self, event: Event) -> None:
         """Process a node wake up event."""
+        # pylint: disable=unused-argument
+        self.data["status"] = NodeStatus.AWAKE
 
     def handle_sleep(self, event: Event) -> None:
         """Process a node sleep event."""
+        # pylint: disable=unused-argument
+        self.data["status"] = NodeStatus.ASLEEP
 
     def handle_dead(self, event: Event) -> None:
         """Process a node dead event."""
+        # pylint: disable=unused-argument
+        self.data["status"] = NodeStatus.DEAD
 
     def handle_alive(self, event: Event) -> None:
         """Process a node alive event."""
+        # pylint: disable=unused-argument
+        self.data["status"] = NodeStatus.ALIVE
 
     def handle_interview_completed(self, event: Event) -> None:
         """Process a node interview completed event."""
