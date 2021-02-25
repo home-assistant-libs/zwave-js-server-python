@@ -1,7 +1,7 @@
 """Generic Utility helper functions."""
 
 import json
-from typing import Any
+from typing import Any, Dict
 
 from ..exceptions import UnparseableValue
 
@@ -12,16 +12,20 @@ def is_json_string(value: Any) -> bool:
     return isinstance(value, str) and value.startswith("{") and value.endswith("}")
 
 
+def parse_buffer(value: Dict[str, Any]) -> str:
+    """Parse value dictionary from a buffer data type."""
+    if (
+        "type" not in value
+        or value["type"] != "Buffer"
+        or "data" not in value
+    ):
+        raise UnparseableValue("Unparseable value: JSON does not match expected schema")
+    return "".join([chr(x) for x in value["data"]])
+
+
 def parse_buffer_from_json(value: str) -> str:
-    """Parse value from a buffer data type."""
+    """Parse value string from a buffer data type."""
     try:
-        parsed_val = json.loads(value)
-        if (
-            "type" not in parsed_val
-            or parsed_val["type"] != "Buffer"
-            or "data" not in parsed_val
-        ):
-            raise ValueError("JSON string does not match expected schema")
-        return "".join([chr(x) for x in parsed_val["data"]])
+        return parse_buffer(json.loads(value))
     except ValueError as err:
         raise UnparseableValue(f"Unparseable value: {value}") from err
