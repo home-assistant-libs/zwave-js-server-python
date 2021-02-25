@@ -5,7 +5,6 @@ from unittest.mock import AsyncMock, patch
 import pytest
 
 from zwave_js_server.__main__ import main
-from zwave_js_server.const import MIN_SERVER_SCHEMA_VERSION
 
 # pylint: disable=unused-argument
 

@@ -10,7 +10,6 @@ from aiohttp import ClientSession, ClientWebSocketResponse
 from aiohttp.http_websocket import WSMessage, WSMsgType
 
 from zwave_js_server.client import Client
-from zwave_js_server.const import MIN_SERVER_SCHEMA_VERSION
 from zwave_js_server.model.controller import Controller
 from zwave_js_server.model.driver import Driver
 from zwave_js_server.model.node import Node
