@@ -58,6 +58,12 @@ def idl_101_lock_state_fixture():
     return json.loads(load_fixture("idl_101_lock_state.json"))
 
 
+@pytest.fixture(name="unparseable_json_string_value_state", scope="session")
+def unparseable_json_string_value_state_fixture():
+    """Load the unparseable string json value node state fixture data."""
+    return json.loads(load_fixture("unparseable_json_string_value_state.json"))
+
+
 @pytest.fixture(name="client_session")
 def client_session_fixture(ws_client):
     """Mock an aiohttp client session."""
