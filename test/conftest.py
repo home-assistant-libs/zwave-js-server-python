@@ -10,7 +10,7 @@ from aiohttp import ClientSession, ClientWebSocketResponse
 from aiohttp.http_websocket import WSMessage, WSMsgType
 
 from zwave_js_server.client import Client
-from zwave_js_server.const import MIN_SERVER_VERSION
+from zwave_js_server.const import MIN_SERVER_SCHEME_VERSION
 from zwave_js_server.model.controller import Controller
 from zwave_js_server.model.driver import Driver
 from zwave_js_server.model.node import Node
@@ -141,8 +141,10 @@ def version_data_fixture():
     return {
         "type": "version",
         "driverVersion": "test_driver_version",
-        "serverVersion": MIN_SERVER_VERSION,
+        "serverVersion": "1.0.0",
         "homeId": "test_home_id",
+        "minSchemeVersion":0,
+        "maxSchemeVersion":1
     }
 
 

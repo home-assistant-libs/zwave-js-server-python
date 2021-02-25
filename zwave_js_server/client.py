@@ -7,10 +7,8 @@ from types import TracebackType
 from typing import Any, Dict, Optional, cast
 
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, client_exceptions
-from awesomeversion import AwesomeVersion
-from awesomeversion.strategy import AwesomeVersionStrategy
 
-from .const import MAX_SERVER_VERSION, MIN_SERVER_VERSION
+from .const import MIN_SERVER_SCHEME_VERSION
 from .event import Event
 from .exceptions import (
     CannotConnect,
@@ -40,6 +38,7 @@ class Client:
         self._client: Optional[ClientWebSocketResponse] = None
         # Version of the connected server
         self.version: Optional[VersionInfo] = None
+        self.scheme_version: int = 0
         self._logger = logging.getLogger(__package__)
         self._loop = asyncio.get_running_loop()
         self._result_futures: Dict[str, asyncio.Future] = {}
@@ -55,8 +54,16 @@ class Client:
         """Return if we're currently connected."""
         return self._client is not None and not self._client.closed
 
-    async def async_send_command(self, message: Dict[str, Any]) -> dict:
+    async def async_send_command(
+        self,
+        message: Dict[str, Any],
+        require_scheme: Optional[int] = None,
+    ) -> dict:
         """Send a command and get a response."""
+        if require_scheme is not None and require_scheme > self.scheme_version:
+            raise InvalidServerVersion(
+                "This command is not available, please update Z-Wave Server to a newer version."
+            )
         future: "asyncio.Future[dict]" = self._loop.create_future()
         message_id = message["messageId"] = uuid.uuid4().hex
         self._result_futures[message_id] = future
@@ -66,8 +73,14 @@ class Client:
         finally:
             self._result_futures.pop(message_id)
 
-    async def async_send_command_no_wait(self, message: Dict[str, Any]) -> None:
+    async def async_send_command_no_wait(
+        self, message: Dict[str, Any], require_scheme: Optional[int] = None
+    ) -> None:
         """Send a command without waiting for the response."""
+        if require_scheme is not None and require_scheme > self.scheme_version:
+            raise InvalidServerVersion(
+                "This command is not available, please update Z-Wave Server to a newer version."
+            )
         message["messageId"] = uuid.uuid4().hex
         await self._send_json_message(message)
 
@@ -92,35 +105,28 @@ class Client:
             await self._receive_json_or_raise()
         )
 
-        # basic check for server version compatability
-        cur_version = AwesomeVersion(self.version.server_version)
-        bad_version = None
-
-        if cur_version.strategy != AwesomeVersionStrategy.SEMVER:
-            bad_version = (
-                "Failed to parse Z-Wave JS Server version "
+        # basic check for server scheme version compatability
+        if (
+            self.version.min_scheme_version > MIN_SERVER_SCHEME_VERSION
+            or self.version.max_scheme_version < MIN_SERVER_SCHEME_VERSION
+        ):
+            await self._client.close()
+            raise InvalidServerVersion(
+                "Z-Wave JS Server version is incompatible "
                 f"{self.version.server_version}"
             )
-        elif cur_version < AwesomeVersion(MIN_SERVER_VERSION):
-            bad_version = (
-                f"Z-Wave JS Server needs to be at least version {MIN_SERVER_VERSION}. "
-                f"Found {self.version.server_version}"
-            )
-        elif cur_version >= AwesomeVersion(MAX_SERVER_VERSION):
-            bad_version = (
-                f"Z-Wave JS Server is newer or equal to {MAX_SERVER_VERSION}. "
-                f"Found {self.version.server_version}"
-            )
-
-        if bad_version:
-            await self._client.close()
-            raise InvalidServerVersion(bad_version)
+        # store the (highest possible) scheme version we're going to use/request
+        # this is a bit future proof as we might decide to use a pinned version at some point
+        # for now we just negotiate the highest available scheme version and
+        # guard incompatability with the MIN_SERVER_SCHEME_VERSION
+        self.scheme_version = self.version.max_scheme_version
 
         self._logger.info(
-            "Connected to Home %s (Server %s, Driver %s)",
+            "Connected to Home %s (Server %s, Driver %s, Using Scheme %s)",
             version.home_id,
             version.server_version,
             version.driver_version,
+            self.scheme_version,
         )
 
     async def listen(self, driver_ready: asyncio.Event) -> None:
@@ -132,7 +138,12 @@ class Client:
 
         try:
             await self._send_json_message(
-                {"command": "start_listening", "messageId": "listen-id"}
+                {
+                    "command": "start_listening",
+                    "messageId": "listen-id",
+                    # note: we already check for incompatible schemes in the connect call
+                    "schemeVersion": self.scheme_version,
+                }
             )
 
             state_msg = await self._receive_json_or_raise()

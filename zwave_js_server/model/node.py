@@ -371,7 +371,8 @@ class Node(EventBase):
             val = self.values[val]
         # the value object needs to be send to the server
         await self.client.async_send_command_no_wait(
-            {"command": "node.poll_value", "nodeId": self.node_id, "valueId": val.data}
+            {"command": "node.poll_value", "nodeId": self.node_id, "valueId": val.data},
+            require_scheme=1
         )
 
     def handle_wake_up(self, event: Event) -> None:

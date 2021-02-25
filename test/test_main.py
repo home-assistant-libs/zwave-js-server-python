@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, patch
 import pytest
 
 from zwave_js_server.__main__ import main
-from zwave_js_server.const import MIN_SERVER_VERSION
+from zwave_js_server.const import MIN_SERVER_SCHEME_VERSION
 
 # pylint: disable=unused-argument
 
@@ -30,9 +30,7 @@ def test_server_version(client_session, url, ws_client, result, capsys):
     assert sys_exit.value.code == 0
     captured = capsys.readouterr()
     assert captured.out == (
-        "Driver: test_driver_version\n"
-        f"Server: {MIN_SERVER_VERSION}\n"
-        "Home ID: test_home_id\n"
+        "Driver: test_driver_version\n" f"Server: 1.0.0\n" "Home ID: test_home_id\n"
     )
     assert ws_client.receive_json.call_count == 1
     assert ws_client.close.call_count == 1
@@ -50,7 +48,7 @@ def test_dump_state(client_session, url, ws_client, result, capsys):
     captured = capsys.readouterr()
     assert captured.out == (
         "{'type': 'version', 'driverVersion': 'test_driver_version', "
-        f"'serverVersion': '{MIN_SERVER_VERSION}', 'homeId': 'test_home_id'}}\n"
+        f"'serverVersion': '1.0.0', 'homeId': 'test_home_id'}}\n"
         "test_result\n"
     )
     assert ws_client.receive_json.call_count == 2
