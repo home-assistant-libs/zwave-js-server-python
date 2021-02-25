@@ -273,7 +273,7 @@ def test_node_inclusion():
 
 
 async def test_node_status_events(multisensor_6):
-    """Test set value."""
+    """Test Node status events."""
     node = multisensor_6
     assert node.status == NodeStatus.ASLEEP
     # mock node wake up event
