@@ -52,6 +52,12 @@ def cover_qubino_shutter_state_fixture():
     return json.loads(load_fixture("cover_qubino_shutter_state.json"))
 
 
+@pytest.fixture(name="node_bad_string_metadata_state", scope="session")
+def node_bad_string_metadata_state_fixture():
+    """Load the bad string meta data node state fixture data."""
+    return json.loads(load_fixture("node_bad_string_metadata_state.json"))
+
+
 @pytest.fixture(name="client_session")
 def client_session_fixture(ws_client):
     """Mock an aiohttp client session."""
