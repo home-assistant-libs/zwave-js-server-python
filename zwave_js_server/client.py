@@ -150,12 +150,12 @@ class Client:
                     "schemaVersion": self.schema_version,
                 }
             )
-            state_msg = await self._receive_json_or_raise()
+            set_api_msg = await self._receive_json_or_raise()
 
-            if not state_msg["success"]:
+            if not set_api_msg["success"]:
                 # this should not happen, but just in case
                 await self._client.close()
-                raise FailedCommand(state_msg["messageId"], state_msg["errorCode"])
+                raise FailedCommand(set_api_msg["messageId"], set_api_msg["errorCode"])
 
             # send start_listening command to the server
             # we will receive a full state dump and from now on get events

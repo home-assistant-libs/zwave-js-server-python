@@ -152,7 +152,12 @@ def version_data_fixture():
 @pytest.fixture(name="set_api_schema_data")
 def set_api_schema_data_fixture():
     """Return mock set_api_schema data."""
-    return {"success": True}
+    return {
+        "type": "result",
+        "success": True,
+        "result": {},
+        "messageId": "api-schema-id",
+    }
 
 
 @pytest.fixture(name="url")

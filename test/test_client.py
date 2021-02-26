@@ -215,6 +215,21 @@ async def test_listen_not_success(client_session, url, result, driver_ready):
     assert not client.connected
 
 
+async def test_set_api_schema_not_success(
+    client_session, url, set_api_schema_data, driver_ready
+):
+    """Test receive result message with success False on listen."""
+    set_api_schema_data["success"] = False
+    set_api_schema_data["errorCode"] = "error_code"
+    client = Client(url, client_session)
+    await client.connect()
+
+    with pytest.raises(FailedCommand):
+        await client.listen(driver_ready)
+
+    assert not client.connected
+
+
 async def test_listen_without_connect(client_session, url, driver_ready):
     """Test listen without first being connected."""
     client = Client(url, client_session)
