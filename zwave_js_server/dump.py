@@ -21,7 +21,6 @@ async def dump_msgs(
     msgs.append(version)
 
     # set preferred schema version on the server
-    # note: we already check for (in)compatible schemas in the connect call
     await client.send_json(
         {
             "command": "set_api_schema",
