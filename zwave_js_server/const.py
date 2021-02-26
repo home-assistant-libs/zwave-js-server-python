@@ -3,9 +3,10 @@ from dataclasses import dataclass
 from enum import Enum, IntEnum
 from typing import Dict, List
 
-MIN_SERVER_VERSION = "1.0.0"
-# Will be checked _excluding_
-MAX_SERVER_VERSION = "2.0.0"
+# minimal server schema version we can handle
+MIN_SERVER_SCHEMA_VERSION = 1
+# max server schema version we can handle (and our code is compatible with)
+MAX_SERVER_SCHEMA_VERSION = 1
 
 VALUE_UNKNOWN = "unknown"
 

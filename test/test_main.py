@@ -5,7 +5,6 @@ from unittest.mock import AsyncMock, patch
 import pytest
 
 from zwave_js_server.__main__ import main
-from zwave_js_server.const import MIN_SERVER_VERSION
 
 # pylint: disable=unused-argument
 
@@ -31,7 +30,7 @@ def test_server_version(client_session, url, ws_client, result, capsys):
     captured = capsys.readouterr()
     assert captured.out == (
         "Driver: test_driver_version\n"
-        f"Server: {MIN_SERVER_VERSION}\n"
+        "Server: test_server_version\n"
         "Home ID: test_home_id\n"
     )
     assert ws_client.receive_json.call_count == 1
@@ -50,10 +49,13 @@ def test_dump_state(client_session, url, ws_client, result, capsys):
     captured = capsys.readouterr()
     assert captured.out == (
         "{'type': 'version', 'driverVersion': 'test_driver_version', "
-        f"'serverVersion': '{MIN_SERVER_VERSION}', 'homeId': 'test_home_id'}}\n"
+        "'serverVersion': 'test_server_version', 'homeId': 'test_home_id', "
+        "'minSchemaVersion': 0, 'maxSchemaVersion': 1}\n"
+        "{'type': 'result', 'success': True, 'result': {}, 'messageId': 'api-schema-id'}\n"
         "test_result\n"
     )
-    assert ws_client.receive_json.call_count == 2
+
+    assert ws_client.receive_json.call_count == 3
     assert ws_client.close.call_count == 1
 
 
@@ -65,4 +67,4 @@ def test_connect(client_session, url, ws_client):
         main()
 
     assert sys_exit.value.code == 0
-    assert ws_client.receive.call_count == 2
+    assert ws_client.receive.call_count == 3

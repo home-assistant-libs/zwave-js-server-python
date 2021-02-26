@@ -31,26 +31,31 @@ def event_fixture():
     }
 
 
-async def test_dump(client_session, result, url, version_data, ws_client):
+async def test_dump(
+    client_session, result, url, version_data, set_api_schema_data, ws_client
+):
     """Test the dump function."""
     messages = await dump_msgs(url, client_session)
 
-    assert ws_client.receive_json.call_count == 2
-    assert ws_client.send_json.call_count == 1
-    assert ws_client.send_json.call_args == call({"command": "start_listening"})
+    assert ws_client.receive_json.call_count == 3
+    assert ws_client.send_json.call_count == 2
+    assert ws_client.send_json.call_args == call(
+        {"command": "start_listening", "messageId": "listen-id"}
+    )
     assert ws_client.close.call_count == 1
     assert messages
-    assert len(messages) == 2
+    assert len(messages) == 3
     assert messages[0] == version_data
-    assert messages[1] == result
+    assert messages[1] == set_api_schema_data
+    assert messages[2] == result
 
 
 async def test_dump_timeout(
-    client_session, result, url, event, version_data, ws_client
+    client_session, result, url, event, version_data, set_api_schema_data, ws_client
 ):
     """Test the dump function with timeout."""
     to_receive = asyncio.Queue()
-    for message in (version_data, result, event):
+    for message in (version_data, set_api_schema_data, result, event):
         to_receive.put_nowait(message)
 
     async def receive_json():
@@ -59,12 +64,15 @@ async def test_dump_timeout(
     ws_client.receive_json = AsyncMock(side_effect=receive_json)
     messages = await dump_msgs(url, client_session, 0.05)
 
-    assert ws_client.receive_json.call_count == 4
-    assert ws_client.send_json.call_count == 1
-    assert ws_client.send_json.call_args == call({"command": "start_listening"})
+    assert ws_client.receive_json.call_count == 5
+    assert ws_client.send_json.call_count == 2
+    assert ws_client.send_json.call_args == call(
+        {"command": "start_listening", "messageId": "listen-id"}
+    )
     assert ws_client.close.call_count == 1
     assert messages
-    assert len(messages) == 3
+    assert len(messages) == 4
     assert messages[0] == version_data
-    assert messages[1] == result
-    assert messages[2] == event
+    assert messages[1] == set_api_schema_data
+    assert messages[2] == result
+    assert messages[3] == event

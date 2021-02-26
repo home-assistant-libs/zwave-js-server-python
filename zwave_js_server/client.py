@@ -7,10 +7,8 @@ from types import TracebackType
 from typing import Any, Dict, Optional, cast
 
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, client_exceptions
-from awesomeversion import AwesomeVersion
-from awesomeversion.strategy import AwesomeVersionStrategy
 
-from .const import MAX_SERVER_VERSION, MIN_SERVER_VERSION
+from .const import MAX_SERVER_SCHEMA_VERSION, MIN_SERVER_SCHEMA_VERSION
 from .event import Event
 from .exceptions import (
     CannotConnect,
@@ -40,6 +38,7 @@ class Client:
         self._client: Optional[ClientWebSocketResponse] = None
         # Version of the connected server
         self.version: Optional[VersionInfo] = None
+        self.schema_version: int = MAX_SERVER_SCHEMA_VERSION
         self._logger = logging.getLogger(__package__)
         self._loop = asyncio.get_running_loop()
         self._result_futures: Dict[str, asyncio.Future] = {}
@@ -55,8 +54,17 @@ class Client:
         """Return if we're currently connected."""
         return self._client is not None and not self._client.closed
 
-    async def async_send_command(self, message: Dict[str, Any]) -> dict:
+    async def async_send_command(
+        self,
+        message: Dict[str, Any],
+        require_schema: Optional[int] = None,
+    ) -> dict:
         """Send a command and get a response."""
+        if require_schema is not None and require_schema > self.schema_version:
+            raise InvalidServerVersion(
+                "Command not available due to incompatible server version. Update the Z-Wave "
+                f"JS Server to a version that supports at least api schema {require_schema}."
+            )
         future: "asyncio.Future[dict]" = self._loop.create_future()
         message_id = message["messageId"] = uuid.uuid4().hex
         self._result_futures[message_id] = future
@@ -66,8 +74,15 @@ class Client:
         finally:
             self._result_futures.pop(message_id)
 
-    async def async_send_command_no_wait(self, message: Dict[str, Any]) -> None:
+    async def async_send_command_no_wait(
+        self, message: Dict[str, Any], require_schema: Optional[int] = None
+    ) -> None:
         """Send a command without waiting for the response."""
+        if require_schema is not None and require_schema > self.schema_version:
+            raise InvalidServerVersion(
+                "Command not available due to incompatible server version. Update the Z-Wave "
+                f"JS Server to a version that supports at least api schema {require_schema}."
+            )
         message["messageId"] = uuid.uuid4().hex
         await self._send_json_message(message)
 
@@ -92,35 +107,30 @@ class Client:
             await self._receive_json_or_raise()
         )
 
-        # basic check for server version compatability
-        cur_version = AwesomeVersion(self.version.server_version)
-        bad_version = None
-
-        if cur_version.strategy != AwesomeVersionStrategy.SEMVER:
-            bad_version = (
-                "Failed to parse Z-Wave JS Server version "
-                f"{self.version.server_version}"
-            )
-        elif cur_version < AwesomeVersion(MIN_SERVER_VERSION):
-            bad_version = (
-                f"Z-Wave JS Server needs to be at least version {MIN_SERVER_VERSION}. "
-                f"Found {self.version.server_version}"
-            )
-        elif cur_version >= AwesomeVersion(MAX_SERVER_VERSION):
-            bad_version = (
-                f"Z-Wave JS Server is newer or equal to {MAX_SERVER_VERSION}. "
-                f"Found {self.version.server_version}"
-            )
-
-        if bad_version:
+        # basic check for server schema version compatability
+        if (
+            self.version.min_schema_version > MIN_SERVER_SCHEMA_VERSION
+            or self.version.max_schema_version < MIN_SERVER_SCHEMA_VERSION
+        ):
             await self._client.close()
-            raise InvalidServerVersion(bad_version)
+            raise InvalidServerVersion(
+                f"Z-Wave JS Server version is incompatible: {self.version.server_version} "
+                "a version is required that supports at least "
+                f"api schema {MIN_SERVER_SCHEMA_VERSION}"
+            )
+        # store the (highest possible) schema version we're going to use/request
+        # this is a bit future proof as we might decide to use a pinned version at some point
+        # for now we just negotiate the highest available schema version and
+        # guard incompatability with the MIN_SERVER_SCHEMA_VERSION
+        if self.version.max_schema_version < MAX_SERVER_SCHEMA_VERSION:
+            self.schema_version = self.version.max_schema_version
 
         self._logger.info(
-            "Connected to Home %s (Server %s, Driver %s)",
+            "Connected to Home %s (Server %s, Driver %s, Using Schema %s)",
             version.home_id,
             version.server_version,
             version.driver_version,
+            self.schema_version,
         )
 
     async def listen(self, driver_ready: asyncio.Event) -> None:
@@ -131,6 +141,24 @@ class Client:
         assert self._client
 
         try:
+            # set preferred schema version on the server
+            # note: we already check for (in)compatible schemas in the connect call
+            await self._send_json_message(
+                {
+                    "command": "set_api_schema",
+                    "messageId": "api-schema-id",
+                    "schemaVersion": self.schema_version,
+                }
+            )
+            set_api_msg = await self._receive_json_or_raise()
+
+            if not set_api_msg["success"]:
+                # this should not happen, but just in case
+                await self._client.close()
+                raise FailedCommand(set_api_msg["messageId"], set_api_msg["errorCode"])
+
+            # send start_listening command to the server
+            # we will receive a full state dump and from now on get events
             await self._send_json_message(
                 {"command": "start_listening", "messageId": "listen-id"}
             )

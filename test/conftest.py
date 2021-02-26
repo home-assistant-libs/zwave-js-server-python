@@ -10,7 +10,6 @@ from aiohttp import ClientSession, ClientWebSocketResponse
 from aiohttp.http_websocket import WSMessage, WSMsgType
 
 from zwave_js_server.client import Client
-from zwave_js_server.const import MIN_SERVER_VERSION
 from zwave_js_server.model.controller import Controller
 from zwave_js_server.model.driver import Driver
 from zwave_js_server.model.node import Node
@@ -88,14 +87,16 @@ def messages_fixture():
 
 
 @pytest.fixture(name="ws_client")
-async def ws_client_fixture(loop, version_data, ws_message, result, messages):
+async def ws_client_fixture(
+    loop, version_data, ws_message, result, messages, set_api_schema_data
+):
     """Mock a websocket client.
 
     This fixture only allows a single message to be received.
     """
     ws_client = AsyncMock(spec_set=ClientWebSocketResponse, closed=False)
-    ws_client.receive_json.side_effect = (version_data, result)
-    for data in (version_data, result):
+    ws_client.receive_json.side_effect = (version_data, set_api_schema_data, result)
+    for data in (version_data, set_api_schema_data, result):
         messages.append(create_ws_message(data))
 
     async def receive():
@@ -112,7 +113,7 @@ async def ws_client_fixture(loop, version_data, ws_message, result, messages):
 
     async def close_client(msg):
         """Close the client."""
-        if msg["command"] == "start_listening":
+        if msg["command"] in ("set_api_schema", "start_listening"):
             return
 
         await asyncio.sleep(0)
@@ -153,8 +154,21 @@ def version_data_fixture():
     return {
         "type": "version",
         "driverVersion": "test_driver_version",
-        "serverVersion": MIN_SERVER_VERSION,
+        "serverVersion": "test_server_version",
         "homeId": "test_home_id",
+        "minSchemaVersion": 0,
+        "maxSchemaVersion": 1,
+    }
+
+
+@pytest.fixture(name="set_api_schema_data")
+def set_api_schema_data_fixture():
+    """Return mock set_api_schema data."""
+    return {
+        "type": "result",
+        "success": True,
+        "result": {},
+        "messageId": "api-schema-id",
     }
 
 

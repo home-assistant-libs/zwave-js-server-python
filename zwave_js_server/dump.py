@@ -4,6 +4,8 @@ from typing import List, Optional
 
 import aiohttp
 
+from .const import MAX_SERVER_SCHEMA_VERSION
+
 
 async def dump_msgs(
     url: str,
@@ -17,9 +19,16 @@ async def dump_msgs(
     version = await client.receive_json()
     msgs.append(version)
 
-    await client.send_json({"command": "start_listening"})
-    msg = await client.receive_json()
-    msgs.append(msg)
+    for to_send in (
+        {
+            "command": "set_api_schema",
+            "messageId": "api-schema-id",
+            "schemaVersion": MAX_SERVER_SCHEMA_VERSION,
+        },
+        {"command": "start_listening", "messageId": "listen-id"},
+    ):
+        await client.send_json(to_send)
+        msgs.append(await client.receive_json())
 
     if timeout is None:
         await client.close()

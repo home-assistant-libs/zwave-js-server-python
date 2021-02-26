@@ -6,6 +6,7 @@ import pytest
 from aiohttp.client_exceptions import ClientError, WSServerHandshakeError
 from aiohttp.client_reqrep import ClientResponse, RequestInfo
 from aiohttp.http_websocket import WSMsgType
+from zwave_js_server.const import MAX_SERVER_SCHEMA_VERSION
 
 from zwave_js_server.client import Client
 from zwave_js_server.exceptions import (
@@ -44,9 +45,40 @@ async def test_cannot_connect(client_session, url, error):
     assert not client.connected
 
 
-async def test_invalid_server_version(client_session, url, version_data):
-    """Test client connect with invalid server version."""
-    version_data["serverVersion"] = "invalid"
+async def test_send_command_schema(
+    client_session, url, ws_client, driver_ready, driver
+):
+    """Test sending unsupported command."""
+    client = Client(url, client_session)
+    await client.connect()
+    assert client.connected
+    client.driver = driver
+    await client.listen(driver_ready)
+    ws_client.receive.assert_awaited()
+
+    # test schema version is at server maximum
+    if client.version.max_schema_version < MAX_SERVER_SCHEMA_VERSION:
+        assert client.schema_version == client.version.max_schema_version
+
+    # send command of current schema version should not fail
+    with pytest.raises(NotConnected):
+        await client.async_send_command(
+            {"command": "test"}, require_schema=client.schema_version
+        )
+    # send command of unsupported schema version should fail
+    with pytest.raises(InvalidServerVersion):
+        await client.async_send_command(
+            {"command": "test"}, require_schema=client.schema_version + 2
+        )
+    with pytest.raises(InvalidServerVersion):
+        await client.async_send_command_no_wait(
+            {"command": "test"}, require_schema=client.schema_version + 2
+        )
+
+
+async def test_min_schema_version(client_session, url, version_data):
+    """Test client connect with invalid schema version."""
+    version_data["minSchemaVersion"] = 3
     client = Client(url, client_session)
 
     with pytest.raises(InvalidServerVersion):
@@ -55,9 +87,9 @@ async def test_invalid_server_version(client_session, url, version_data):
     assert not client.connected
 
 
-async def test_newer_server_version(client_session, url, version_data):
-    """Test client connect with invalid server version."""
-    version_data["serverVersion"] = "99999.0.0"
+async def test_max_schema_version(client_session, url, version_data):
+    """Test client connect with invalid schema version."""
+    version_data["maxSchemaVersion"] = 0
     client = Client(url, client_session)
 
     with pytest.raises(InvalidServerVersion):
@@ -174,6 +206,21 @@ async def test_listen_not_success(client_session, url, result, driver_ready):
     """Test receive result message with success False on listen."""
     result["success"] = False
     result["errorCode"] = "error_code"
+    client = Client(url, client_session)
+    await client.connect()
+
+    with pytest.raises(FailedCommand):
+        await client.listen(driver_ready)
+
+    assert not client.connected
+
+
+async def test_set_api_schema_not_success(
+    client_session, url, set_api_schema_data, driver_ready
+):
+    """Test receive result message with success False on listen."""
+    set_api_schema_data["success"] = False
+    set_api_schema_data["errorCode"] = "error_code"
     client = Client(url, client_session)
     await client.connect()
 
