@@ -20,24 +20,16 @@ async def dump_msgs(
     version = await client.receive_json()
     msgs.append(version)
 
-    # set preferred schema version on the server
-    await client.send_json(
+    for to_send in (
         {
             "command": "set_api_schema",
             "messageId": "api-schema-id",
             "schemaVersion": MAX_SERVER_SCHEMA_VERSION,
-        }
-    )
-    state_msg = await client.receive_json()
-
-    if not state_msg["success"]:
-        # this should not happen, but just in case
-        await client.disconnect()
-        raise FailedCommand(state_msg["messageId"], state_msg["errorCode"])
-
-    await client.send_json({"command": "start_listening"})
-    msg = await client.receive_json()
-    msgs.append(msg)
+        },
+        {"command": "start_listening", "messageId": "listen-id"},
+    ):
+        await client.send_json(to_send)
+        msgs.append(await client.receive_json())
 
     if timeout is None:
         await client.close()
