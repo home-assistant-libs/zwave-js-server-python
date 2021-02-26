@@ -5,7 +5,6 @@ from typing import List, Optional
 import aiohttp
 
 from .const import MAX_SERVER_SCHEMA_VERSION
-from .exceptions import FailedCommand
 
 
 async def dump_msgs(
