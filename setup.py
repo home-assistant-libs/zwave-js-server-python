@@ -5,7 +5,7 @@ from setuptools import find_packages, setup
 
 PROJECT_DIR = Path(__file__).parent.resolve()
 README_FILE = PROJECT_DIR / "README.md"
-VERSION = "0.19.0"
+VERSION = "0.20.0"
 
 
 setup(
@@ -20,11 +20,7 @@ setup(
     long_description_content_type="text/markdown",
     packages=find_packages(exclude=["test.*", "test"]),
     python_requires=">=3.8",
-    install_requires=[
-        "aiohttp>3",
-        # We rely on a feature introduced in this version
-        "awesomeversion>=21.2.1",
-    ],
+    install_requires=["aiohttp>3"],
     entry_points={
         "console_scripts": ["zwave-js-server-python = zwave_js_server.__main__:main"]
     },
