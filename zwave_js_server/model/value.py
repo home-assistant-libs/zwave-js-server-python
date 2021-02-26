@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any, Dict, Optional, TypedDict, Union
 
 from ..const import VALUE_UNKNOWN, ConfigurationValueType
 from ..event import Event
-from ..util.helpers import is_json_string, parse_buffer_from_json
+from ..util.helpers import is_json_string, parse_buffer, parse_buffer_from_json
 
 if TYPE_CHECKING:
     from .node import Node
@@ -228,9 +228,13 @@ class Value:
             self._value = data["newValue"]
         if "value" in data:
             self._value = data["value"]
-        # handle json string in value
-        if self.metadata.type == "string" and is_json_string(self._value):
-            self._value = parse_buffer_from_json(self._value)
+
+        # handle buffer dict and json string in value
+        if self.metadata.type == "string":
+            if isinstance(self._value, dict):
+                self._value = parse_buffer(self._value)
+            elif is_json_string(self._value):
+                self._value = parse_buffer_from_json(self._value)
 
 
 class ValueNotification(Value):

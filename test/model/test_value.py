@@ -3,8 +3,8 @@ from zwave_js_server.model.node import Node
 from zwave_js_server.model.value import get_value_id
 
 
-def test_metadata_string_check(client, idl_101_lock_state):
-    """Test that we handle metadata incorrectly labeled as string."""
+def test_buffer_dict(client, idl_101_lock_state):
+    """Test that we handle buffer dictionary correctly."""
     node = Node(client, idl_101_lock_state)
 
     value_id = get_value_id(node, 99, "userCode", 0, 3, "3")
@@ -14,7 +14,7 @@ def test_metadata_string_check(client, idl_101_lock_state):
     zwave_value = node.values[value_id]
 
     assert zwave_value.metadata.type == "string"
-    assert zwave_value.value == {"type": "Buffer", "data": [164, 14, 170, 86]}
+    assert zwave_value.value == "¤\x0eªV"
 
 
 def test_unparseable_value(client, unparseable_json_string_value_state):
