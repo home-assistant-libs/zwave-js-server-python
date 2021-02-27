@@ -129,7 +129,7 @@ class ValueMetadata:
         """Return ccSpecific."""
         return self.data.get("ccSpecific", {})
 
-    def update(self, data):
+    def update(self, data: MetaDataType) -> None:
         """Update data."""
         self.data.update(data)
 
