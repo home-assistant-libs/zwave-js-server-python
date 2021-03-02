@@ -57,6 +57,12 @@ def idl_101_lock_state_fixture():
     return json.loads(load_fixture("idl_101_lock_state.json"))
 
 
+@pytest.fixture(name="wallmote_central_scene_state", scope="session")
+def wallmote_central_scene_state_fixture():
+    """Load the wallmote central scene node state fixture data."""
+    return json.loads(load_fixture("wallmote_central_scene_state.json"))
+
+
 @pytest.fixture(name="unparseable_json_string_value_state", scope="session")
 def unparseable_json_string_value_state_fixture():
     """Load the unparseable string json value node state fixture data."""
@@ -289,6 +295,14 @@ def climate_radio_thermostat_ct100_plus_fixture(
 def cover_qubino_shutter_fixture(driver, cover_qubino_shutter_state):
     """Mock a qubino shutter cover node."""
     node = Node(driver.client, cover_qubino_shutter_state)
+    driver.controller.nodes[node.node_id] = node
+    return node
+
+
+@pytest.fixture(name="wallmote_central_scene")
+def wallmote_central_scene_fixture(driver, wallmote_central_scene_state):
+    """Mock a wallmote central scene node."""
+    node = Node(driver.client, wallmote_central_scene_state)
     driver.controller.nodes[node.node_id] = node
     return node
 

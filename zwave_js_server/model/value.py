@@ -129,6 +129,10 @@ class ValueMetadata:
         """Return ccSpecific."""
         return self.data.get("ccSpecific", {})
 
+    def update(self, data: MetaDataType) -> None:
+        """Update data."""
+        self.data.update(data)
+
 
 class Value:
     """Represent a Z-Wave JS value."""
@@ -138,6 +142,7 @@ class Value:
         self.node = node
         self.data: ValueDataType = {}
         self._value: Any = None
+        self._metadata = ValueMetadata({"type": "unknown"})
         self.update(data)
 
     def __repr__(self) -> str:
@@ -162,7 +167,7 @@ class Value:
     @property
     def metadata(self) -> ValueMetadata:
         """Return value metadata."""
-        return ValueMetadata(self.data.get("metadata", {"type": "unknown"}))
+        return self._metadata
 
     @property
     def value(self) -> Optional[Any]:
@@ -228,6 +233,8 @@ class Value:
             self._value = data["newValue"]
         if "value" in data:
             self._value = data["value"]
+        if "metadata" in data:
+            self._metadata.update(data["metadata"])
 
         # handle buffer dict and json string in value
         if self.metadata.type == "string":
