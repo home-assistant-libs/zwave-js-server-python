@@ -7,7 +7,7 @@ from zwave_js_server.const import CommandClass
 from zwave_js_server.event import Event
 from zwave_js_server.exceptions import UnwriteableValue
 from zwave_js_server.model import node as node_pkg
-from zwave_js_server.model.node import NodeStatus
+from zwave_js_server.model.node import Node, NodeStatus
 
 from .. import load_fixture
 
@@ -292,3 +292,118 @@ async def test_node_status_events(multisensor_6):
     event = Event(type="sleep")
     node.handle_sleep(event)
     assert node.status == NodeStatus.ASLEEP
+
+
+async def test_value_notification(wallmote_central_scene: Node):
+    """Test value notification events."""
+    node = wallmote_central_scene
+
+    # Validate that metadata gets added to notification when it's not included
+    event = Event(
+        type="value notification",
+        data={
+            "source": "node",
+            "event": "value notification",
+            "nodeId": 35,
+            "args": {
+                "endpoint": 0,
+                "commandClass": 91,
+                "commandClassName": "Central Scene",
+                "property": "scene",
+                "propertyKey": "002",
+                "propertyName": "scene",
+                "propertyKeyName": "002",
+                "ccVersion": 2,
+            },
+        },
+    )
+
+    node.handle_value_notification(event)
+    assert event.data["value_notification"].metadata.states
+
+    # Validate that a value notification event for an unknown value gets returned as is
+
+    event = Event(
+        type="value notification",
+        data={
+            "source": "node",
+            "event": "value notification",
+            "nodeId": 35,
+            "args": {
+                "endpoint": 0,
+                "commandClass": 91,
+                "commandClassName": "Central Scene",
+                "property": "scene",
+                "propertyKey": "005",
+                "propertyName": "scene",
+                "propertyKeyName": "005",
+                "ccVersion": 2,
+            },
+        },
+    )
+
+    node.handle_value_notification(event)
+    assert event.data["value_notification"].data == {
+        "endpoint": 0,
+        "commandClass": 91,
+        "commandClassName": "Central Scene",
+        "property": "scene",
+        "propertyKey": "005",
+        "propertyName": "scene",
+        "propertyKeyName": "005",
+        "ccVersion": 2,
+    }
+
+
+async def test_metadata_updated(climate_radio_thermostat_ct100_plus: Node):
+    """Test metadata updated events."""
+    node = climate_radio_thermostat_ct100_plus
+
+    value = node.values["13-135-1-value-00-00"]
+
+    assert not value.metadata.states
+
+    # Validate that states becomes available on a value that doesn't have a state when
+    # a metadata updated event with states is received
+    event = Event(
+        type="value notification",
+        data={
+            "source": "node",
+            "event": "metadata updated",
+            "nodeId": 13,
+            "args": {
+                "commandClassName": "Indicator",
+                "commandClass": 135,
+                "endpoint": 1,
+                "property": "value",
+                "propertyName": "value",
+                "metadata": {
+                    "type": "number",
+                    "readable": True,
+                    "writeable": True,
+                    "min": 0,
+                    "max": 255,
+                    "label": "Indicator value",
+                    "ccSpecific": {"indicatorId": 0},
+                    "states": {
+                        "0": "Idle",
+                        "1": "Heating",
+                        "2": "Cooling",
+                        "3": "Fan Only",
+                        "4": "Pending Heat",
+                        "5": "Pending Cool",
+                        "6": "Vent/Economizer",
+                        "7": "Aux Heating",
+                        "8": "2nd Stage Heating",
+                        "9": "2nd Stage Cooling",
+                        "10": "2nd Stage Aux Heat",
+                        "11": "3rd Stage Aux Heat",
+                    },
+                },
+                "value": 0,
+            },
+        },
+    )
+
+    node.handle_metadata_updated(event)
+    assert value.metadata.states
