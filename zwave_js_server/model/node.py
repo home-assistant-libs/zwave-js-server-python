@@ -459,7 +459,7 @@ class Node(EventBase):
             value.update(event.data["args"])
             value_notification = cast(ValueNotification, value)
         else:
-            value_notification = event.data["args"]
+            value_notification = ValueNotification(self, event.data["args"])
         event.data["value_notification"] = value_notification
 
     def handle_metadata_updated(self, event: Event) -> None:
