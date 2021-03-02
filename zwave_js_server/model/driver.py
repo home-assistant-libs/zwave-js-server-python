@@ -1,9 +1,10 @@
 """Provide a model for the Z-Wave JS Driver."""
 from typing import TYPE_CHECKING
-from zwave_js_server.model.log_config import LogConfig
 
+from ..const import LogLevel
 from ..event import Event, EventBase
 from .controller import Controller
+from .log_config import LogConfig
 
 if TYPE_CHECKING:
     from ..client import Client
@@ -53,4 +54,7 @@ class Driver(EventBase):
     async def async_get_log_config(self) -> LogConfig:
         """Return current log config for driver."""
         result = await self.client.async_send_command({"command": "get_log_config"})
-        return LogConfig.from_dict(result["config"])
+        config = result["config"]
+        if isinstance(config.get("level"), str):
+            config["level"] = LogLevel[config["level"].upper()]
+        return LogConfig.from_dict(config)
