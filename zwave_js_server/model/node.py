@@ -485,26 +485,20 @@ class Node(EventBase):
     def handle_value_notification(self, event: Event) -> None:
         """Process a node value notification event."""
         # append metadata if value metadata is available
-        value = None
-        value_notification = ValueNotification(self, event.data["args"])
+        # If endpoint isn't provided, we can assume the endpoint is 0
+        # https://zwave-js.github.io/node-zwave-js/#/api/valueid
+        if event.data["args"].get("endpoint") is None:
+            event.data["args"]["endpoint"] = 0
 
-        # If endpoint isn't provided, we need to search for the Value
-        if value_notification.endpoint is None:
-            value = self.find_value(
-                property_=value_notification.property_,
-                property_name=value_notification.property_name,
-                property_key=value_notification.property_key,
-                property_key_name=value_notification.property_key_name,
-            )
-        else:
-            value = self.values.get(
-                _get_value_id_from_dict(self, value_notification.data)
-            )
+        value = self.values.get(
+            _get_value_id_from_dict(self, event.data["args"])
+        )
 
         if value:
-            value.update(value_notification.data)
+            value.update(event.data["args"])
             value_notification = cast(ValueNotification, value)
-
+        else:
+            value_notification = ValueNotification(self, event.data["args"])
         event.data["value_notification"] = value_notification
 
     def handle_metadata_updated(self, event: Event) -> None:
