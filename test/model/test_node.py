@@ -306,7 +306,6 @@ async def test_value_notification(wallmote_central_scene: Node):
             "event": "value notification",
             "nodeId": 35,
             "args": {
-                "endpoint": 0,
                 "commandClass": 91,
                 "commandClassName": "Central Scene",
                 "property": "scene",

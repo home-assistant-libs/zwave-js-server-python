@@ -1,6 +1,6 @@
 """Utility functions for Z-Wave JS nodes."""
 import json
-from typing import Optional, Union
+from typing import Optional, Union, cast
 
 from ..const import CommandClass, ConfigurationValueType
 from ..exceptions import InvalidNewValue, NotFoundError, SetValueFailed
@@ -25,17 +25,16 @@ async def async_set_config_parameter(
     # If a property name is provided, we have to search for the correct value since
     # we can't use value ID
     if isinstance(property_or_property_name, str):
-        try:
-            zwave_value = next(
-                config_value
-                for config_value in config_values.values()
-                if config_value.property_name == property_or_property_name
-            )
-        except StopIteration:
+        zwave_value = node.find_value(
+            command_class=CommandClass.CONFIGURATION,
+            property_name=property_or_property_name,
+        )
+        if not zwave_value:
             raise NotFoundError(
                 "Configuration parameter with parameter name "
                 f"{property_or_property_name} could not be found"
             ) from None
+        zwave_value = cast(ConfigurationValue, zwave_value)
     else:
         value_id = get_value_id(
             node,

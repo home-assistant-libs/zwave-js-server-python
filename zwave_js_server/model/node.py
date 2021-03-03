@@ -2,8 +2,7 @@
 from enum import IntEnum
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
 
-from zwave_js_server.const import CommandClass
-
+from ..const import CommandClass
 from ..event import Event, EventBase
 from ..exceptions import UnparseableValue, UnwriteableValue
 from .command_class import CommandClassInfo, CommandClassInfoDataType
@@ -390,6 +389,38 @@ class Node(EventBase):
             require_schema=1,
         )
 
+    def find_value(
+        self,
+        command_class: Optional[int] = None,
+        command_class_name: Optional[str] = None,
+        endpoint: Optional[int] = None,
+        property_: Optional[Union[int, str]] = None,
+        property_name: Optional[str] = None,
+        property_key: Optional[Union[int, str]] = None,
+        property_key_name: Optional[str] = None,
+    ) -> Optional[Union[ConfigurationValue, Value]]:
+        """Find value from input parameters and return if found."""
+        return next(
+            (
+                value
+                for value in self.values.values()
+                if (command_class is None or value.command_class == command_class)
+                and (
+                    command_class_name is None
+                    or value.command_class_name == command_class_name
+                )
+                and (endpoint is None or value.endpoint == endpoint)
+                and (property_ is None or value.property_ == property_)
+                and (property_name is None or value.property_name == property_name)
+                and (property_key is None or value.property_key == property_key)
+                and (
+                    property_key_name is None
+                    or value.property_key_name == property_key_name
+                )
+            ),
+            None,
+        )
+
     def handle_wake_up(self, event: Event) -> None:
         """Process a node wake up event."""
         # pylint: disable=unused-argument
@@ -454,12 +485,26 @@ class Node(EventBase):
     def handle_value_notification(self, event: Event) -> None:
         """Process a node value notification event."""
         # append metadata if value metadata is available
-        value = self.values.get(_get_value_id_from_dict(self, event.data["args"]))
-        if value:
-            value.update(event.data["args"])
-            value_notification = cast(ValueNotification, value)
+        value = None
+        value_notification = ValueNotification(self, event.data["args"])
+
+        # If endpoint isn't provided, we need to search for the Value
+        if value_notification.endpoint is None:
+            value = self.find_value(
+                property_=value_notification.property_,
+                property_name=value_notification.property_name,
+                property_key=value_notification.property_key,
+                property_key_name=value_notification.property_key_name,
+            )
         else:
-            value_notification = ValueNotification(self, event.data["args"])
+            value = self.values.get(
+                _get_value_id_from_dict(self, value_notification.data)
+            )
+
+        if value:
+            value.update(value_notification.data)
+            value_notification = cast(ValueNotification, value)
+
         event.data["value_notification"] = value_notification
 
     def handle_metadata_updated(self, event: Event) -> None:
