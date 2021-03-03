@@ -491,7 +491,6 @@ class Node(EventBase):
             event.data["args"]["endpoint"] = 0
 
         value = self.values.get(_get_value_id_from_dict(self, event.data["args"]))
-
         if value:
             value.update(event.data["args"])
             value_notification = cast(ValueNotification, value)
