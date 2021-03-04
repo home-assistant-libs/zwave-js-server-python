@@ -65,20 +65,20 @@ async def test_unknown_values(cover_qubino_shutter):
     """Test that values that are unknown return as None."""
     node = cover_qubino_shutter
     assert (
-        "5-38-0-currentValue-00-00" in node.values
-        and node.values["5-38-0-currentValue-00-00"].value is None
+        "5-38-0-currentValue" in node.values
+        and node.values["5-38-0-currentValue"].value is None
     )
     assert (
-        "5-37-0-currentValue-00-00" in node.values
-        and node.values["5-37-0-currentValue-00-00"].value is None
+        "5-37-0-currentValue" in node.values
+        and node.values["5-37-0-currentValue"].value is None
     )
 
 
 async def test_values_without_property_key_name(multisensor_6):
     """Test that values with property key and without property key name can be found."""
     node = multisensor_6
-    assert "52-112-0-101-1-00" in node.values
-    assert "52-112-0-101-16-00" in node.values
+    assert "52-112-0-101-1" in node.values
+    assert "52-112-0-101-16" in node.values
 
 
 async def test_hash(climate_radio_thermostat_ct100_plus):
@@ -95,7 +95,7 @@ async def test_command_class_values(climate_radio_thermostat_ct100_plus):
     assert len(switch_values) == 2
 
     with pytest.raises(UnwriteableValue):
-        await node.async_set_value("13-112-0-2-00-00", 1)
+        await node.async_set_value("13-112-0-2", 1)
 
 
 async def test_set_value(multisensor_6, uuid4, mock_command):
@@ -105,7 +105,7 @@ async def test_set_value(multisensor_6, uuid4, mock_command):
         {"command": "node.set_value", "nodeId": node.node_id},
         {"success": True},
     )
-    value_id = "52-32-0-targetValue-00-00"
+    value_id = "52-32-0-targetValue"
     value = node.values[value_id]
     assert await node.async_set_value(value_id, 42) is None
 
@@ -126,7 +126,7 @@ async def test_poll_value(multisensor_6, uuid4, mock_command):
         {"command": "node.poll_value", "nodeId": node.node_id},
         {"result": "something"},
     )
-    value_id = "52-32-0-currentValue-00-00"
+    value_id = "52-32-0-currentValue"
     value = node.values[value_id]
     assert await node.async_poll_value(value_id) is None
 
@@ -218,7 +218,7 @@ async def test_get_value_metadata(multisensor_6, uuid4, mock_command):
         },
     )
 
-    value_id = "52-32-0-targetValue-00-00"
+    value_id = "52-32-0-targetValue"
     value = node.values[value_id]
     result = await node.async_get_value_metadata(value)
 
@@ -359,7 +359,7 @@ async def test_metadata_updated(climate_radio_thermostat_ct100_plus: Node):
     """Test metadata updated events."""
     node = climate_radio_thermostat_ct100_plus
 
-    value = node.values["13-135-1-value-00-00"]
+    value = node.values["13-135-1-value"]
 
     assert not value.metadata.states
 
