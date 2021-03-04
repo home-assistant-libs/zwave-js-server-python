@@ -25,7 +25,6 @@ def get_code_slot_value(node: Node, code_slot: int, property_name: str) -> Value
             property_name,
             endpoint=0,
             property_key=code_slot,
-            property_key_name=str(code_slot),
         )
     )
 
