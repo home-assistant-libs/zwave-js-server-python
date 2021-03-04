@@ -61,7 +61,7 @@ def get_value_id(
 ) -> str:
     """Return ID of value."""
     # If endpoint is not provided, assume root endpoint
-    endpoint_ = 0 if endpoint is None else endpoint
+    endpoint_ = endpoint or 0
     value_id = f"{node.node_id}-{command_class}-{endpoint_}-{property_}"
     # Property key is only included when it has a value
     if property_key is not None:
