@@ -192,7 +192,7 @@ class Value:
     @property
     def endpoint(self) -> Optional[int]:
         """Return endpoint."""
-        return self.data.get("endpoint")
+        return self.data.get("endpoint", 0)
 
     @property
     def property_(self) -> Union[str, int]:
