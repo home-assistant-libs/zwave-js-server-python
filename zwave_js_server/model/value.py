@@ -243,6 +243,10 @@ class Value:
             elif is_json_string(self._value):
                 self._value = parse_buffer_from_json(self._value)
 
+    def copy(self) -> "Value":
+        """Copy a value to a new instance."""
+        return Value(self.node, self.data.copy())
+
 
 class ValueNotification(Value):
     """
