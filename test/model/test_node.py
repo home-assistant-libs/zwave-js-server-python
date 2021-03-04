@@ -306,7 +306,6 @@ async def test_value_notification(wallmote_central_scene: Node):
             "event": "value notification",
             "nodeId": 35,
             "args": {
-                "endpoint": 0,
                 "commandClass": 91,
                 "commandClassName": "Central Scene",
                 "property": "scene",
@@ -322,7 +321,6 @@ async def test_value_notification(wallmote_central_scene: Node):
     assert event.data["value_notification"].metadata.states
 
     # Validate that a value notification event for an unknown value gets returned as is
-
     event = Event(
         type="value notification",
         data={
@@ -330,7 +328,6 @@ async def test_value_notification(wallmote_central_scene: Node):
             "event": "value notification",
             "nodeId": 35,
             "args": {
-                "endpoint": 0,
                 "commandClass": 91,
                 "commandClassName": "Central Scene",
                 "property": "scene",
@@ -344,7 +341,6 @@ async def test_value_notification(wallmote_central_scene: Node):
 
     node.handle_value_notification(event)
     assert event.data["value_notification"].data == {
-        "endpoint": 0,
         "commandClass": 91,
         "commandClassName": "Central Scene",
         "property": "scene",
