@@ -53,7 +53,7 @@ async def test_configuration_parameter_values(
         node, "2.0\u00b0 F", "Temperature Reporting Threshold"
     )
 
-    value = node.values["13-112-0-1-00-00"]
+    value = node.values["13-112-0-1"]
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "node.set_value",

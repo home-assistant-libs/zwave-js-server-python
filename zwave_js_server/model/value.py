@@ -49,7 +49,6 @@ def _get_value_id_from_dict(node: "Node", val: ValueDataType) -> str:
         val["property"],
         val.get("endpoint"),
         val.get("propertyKey"),
-        val.get("propertyKeyName"),
     )
 
 
@@ -59,17 +58,15 @@ def get_value_id(
     property_: Union[str, int],
     endpoint: Optional[int] = None,
     property_key: Optional[Union[str, int]] = None,
-    property_key_name: Optional[str] = None,
 ) -> str:
     """Return ID of value."""
-    endpoint_ = "00" if endpoint is None else endpoint
-    if property_key is None:
-        property_key = "00"
-    property_key_name = property_key_name or "00"
-    return (
-        f"{node.node_id}-{command_class}-{endpoint_}-"
-        f"{property_}-{property_key}-{property_key_name}"
-    )
+    # If endpoint is not provided, assume root endpoint
+    endpoint_ = endpoint or 0
+    value_id = f"{node.node_id}-{command_class}-{endpoint_}-{property_}"
+    # Property key is only included when it has a value
+    if property_key is not None:
+        value_id += f"-{property_key}"
+    return value_id
 
 
 class ValueMetadata:

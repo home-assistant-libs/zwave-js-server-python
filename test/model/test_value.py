@@ -7,9 +7,9 @@ def test_buffer_dict(client, idl_101_lock_state):
     """Test that we handle buffer dictionary correctly."""
     node = Node(client, idl_101_lock_state)
 
-    value_id = get_value_id(node, 99, "userCode", 0, 3, "3")
+    value_id = get_value_id(node, 99, "userCode", 0, 3)
 
-    assert value_id == "26-99-0-userCode-3-3"
+    assert value_id == "26-99-0-userCode-3"
 
     zwave_value = node.values[value_id]
 
@@ -21,7 +21,7 @@ def test_unparseable_value(client, unparseable_json_string_value_state):
     """Test that we handle string value with unparseable format."""
     node = Node(client, unparseable_json_string_value_state)
 
-    value_id = get_value_id(node, 99, "userCode", 0, 4, "4")
+    value_id = get_value_id(node, 99, "userCode", 0, 4)
 
-    assert value_id == "20-99-0-userCode-4-4"
+    assert value_id == "20-99-0-userCode-4"
     assert value_id not in node.values
