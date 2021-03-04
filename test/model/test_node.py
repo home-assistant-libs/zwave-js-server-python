@@ -319,6 +319,7 @@ async def test_value_notification(wallmote_central_scene: Node):
 
     node.handle_value_notification(event)
     assert event.data["value_notification"].metadata.states
+    assert event.data["value_notification"].endpoint is not None
 
     # Validate that a value notification event for an unknown value gets returned as is
     event = Event(
