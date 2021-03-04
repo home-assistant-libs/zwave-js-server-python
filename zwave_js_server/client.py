@@ -165,7 +165,7 @@ class Client:
 
             state_msg = await self._receive_json_or_raise()
 
-            if not state_msg["success"]:
+            if not state_msg.get("success"):
                 await self._client.close()
                 raise FailedCommand(state_msg["messageId"], state_msg["errorCode"])
 
