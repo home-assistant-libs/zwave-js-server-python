@@ -455,13 +455,12 @@ class Node(EventBase):
         """Process a node value notification event."""
         # if value is found, use value data as base and update what is provided
         # in the event, otherwise use the event data
-        if value := self.values.get(
-            _get_value_id_from_dict(self, event.data["args"])
-        ):
+        event_data = event.data["args"]
+        if value := self.values.get(_get_value_id_from_dict(self, event_data)):
             value_notification = ValueNotification(self, value.data)
-            value_notification.update(event.data["args"])
+            value_notification.update(event_data)
         else:
-            value_notification = ValueNotification(self, event.data["args"])
+            value_notification = ValueNotification(self, event_data)
 
         event.data["value_notification"] = value_notification
 
