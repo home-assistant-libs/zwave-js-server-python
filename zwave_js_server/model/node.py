@@ -460,7 +460,7 @@ class Node(EventBase):
             _get_value_id_from_dict(self, value_notification.data)
         ):
             value_notification.metadata.update(value.metadata.data)
-            if value_notification.endpoint is None:
+            if value_notification.endpoint is None and value.endpoint is not None:
                 value_notification.data["endpoint"] = value.endpoint
         event.data["value_notification"] = value_notification
 
