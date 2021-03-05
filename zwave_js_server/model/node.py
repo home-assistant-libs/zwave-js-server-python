@@ -453,10 +453,9 @@ class Node(EventBase):
 
     def handle_value_notification(self, event: Event) -> None:
         """Process a node value notification event."""
-        # append metadata if value metadata is available
         value_notification = ValueNotification(self, event.data["args"])
-        # If we find a Value associated with this value notification, include its
-        # metadata and endpoint if needed
+        # append metadata if value metadata is available and endpoint
+        # if value notification endpoint isn't provided
         if value := self.values.get(
             _get_value_id_from_dict(self, value_notification.data)
         ):
