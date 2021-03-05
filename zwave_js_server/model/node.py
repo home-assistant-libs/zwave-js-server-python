@@ -454,13 +454,13 @@ class Node(EventBase):
     def handle_value_notification(self, event: Event) -> None:
         """Process a node value notification event."""
         # append metadata if value metadata is available
-        value = self.values.get(_get_value_id_from_dict(self, event.data["args"]))
+        value_notification = ValueNotification(self, event.data["args"])
+        value = self.values.get(_get_value_id_from_dict(self, value_notification.data))
         if value:
-            value_notification = ValueNotification(self, value.data)
-            value_notification.update(event.data["args"])
-            value.update(event.data["args"])
-        else:
-            value_notification = ValueNotification(self, event.data["args"])
+            # We update the Value first so that we can merge the Value back into
+            # ValueNotification
+            value.update(value_notification.data)
+            value_notification.update(value.data)
         event.data["value_notification"] = value_notification
 
     def handle_metadata_updated(self, event: Event) -> None:
