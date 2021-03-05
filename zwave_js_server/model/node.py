@@ -1,11 +1,12 @@
 """Provide a model for the Z-Wave JS node."""
 from enum import IntEnum
+import logging
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
 
 from zwave_js_server.const import CommandClass
 
 from ..event import Event, EventBase
-from ..exceptions import UnparseableValue, UnwriteableValue
+from ..exceptions import FailedCommand, UnparseableValue, UnwriteableValue
 from .command_class import CommandClassInfo, CommandClassInfoDataType
 from .device_class import DeviceClass, DeviceClassDataType
 from .device_config import DeviceConfig, DeviceConfigDataType
@@ -310,8 +311,37 @@ class Node(EventBase):
 
         self.emit(event.type, event.data)
 
+    async def async_send_command(
+        self,
+        cmd: str,
+        require_schema: Optional[int] = None,
+        wait_for_result: bool = None,
+        **cmd_kwargs,
+    ) -> Optional[Any]:
+        """
+        Send a node command.
+
+        If wait_for_result is not None, it will take precedence, otherwise we will decide to wait
+        or not based on the node status.
+        """
+        kwargs = {}
+        message = {"command": f"node.{cmd}", "nodeId": self.node_id, **cmd_kwargs}
+
+        if require_schema is not None:
+            kwargs["require_schema"] = require_schema
+
+        if wait_for_result or self.status != NodeStatus.ASLEEP:
+            result = await self.client.async_send_command(message, **kwargs)
+            return result
+
+        await self.client.async_send_command_no_wait(message, **kwargs)
+        return None
+
     async def async_set_value(
-        self, val: Union[Value, str], new_value: Any, wait_for_result: bool = False
+        self,
+        val: Union[Value, str],
+        new_value: Any,
+        wait_for_result: Optional[bool] = None,
     ) -> Optional[bool]:
         """Send setValue command to Node for given value (or value_id)."""
         # a value may be specified as value_id or the value itself
@@ -321,39 +351,40 @@ class Node(EventBase):
         if val.metadata.writeable is False:
             raise UnwriteableValue
 
-        # the value object needs to be send to the server
-        args = {
-            "command": "node.set_value",
-            "nodeId": self.node_id,
+        params = {
             "valueId": val.data,
             "value": new_value,
         }
-        if wait_for_result:
-            result = await self.client.async_send_command(args)
-            return cast(bool, result)
-        await self.client.async_send_command_no_wait(args)
-        return None
+
+        # the value object needs to be send to the server
+        result = await self.async_send_command(
+            "set_value",
+            wait_for_result=wait_for_result,
+            **params,
+        )
+
+        if result is None:
+            return None
+
+        return cast(bool, result)
 
     async def async_refresh_info(self) -> None:
         """Send refreshInfo command to Node."""
-        await self.client.async_send_command_no_wait(
-            {
-                "command": "node.refresh_info",
-                "nodeId": self.node_id,
-            }
-        )
+        await self.async_send_command("refresh_info", wait_for_result=False)
 
     async def async_get_defined_value_ids(self) -> List[Value]:
         """Send getDefinedValueIDs command to Node."""
-        data = await self.client.async_send_command(
-            {
-                "command": "node.get_defined_value_ids",
-                "nodeId": self.node_id,
-            }
+        data = await self.async_send_command(
+            "get_defined_value_ids", wait_for_result=True
         )
-        return [
-            Value(self, cast(ValueDataType, valueId)) for valueId in data["valueIds"]
-        ]
+        if data is not None:
+            return [
+                Value(self, cast(ValueDataType, valueId))
+                for valueId in data["valueIds"]
+            ]
+        else:
+            # We should never reach this code
+            raise FailedCommand("Command failed", "failed_command")
 
     async def async_get_value_metadata(self, val: Union[Value, str]) -> ValueMetadata:
         """Send getValueMetadata command to Node."""
@@ -361,34 +392,21 @@ class Node(EventBase):
         if not isinstance(val, Value):
             val = self.values[val]
         # the value object needs to be send to the server
-        data = await self.client.async_send_command(
-            {
-                "command": "node.get_value_metadata",
-                "nodeId": self.node_id,
-                "valueId": val.data,
-            }
+        data = await self.async_send_command(
+            "get_value_metadata", valueId=val.data, wait_for_result=True
         )
         return ValueMetadata(cast(MetaDataType, data))
 
     async def async_abort_firmware_update(self) -> None:
         """Send abortFirmwareUpdate command to Node."""
-        await self.client.async_send_command_no_wait(
-            {
-                "command": "node.abort_firmware_update",
-                "nodeId": self.node_id,
-            }
-        )
+        await self.async_send_command("abort_firmware_update", wait_for_result=False)
 
     async def async_poll_value(self, val: Union[Value, str]) -> None:
         """Send pollValue command to Node for given value (or value_id)."""
         # a value may be specified as value_id or the value itself
         if not isinstance(val, Value):
             val = self.values[val]
-        # the value object needs to be send to the server
-        await self.client.async_send_command_no_wait(
-            {"command": "node.poll_value", "nodeId": self.node_id, "valueId": val.data},
-            require_schema=1,
-        )
+        await self.async_send_command("poll_value", valueId=val.data, require_schema=1)
 
     def handle_wake_up(self, event: Event) -> None:
         """Process a node wake up event."""
