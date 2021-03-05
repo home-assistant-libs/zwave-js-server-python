@@ -121,7 +121,7 @@ class Client:
         # store the (highest possible) schema version we're going to use/request
         # this is a bit future proof as we might decide to use a pinned version at some point
         # for now we just negotiate the highest available schema version and
-        # guard incompatability with the MIN_SERVER_SCHEMA_VERSION
+        # guard incompatibility with the MIN_SERVER_SCHEMA_VERSION
         if self.version.max_schema_version < MAX_SERVER_SCHEMA_VERSION:
             self.schema_version = self.version.max_schema_version
 
