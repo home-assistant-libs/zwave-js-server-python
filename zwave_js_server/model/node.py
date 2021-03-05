@@ -1,6 +1,5 @@
 """Provide a model for the Z-Wave JS node."""
 from enum import IntEnum
-import logging
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
 
 from zwave_js_server.const import CommandClass
@@ -374,13 +373,13 @@ class Node(EventBase):
             "get_defined_value_ids", wait_for_result=True
         )
         if data is not None:
-            return [
-                Value(self, cast(ValueDataType, valueId))
-                for valueId in data["valueIds"]
-            ]
-        else:
             # We should never reach this code
             raise FailedCommand("Command failed", "failed_command")
+
+        return [
+            Value(self, cast(ValueDataType, valueId))
+            for valueId in data["valueIds"]
+        ]
 
     async def async_get_value_metadata(self, val: Union[Value, str]) -> ValueMetadata:
         """Send getValueMetadata command to Node."""
