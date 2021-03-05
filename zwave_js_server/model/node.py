@@ -325,7 +325,7 @@ class Node(EventBase):
         """
         kwargs = {}
         message = {"command": f"node.{cmd}", "nodeId": self.node_id, **cmd_kwargs}
-
+        logging.getLogger(__name__).error(message)
         if require_schema is not None:
             kwargs["require_schema"] = require_schema
 
@@ -372,7 +372,7 @@ class Node(EventBase):
         data = await self._async_send_command(
             "get_defined_value_ids", wait_for_result=True
         )
-        if data is not None:
+        if data is None:
             # We should never reach this code
             raise FailedCommand("Command failed", "failed_command")
 
