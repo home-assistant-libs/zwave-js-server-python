@@ -323,6 +323,7 @@ async def test_value_notification(wallmote_central_scene: Node):
     assert event.data["value_notification"].metadata.states
     assert event.data["value_notification"].endpoint is not None
     assert event.data["value_notification"].value == 1
+    # Let's make sure that the Value was not updated by the value notification event
     assert node.values["35-91-0-scene-002"].value is None
 
     # Validate that a value notification event for an unknown value gets returned as is
