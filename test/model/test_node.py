@@ -313,6 +313,7 @@ async def test_value_notification(wallmote_central_scene: Node):
                 "propertyName": "scene",
                 "propertyKeyName": "002",
                 "ccVersion": 2,
+                "value": 1,
             },
         },
     )
@@ -320,6 +321,7 @@ async def test_value_notification(wallmote_central_scene: Node):
     node.handle_value_notification(event)
     assert event.data["value_notification"].metadata.states
     assert event.data["value_notification"].endpoint is not None
+    assert event.data["value_notification"].value == 1
 
     # Validate that a value notification event for an unknown value gets returned as is
     event = Event(
@@ -336,20 +338,19 @@ async def test_value_notification(wallmote_central_scene: Node):
                 "propertyName": "scene",
                 "propertyKeyName": "005",
                 "ccVersion": 2,
+                "value": 2,
             },
         },
     )
 
     node.handle_value_notification(event)
-    assert event.data["value_notification"].data == {
-        "commandClass": 91,
-        "commandClassName": "Central Scene",
-        "property": "scene",
-        "propertyKey": "005",
-        "propertyName": "scene",
-        "propertyKeyName": "005",
-        "ccVersion": 2,
-    }
+    assert event.data["value_notification"].command_class == 91
+    assert event.data["value_notification"].command_class_name == "Central Scene"
+    assert event.data["value_notification"].property_ == "scene"
+    assert event.data["value_notification"].property_name == "scene"
+    assert event.data["value_notification"].property_key == "005"
+    assert event.data["value_notification"].property_key_name == "005"
+    assert event.data["value_notification"].value == 2
 
 
 async def test_metadata_updated(climate_radio_thermostat_ct100_plus: Node):
