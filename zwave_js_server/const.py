@@ -184,7 +184,7 @@ class CodeSlotStatus(IntEnum):
     DISABLED = 2
 
 
-# Depending on the Commmand Class being used by the lock, the lock state is
+# Depending on the Command Class being used by the lock, the lock state is
 # different so we need a map to track it
 LOCK_CMD_CLASS_TO_LOCKED_STATE_MAP = {
     CommandClass.DOOR_LOCK: DoorLockMode.SECURED,
