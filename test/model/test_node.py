@@ -1,6 +1,5 @@
 """Test the node model."""
 import json
-from zwave_js_server.model.value import get_value_id
 
 import pytest
 
