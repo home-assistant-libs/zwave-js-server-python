@@ -243,7 +243,7 @@ class Value:
 
 class ValueNotification(Value):
     """
-    Model for a Value Nofification message.
+    Model for a Value Notification message.
 
     https://zwave-js.github.io/node-zwave-js/#/api/node?id=quotvalue-notificationquot
     """
