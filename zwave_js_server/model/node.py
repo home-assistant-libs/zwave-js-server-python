@@ -351,16 +351,12 @@ class Node(EventBase):
         if val.metadata.writeable is False:
             raise UnwriteableValue
 
-        params = {
-            "valueId": val.data,
-            "value": new_value,
-        }
-
         # the value object needs to be send to the server
         result = await self.async_send_command(
             "set_value",
+            valueId=val.data,
+            value=new_value,
             wait_for_result=wait_for_result,
-            **params,
         )
 
         if result is None:
