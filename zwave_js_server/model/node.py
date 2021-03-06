@@ -24,7 +24,6 @@ from .value import (
 if TYPE_CHECKING:
     from ..client import Client
 
-
 class NodeStatus(IntEnum):
     """Enum with all Node status values.
 
@@ -314,9 +313,9 @@ class Node(EventBase):
         self,
         cmd: str,
         require_schema: Optional[int] = None,
-        wait_for_result: bool = None,
+        wait_for_result: Optional[bool] = None,
         **cmd_kwargs: Any,
-    ) -> Optional[Any]:
+    ) -> Optional[Dict[str, Any]]:
         """
         Send a node command. For internal use only.
 
@@ -362,7 +361,7 @@ class Node(EventBase):
         if result is None:
             return None
 
-        return cast(bool, result)
+        return isinstance(result, dict) and result.get("success", False)
 
     async def async_refresh_info(self) -> None:
         """Send refreshInfo command to Node."""
