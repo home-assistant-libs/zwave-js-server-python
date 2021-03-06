@@ -362,7 +362,7 @@ class Node(EventBase):
         if result is None:
             return None
 
-        return isinstance(result, dict) and result.get("success", False)
+        return result["success"]
 
     async def async_refresh_info(self) -> None:
         """Send refreshInfo command to Node."""
