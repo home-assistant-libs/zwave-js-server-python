@@ -328,7 +328,9 @@ class Node(EventBase):
         if require_schema is not None:
             kwargs["require_schema"] = require_schema
 
-        if wait_for_result or self.status != NodeStatus.ASLEEP:
+        if wait_for_result or (
+            wait_for_result is None and self.status != NodeStatus.ASLEEP
+        ):
             result = await self.client.async_send_command(message, **kwargs)
             return result
 
