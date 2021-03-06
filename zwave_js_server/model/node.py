@@ -24,6 +24,7 @@ from .value import (
 if TYPE_CHECKING:
     from ..client import Client
 
+
 class NodeStatus(IntEnum):
     """Enum with all Node status values.
 
