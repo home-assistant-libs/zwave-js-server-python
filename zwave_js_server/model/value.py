@@ -264,7 +264,7 @@ class ConfigurationValue(Value):
     def configuration_value_type(self) -> ConfigurationValueType:
         """Return configuration value type."""
         if self.metadata.type == "number":
-            if self.metadata.states and not self.metadata.allowmanualentry:
+            if self.metadata.states and not self.metadata.allow_manual_entry:
                 return ConfigurationValueType.ENUMERATED
             if (
                 self.metadata.max is not None or self.metadata.min is not None
