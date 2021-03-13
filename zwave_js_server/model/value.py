@@ -128,7 +128,7 @@ class ValueMetadata:
         return self.data.get("ccSpecific", {})
 
     @property
-    def allowmanualentry(self) -> Optional[bool]:
+    def allow_manual_entry(self) -> Optional[bool]:
         """Return allowManualEntry."""
         return self.data.get("allowManualEntry")
 
