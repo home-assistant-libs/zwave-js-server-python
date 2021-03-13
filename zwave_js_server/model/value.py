@@ -128,7 +128,7 @@ class ValueMetadata:
         return self.data.get("ccSpecific", {})
 
     @property
-    def allowManualEntry(self) -> Optional[bool]:
+    def allowmanualentry(self) -> Optional[bool]:
         """Return allowManualEntry."""
         return self.data.get("allowManualEntry")
 
@@ -264,7 +264,7 @@ class ConfigurationValue(Value):
     def configuration_value_type(self) -> ConfigurationValueType:
         """Return configuration value type."""
         if self.metadata.type == "number":
-            if self.metadata.states and not self.metadata.allowManualEntry:
+            if self.metadata.states and not self.metadata.allowmanualentry:
                 return ConfigurationValueType.ENUMERATED
             if (
                 self.metadata.max is not None or self.metadata.min is not None
