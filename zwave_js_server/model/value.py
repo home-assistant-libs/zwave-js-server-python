@@ -130,7 +130,7 @@ class ValueMetadata:
     @property
     def allowManualEntry(self) -> Optional[bool]:
         """Return allowManualEntry."""
-        return self.data.get("allowManualEntry", {})
+        return self.data.get("allowManualEntry")
 
     def update(self, data: MetaDataType) -> None:
         """Update data."""
