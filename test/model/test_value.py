@@ -38,3 +38,8 @@ def test_allow_manual_entry(client, inovelli_switch_state):
     zwave_value = config_values[value_id]
 
     assert zwave_value.configuration_value_type == ConfigurationValueType.RANGE
+
+    value_id = get_value_id(node, 112, 8, 0, 65280)
+    zwave_value = config_values[value_id]
+
+    assert zwave_value.configuration_value_type == ConfigurationValueType.ENUMERATED
