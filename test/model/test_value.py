@@ -1,8 +1,7 @@
 """Test value model."""
-from zwave_js_server.const import CommandClass, ConfigurationValueType
+from zwave_js_server.const import ConfigurationValueType
 from zwave_js_server.model.node import Node
 from zwave_js_server.model.value import get_value_id
-from zwave_js_server.util.node import async_set_config_parameter
 
 
 def test_buffer_dict(client, idl_101_lock_state):
