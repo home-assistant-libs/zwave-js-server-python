@@ -77,6 +77,12 @@ def client_session_fixture(ws_client):
     return client_session
 
 
+@pytest.fixture(name="inovelli_switch_state", scope="session")
+def inovelli_switch_state_fixture():
+    """Load the bad string meta data node state fixture data."""
+    return json.loads(load_fixture("inovelli_switch_state.json"))
+
+
 def create_ws_message(result):
     """Return a mock WSMessage."""
     message = Mock(spec_set=WSMessage)
@@ -312,3 +318,11 @@ def controller_fixture(driver, controller_state):
     """Return a controller instance with a supporting client."""
     controller = Controller(driver.client, controller_state)
     return controller
+
+
+@pytest.fixture(name="inovelli_switch")
+def inovelli_switch_fixture(driver, inovelli_switch_state):
+    """Mock a radio thermostat node."""
+    node = Node(driver.client, inovelli_switch_state)
+    driver.controller.nodes[node.node_id] = node
+    return node

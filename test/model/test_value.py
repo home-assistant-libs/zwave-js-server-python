@@ -1,6 +1,8 @@
 """Test value model."""
+from zwave_js_server.const import CommandClass, ConfigurationValueType
 from zwave_js_server.model.node import Node
 from zwave_js_server.model.value import get_value_id
+from zwave_js_server.util.node import async_set_config_parameter
 
 
 def test_buffer_dict(client, idl_101_lock_state):
@@ -25,3 +27,15 @@ def test_unparseable_value(client, unparseable_json_string_value_state):
 
     assert value_id == "20-99-0-userCode-4"
     assert value_id not in node.values
+
+
+def test_allow_manual_entry(client, inovelli_switch_state):
+    """Test that allow_manaual_entry works correctly."""
+    node = Node(client, inovelli_switch_state)
+
+    config_values = node.get_configuration_values()
+    value_id = get_value_id(node, 112, 8, 0, 255)
+
+    zwave_value = config_values[value_id]
+
+    assert zwave_value.configuration_value_type == ConfigurationValueType.RANGE
