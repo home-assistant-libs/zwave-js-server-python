@@ -33,11 +33,11 @@ async def test_configuration_parameter_values(
     with pytest.raises(NotImplementedError):
         await async_set_config_parameter(node, 1, 2)
 
-    # Test setting an manual entry configuration parameter with an invalid value
+    # Test setting a manual entry configuration parameter with an invalid value
     with pytest.raises(InvalidNewValue):
         await async_set_config_parameter(node_2, "Purple", 8, 255)
 
-    # Test setting an manual entry configuration parameter with an valid value
+    # Test setting a manual entry configuration parameter with a valid value
     ack_commands_2 = mock_command(
         {"command": "node.set_value", "nodeId": node_2.node_id},
         {"success": True},
