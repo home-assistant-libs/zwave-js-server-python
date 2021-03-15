@@ -8,10 +8,11 @@ from zwave_js_server.util.node import async_set_config_parameter
 
 
 async def test_configuration_parameter_values(
-    climate_radio_thermostat_ct100_plus, uuid4, mock_command
+    climate_radio_thermostat_ct100_plus, inovelli_switch, uuid4, mock_command
 ):
     """Test node methods to get and set configuration parameter values."""
     node: Node = climate_radio_thermostat_ct100_plus
+    node_2: Node = inovelli_switch
     ack_commands = mock_command(
         {"command": "node.set_value", "nodeId": node.node_id},
         {"success": True},
@@ -21,12 +22,50 @@ async def test_configuration_parameter_values(
     config_values = node.get_configuration_values()
     assert len(config_values) == 12
 
+    assert node_2.node_id == 31
+    config_values_2 = node_2.get_configuration_values()
+    assert len(config_values_2) == 15
+
     for value in config_values.values():
         assert isinstance(value, ConfigurationValue)
 
     # Test setting a configuration parameter that has no metadata
     with pytest.raises(NotImplementedError):
         await async_set_config_parameter(node, 1, 2)
+
+    # Test setting a manual entry configuration parameter with an invalid value
+    with pytest.raises(InvalidNewValue):
+        await async_set_config_parameter(node_2, "Purple", 8, 255)
+
+    # Test setting a manual entry configuration parameter with a valid value
+    ack_commands_2 = mock_command(
+        {"command": "node.set_value", "nodeId": node_2.node_id},
+        {"success": True},
+    )
+
+    await async_set_config_parameter(node_2, 190, 8, 255)
+
+    value = node_2.values["31-112-0-8-255"]
+    assert len(ack_commands_2) == 1
+    assert ack_commands_2[0] == {
+        "command": "node.set_value",
+        "nodeId": node_2.node_id,
+        "valueId": value.data,
+        "value": 190,
+        "messageId": uuid4,
+    }
+
+    await async_set_config_parameter(node_2, "Blue", 8, 255)
+
+    value = node_2.values["31-112-0-8-255"]
+    assert len(ack_commands_2) == 2
+    assert ack_commands_2[1] == {
+        "command": "node.set_value",
+        "nodeId": node_2.node_id,
+        "valueId": value.data,
+        "value": 170,
+        "messageId": uuid4,
+    }
 
     # Test setting an enumerated configuration parameter with an invalid value
     with pytest.raises(InvalidNewValue):
@@ -54,8 +93,8 @@ async def test_configuration_parameter_values(
     )
 
     value = node.values["13-112-0-1"]
-    assert len(ack_commands) == 1
-    assert ack_commands[0] == {
+    assert len(ack_commands) == 3
+    assert ack_commands[2] == {
         "command": "node.set_value",
         "nodeId": node.node_id,
         "valueId": value.data,

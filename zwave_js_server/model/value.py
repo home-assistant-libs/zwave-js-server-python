@@ -22,6 +22,7 @@ class MetaDataType(TypedDict, total=False):
     unit: str
     states: Dict[int, str]
     ccSpecific: Dict[str, Any]
+    allowManualEntry: bool
 
 
 class ValueDataType(TypedDict, total=False):
@@ -125,6 +126,11 @@ class ValueMetadata:
     def cc_specific(self) -> Dict[str, Any]:
         """Return ccSpecific."""
         return self.data.get("ccSpecific", {})
+
+    @property
+    def allow_manual_entry(self) -> Optional[bool]:
+        """Return allowManualEntry."""
+        return self.data.get("allowManualEntry")
 
     def update(self, data: MetaDataType) -> None:
         """Update data."""
@@ -258,6 +264,11 @@ class ConfigurationValue(Value):
     def configuration_value_type(self) -> ConfigurationValueType:
         """Return configuration value type."""
         if self.metadata.type == "number":
+            if (
+                self.metadata.allow_manual_entry
+                and not self.metadata.max == self.metadata.min == 0
+            ):
+                return ConfigurationValueType.MANUAL_ENTRY
             if self.metadata.states:
                 return ConfigurationValueType.ENUMERATED
             if (
