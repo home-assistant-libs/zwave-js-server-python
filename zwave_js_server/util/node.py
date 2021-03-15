@@ -86,9 +86,13 @@ async def async_set_config_parameter(
     # Validate that new value for range configuration parameter is within bounds
     max_ = zwave_value.metadata.max
     min_ = zwave_value.metadata.min
-    if zwave_value.configuration_value_type == ConfigurationValueType.RANGE and (
-        (max_ is not None and new_value > max_)
-        or (min_ is not None and new_value < min_)
+    if (
+        zwave_value.configuration_value_type == ConfigurationValueType.RANGE
+        or zwave_value.configuration_value_type == ConfigurationValueType.MANUAL_ENTRY
+        and (
+            (max_ is not None and new_value > max_)
+            or (min_ is not None and new_value < min_)
+        )
     ):
         bounds = []
         if min_ is not None:

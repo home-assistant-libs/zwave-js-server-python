@@ -312,6 +312,7 @@ class ConfigurationValueType(Enum):
     """Enum for configuration value types."""
 
     ENUMERATED = "enumerated"
+    MANUAL_ENTRY = "manual_entry"
     RANGE = "range"
     UNDEFINED = "undefined"
 
