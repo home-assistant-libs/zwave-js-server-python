@@ -55,6 +55,18 @@ async def test_configuration_parameter_values(
         "messageId": uuid4,
     }
 
+    await async_set_config_parameter(node_2, "Blue", 8, 255)
+
+    value = node_2.values["31-112-0-8-255"]
+    assert len(ack_commands_2) == 2
+    assert ack_commands_2[1] == {
+        "command": "node.set_value",
+        "nodeId": node_2.node_id,
+        "valueId": value.data,
+        "value": 170,
+        "messageId": uuid4,
+    }
+
     # Test setting an enumerated configuration parameter with an invalid value
     with pytest.raises(InvalidNewValue):
         await async_set_config_parameter(node, 5, 1)
@@ -81,8 +93,8 @@ async def test_configuration_parameter_values(
     )
 
     value = node.values["13-112-0-1"]
-    assert len(ack_commands) == 2
-    assert ack_commands[1] == {
+    assert len(ack_commands) == 3
+    assert ack_commands[2] == {
         "command": "node.set_value",
         "nodeId": node.node_id,
         "valueId": value.data,
