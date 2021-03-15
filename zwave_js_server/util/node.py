@@ -68,6 +68,21 @@ async def async_set_config_parameter(
             f"{json.dumps(zwave_value.metadata.states)}"
         )
 
+    # Validate that new value for manual entry configuration parameter is a valid state
+    # key or label
+    if (
+        zwave_value.configuration_value_type == ConfigurationValueType.MANUAL_ENTRY
+        and str(new_value)
+        not in [
+            *zwave_value.metadata.states,
+            *zwave_value.metadata.states.values(),
+        ]
+    ):
+        raise InvalidNewValue(
+            "Must provide a value that represents a valid state key or label from "
+            f"{json.dumps(zwave_value.metadata.states)}"
+        )
+
     # If needed, convert a state label to its key. We know the state exists because
     # of the validation above.
     if isinstance(new_value, str):

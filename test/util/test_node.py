@@ -8,10 +8,11 @@ from zwave_js_server.util.node import async_set_config_parameter
 
 
 async def test_configuration_parameter_values(
-    climate_radio_thermostat_ct100_plus, uuid4, mock_command
+    climate_radio_thermostat_ct100_plus, inovelli_switch, uuid4, mock_command
 ):
     """Test node methods to get and set configuration parameter values."""
     node: Node = climate_radio_thermostat_ct100_plus
+    node_2: Node = inovelli_switch
     ack_commands = mock_command(
         {"command": "node.set_value", "nodeId": node.node_id},
         {"success": True},
@@ -21,12 +22,20 @@ async def test_configuration_parameter_values(
     config_values = node.get_configuration_values()
     assert len(config_values) == 12
 
+    assert node_2.node_id == 31
+    config_values_2 = node_2.get_configuration_values()
+    assert len(config_values_2) == 15
+
     for value in config_values.values():
         assert isinstance(value, ConfigurationValue)
 
     # Test setting a configuration parameter that has no metadata
     with pytest.raises(NotImplementedError):
         await async_set_config_parameter(node, 1, 2)
+
+    # Test setting an manual entry configuration parameter with an invalid value
+    with pytest.raises(InvalidNewValue):
+        await async_set_config_parameter(node_2, "Purple", 8, 255)
 
     # Test setting an enumerated configuration parameter with an invalid value
     with pytest.raises(InvalidNewValue):
