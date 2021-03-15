@@ -77,7 +77,7 @@ async def async_set_config_parameter(
     ):
         raise InvalidNewValue(
             "Must provide a value that represents a valid state from "
-            f"{json.dumps(zwave_value.metadata.states.values())}"
+            f"{list(zwave_value.metadata.states.values())}"
         )
 
     # If needed, convert a state label to its key. We know the state exists because
