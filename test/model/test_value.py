@@ -1,4 +1,6 @@
 """Test value model."""
+from copy import deepcopy
+
 from zwave_js_server.const import ConfigurationValueType
 from zwave_js_server.model.node import Node
 from zwave_js_server.model.value import get_value_id
@@ -6,7 +8,8 @@ from zwave_js_server.model.value import get_value_id
 
 def test_buffer_dict(client, idl_101_lock_state):
     """Test that we handle buffer dictionary correctly."""
-    node = Node(client, idl_101_lock_state)
+    node_data = deepcopy(idl_101_lock_state)
+    node = Node(client, node_data)
 
     value_id = get_value_id(node, 99, "userCode", 0, 3)
 
@@ -15,6 +18,12 @@ def test_buffer_dict(client, idl_101_lock_state):
     zwave_value = node.values[value_id]
 
     assert zwave_value.metadata.type == "string"
+    assert zwave_value.value == "¤\x0eªV"
+
+    zwave_value.data["metadata"]["type"] = "buffer"
+    zwave_value.update(zwave_value.data)
+
+    assert zwave_value.metadata.type == "buffer"
     assert zwave_value.value == "¤\x0eªV"
 
 
