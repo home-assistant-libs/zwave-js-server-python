@@ -47,7 +47,7 @@ def test_from_state():
     assert node.is_routing is False
     assert node.max_data_rate == 100000
     assert node.is_secure is False
-    assert node.protocol_version == ProtocolVersion.VERSION_45X_OR_60X
+    assert node.protocol_version == ProtocolVersion.VERSION_4_5X_OR_6_0X
     assert node.supports_beaming is True
     assert node.manufacturer_id == 134
     assert node.product_id == 90

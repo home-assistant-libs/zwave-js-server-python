@@ -58,9 +58,9 @@ class ProtocolVersion(IntEnum):
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/node/Types.ts#L149
     UNKNOWN = 0
-    VERSION_20 = 1
-    VERSION_42X_OR_50X = 2
-    VERSION_45X_OR_60X = 3
+    VERSION_2_0 = 1
+    VERSION_4_2X_OR_5_0X = 2
+    VERSION_4_5X_OR_6_0X = 3
 
 
 class LogLevel(Enum):
