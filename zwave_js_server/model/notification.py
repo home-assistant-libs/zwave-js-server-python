@@ -4,9 +4,7 @@ Model for a Zwave Node's Notification Event.
 https://zwave-js.github.io/node-zwave-js/#/api/node?id=quotnotificationquot
 """
 
-from typing import Literal, TYPE_CHECKING, Any, Dict, TypedDict, Union
-
-from ..const import CommandClass, EntryControlDataType, EntryControlEventType
+from typing import Literal, TYPE_CHECKING, Any, Dict, TypedDict
 
 if TYPE_CHECKING:
     from .node import Node
@@ -65,9 +63,9 @@ class NotificationNotification:
         return self.data["nodeId"]
 
     @property
-    def command_class(self) -> CommandClass:
+    def command_class(self) -> int:
         """Return command class."""
-        return CommandClass(self.data["ccId"])
+        return self.data["ccId"]
 
     @property
     def type_(self) -> int:
@@ -109,19 +107,19 @@ class EntryControlNotification:
         return self.data["nodeId"]
 
     @property
-    def command_class(self) -> CommandClass:
+    def command_class(self) -> int:
         """Return command class."""
-        return CommandClass(self.data["ccId"])
+        return self.data["ccId"]
 
     @property
-    def event_type(self) -> EntryControlEventType:
+    def event_type(self) -> int:
         """Return event type property."""
-        return EntryControlEventType(self.data["args"]["eventType"])
+        return self.data["args"]["eventType"]
 
     @property
-    def data_type(self) -> EntryControlDataType:
+    def data_type(self) -> int:
         """Return data type property."""
-        return EntryControlDataType(self.data["args"]["dataType"])
+        return self.data["args"]["dataType"]
 
     @property
     def event_data(self) -> str:

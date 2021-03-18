@@ -189,9 +189,9 @@ class Node(EventBase):
         return self.data.get("isSecure")
 
     @property
-    def protocol_version(self) -> Optional[ProtocolVersion]:
+    def protocol_version(self) -> Optional[int]:
         """Return the protocol_version."""
-        return ProtocolVersion(self.data.get("protocolVersion"))
+        return self.data.get("protocolVersion")
 
     @property
     def supports_beaming(self) -> Optional[bool]:
