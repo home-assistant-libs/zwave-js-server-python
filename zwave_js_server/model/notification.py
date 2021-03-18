@@ -24,7 +24,7 @@ class EntryControlNotificationArgsDataType(TypedDict, total=False):
 
     eventType: int  # required
     dataType: int  # required
-    eventData: str  # required
+    eventData: str
 
 
 class EntryControlNotificationDataType(NotificationDataType):
@@ -124,4 +124,4 @@ class EntryControlNotification:
     @property
     def event_data(self) -> str:
         """Return event data property."""
-        return self.data["args"]["eventData"]
+        return self.data["args"].get("eventData")
