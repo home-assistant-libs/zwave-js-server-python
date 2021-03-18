@@ -45,18 +45,18 @@ def test_from_state():
     assert node.is_listening is True
     assert node.is_frequent_listening is False
     assert node.is_routing is False
-    assert node.max_data_rate == 40000
+    assert node.max_data_rate == 100000
     assert node.is_secure is False
-    assert node.protocol_version == 4
-    assert node.supports_beaming is None
+    assert node.protocol_version == 3
+    assert node.supports_beaming is True
     assert node.manufacturer_id == 134
     assert node.product_id == 90
     assert node.product_type == 257
     for attr, value in DEVICE_CONFIG_FIXTURE.items():
         assert getattr(node.device_config, attr) == value
     assert node.label == "ZW090"
-    assert node.neighbors == [23, 26, 5, 6]
-    assert node.interview_attempts == 0
+    assert node.neighbors == [5, 6, 23, 26]
+    assert node.interview_attempts == 1
     assert len(node.endpoints) == 1
     assert node.endpoints[0].index == 0
 
@@ -433,6 +433,7 @@ async def test_notification(lock_schlage_be469: Node):
 
     node.handle_notification(event)
     assert event.data["notification"].command_class == CommandClass.NOTIFICATION
+    assert event.data["notification"].node_id == 23
     assert event.data["notification"].type_ == 6
     assert event.data["notification"].event == 5
     assert event.data["notification"].label == "Access Control"
