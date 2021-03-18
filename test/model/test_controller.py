@@ -8,13 +8,13 @@ from .. import load_fixture
 
 def test_from_state():
     """Test from_state method."""
-    state = json.loads(load_fixture("basic_dump.txt").split("\n")[0])["state"]
+    state = json.loads(load_fixture("basic_dump.txt").split("\n")[0])["result"]["state"]
 
     ctrl = controller_pkg.Controller(None, state)
 
     assert ctrl.library_version == "Z-Wave 3.95"
     assert ctrl.controller_type == 1
-    assert ctrl.home_id == 3245146787
+    assert ctrl.home_id == 3601639587
     assert ctrl.own_node_id == 1
     assert ctrl.is_secondary is False
     assert ctrl.is_using_home_id_from_other_network is False
