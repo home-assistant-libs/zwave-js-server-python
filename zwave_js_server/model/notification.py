@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class NotificationDataType(TypedDict, total=False):
-    """Represent a base notification event data dict type."""
+    """Represent a generic notification event data dict type."""
 
     source: Literal["node"]  # required
     event: Literal["notification"]  # required
@@ -53,10 +53,10 @@ class NotificationNotificationDataType(NotificationDataType):
     args: NotificationNotificationArgsDataType  # required
 
 
-class Notification:
+class NotificationNotification:
     """Model for a Zwave Node's Notification CC notification event."""
 
-    def __init__(self, node: "Node", data: NotificationDataType) -> None:
+    def __init__(self, node: "Node", data: NotificationNotificationDataType) -> None:
         """Initialize."""
         self.node = node
         self.data = data
@@ -71,21 +71,13 @@ class Notification:
         """Return command class."""
         return self.data["ccId"]
 
-
-class NotificationNotification(Notification):
-    """Model for a Zwave Node's Notification CC notification event."""
-
-    def __init__(self, node: "Node", data: NotificationNotificationDataType) -> None:
-        """Initialize."""
-        super().__init__(node, data)
-
     @property
     def type_(self) -> int:
         """Return type property."""
         return self.data["args"]["type"]
 
     @property
-    def label(self) -> int:
+    def label(self) -> str:
         """Return label property."""
         return self.data["args"]["label"]
 
@@ -105,12 +97,23 @@ class NotificationNotification(Notification):
         return self.data["args"].get("parameters", {})
 
 
-class EntryControlNotification(Notification):
+class EntryControlNotification:
     """Model for a Zwave Node's Entry Control CC notification event."""
 
     def __init__(self, node: "Node", data: EntryControlNotificationDataType) -> None:
         """Initialize."""
-        super().__init__(node, data)
+        self.node = node
+        self.data = data
+
+    @property
+    def node_id(self) -> int:
+        """Return node ID property."""
+        return self.data["nodeId"]
+
+    @property
+    def command_class(self) -> CommandClass:
+        """Return command class."""
+        return self.data["ccId"]
 
     @property
     def event_type(self) -> EntryControlEventType:

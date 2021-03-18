@@ -500,9 +500,7 @@ class Node(EventBase):
         # included metadata)
         self.handle_value_updated(event)
 
-    def handle_notification(
-        self, event: Event
-    ) -> Union[EntryControlNotification, NotificationNotification]:
+    def handle_notification(self, event: Event) -> None:
         """Process a node notification event."""
         if event.data["ccId"] == CommandClass.NOTIFICATION.value:
             event.data["notification"] = NotificationNotification(
