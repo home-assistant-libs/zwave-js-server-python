@@ -126,4 +126,4 @@ class EntryControlNotification:
     def event_data(self) -> Optional[str]:
         """Return event data property."""
         event_data = self.data["args"].get("eventData")
-        return parse_buffer(event_data) if event_data else cast(str, event_data)
+        return parse_buffer(event_data) if event_data is not None else event_data
