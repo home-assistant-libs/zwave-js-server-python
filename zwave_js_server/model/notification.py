@@ -4,7 +4,7 @@ Model for a Zwave Node's Notification Event.
 https://zwave-js.github.io/node-zwave-js/#/api/node?id=quotnotificationquot
 """
 
-from typing import Literal, TYPE_CHECKING, Any, Dict, Optional, TypedDict, Union, cast
+from typing import Literal, TYPE_CHECKING, Any, Dict, Optional, TypedDict, Union
 from zwave_js_server.util.helpers import parse_buffer
 
 if TYPE_CHECKING:
@@ -125,5 +125,6 @@ class EntryControlNotification:
     @property
     def event_data(self) -> Optional[str]:
         """Return event data property."""
-        event_data = self.data["args"].get("eventData")
-        return parse_buffer(event_data) if event_data is not None else event_data
+        if event_data := self.data["args"].get("eventData"):
+            return parse_buffer(event_data)
+        return None
