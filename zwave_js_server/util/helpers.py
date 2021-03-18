@@ -16,7 +16,8 @@ def parse_buffer(value: Union[Dict[str, Any], str]) -> str:
     """Parse value from a buffer data type."""
     if isinstance(value, dict):
         return parse_buffer_from_dict(value)
-    elif isinstance(value, str) and is_json_string(value):
+
+    if is_json_string(value):
         return parse_buffer_from_json(value)
 
     return value
