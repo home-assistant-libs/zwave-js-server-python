@@ -180,7 +180,7 @@ class Node(EventBase):
     @property
     def supported_data_rates(self) -> Optional[List[int]]:
         """Return the supported_data_rates."""
-        return self.data.get("supportedDataRates")
+        return self.data.get("supportedDataRates", [])
 
     @property
     def is_secure(self) -> Optional[bool]:
