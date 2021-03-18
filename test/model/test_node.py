@@ -407,3 +407,34 @@ async def test_metadata_updated(climate_radio_thermostat_ct100_plus: Node):
 
     node.handle_metadata_updated(event)
     assert value.metadata.states
+
+
+async def test_notification(lock_schlage_be469: Node):
+    """Test notification events."""
+    node = lock_schlage_be469
+
+    # Validate that metadata gets added to notification when it's not included
+    event = Event(
+        type="notification",
+        data={
+            "source": "node",
+            "event": "notification",
+            "nodeId": 23,
+            "ccId": 113,
+            "args": {
+                "type": 6,
+                "event": 5,
+                "label": "Access Control",
+                "eventLabel": "Keypad lock operation",
+                "parameters": {"userId": 1},
+            },
+        },
+    )
+
+    node.handle_notification(event)
+    assert event.data["notification"].command_class == CommandClass.NOTIFICATION
+    assert event.data["notification"].type_ == 6
+    assert event.data["notification"].event == 5
+    assert event.data["notification"].label == "Access Control"
+    assert event.data["notification"].event_label == "Keypad lock operation"
+    assert event.data["notification"].parameters == {"userId": 1}
