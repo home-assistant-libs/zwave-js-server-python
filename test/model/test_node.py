@@ -46,9 +46,13 @@ def test_from_state():
     assert node.is_frequent_listening is False
     assert node.is_routing is False
     assert node.max_data_rate == 100000
+    assert node.supported_data_rates == [40000, 100000]
     assert node.is_secure is False
     assert node.protocol_version == ProtocolVersion.VERSION_4_5X_OR_6_0X
     assert node.supports_beaming is True
+    assert node.supports_security is False
+    assert node.zwave_plus_node_type is None
+    assert node.zwave_plus_role_type is None
     assert node.manufacturer_id == 134
     assert node.product_id == 90
     assert node.product_type == 257
