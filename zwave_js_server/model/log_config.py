@@ -42,9 +42,9 @@ class LogConfig:
     def from_dict(data: LogConfigDataType) -> "LogConfig":
         """Return LogConfig from LogConfigDataType dict."""
         return LogConfig(
-            data["enabled"],
-            LogLevel(data["level"]),
-            data["logToFile"],
-            data["filename"],
-            data["forceConsole"],
+            data.get("enabled"),
+            LogLevel(data["level"]) if "level" in data else None,
+            data.get("logToFile"),
+            data.get("filename"),
+            data.get("forceConsole"),
         )
