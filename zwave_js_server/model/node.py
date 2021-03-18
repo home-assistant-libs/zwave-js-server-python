@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, c
 
 from zwave_js_server.const import CommandClass
 
-from ..const import ProtocolVersion
 from ..event import Event, EventBase
 from ..exceptions import FailedCommand, UnparseableValue, UnwriteableValue
 from .command_class import CommandClassInfo, CommandClassInfoDataType
