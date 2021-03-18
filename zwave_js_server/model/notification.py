@@ -4,8 +4,12 @@ Model for a Zwave Node's Notification Event.
 https://zwave-js.github.io/node-zwave-js/#/api/node?id=quotnotificationquot
 """
 
-from typing import Literal, TYPE_CHECKING, Any, Dict, Optional, TypedDict
-from zwave_js_server.util.helpers import is_json_string, parse_buffer, parse_buffer_from_json
+from typing import Literal, TYPE_CHECKING, Any, Dict, Optional, TypedDict, Union, cast
+from zwave_js_server.util.helpers import (
+    is_json_string,
+    parse_buffer,
+    parse_buffer_from_json,
+)
 
 if TYPE_CHECKING:
     from .node import Node
@@ -25,7 +29,7 @@ class EntryControlNotificationArgsDataType(TypedDict, total=False):
 
     eventType: int  # required
     dataType: int  # required
-    eventData: str
+    eventData: Union[str, Dict[str, Any]]
 
 
 class EntryControlNotificationDataType(NotificationDataType):
@@ -127,8 +131,8 @@ class EntryControlNotification:
         """Return event data property."""
         event_data = self.data["args"].get("eventData")
         if event_data:
-            if is_json_string(event_data):
+            if isinstance(event_data, str) and is_json_string(event_data):
                 return parse_buffer_from_json(event_data)
             if isinstance(event_data, dict):
                 return parse_buffer(event_data)
-        return event_data
+        return cast(str, event_data)
