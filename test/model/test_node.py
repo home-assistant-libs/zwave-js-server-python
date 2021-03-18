@@ -45,10 +45,10 @@ def test_from_state():
     assert node.is_listening is True
     assert node.is_frequent_listening is False
     assert node.is_routing is False
-    assert node.max_baud_rate == 40000
+    assert node.max_data_rate == 40000
     assert node.is_secure is False
-    assert node.version == 4
-    assert node.is_beaming is True
+    assert node.protocol_version == 4
+    assert node.supports_beaming is True
     assert node.manufacturer_id == 134
     assert node.product_id == 90
     assert node.product_type == 257
