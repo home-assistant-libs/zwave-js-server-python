@@ -240,9 +240,7 @@ class Value:
             self._metadata.update(data["metadata"])
 
         # Handle buffer dict and json string in value.
-        # In schema version 1 this is type string,
-        # while in schema version 2 this is type buffer.
-        if self.metadata.type in ("string", "buffer"):
+        if self.metadata.type == "buffer":
             self._value = parse_buffer(self._value)
 
 

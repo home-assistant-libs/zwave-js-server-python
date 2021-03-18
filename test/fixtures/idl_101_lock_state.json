@@ -359,7 +359,7 @@
       "propertyKeyName": "3",
       "ccVersion": 1,
       "metadata": {
-        "type": "string",
+        "type": "buffer",
         "readable": true,
         "writeable": true,
         "minLength": 4,
