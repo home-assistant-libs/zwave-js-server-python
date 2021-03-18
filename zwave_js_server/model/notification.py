@@ -130,9 +130,4 @@ class EntryControlNotification:
     def event_data(self) -> Optional[str]:
         """Return event data property."""
         event_data = self.data["args"].get("eventData")
-        if event_data:
-            if isinstance(event_data, str) and is_json_string(event_data):
-                return parse_buffer_from_json(event_data)
-            if isinstance(event_data, dict):
-                return parse_buffer(event_data)
-        return cast(str, event_data)
+        return parse_buffer(event_data) if event_data else cast(str, event_data)
