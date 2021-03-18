@@ -4,13 +4,14 @@ Model for a Zwave Node's Notification Event.
 https://zwave-js.github.io/node-zwave-js/#/api/node?id=quotnotificationquot
 """
 
-from typing import Literal, TYPE_CHECKING, Any, Dict, TypedDict
+from typing import Literal, TYPE_CHECKING, Any, Dict, Optional, TypedDict
+from zwave_js_server.util.helpers import is_json_string, parse_buffer, parse_buffer_from_json
 
 if TYPE_CHECKING:
     from .node import Node
 
 
-class NotificationDataType(TypedDict, total=False):
+class NotificationDataType(TypedDict):
     """Represent a generic notification event data dict type."""
 
     source: Literal["node"]  # required
@@ -122,6 +123,12 @@ class EntryControlNotification:
         return self.data["args"]["dataType"]
 
     @property
-    def event_data(self) -> str:
+    def event_data(self) -> Optional[str]:
         """Return event data property."""
-        return self.data["args"].get("eventData")
+        event_data = self.data["args"].get("eventData")
+        if event_data:
+            if is_json_string(event_data):
+                return parse_buffer_from_json(event_data)
+            if isinstance(event_data, dict):
+                return parse_buffer(event_data)
+        return event_data
