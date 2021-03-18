@@ -3,7 +3,7 @@ import json
 
 import pytest
 
-from zwave_js_server.const import CommandClass
+from zwave_js_server.const import CommandClass, ProtocolVersion
 from zwave_js_server.event import Event
 from zwave_js_server.exceptions import UnwriteableValue
 from zwave_js_server.model import node as node_pkg
@@ -47,7 +47,7 @@ def test_from_state():
     assert node.is_routing is False
     assert node.max_data_rate == 100000
     assert node.is_secure is False
-    assert node.protocol_version == 3
+    assert node.protocol_version == ProtocolVersion.VERSION_45X_OR_60X
     assert node.supports_beaming is True
     assert node.manufacturer_id == 134
     assert node.product_id == 90
