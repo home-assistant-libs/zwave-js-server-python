@@ -18,16 +18,14 @@ class NotificationDataType(TypedDict, total=False):
     source: Literal["node"]  # required
     event: Literal["notification"]  # required
     nodeId: int  # required
-    ccId: Union[
-        Literal[CommandClass.NOTIFICATION], Literal[CommandClass.ENTRY_CONTROL]
-    ]  # required
+    ccId: int  # required
 
 
 class EntryControlNotificationArgsDataType(TypedDict, total=False):
     """Represent args for a Entry Control CC notification event data dict type."""
 
-    eventType: EntryControlEventType  # required
-    dataType: EntryControlDataType  # required
+    eventType: int  # required
+    dataType: int  # required
     eventData: str  # required
 
 
@@ -69,7 +67,7 @@ class NotificationNotification:
     @property
     def command_class(self) -> CommandClass:
         """Return command class."""
-        return self.data["ccId"]
+        return CommandClass(self.data["ccId"])
 
     @property
     def type_(self) -> int:
@@ -113,17 +111,17 @@ class EntryControlNotification:
     @property
     def command_class(self) -> CommandClass:
         """Return command class."""
-        return self.data["ccId"]
+        return CommandClass(self.data["ccId"])
 
     @property
     def event_type(self) -> EntryControlEventType:
         """Return event type property."""
-        return self.data["args"]["eventType"]
+        return EntryControlEventType(self.data["args"]["eventType"])
 
     @property
     def data_type(self) -> EntryControlDataType:
         """Return data type property."""
-        return self.data["args"]["dataType"]
+        return EntryControlDataType(self.data["args"]["dataType"])
 
     @property
     def event_data(self) -> str:

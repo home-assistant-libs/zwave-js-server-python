@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, c
 
 from zwave_js_server.const import CommandClass
 
+from ..const import ProtocolVersion
 from ..event import Event, EventBase
 from ..exceptions import FailedCommand, UnparseableValue, UnwriteableValue
 from .command_class import CommandClassInfo, CommandClassInfoDataType
@@ -188,9 +189,9 @@ class Node(EventBase):
         return self.data.get("isSecure")
 
     @property
-    def protocol_version(self) -> Optional[int]:
+    def protocol_version(self) -> Optional[ProtocolVersion]:
         """Return the protocol_version."""
-        return self.data.get("protocolVersion")
+        return ProtocolVersion(self.data.get("protocolVersion"))
 
     @property
     def supports_beaming(self) -> Optional[bool]:

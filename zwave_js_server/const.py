@@ -53,6 +53,16 @@ class EntryControlDataType(IntEnum):
     MD5 = 3
 
 
+class ProtocolVersion(IntEnum):
+    """Protocol version."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/node/Types.ts#L149
+    UNKNOWN = 0
+    VERSION_20 = 1
+    VERSION_42X_OR_50X = 2
+    VERSION_45X_OR_60X = 3
+
+
 class LogLevel(Enum):
     """Enum for log levels used by node-zwave-js."""
 
