@@ -178,7 +178,7 @@ class Node(EventBase):
         return self.data.get("maxDataRate")
 
     @property
-    def supported_data_rates(self) -> Optional[List[int]]:
+    def supported_data_rates(self) -> List[int]:
         """Return the supported_data_rates."""
         return self.data.get("supportedDataRates", [])
 
