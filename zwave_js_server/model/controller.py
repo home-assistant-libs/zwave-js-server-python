@@ -318,11 +318,11 @@ class Controller(EventBase):
             }
         )
 
-    async def async_remove_node_from_all_assocations(self, node_id: int) -> None:
-        """Send removeNodeFromAllAssocations command to Controller."""
+    async def async_remove_node_from_all_associations(self, node_id: int) -> None:
+        """Send removeNodeFromAllAssociations command to Controller."""
         await self.client.async_send_command(
             {
-                "command": "controller.remove_node_from_all_assocations",
+                "command": "controller.remove_node_from_all_associations",
                 "nodeId": node_id,
             }
         )

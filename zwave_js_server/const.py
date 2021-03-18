@@ -4,25 +4,67 @@ from enum import Enum, IntEnum
 from typing import Dict, List
 
 # minimal server schema version we can handle
-MIN_SERVER_SCHEMA_VERSION = 1
+MIN_SERVER_SCHEMA_VERSION = 3
 # max server schema version we can handle (and our code is compatible with)
-MAX_SERVER_SCHEMA_VERSION = 2
+MAX_SERVER_SCHEMA_VERSION = 3
 
 VALUE_UNKNOWN = "unknown"
 
 
-class LogLevel(IntEnum):
+class EntryControlEventType(IntEnum):
+    """Entry control event types."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/EntryControlCC.ts#L54
+    CACHING = 0
+    CACHED_KEYS = 1
+    ENTER = 2
+    DISARM_ALL = 3
+    ARM_ALL = 4
+    ARM_AWAY = 5
+    ARM_HOME = 6
+    EXIT_DELAY = 7
+    ARM1 = 8
+    ARM2 = 9
+    ARM3 = 10
+    ARM4 = 11
+    ARM5 = 12
+    ARM6 = 13
+    RFID = 14
+    BELL = 15
+    FIRE = 16
+    POLICE = 17
+    ALERT_PANIC = 18
+    ALERT_MEDICAL = 19
+    GATE_OPEN = 20
+    GATE_CLOSE = 21
+    LOCK = 22
+    UNLOCK = 23
+    TEST = 24
+    CANCEL = 25
+
+
+class EntryControlDataType(IntEnum):
+    """Entry control data types."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/EntryControlCC.ts#L83
+    NONE = 0
+    RAW = 1
+    ASCII = 2
+    MD5 = 3
+
+
+class LogLevel(Enum):
     """Enum for log levels used by node-zwave-js."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/log/shared.ts#L12
     # https://github.com/winstonjs/triple-beam/blame/master/config/npm.js#L14
-    ERROR = 0
-    WARN = 1
-    INFO = 2
-    HTTP = 3
-    VERBOSE = 4
-    DEBUG = 5
-    SILLY = 6
+    ERROR = "error"
+    WARN = "warn"
+    INFO = "info"
+    HTTP = "http"
+    VERBOSE = "verbose"
+    DEBUG = "debug"
+    SILLY = "silly"
 
 
 @dataclass
