@@ -3,7 +3,12 @@ import json
 
 import pytest
 
-from zwave_js_server.const import CommandClass, ProtocolVersion
+from zwave_js_server.const import (
+    CommandClass,
+    EntryControlDataType,
+    EntryControlEventType,
+    ProtocolVersion,
+)
 from zwave_js_server.event import Event
 from zwave_js_server.exceptions import UnwriteableValue
 from zwave_js_server.model import node as node_pkg
@@ -417,7 +422,7 @@ async def test_notification(lock_schlage_be469: Node):
     """Test notification events."""
     node = lock_schlage_be469
 
-    # Validate that metadata gets added to notification when it's not included
+    # Validate that Notification CC notification event is received as expected
     event = Event(
         type="notification",
         data={
@@ -443,3 +448,25 @@ async def test_notification(lock_schlage_be469: Node):
     assert event.data["notification"].label == "Access Control"
     assert event.data["notification"].event_label == "Keypad lock operation"
     assert event.data["notification"].parameters == {"userId": 1}
+
+
+async def test_entry_control_notification(ring_keypad):
+    node = ring_keypad
+
+    # Validate that Entry Control CC notification event is received as expected
+    event = Event(
+        type="notification",
+        data={
+            "source": "node",
+            "event": "notification",
+            "nodeId": 10,
+            "ccId": 111,
+            "args": {"eventType": 5, "dataType": 2, "eventData": "555"},
+        },
+    )
+    node.handle_notification(event)
+    assert event.data["notification"].command_class == CommandClass.ENTRY_CONTROL
+    assert event.data["notification"].node_id == 10
+    assert event.data["notification"].event_type == EntryControlEventType.ARM_AWAY
+    assert event.data["notification"].data_type == EntryControlDataType.ASCII
+    assert event.data["notification"].event_data == "555"
