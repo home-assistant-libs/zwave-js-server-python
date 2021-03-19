@@ -63,6 +63,8 @@ class ProtocolVersion(IntEnum):
     VERSION_4_5X_OR_6_0X = 3
 
 
+# Multiple inheritance so that LogLevel will JSON serialize properly
+# Reference: https://stackoverflow.com/a/51976841
 class LogLevel(str, Enum):
     """Enum for log levels used by node-zwave-js."""
 
