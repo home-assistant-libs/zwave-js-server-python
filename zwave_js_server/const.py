@@ -1,5 +1,4 @@
 """Constants for the Z-Wave JS python library."""
-from dataclasses import dataclass
 from enum import Enum, IntEnum
 from typing import Dict, List
 
@@ -23,14 +22,6 @@ class LogLevel(IntEnum):
     VERBOSE = 4
     DEBUG = 5
     SILLY = 6
-
-
-@dataclass
-class PropertyKey:
-    """Class to represent a property key and its name."""
-
-    key: int
-    name: str
 
 
 class CommandClass(IntEnum):
@@ -253,7 +244,7 @@ class ThermostatOperatingState(IntEnum):
     THIRD_STAGE_AUX_HEAT = 11
 
 
-class ThermostatSetpointType(Enum):
+class ThermostatSetpointType(IntEnum):
     """
     Enum with all (known/used) Z-Wave Thermostat Setpoint Types.
 
@@ -261,18 +252,18 @@ class ThermostatSetpointType(Enum):
     """
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/ThermostatSetpointCC.ts#L53-L66
-    NA = PropertyKey(0, "N/A")
-    HEATING = PropertyKey(1, "Heating")
-    COOLING = PropertyKey(2, "Cooling")
-    FURNACE = PropertyKey(7, "Furnace")
-    DRY_AIR = PropertyKey(8, "Dry Air")
-    MOIST_AIR = PropertyKey(9, "Moist Air")
-    AUTO_CHANGEOVER = PropertyKey(10, "Auto Changeover")
-    ENERGY_SAVE_HEATING = PropertyKey(11, "Energy Save Heating")
-    ENERGY_SAVE_COOLING = PropertyKey(12, "Energy Save Cooling")
-    AWAY_HEATING = PropertyKey(13, "Away Heating")
-    AWAY_COOLING = PropertyKey(14, "Away Cooling")
-    FULL_POWER = PropertyKey(15, "Full Power")
+    NA = 0
+    HEATING = 1
+    COOLING = 2
+    FURNACE = 7
+    DRY_AIR = 8
+    MOIST_AIR = 9
+    AUTO_CHANGEOVER = 10
+    ENERGY_SAVE_HEATING = 11
+    ENERGY_SAVE_COOLING = 12
+    AWAY_HEATING = 13
+    AWAY_COOLING = 14
+    FULL_POWER = 15
 
 
 # In Z-Wave the modes and presets are both in ThermostatMode.
@@ -336,16 +327,16 @@ class BarrierState(IntEnum):
     OPEN = 255
 
 
-class ColorComponent(Enum):
+class ColorComponent(IntEnum):
     """Enum with all (known/used) Color Switch CC colors."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/ColorSwitchCC.ts#L62
-    WARM_WHITE = PropertyKey(0, "Warm White")
-    COLD_WHITE = PropertyKey(1, "Cold White")
-    RED = PropertyKey(2, "Red")
-    GREEN = PropertyKey(3, "Green")
-    BLUE = PropertyKey(4, "Blue")
-    AMBER = PropertyKey(5, "Amber")
-    CYAN = PropertyKey(6, "Cyan")
-    PURPLE = PropertyKey(7, "Purple")
-    INDEX = PropertyKey(8, "Index")
+    WARM_WHITE = 0
+    COLD_WHITE = 1
+    RED = 2
+    GREEN = 3
+    BLUE = 4
+    AMBER = 5
+    CYAN = 6
+    PURPLE = 7
+    INDEX = 8
