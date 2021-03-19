@@ -63,7 +63,7 @@ class ProtocolVersion(IntEnum):
     VERSION_4_5X_OR_6_0X = 3
 
 
-class LogLevel(Enum):
+class LogLevel(str, Enum):
     """Enum for log levels used by node-zwave-js."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/log/shared.ts#L12
