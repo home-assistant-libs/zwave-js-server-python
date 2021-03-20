@@ -14,9 +14,9 @@ class EndpointDataType(TypedDict, total=False):
 
     nodeId: int  # required
     index: int  # required
+    deviceClass: DeviceClassDataType  # required
     installerIcon: int
     userIcon: int
-    deviceClass: DeviceClassDataType
 
 
 class Endpoint:
@@ -37,6 +37,11 @@ class Endpoint:
         return self.data["index"]
 
     @property
+    def device_class(self) -> DeviceClass:
+        """Return the device_class."""
+        return DeviceClass(self.data["deviceClass"])
+
+    @property
     def installer_icon(self) -> Optional[int]:
         """Return installer icon property."""
         return self.data.get("installerIcon")
@@ -45,8 +50,3 @@ class Endpoint:
     def user_icon(self) -> Optional[int]:
         """Return user icon property."""
         return self.data.get("userIcon")
-
-    @property
-    def device_class(self) -> DeviceClass:
-        """Return the device_class."""
-        return DeviceClass(self.data["deviceClass"])
