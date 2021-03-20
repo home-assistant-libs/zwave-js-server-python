@@ -66,6 +66,18 @@ def test_from_state():
     assert node.label == "ZW090"
     assert node.neighbors == [23, 26, 5, 6]
     assert node.interview_attempts == 0
+    assert node.installer_icon is None
+    assert node.user_icon is None
+    assert node.firmware_version is None
+    assert node.name is None
+    assert node.zwave_plus_version is None
+    assert node.location is None
+    assert node.endpoint_count_is_dynamic is None
+    assert node.endpoints_have_identical_capabilities is None
+    assert node.individual_endpoint_count is None
+    assert node.aggregated_endpoint_count is None
+    assert node.interview_stage == 6
+    assert len(node.command_classes) == 0
     assert len(node.endpoints) == 1
     assert node.endpoints[0].index == 0
     device_class = node.endpoints[0].device_class
@@ -167,6 +179,44 @@ async def test_refresh_info(multisensor_6, uuid4, mock_command):
         "nodeId": node.node_id,
         "messageId": uuid4,
     }
+
+
+async def test_value_added_event(multisensor_6):
+    """Test Node value removed event."""
+    node = multisensor_6
+    event = Event(
+        type="value removed",
+        data={
+            "source": "node",
+            "event": "value removed",
+            "nodeId": 52,
+            "args": {
+                "commandClassName": "Configuration",
+                "commandClass": 112,
+                "endpoint": 0,
+                "property": 2,
+                "propertyName": "Stay Awake in Battery Mode",
+                "metadata": {
+                    "type": "number",
+                    "readable": True,
+                    "writeable": True,
+                    "valueSize": 1,
+                    "min": 0,
+                    "max": 1,
+                    "default": 0,
+                    "format": 0,
+                    "allowManualEntry": False,
+                    "states": {"0": "Disable", "1": "Enable"},
+                    "label": "Stay Awake in Battery Mode",
+                    "description": "Stay awake for 10 minutes at power on",
+                    "isFromConfig": True,
+                },
+                "value": 0,
+            },
+        },
+    )
+    node.handle_value_removed(event)
+    assert "52-112-0-2" not in node.values
 
 
 async def test_get_defined_value_ids(multisensor_6, uuid4, mock_command):
