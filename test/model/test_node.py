@@ -1,5 +1,6 @@
 """Test the node model."""
 import json
+from zwave_js_server.model.value import ConfigurationValue
 
 import pytest
 
@@ -305,6 +306,45 @@ async def test_node_status_events(multisensor_6):
     event = Event(type="sleep")
     node.handle_sleep(event)
     assert node.status == NodeStatus.ASLEEP
+
+
+async def test_value_added_events(multisensor_6):
+    """Test Node value added events."""
+    node = multisensor_6
+    event = Event(
+        type="value added",
+        data={
+            "source": "node",
+            "event": "value added",
+            "nodeId": 52,
+            "args": {
+                "commandClassName": "Configuration",
+                "commandClass": 112,
+                "endpoint": 0,
+                "property": 2,
+                "propertyName": "Stay Awake in Battery Mode",
+                "metadata": {
+                    "type": "number",
+                    "readable": True,
+                    "writeable": True,
+                    "valueSize": 1,
+                    "min": 0,
+                    "max": 1,
+                    "default": 0,
+                    "format": 0,
+                    "allowManualEntry": False,
+                    "states": {"0": "Disable", "1": "Enable"},
+                    "label": "Stay Awake in Battery Mode",
+                    "description": "Stay awake for 10 minutes at power on",
+                    "isFromConfig": True,
+                },
+                "value": 0,
+            },
+        },
+    )
+    node.handle_value_added(event)
+    assert isinstance(event.data["value"], ConfigurationValue)
+    assert isinstance(node.values["52-112-0-2"], ConfigurationValue)
 
 
 async def test_value_notification(wallmote_central_scene: Node):
