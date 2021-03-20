@@ -64,10 +64,14 @@ def test_from_state():
     for attr, value in DEVICE_CONFIG_FIXTURE.items():
         assert getattr(node.device_config, attr) == value
     assert node.label == "ZW090"
-    assert node.neighbors == [5, 6, 23, 26]
-    assert node.interview_attempts == 1
+    assert node.neighbors == [23, 26, 5, 6]
+    assert node.interview_attempts == 0
     assert len(node.endpoints) == 1
     assert node.endpoints[0].index == 0
+    device_class = node.endpoints[0].device_class
+    assert device_class.basic.key == 2
+    assert device_class.generic.key == 2
+    assert device_class.specific.key == 1
 
 
 async def test_unknown_values(cover_qubino_shutter):
