@@ -2,10 +2,7 @@
 from typing import TYPE_CHECKING, Dict, List, Optional, TypedDict, cast
 
 from ..event import Event, EventBase
-from .association import (
-    AssociationGroup,
-    Association,
-)
+from .association import Association, AssociationGroup
 from .node import Node
 
 if TYPE_CHECKING:

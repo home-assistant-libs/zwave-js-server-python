@@ -24,6 +24,7 @@ from .value import (
     ValueMetadata,
     ValueNotification,
     _get_value_id_from_dict,
+    _init_value,
 )
 
 if TYPE_CHECKING:
@@ -98,10 +99,7 @@ class Node(EventBase):
         for val in data["values"]:
             value_id = _get_value_id_from_dict(self, val)
             try:
-                if val["commandClass"] == CommandClass.CONFIGURATION:
-                    self.values[value_id] = ConfigurationValue(self, val)
-                else:
-                    self.values[value_id] = Value(self, val)
+                self.values[value_id] = _init_value(self, val)
             except UnparseableValue:
                 # If we can't parse the value, don't store it
                 pass
@@ -395,7 +393,8 @@ class Node(EventBase):
             # We should never reach this code
             raise FailedCommand("Command failed", "failed_command")
         return [
-            Value(self, cast(ValueDataType, valueId)) for valueId in data["valueIds"]
+            _init_value(self, cast(ValueDataType, valueId))
+            for valueId in data["valueIds"]
         ]
 
     async def async_get_value_metadata(self, val: Union[Value, str]) -> ValueMetadata:
@@ -455,13 +454,13 @@ class Node(EventBase):
             value_id = _get_value_id_from_dict(self, value_state)
             value = self.values.get(value_id)
             if value is None:
-                self.values[value_id] = Value(self, value_state)
+                self.values[value_id] = _init_value(self, value_state)
             else:
                 value.update(value_state)
 
     def handle_value_added(self, event: Event) -> None:
         """Process a node value added event."""
-        value = Value(self, event.data["args"])
+        value = _init_value(self, event.data["args"])
         self.values[value.value_id] = event.data["value"] = value
 
     def handle_value_updated(self, event: Event) -> None:
