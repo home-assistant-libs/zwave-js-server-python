@@ -1,0 +1,831 @@
+{
+  "nodeId": 10,
+  "index": 0,
+  "installerIcon": 8193,
+  "userIcon": 8193,
+  "status": 4,
+  "ready": true,
+  "isListening": false,
+  "isRouting": true,
+  "isSecure": true,
+  "manufacturerId": 838,
+  "productId": 513,
+  "productType": 257,
+  "firmwareVersion": "2.14",
+  "zwavePlusVersion": 1,
+  "deviceConfig": {
+    "filename": "C:\\Users\\hessl\\Documents\\Dev\\zwave-js-server\\node_modules\\@zwave-js\\config\\config\\devices\\0x0346\\alarm_keypad_gen1.json",
+    "manufacturer": "Ring",
+    "manufacturerId": 838,
+    "label": "4AK1S7-0EN0 / 4AK1E9-0EU0",
+    "description": "Alarm Keypad (1st generation)",
+    "devices": [
+      { "productType": 257, "productId": 513 },
+      { "productType": 257, "productId": 514 }
+    ],
+    "firmwareVersion": { "min": "0.0", "max": "255.255" },
+    "paramInformation": { "_map": {} },
+    "compat": {
+      "valueIdRegex": {},
+      "disableStrictEntryControlDataValidation": true
+    },
+    "metadata": {
+      "manual": "https://support.ring.com/hc/en-us/article_attachments/360051851012/Keypad_Zwave_UK.pdf"
+    }
+  },
+  "label": "4AK1S7-0EN0 / 4AK1E9-0EU0",
+  "neighbors": [1, 7, 16],
+  "interviewAttempts": 1,
+  "interviewStage": 6,
+  "endpoints": [
+    { "nodeId": 10, "index": 0, "installerIcon": 8193, "userIcon": 8193 }
+  ],
+  "values": [
+    {
+      "endpoint": 0,
+      "commandClass": 111,
+      "commandClassName": "Entry Control",
+      "property": "keyCacheSize",
+      "propertyName": "keyCacheSize",
+      "ccVersion": 0,
+      "metadata": {
+        "type": "number",
+        "readable": true,
+        "writeable": true,
+        "description": "Number of character that must be stored before sending",
+        "label": "Key cache size",
+        "min": 4,
+        "max": 10
+      },
+      "value": 8
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 111,
+      "commandClassName": "Entry Control",
+      "property": "keyCacheTimeout",
+      "propertyName": "keyCacheTimeout",
+      "ccVersion": 0,
+      "metadata": {
+        "type": "number",
+        "readable": true,
+        "writeable": true,
+        "description": "How long the key cache must wait for additional characters",
+        "label": "Key cache timeout",
+        "min": 0,
+        "max": 30,
+        "unit": "seconds"
+      },
+      "value": 5
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 114,
+      "commandClassName": "Manufacturer Specific",
+      "property": "manufacturerId",
+      "propertyName": "manufacturerId",
+      "ccVersion": 2,
+      "metadata": {
+        "type": "number",
+        "readable": true,
+        "writeable": false,
+        "label": "Manufacturer ID",
+        "min": 0,
+        "max": 65535
+      },
+      "value": 838
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 114,
+      "commandClassName": "Manufacturer Specific",
+      "property": "productType",
+      "propertyName": "productType",
+      "ccVersion": 2,
+      "metadata": {
+        "type": "number",
+        "readable": true,
+        "writeable": false,
+        "label": "Product type",
+        "min": 0,
+        "max": 65535
+      },
+      "value": 257
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 114,
+      "commandClassName": "Manufacturer Specific",
+      "property": "productId",
+      "propertyName": "productId",
+      "ccVersion": 2,
+      "metadata": {
+        "type": "number",
+        "readable": true,
+        "writeable": false,
+        "label": "Product ID",
+        "min": 0,
+        "max": 65535
+      },
+      "value": 513
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 134,
+      "commandClassName": "Version",
+      "property": "libraryType",
+      "propertyName": "libraryType",
+      "ccVersion": 2,
+      "metadata": {
+        "type": "any",
+        "readable": true,
+        "writeable": false,
+        "label": "Library type"
+      },
+      "value": 3
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 134,
+      "commandClassName": "Version",
+      "property": "protocolVersion",
+      "propertyName": "protocolVersion",
+      "ccVersion": 2,
+      "metadata": {
+        "type": "any",
+        "readable": true,
+        "writeable": false,
+        "label": "Z-Wave protocol version"
+      },
+      "value": "6.3"
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 134,
+      "commandClassName": "Version",
+      "property": "firmwareVersions",
+      "propertyName": "firmwareVersions",
+      "ccVersion": 2,
+      "metadata": {
+        "type": "any",
+        "readable": true,
+        "writeable": false,
+        "label": "Z-Wave chip firmware versions"
+      },
+      "value": ["2.14"]
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 134,
+      "commandClassName": "Version",
+      "property": "hardwareVersion",
+      "propertyName": "hardwareVersion",
+      "ccVersion": 2,
+      "metadata": {
+        "type": "any",
+        "readable": true,
+        "writeable": false,
+        "label": "Z-Wave chip hardware version"
+      }
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 128,
+      "commandClassName": "Battery",
+      "property": "level",
+      "propertyName": "level",
+      "ccVersion": 1,
+      "metadata": {
+        "type": "number",
+        "readable": true,
+        "writeable": false,
+        "label": "Battery level",
+        "min": 0,
+        "max": 100,
+        "unit": "%"
+      },
+      "value": 41
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 128,
+      "commandClassName": "Battery",
+      "property": "isLow",
+      "propertyName": "isLow",
+      "ccVersion": 1,
+      "metadata": {
+        "type": "boolean",
+        "readable": true,
+        "writeable": false,
+        "label": "Low battery level"
+      },
+      "value": false
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 112,
+      "commandClassName": "Configuration",
+      "property": 1,
+      "propertyName": "Battery Report Interval",
+      "ccVersion": 1,
+      "metadata": {
+        "type": "number",
+        "default": 70,
+        "readable": true,
+        "writeable": true,
+        "description": "Default heartbeat check in time",
+        "label": "Battery Report Interval",
+        "min": 70,
+        "max": 1440,
+        "states": {},
+        "unit": "minutes"
+      },
+      "value": 70
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 112,
+      "commandClassName": "Configuration",
+      "property": 2,
+      "propertyName": "Awake Timeout",
+      "ccVersion": 1,
+      "metadata": {
+        "type": "number",
+        "default": 1,
+        "readable": true,
+        "writeable": true,
+        "description": "How long the device waits for a command before going back to sleep",
+        "label": "Awake Timeout",
+        "min": 1,
+        "max": 5,
+        "states": {},
+        "unit": "seconds"
+      },
+      "value": 1
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 112,
+      "commandClassName": "Configuration",
+      "property": 3,
+      "propertyName": "Co-Proc Status",
+      "ccVersion": 1,
+      "metadata": {
+        "type": "number",
+        "default": 1,
+        "readable": true,
+        "writeable": false,
+        "description": "Check to see if the co-proc is operational",
+        "label": "Co-Proc Status",
+        "min": 0,
+        "max": 1,
+        "states": { "0": "Dead", "1": "Alive" }
+      },
+      "value": 1
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 112,
+      "commandClassName": "Configuration",
+      "property": 4,
+      "propertyName": "Proximity Timeout",
+      "ccVersion": 1,
+      "metadata": {
+        "type": "number",
+        "default": 5,
+        "readable": true,
+        "writeable": true,
+        "description": "Timeout when proximity is detected and no input is received",
+        "label": "Proximity Timeout",
+        "min": 0,
+        "max": 30,
+        "states": {},
+        "unit": "seconds"
+      },
+      "value": 5
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 112,
+      "commandClassName": "Configuration",
+      "property": 5,
+      "propertyName": "Button Press Timeout",
+      "ccVersion": 1,
+      "metadata": {
+        "type": "number",
+        "default": 5,
+        "readable": true,
+        "writeable": true,
+        "description": ": Timeout when a button is pressed, but a sequence is not completed and buttons are no longer being pressed",
+        "label": "Button Press Timeout",
+        "min": 0,
+        "max": 30,
+        "states": {},
+        "unit": "seconds"
+      },
+      "value": 5
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 112,
+      "commandClassName": "Configuration",
+      "property": 6,
+      "propertyName": "Status Change Timeout",
+      "ccVersion": 1,
+      "metadata": {
+        "type": "number",
+        "default": 15,
+        "readable": true,
+        "writeable": true,
+        "label": "Status Change Timeout",
+        "min": 10,
+        "max": 60,
+        "states": {},
+        "unit": "seconds"
+      },
+      "value": 15
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 112,
+      "commandClassName": "Configuration",
+      "property": 7,
+      "propertyName": "Enable / Disable Extended Battery Life Mode",
+      "ccVersion": 1,
+      "metadata": {
+        "type": "number",
+        "default": 0,
+        "readable": true,
+        "writeable": true,
+        "label": "Enable / Disable Extended Battery Life Mode",
+        "min": 0,
+        "max": 1,
+        "states": { "0": "Enable", "1": "Disable" }
+      },
+      "value": 0
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 112,
+      "commandClassName": "Configuration",
+      "property": 8,
+      "propertyName": "Key Backlight Timeout",
+      "ccVersion": 1,
+      "metadata": {
+        "type": "number",
+        "default": 3,
+        "readable": true,
+        "writeable": true,
+        "description": "Timeout for keypad LED backlight to stay on between key presses",
+        "label": "Key Backlight Timeout",
+        "min": 1,
+        "max": 15,
+        "states": {},
+        "unit": "seconds"
+      },
+      "value": 3
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 112,
+      "commandClassName": "Configuration",
+      "property": 9,
+      "propertyName": "Key Backlight Brightness",
+      "ccVersion": 1,
+      "metadata": {
+        "type": "number",
+        "default": 100,
+        "readable": true,
+        "writeable": true,
+        "description": "Adjusts the brightness of the keypad backlight",
+        "label": "Key Backlight Brightness",
+        "min": 0,
+        "max": 100,
+        "states": {},
+        "unit": "%"
+      },
+      "value": 100
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 112,
+      "commandClassName": "Configuration",
+      "property": 10,
+      "propertyName": "Key Tone Volume",
+      "ccVersion": 1,
+      "metadata": {
+        "type": "number",
+        "default": 8,
+        "readable": true,
+        "writeable": true,
+        "label": "Key Tone Volume",
+        "min": 0,
+        "max": 10,
+        "states": {}
+      },
+      "value": 8
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 112,
+      "commandClassName": "Configuration",
+      "property": 11,
+      "propertyName": "Ambient Light Sensor Level",
+      "ccVersion": 1,
+      "metadata": {
+        "type": "number",
+        "default": 5,
+        "readable": true,
+        "writeable": true,
+        "description": "Light threshold where keypad will stop backlighting if higher than choosen value",
+        "label": "Ambient Light Sensor Level",
+        "min": 0,
+        "max": 100,
+        "states": {}
+      },
+      "value": 5
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 112,
+      "commandClassName": "Configuration",
+      "property": 12,
+      "propertyName": "Siren Volume",
+      "ccVersion": 1,
+      "metadata": {
+        "type": "number",
+        "default": 6,
+        "readable": true,
+        "writeable": true,
+        "label": "Siren Volume",
+        "min": 0,
+        "max": 10,
+        "states": {}
+      },
+      "value": 6
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 112,
+      "commandClassName": "Configuration",
+      "property": 13,
+      "propertyName": "Enable / Disable Proximity mode",
+      "ccVersion": 1,
+      "metadata": {
+        "type": "number",
+        "default": 1,
+        "readable": true,
+        "writeable": true,
+        "label": "Enable / Disable Proximity mode",
+        "min": 0,
+        "max": 1,
+        "states": { "0": "Disable", "1": "Enable" }
+      },
+      "value": 1
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 112,
+      "commandClassName": "Configuration",
+      "property": 14,
+      "propertyName": "Proximity Distance",
+      "ccVersion": 1,
+      "metadata": {
+        "type": "number",
+        "default": 100,
+        "readable": true,
+        "writeable": true,
+        "label": "Proximity Distance",
+        "min": 0,
+        "max": 100,
+        "states": {},
+        "unit": "centimeters"
+      },
+      "value": 100
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 112,
+      "commandClassName": "Configuration",
+      "property": 15,
+      "propertyName": "Extended Battery Life LED Brightness Adjustment",
+      "ccVersion": 1,
+      "metadata": {
+        "type": "number",
+        "default": 50,
+        "readable": true,
+        "writeable": true,
+        "label": "Extended Battery Life LED Brightness Adjustment",
+        "min": 0,
+        "max": 100,
+        "states": {},
+        "unit": "%"
+      },
+      "value": 50
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 112,
+      "commandClassName": "Configuration",
+      "property": 16,
+      "propertyName": "Reduced Battery Life LED Brightness Adjustment",
+      "ccVersion": 1,
+      "metadata": {
+        "type": "number",
+        "default": 65,
+        "readable": true,
+        "writeable": true,
+        "label": "Reduced Battery Life LED Brightness Adjustment",
+        "min": 0,
+        "max": 100,
+        "states": {},
+        "unit": "%"
+      },
+      "value": 65
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 112,
+      "commandClassName": "Configuration",
+      "property": 17,
+      "propertyName": "Fast Blink Rate",
+      "ccVersion": 1,
+      "metadata": {
+        "type": "number",
+        "default": 5,
+        "readable": true,
+        "writeable": true,
+        "label": "Fast Blink Rate",
+        "min": 0,
+        "max": 100,
+        "states": {},
+        "unit": "0.1 seconds"
+      },
+      "value": 5
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 112,
+      "commandClassName": "Configuration",
+      "property": 18,
+      "propertyName": "Slow Blink Rate",
+      "ccVersion": 1,
+      "metadata": {
+        "type": "number",
+        "default": 2,
+        "readable": true,
+        "writeable": true,
+        "label": "Slow Blink Rate",
+        "min": 0,
+        "max": 100,
+        "states": {},
+        "unit": "0.5 seconds"
+      },
+      "value": 2
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 112,
+      "commandClassName": "Configuration",
+      "property": 19,
+      "propertyName": "Supervision Report Timeout",
+      "ccVersion": 1,
+      "metadata": {
+        "type": "number",
+        "default": 1500,
+        "readable": true,
+        "writeable": true,
+        "label": "Supervision Report Timeout",
+        "min": 500,
+        "max": 5000,
+        "states": {},
+        "unit": "milliseconds"
+      },
+      "value": 1500
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 112,
+      "commandClassName": "Configuration",
+      "property": 20,
+      "propertyName": "Number of Re-transmissions Attempts",
+      "ccVersion": 1,
+      "metadata": {
+        "type": "number",
+        "default": 1,
+        "readable": true,
+        "writeable": true,
+        "label": "Number of Re-transmissions Attempts",
+        "min": 0,
+        "max": 5,
+        "states": {}
+      },
+      "value": 1
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 112,
+      "commandClassName": "Configuration",
+      "property": 21,
+      "propertyName": "Wait Period Between Re-transmissions Attempts",
+      "ccVersion": 1,
+      "metadata": {
+        "type": "number",
+        "default": 5,
+        "readable": true,
+        "writeable": true,
+        "label": "Wait Period Between Re-transmissions Attempts",
+        "min": 1,
+        "max": 60,
+        "states": {},
+        "unit": "seconds"
+      },
+      "value": 5
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 135,
+      "commandClassName": "Indicator",
+      "property": "value",
+      "propertyName": "value",
+      "ccVersion": 1,
+      "metadata": {
+        "type": "number",
+        "readable": true,
+        "writeable": true,
+        "label": "Indicator value",
+        "ccSpecific": { "indicatorId": 0 },
+        "min": 0,
+        "max": 255
+      },
+      "value": 0
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 113,
+      "commandClassName": "Notification",
+      "property": "Home Security",
+      "propertyKey": "Motion sensor status",
+      "propertyName": "Home Security",
+      "propertyKeyName": "Motion sensor status",
+      "ccVersion": 8,
+      "metadata": {
+        "type": "number",
+        "readable": true,
+        "writeable": false,
+        "label": "Motion sensor status",
+        "ccSpecific": { "notificationType": 7 },
+        "min": 0,
+        "max": 255,
+        "states": { "0": "idle", "8": "Motion detection" }
+      },
+      "value": 0
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 113,
+      "commandClassName": "Notification",
+      "property": "Power Management",
+      "propertyKey": "Power status",
+      "propertyName": "Power Management",
+      "propertyKeyName": "Power status",
+      "ccVersion": 8,
+      "metadata": {
+        "type": "number",
+        "readable": true,
+        "writeable": false,
+        "label": "Power status",
+        "ccSpecific": { "notificationType": 8 },
+        "min": 0,
+        "max": 255,
+        "states": { "0": "idle", "1": "Power has been applied" }
+      },
+      "value": 0
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 113,
+      "commandClassName": "Notification",
+      "property": "Power Management",
+      "propertyKey": "Battery load status",
+      "propertyName": "Power Management",
+      "propertyKeyName": "Battery load status",
+      "ccVersion": 8,
+      "metadata": {
+        "type": "number",
+        "readable": true,
+        "writeable": false,
+        "label": "Battery load status",
+        "ccSpecific": { "notificationType": 8 },
+        "min": 0,
+        "max": 255,
+        "states": { "0": "idle", "12": "Battery is charging" }
+      },
+      "value": 0
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 113,
+      "commandClassName": "Notification",
+      "property": "System",
+      "propertyKey": "Software status",
+      "propertyName": "System",
+      "propertyKeyName": "Software status",
+      "ccVersion": 8,
+      "metadata": {
+        "type": "number",
+        "readable": true,
+        "writeable": false,
+        "label": "Software status",
+        "ccSpecific": { "notificationType": 9 },
+        "min": 0,
+        "max": 255,
+        "states": {
+          "0": "idle",
+          "4": "System software failure (with failure code)"
+        }
+      },
+      "value": 0
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 113,
+      "commandClassName": "Notification",
+      "property": "Power Management",
+      "propertyKey": "Mains status",
+      "propertyName": "Power Management",
+      "propertyKeyName": "Mains status",
+      "ccVersion": 8,
+      "metadata": {
+        "type": "number",
+        "readable": true,
+        "writeable": false,
+        "label": "Mains status",
+        "ccSpecific": { "notificationType": 8 },
+        "min": 0,
+        "max": 255,
+        "states": {
+          "2": "AC mains disconnected",
+          "3": "AC mains re-connected"
+        }
+      }
+    }
+  ],
+  "isFrequentListening": "1000ms",
+  "maxDataRate": 100000,
+  "supportedDataRates": [40000, 100000],
+  "protocolVersion": 3,
+  "supportsBeaming": true,
+  "supportsSecurity": false,
+  "nodeType": 1,
+  "zwavePlusNodeType": 0,
+  "zwavePlusRoleType": 7,
+  "deviceClass": {
+    "basic": { "key": 4, "label": "Routing Slave" },
+    "generic": { "key": 64, "label": "Entry Control" },
+    "specific": { "key": 11, "label": "Secure Keypad" },
+    "mandatorySupportedCCs": [90, 111, 114, 152, 134],
+    "mandatoryControlledCCs": []
+  },
+  "commandClasses": [
+    {
+      "id": 90,
+      "name": "Device Reset Locally",
+      "version": 1,
+      "isSecure": true
+    },
+    { "id": 111, "name": "Entry Control", "version": 1, "isSecure": true },
+    {
+      "id": 114,
+      "name": "Manufacturer Specific",
+      "version": 2,
+      "isSecure": true
+    },
+    { "id": 152, "name": "Security", "version": 1, "isSecure": true },
+    { "id": 134, "name": "Version", "version": 2, "isSecure": true },
+    {
+      "id": 94,
+      "name": "Z-Wave Plus Info",
+      "version": 2,
+      "isSecure": false
+    },
+    { "id": 133, "name": "Association", "version": 2, "isSecure": true },
+    {
+      "id": 89,
+      "name": "Association Group Information",
+      "version": 1,
+      "isSecure": true
+    },
+    { "id": 128, "name": "Battery", "version": 1, "isSecure": true },
+    { "id": 112, "name": "Configuration", "version": 1, "isSecure": true },
+    { "id": 135, "name": "Indicator", "version": 1, "isSecure": true },
+    { "id": 113, "name": "Notification", "version": 8, "isSecure": true },
+    { "id": 108, "name": "Supervision", "version": 1, "isSecure": true },
+    {
+      "id": 122,
+      "name": "Firmware Update Meta Data",
+      "version": 4,
+      "isSecure": true
+    }
+  ]
+}

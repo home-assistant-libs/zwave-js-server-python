@@ -396,7 +396,7 @@
       "propertyName": "userCode",
       "propertyKeyName": "4",
       "metadata": {
-        "type": "string",
+        "type": "buffer",
         "readable": true,
         "writeable": true,
         "minLength": 4,

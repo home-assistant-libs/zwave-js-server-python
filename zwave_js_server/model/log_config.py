@@ -31,7 +31,7 @@ class LogConfig:
         """Return LogConfigDataType dict from self."""
         data = {
             "enabled": self.enabled,
-            "level": self.level,
+            "level": self.level.value if self.level else None,
             "logToFile": self.log_to_file,
             "filename": self.filename,
             "forceConsole": self.force_console,
@@ -43,7 +43,7 @@ class LogConfig:
         """Return LogConfig from LogConfigDataType dict."""
         return LogConfig(
             data.get("enabled"),
-            data.get("level"),
+            LogLevel(data["level"]) if "level" in data else None,
             data.get("logToFile"),
             data.get("filename"),
             data.get("forceConsole"),

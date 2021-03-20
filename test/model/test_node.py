@@ -3,7 +3,12 @@ import json
 
 import pytest
 
-from zwave_js_server.const import CommandClass
+from zwave_js_server.const import (
+    CommandClass,
+    EntryControlDataType,
+    EntryControlEventType,
+    ProtocolVersion,
+)
 from zwave_js_server.event import Event
 from zwave_js_server.exceptions import UnwriteableValue
 from zwave_js_server.model import node as node_pkg
@@ -17,9 +22,9 @@ DEVICE_CONFIG_FIXTURE = {
     "label": "ZW090",
     "description": "Z‐Stick Gen5 USB Controller",
     "devices": [
-        {"productType": "0x0001", "productId": "0x005a"},
-        {"productType": "0x0101", "productId": "0x005a"},
-        {"productType": "0x0201", "productId": "0x005a"},
+        {"productType": 1, "productId": 90},
+        {"productType": 257, "productId": 90},
+        {"productType": 513, "productId": 90},
     ],
     "firmware_version": {"min": "0.0", "max": "255.255"},
     "associations": {},
@@ -29,7 +34,7 @@ DEVICE_CONFIG_FIXTURE = {
 
 def test_from_state():
     """Test from_state method."""
-    state = json.loads(load_fixture("basic_dump.txt").split("\n")[0])["state"]
+    state = json.loads(load_fixture("basic_dump.txt").split("\n")[0])["result"]["state"]
 
     node = node_pkg.Node(None, state["nodes"][0])
 
@@ -45,17 +50,21 @@ def test_from_state():
     assert node.is_listening is True
     assert node.is_frequent_listening is False
     assert node.is_routing is False
-    assert node.max_baud_rate == 40000
+    assert node.max_data_rate == 100000
+    assert node.supported_data_rates == [40000, 100000]
     assert node.is_secure is False
-    assert node.version == 4
-    assert node.is_beaming is True
+    assert node.protocol_version == ProtocolVersion.VERSION_4_5X_OR_6_0X
+    assert node.supports_beaming is True
+    assert node.supports_security is False
+    assert node.zwave_plus_node_type is None
+    assert node.zwave_plus_role_type is None
     assert node.manufacturer_id == 134
     assert node.product_id == 90
     assert node.product_type == 257
     for attr, value in DEVICE_CONFIG_FIXTURE.items():
         assert getattr(node.device_config, attr) == value
     assert node.label == "ZW090"
-    assert node.neighbors == [31, 32, 33, 36, 37, 39, 52]
+    assert node.neighbors == [5, 6, 23, 26]
     assert node.interview_attempts == 1
     assert len(node.endpoints) == 1
     assert node.endpoints[0].index == 0
@@ -407,3 +416,57 @@ async def test_metadata_updated(climate_radio_thermostat_ct100_plus: Node):
 
     node.handle_metadata_updated(event)
     assert value.metadata.states
+
+
+async def test_notification(lock_schlage_be469: Node):
+    """Test notification events."""
+    node = lock_schlage_be469
+
+    # Validate that Notification CC notification event is received as expected
+    event = Event(
+        type="notification",
+        data={
+            "source": "node",
+            "event": "notification",
+            "nodeId": 23,
+            "ccId": 113,
+            "args": {
+                "type": 6,
+                "event": 5,
+                "label": "Access Control",
+                "eventLabel": "Keypad lock operation",
+                "parameters": {"userId": 1},
+            },
+        },
+    )
+
+    node.handle_notification(event)
+    assert event.data["notification"].command_class == CommandClass.NOTIFICATION
+    assert event.data["notification"].node_id == 23
+    assert event.data["notification"].type_ == 6
+    assert event.data["notification"].event == 5
+    assert event.data["notification"].label == "Access Control"
+    assert event.data["notification"].event_label == "Keypad lock operation"
+    assert event.data["notification"].parameters == {"userId": 1}
+
+
+async def test_entry_control_notification(ring_keypad):
+    node = ring_keypad
+
+    # Validate that Entry Control CC notification event is received as expected
+    event = Event(
+        type="notification",
+        data={
+            "source": "node",
+            "event": "notification",
+            "nodeId": 10,
+            "ccId": 111,
+            "args": {"eventType": 5, "dataType": 2, "eventData": "555"},
+        },
+    )
+    node.handle_notification(event)
+    assert event.data["notification"].command_class == CommandClass.ENTRY_CONTROL
+    assert event.data["notification"].node_id == 10
+    assert event.data["notification"].event_type == EntryControlEventType.ARM_AWAY
+    assert event.data["notification"].data_type == EntryControlDataType.ASCII
+    assert event.data["notification"].event_data == "555"

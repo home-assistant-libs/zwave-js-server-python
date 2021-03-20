@@ -8,13 +8,13 @@ from .. import load_fixture
 
 def test_from_state():
     """Test from_state method."""
-    state = json.loads(load_fixture("basic_dump.txt").split("\n")[0])["state"]
+    state = json.loads(load_fixture("basic_dump.txt").split("\n")[0])["result"]["state"]
 
     ctrl = controller_pkg.Controller(None, state)
 
     assert ctrl.library_version == "Z-Wave 3.95"
     assert ctrl.controller_type == 1
-    assert ctrl.home_id == 3245146787
+    assert ctrl.home_id == 3601639587
     assert ctrl.own_node_id == 1
     assert ctrl.is_secondary is False
     assert ctrl.is_using_home_id_from_other_network is False
@@ -450,20 +450,20 @@ async def test_remove_associations(controller, uuid4, mock_command):
     }
 
 
-async def test_remove_node_from_all_assocations(controller, uuid4, mock_command):
+async def test_remove_node_from_all_associations(controller, uuid4, mock_command):
     """Test remove associations."""
 
     ack_commands = mock_command(
-        {"command": "controller.remove_node_from_all_assocations"},
+        {"command": "controller.remove_node_from_all_associations"},
         {},
     )
 
     node_id = 52
-    await controller.async_remove_node_from_all_assocations(node_id)
+    await controller.async_remove_node_from_all_associations(node_id)
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
-        "command": "controller.remove_node_from_all_assocations",
+        "command": "controller.remove_node_from_all_associations",
         "messageId": uuid4,
         "nodeId": node_id,
     }

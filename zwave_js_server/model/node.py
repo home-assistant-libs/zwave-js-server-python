@@ -10,7 +10,12 @@ from .command_class import CommandClassInfo, CommandClassInfoDataType
 from .device_class import DeviceClass, DeviceClassDataType
 from .device_config import DeviceConfig, DeviceConfigDataType
 from .endpoint import Endpoint, EndpointDataType
-from .notification import Notification, NotificationDataType
+from .notification import (
+    EntryControlNotification,
+    EntryControlNotificationDataType,
+    NotificationNotification,
+    NotificationNotificationDataType,
+)
 from .value import (
     ConfigurationValue,
     MetaDataType,
@@ -47,15 +52,17 @@ class NodeDataType(TypedDict, total=False):
     status: int  # 0-4  # required
     deviceClass: DeviceClassDataType
     zwavePlusVersion: int
-    nodeType: int
-    roleType: int
+    zwavePlusNodeType: int
+    zwavePlusRoleType: int
     isListening: bool
-    isFrequentListening: bool
+    isFrequentListening: Union[bool, str]
     isRouting: bool
-    maxBaudRate: int
+    maxDataRate: int
+    supportedDataRates: List[int]
     isSecure: bool
-    isBeaming: bool
-    version: int
+    supportsBeaming: bool
+    supportsSecurity: bool
+    protocolVersion: int
     firmwareVersion: str
     manufacturerId: int
     productId: int
@@ -156,9 +163,9 @@ class Node(EventBase):
         return self.data.get("isListening")
 
     @property
-    def is_frequent_listening(self) -> Optional[bool]:
+    def is_frequent_listening(self) -> Optional[Union[bool, str]]:
         """Return the is_frequent_listening."""
-        return self.data["isFrequentListening"]
+        return self.data.get("isFrequentListening")
 
     @property
     def is_routing(self) -> Optional[bool]:
@@ -166,9 +173,14 @@ class Node(EventBase):
         return self.data.get("isRouting")
 
     @property
-    def max_baud_rate(self) -> Optional[int]:
-        """Return the max_baud_rate."""
-        return self.data.get("maxBaudRate")
+    def max_data_rate(self) -> Optional[int]:
+        """Return the max_data_rate."""
+        return self.data.get("maxDataRate")
+
+    @property
+    def supported_data_rates(self) -> List[int]:
+        """Return the supported_data_rates."""
+        return self.data.get("supportedDataRates", [])
 
     @property
     def is_secure(self) -> Optional[bool]:
@@ -176,14 +188,19 @@ class Node(EventBase):
         return self.data.get("isSecure")
 
     @property
-    def version(self) -> Optional[int]:
-        """Return the version."""
-        return self.data.get("version")
+    def protocol_version(self) -> Optional[int]:
+        """Return the protocol_version."""
+        return self.data.get("protocolVersion")
 
     @property
-    def is_beaming(self) -> Optional[bool]:
-        """Return the is_beaming."""
-        return self.data.get("isBeaming")
+    def supports_beaming(self) -> Optional[bool]:
+        """Return the supports_beaming."""
+        return self.data.get("supportsBeaming")
+
+    @property
+    def supports_security(self) -> Optional[bool]:
+        """Return the supports_security."""
+        return self.data.get("supportsSecurity")
 
     @property
     def manufacturer_id(self) -> Optional[int]:
@@ -211,14 +228,14 @@ class Node(EventBase):
         return self.data.get("zwavePlusVersion")
 
     @property
-    def node_type(self) -> Optional[int]:
-        """Return the node_type."""
-        return self.data.get("nodeType")
+    def zwave_plus_node_type(self) -> Optional[int]:
+        """Return the zwave_plus_node_type."""
+        return self.data.get("zwavePlusNodeType")
 
     @property
-    def role_type(self) -> Optional[int]:
-        """Return the role_type."""
-        return self.data.get("roleType")
+    def zwave_plus_role_type(self) -> Optional[int]:
+        """Return the zwave_plus_role_type."""
+        return self.data.get("zwavePlusRoleType")
 
     @property
     def name(self) -> Optional[str]:
@@ -485,9 +502,14 @@ class Node(EventBase):
 
     def handle_notification(self, event: Event) -> None:
         """Process a node notification event."""
-        event.data["notification"] = Notification(
-            self, cast(NotificationDataType, event.data)
-        )
+        if event.data["ccId"] == CommandClass.NOTIFICATION.value:
+            event.data["notification"] = NotificationNotification(
+                self, cast(NotificationNotificationDataType, event.data)
+            )
+        else:
+            event.data["notification"] = EntryControlNotification(
+                self, cast(EntryControlNotificationDataType, event.data)
+            )
 
     def handle_firmware_update_progress(self, event: Event) -> None:
         """Process a node firmware update progress event."""

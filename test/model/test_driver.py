@@ -12,7 +12,7 @@ def test_from_state():
     """Test from_state method."""
     ws_msgs = load_fixture("basic_dump.txt").strip().split("\n")
 
-    driver = driver_pkg.Driver(None, json.loads(ws_msgs[0])["state"])
+    driver = driver_pkg.Driver(None, json.loads(ws_msgs[0])["result"]["state"])
 
     for msg in ws_msgs[1:]:
         msg = json.loads(msg)
@@ -27,7 +27,7 @@ async def test_update_log_config(driver, uuid4, mock_command):
     """Test update log config."""
     # Update log level
     ack_commands = mock_command(
-        {"command": "update_log_config", "config": {"level": 0}},
+        {"command": "update_log_config", "config": {"level": "error"}},
         {"success": True},
     )
 
@@ -41,7 +41,7 @@ async def test_update_log_config(driver, uuid4, mock_command):
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "update_log_config",
-        "config": {"level": 0},
+        "config": {"level": "error"},
         "messageId": uuid4,
     }
 
@@ -51,7 +51,7 @@ async def test_update_log_config(driver, uuid4, mock_command):
             "command": "update_log_config",
             "config": {
                 "enabled": True,
-                "level": 0,
+                "level": "error",
                 "logToFile": True,
                 "filename": "/test.txt",
                 "forceConsole": True,
@@ -77,7 +77,7 @@ async def test_update_log_config(driver, uuid4, mock_command):
         "command": "update_log_config",
         "config": {
             "enabled": True,
-            "level": 0,
+            "level": "error",
             "logToFile": True,
             "filename": "/test.txt",
             "forceConsole": True,
@@ -94,7 +94,7 @@ async def test_get_log_config(driver, uuid4, mock_command):
             "success": True,
             "config": {
                 "enabled": True,
-                "level": 0,
+                "level": "error",
                 "logToFile": False,
                 "filename": "/test.txt",
                 "forceConsole": False,

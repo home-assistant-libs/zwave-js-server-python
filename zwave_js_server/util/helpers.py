@@ -1,7 +1,7 @@
 """Generic Utility helper functions."""
 
 import json
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 from ..exceptions import UnparseableValue
 
@@ -12,7 +12,18 @@ def is_json_string(value: Any) -> bool:
     return isinstance(value, str) and value.startswith("{") and value.endswith("}")
 
 
-def parse_buffer(value: Dict[str, Any]) -> str:
+def parse_buffer(value: Union[Dict[str, Any], str]) -> str:
+    """Parse value from a buffer data type."""
+    if isinstance(value, dict):
+        return parse_buffer_from_dict(value)
+
+    if is_json_string(value):
+        return parse_buffer_from_json(value)
+
+    return value
+
+
+def parse_buffer_from_dict(value: Dict[str, Any]) -> str:
     """Parse value dictionary from a buffer data type."""
     if value.get("type") != "Buffer" or "data" not in value:
         raise UnparseableValue(f"Unparseable value: {value}") from ValueError(
@@ -24,6 +35,6 @@ def parse_buffer(value: Dict[str, Any]) -> str:
 def parse_buffer_from_json(value: str) -> str:
     """Parse value string from a buffer data type."""
     try:
-        return parse_buffer(json.loads(value))
+        return parse_buffer_from_dict(json.loads(value))
     except ValueError as err:
         raise UnparseableValue(f"Unparseable value: {value}") from err

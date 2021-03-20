@@ -83,6 +83,12 @@ def inovelli_switch_state_fixture():
     return json.loads(load_fixture("inovelli_switch_state.json"))
 
 
+@pytest.fixture(name="ring_keypad_state", scope="session")
+def ring_keypad_state_fixture():
+    """Load the ring keypad node state fixture data."""
+    return json.loads(load_fixture("ring_keypad_state.json"))
+
+
 def create_ws_message(result):
     """Return a mock WSMessage."""
     message = Mock(spec_set=WSMessage)
@@ -169,7 +175,7 @@ def version_data_fixture():
         "serverVersion": "test_server_version",
         "homeId": "test_home_id",
         "minSchemaVersion": 0,
-        "maxSchemaVersion": 1,
+        "maxSchemaVersion": 3,
     }
 
 
@@ -322,7 +328,15 @@ def controller_fixture(driver, controller_state):
 
 @pytest.fixture(name="inovelli_switch")
 def inovelli_switch_fixture(driver, inovelli_switch_state):
-    """Mock a radio thermostat node."""
+    """Mock a inovelli switch node."""
     node = Node(driver.client, inovelli_switch_state)
+    driver.controller.nodes[node.node_id] = node
+    return node
+
+
+@pytest.fixture(name="ring_keypad")
+def ring_keypad_fixture(driver, ring_keypad_state):
+    """Mock a ring keypad node."""
+    node = Node(driver.client, ring_keypad_state)
     driver.controller.nodes[node.node_id] = node
     return node

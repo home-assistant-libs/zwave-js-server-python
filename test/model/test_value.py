@@ -17,12 +17,6 @@ def test_buffer_dict(client, idl_101_lock_state):
 
     zwave_value = node.values[value_id]
 
-    assert zwave_value.metadata.type == "string"
-    assert zwave_value.value == "¤\x0eªV"
-
-    zwave_value.data["metadata"]["type"] = "buffer"
-    zwave_value.update(zwave_value.data)
-
     assert zwave_value.metadata.type == "buffer"
     assert zwave_value.value == "¤\x0eªV"
 
