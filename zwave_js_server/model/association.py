@@ -1,6 +1,6 @@
 """Provide a model for the association."""
-from typing import Dict, List, Optional
 from dataclasses import dataclass, field
+from typing import Dict, List, Optional
 
 
 @dataclass

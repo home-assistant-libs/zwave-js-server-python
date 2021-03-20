@@ -4,7 +4,8 @@ Model for a Zwave Node's Notification Event.
 https://zwave-js.github.io/node-zwave-js/#/api/node?id=quotnotificationquot
 """
 
-from typing import Literal, TYPE_CHECKING, Any, Dict, Optional, TypedDict, Union
+from typing import TYPE_CHECKING, Any, Dict, Literal, Optional, TypedDict, Union
+
 from zwave_js_server.util.helpers import parse_buffer
 
 if TYPE_CHECKING:

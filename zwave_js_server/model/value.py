@@ -1,7 +1,7 @@
 """Provide a model for the Z-Wave JS value."""
 from typing import TYPE_CHECKING, Any, Dict, Optional, TypedDict, Union
 
-from ..const import VALUE_UNKNOWN, ConfigurationValueType
+from ..const import VALUE_UNKNOWN, CommandClass, ConfigurationValueType
 from ..event import Event
 from ..util.helpers import parse_buffer
 
@@ -40,6 +40,15 @@ class ValueDataType(TypedDict, total=False):
     prevValue: Any
     metadata: MetaDataType
     ccVersion: int
+
+
+def _init_value(
+    node: "Node", val: ValueDataType
+) -> Union["Value", "ConfigurationValue"]:
+    """Intialize a Value object from ValueDataType."""
+    if val["commandClass"] == CommandClass.CONFIGURATION:
+        return ConfigurationValue(node, val)
+    return Value(node, val)
 
 
 def _get_value_id_from_dict(node: "Node", val: ValueDataType) -> str:

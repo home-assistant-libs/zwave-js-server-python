@@ -5,6 +5,7 @@ https://zwave-js.github.io/node-zwave-js/#/api/endpoint?id=commandclasses
 """
 
 from typing import TypedDict
+
 from ..const import CommandClass
 
 

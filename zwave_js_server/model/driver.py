@@ -1,5 +1,6 @@
 """Provide a model for the Z-Wave JS Driver."""
 from typing import TYPE_CHECKING
+
 from zwave_js_server.model.log_config import LogConfig
 
 from ..event import Event, EventBase
