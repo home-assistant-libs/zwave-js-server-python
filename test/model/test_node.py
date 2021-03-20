@@ -184,6 +184,7 @@ async def test_refresh_info(multisensor_6, uuid4, mock_command):
 async def test_value_added_event(multisensor_6):
     """Test Node value removed event."""
     node = multisensor_6
+    assert "52-112-0-2" in node.values
     event = Event(
         type="value removed",
         data={
