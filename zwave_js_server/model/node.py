@@ -393,8 +393,8 @@ class Node(EventBase):
             # We should never reach this code
             raise FailedCommand("Command failed", "failed_command")
         return [
-            _init_value(self, cast(ValueDataType, valueId))
-            for valueId in data["valueIds"]
+            _init_value(self, cast(ValueDataType, value_id))
+            for value_id in data["valueIds"]
         ]
 
     async def async_get_value_metadata(self, val: Union[Value, str]) -> ValueMetadata:
