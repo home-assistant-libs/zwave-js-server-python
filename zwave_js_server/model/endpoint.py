@@ -6,6 +6,8 @@ https://zwave-js.github.io/node-zwave-js/#/api/endpoint?id=endpoint-properties
 
 from typing import Optional, TypedDict
 
+from .device_class import DeviceClass, DeviceClassDataType
+
 
 class EndpointDataType(TypedDict, total=False):
     """Represent an endpoint data dict type."""
@@ -14,6 +16,7 @@ class EndpointDataType(TypedDict, total=False):
     index: int  # required
     installerIcon: int
     userIcon: int
+    deviceClass: DeviceClassDataType
 
 
 class Endpoint:
@@ -42,3 +45,8 @@ class Endpoint:
     def user_icon(self) -> Optional[int]:
         """Return user icon property."""
         return self.data.get("userIcon")
+
+    @property
+    def device_class(self) -> DeviceClass:
+        """Return the device_class."""
+        return DeviceClass(self.data["deviceClass"])
