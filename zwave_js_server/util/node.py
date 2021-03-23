@@ -86,8 +86,8 @@ def partial_param_bit_shift(property_key: int) -> int:
 
 async def async_bulk_set_partial_config_parameters(
     node: Node,
-    new_value: Union[int, Dict[int, Union[int, str]]],
     property_: int,
+    new_value: Union[int, Dict[int, Union[int, str]]],
 ) -> None:
     """Bulk set partial configuration values on this node."""
     config_values = node.get_configuration_values()
@@ -142,24 +142,15 @@ async def async_bulk_set_partial_config_parameters(
         remaining_value = new_value
 
         # Break down the bulk value into partial values and validate them against
-        # each partial parameter's metadata
-        for property_key in sorted(
-            [cast(int, value.property_key) for value in property_values], reverse=True
+        # each partial parameter's metadata by looping through the property values
+        # starting with the highest property key
+        for zwave_value in sorted(
+            property_values, key=lambda val: cast(int, val.property_key), reverse=True
         ):
+            property_key = cast(int, zwave_value.property_key)
             multiplication_factor = 2 ** partial_param_bit_shift(property_key)
             partial_value = int(remaining_value / multiplication_factor)
             remaining_value = remaining_value % multiplication_factor
-            zwave_value = cast(
-                ConfigurationValue,
-                node.values[
-                    get_value_id(
-                        node,
-                        CommandClass.CONFIGURATION,
-                        property_,
-                        property_key=property_key,
-                    )
-                ],
-            )
             _validate_and_transform_new_value(zwave_value, partial_value)
 
     if (
