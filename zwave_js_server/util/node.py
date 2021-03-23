@@ -161,16 +161,20 @@ async def async_bulk_set_partial_config_parameters(
         },
         value=new_value,
     )
-    if cmd_response and not cast(bool, cmd_response["success"]):
+
+    # If we didn't wait for a response, we assume the command has been queued
+    if cmd_response is None:
+        return CommandStatus.QUEUED
+
+    if not cast(bool, cmd_response["success"]):
         raise SetValueFailed(
             "Unable to set value, refer to "
             "https://zwave-js.github.io/node-zwave-js/#/api/node?id=setvalue for "
             "possible reasons"
         )
 
-    # If we received a response that is not false, the command was successful, otherwise
-    # we've queued it
-    return CommandStatus.ACCEPTED if cmd_response else CommandStatus.QUEUED
+    # If we received a response that is not false, the command was successful
+    return CommandStatus.ACCEPTED
 
 
 async def async_set_config_parameter(
