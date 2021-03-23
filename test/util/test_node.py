@@ -1,7 +1,7 @@
 """Test node utility functions."""
-from zwave_js_server.const import CommandClass
 import pytest
 
+from zwave_js_server.const import CommandClass
 from zwave_js_server.exceptions import InvalidNewValue, NotFoundError
 from zwave_js_server.model.node import Node
 from zwave_js_server.model.value import ConfigurationValue
