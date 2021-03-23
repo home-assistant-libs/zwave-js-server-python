@@ -13,7 +13,7 @@ from ..const import (
 )
 from ..exceptions import NotFoundError
 from ..model.node import Node
-from ..model.value import get_value_id, Value
+from ..model.value import Value, get_value_id
 
 
 def get_code_slot_value(node: Node, code_slot: int, property_name: str) -> Value:

@@ -1,10 +1,14 @@
 """Test node utility functions."""
+from zwave_js_server.const import CommandClass
 import pytest
 
 from zwave_js_server.exceptions import InvalidNewValue, NotFoundError
 from zwave_js_server.model.node import Node
 from zwave_js_server.model.value import ConfigurationValue
-from zwave_js_server.util.node import async_set_config_parameter
+from zwave_js_server.util.node import (
+    async_bulk_set_partial_config_parameters,
+    async_set_config_parameter,
+)
 
 
 async def test_configuration_parameter_values(
@@ -101,3 +105,65 @@ async def test_configuration_parameter_values(
         "value": 4,
         "messageId": uuid4,
     }
+
+
+async def test_bulk_set_partial_config_parameters(multisensor_6, uuid4, mock_command):
+    """Test bulk setting partial config parameters."""
+    node: Node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.set_value", "nodeId": node.node_id},
+        {"success": True},
+    )
+    await async_bulk_set_partial_config_parameters(node, 241, 101)
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.set_value",
+        "nodeId": node.node_id,
+        "valueId": {
+            "commandClass": CommandClass.CONFIGURATION.value,
+            "property": 101,
+        },
+        "value": 241,
+        "messageId": uuid4,
+    }
+
+    await async_bulk_set_partial_config_parameters(
+        node, {128: 1, 64: 1, 32: 1, 16: 1, 1: 1}, 101
+    )
+    assert len(ack_commands) == 2
+    assert ack_commands[1] == {
+        "command": "node.set_value",
+        "nodeId": node.node_id,
+        "valueId": {
+            "commandClass": CommandClass.CONFIGURATION.value,
+            "property": 101,
+        },
+        "value": 241,
+        "messageId": uuid4,
+    }
+
+    # Only set some values so we use cached values for the rest
+    await async_bulk_set_partial_config_parameters(
+        node, {64: 1, 32: 1, 16: 1, 1: 1}, 101
+    )
+    assert len(ack_commands) == 3
+    assert ack_commands[2] == {
+        "command": "node.set_value",
+        "nodeId": node.node_id,
+        "valueId": {
+            "commandClass": CommandClass.CONFIGURATION.value,
+            "property": 101,
+        },
+        "value": 241,
+        "messageId": uuid4,
+    }
+
+    # Use an invalid property
+    with pytest.raises(NotFoundError):
+        await async_bulk_set_partial_config_parameters(node, 99, 999)
+
+    # use an invalid bitmask
+    with pytest.raises(NotFoundError):
+        await async_bulk_set_partial_config_parameters(
+            node, {128: 1, 64: 1, 32: 1, 16: 1, 2: 1}, 101
+        )
