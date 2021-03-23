@@ -114,7 +114,7 @@ async def test_bulk_set_partial_config_parameters(multisensor_6, uuid4, mock_com
         {"command": "node.set_value", "nodeId": node.node_id},
         {"success": True},
     )
-    await async_bulk_set_partial_config_parameters(node, 241, 101)
+    await async_bulk_set_partial_config_parameters(node, 101, 241)
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "node.set_value",
@@ -128,7 +128,7 @@ async def test_bulk_set_partial_config_parameters(multisensor_6, uuid4, mock_com
     }
 
     await async_bulk_set_partial_config_parameters(
-        node, {128: 1, 64: 1, 32: 1, 16: 1, 1: 1}, 101
+        node, 101, {128: 1, 64: 1, 32: 1, 16: 1, 1: 1}
     )
     assert len(ack_commands) == 2
     assert ack_commands[1] == {
@@ -144,7 +144,7 @@ async def test_bulk_set_partial_config_parameters(multisensor_6, uuid4, mock_com
 
     # Only set some values so we use cached values for the rest
     await async_bulk_set_partial_config_parameters(
-        node, {64: 1, 32: 1, 16: 1, 1: 1}, 101
+        node, 101, {64: 1, 32: 1, 16: 1, 1: 1}
     )
     assert len(ack_commands) == 3
     assert ack_commands[2] == {
@@ -160,10 +160,10 @@ async def test_bulk_set_partial_config_parameters(multisensor_6, uuid4, mock_com
 
     # Use an invalid property
     with pytest.raises(NotFoundError):
-        await async_bulk_set_partial_config_parameters(node, 99, 999)
+        await async_bulk_set_partial_config_parameters(node, 999, 99)
 
     # use an invalid bitmask
     with pytest.raises(NotFoundError):
         await async_bulk_set_partial_config_parameters(
-            node, {128: 1, 64: 1, 32: 1, 16: 1, 2: 1}, 101
+            node, 101, {128: 1, 64: 1, 32: 1, 16: 1, 2: 1}
         )
