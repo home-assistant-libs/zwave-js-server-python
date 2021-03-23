@@ -1,15 +1,15 @@
 """Utility functions for Z-Wave JS nodes."""
 import json
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Union, cast
 
 from ..const import CommandClass, ConfigurationValueType
 from ..exceptions import InvalidNewValue, NotFoundError, SetValueFailed
 from ..model.node import Node
-from ..model.value import ConfigurationValue, Value, get_value_id
+from ..model.value import ConfigurationValue, get_value_id
 
 
 def _validate_and_transform_new_value(
-    zwave_value: Value, new_value: Union[int, str]
+    zwave_value: ConfigurationValue, new_value: Union[int, str]
 ) -> int:
     """Validate a new value and return the integer value to set."""
     # Validate that new value for enumerated configuration parameter is a valid state
@@ -86,7 +86,7 @@ def partial_param_bit_shift(property_key: int) -> int:
 
 async def async_bulk_set_partial_config_parameters(
     node: Node,
-    new_value: Union[int, Dict[str, Union[int, str]]],
+    new_value: Union[int, Dict[int, Union[int, str]]],
     property_: int,
 ) -> None:
     """Bulk set partial configuration values on this node."""
@@ -97,6 +97,12 @@ async def async_bulk_set_partial_config_parameters(
     if len(property_values) == 0:
         raise NotFoundError(
             f"Configuration parameter {property_} for node {node.node_id} not found"
+        )
+
+    if len(property_values) == 1:
+        raise TypeError(
+            f"Configuration parameter {property_} for node {node.node_id} does not "
+            "have partials"
         )
 
     # If new_value is a dictionary, we need to calculate the full value to send
@@ -113,7 +119,7 @@ async def async_bulk_set_partial_config_parameters(
                     f"Bitmask {property_key} ({hex(property_key)}) not found for "
                     f"parameter {property_}"
                 )
-            zwave_value = node.values[value_id]
+            zwave_value = cast(ConfigurationValue, node.values[value_id])
             partial_value = _validate_and_transform_new_value(
                 zwave_value, partial_value
             )
@@ -123,14 +129,14 @@ async def async_bulk_set_partial_config_parameters(
         # property keys that haven't been specified
         for property_value in property_values:
             if property_value.property_key not in new_value:
-                temp_value += property_value.value << partial_param_bit_shift(
-                    property_value.property_key
+                temp_value += cast(int, property_value.value) << partial_param_bit_shift(
+                    cast(int, property_value.property_key)
                 )
 
         new_value = temp_value
     else:
         property_keys = sorted(
-            [value.property_key for value in property_values], reverse=True
+            [cast(int, value.property_key) for value in property_values], reverse=True
         )
         temp_value = new_value
 
@@ -140,14 +146,14 @@ async def async_bulk_set_partial_config_parameters(
             multiplication_factor = 2 ** partial_param_bit_shift(property_key)
             partial_value = int(temp_value / multiplication_factor)
             temp_value = temp_value % multiplication_factor
-            zwave_value = node.values[
+            zwave_value = cast(ConfigurationValue, node.values[
                 get_value_id(
                     node,
                     CommandClass.CONFIGURATION,
                     property_,
                     property_key=property_key,
                 )
-            ]
+            ])
             _validate_and_transform_new_value(zwave_value, partial_value)
 
     if (
