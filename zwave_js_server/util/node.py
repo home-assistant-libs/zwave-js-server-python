@@ -129,9 +129,9 @@ async def async_bulk_set_partial_config_parameters(
         # property keys that haven't been specified
         for property_value in property_values:
             if property_value.property_key not in new_value:
-                temp_value += cast(int, property_value.value) << partial_param_bit_shift(
-                    cast(int, property_value.property_key)
-                )
+                temp_value += cast(
+                    int, property_value.value
+                ) << partial_param_bit_shift(cast(int, property_value.property_key))
 
         new_value = temp_value
     else:
@@ -146,14 +146,17 @@ async def async_bulk_set_partial_config_parameters(
             multiplication_factor = 2 ** partial_param_bit_shift(property_key)
             partial_value = int(temp_value / multiplication_factor)
             temp_value = temp_value % multiplication_factor
-            zwave_value = cast(ConfigurationValue, node.values[
-                get_value_id(
-                    node,
-                    CommandClass.CONFIGURATION,
-                    property_,
-                    property_key=property_key,
-                )
-            ])
+            zwave_value = cast(
+                ConfigurationValue,
+                node.values[
+                    get_value_id(
+                        node,
+                        CommandClass.CONFIGURATION,
+                        property_,
+                        property_key=property_key,
+                    )
+                ],
+            )
             _validate_and_transform_new_value(zwave_value, partial_value)
 
     if (
