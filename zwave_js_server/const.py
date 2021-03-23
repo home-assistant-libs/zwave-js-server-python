@@ -10,6 +10,14 @@ MAX_SERVER_SCHEMA_VERSION = 3
 VALUE_UNKNOWN = "unknown"
 
 
+class CommandStatus(str, Enum):
+    """Status of a command sent to zwave-js-server."""
+
+    ACCEPTED = "accepted"
+    QUEUED = "queued"
+    FAILED = "failed"
+
+
 class EntryControlEventType(IntEnum):
     """Entry control event types."""
 

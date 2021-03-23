@@ -1,8 +1,8 @@
 """Utility functions for Z-Wave JS nodes."""
 import json
-from typing import Dict, Optional, Union, cast
+from typing import Dict, Optional, Tuple, Union, cast
 
-from ..const import CommandClass, ConfigurationValueType
+from ..const import CommandClass, CommandStatus, ConfigurationValueType
 from ..exceptions import InvalidNewValue, NotFoundError, SetValueFailed, ValueTypeError
 from ..model.node import Node
 from ..model.value import ConfigurationValue, get_value_id
@@ -88,7 +88,7 @@ async def async_bulk_set_partial_config_parameters(
     node: Node,
     property_: int,
     new_value: Union[int, Dict[int, Union[int, str]]],
-) -> None:
+) -> CommandStatus:
     """Bulk set partial configuration values on this node."""
     config_values = node.get_configuration_values()
     property_values = [
@@ -153,7 +153,7 @@ async def async_bulk_set_partial_config_parameters(
             remaining_value = remaining_value % multiplication_factor
             _validate_and_transform_new_value(zwave_value, partial_value)
 
-    response = await node.async_send_command(
+    cmd_response = await node.async_send_command(
         "set_value",
         valueId={
             "commandClass": CommandClass.CONFIGURATION.value,
@@ -161,12 +161,16 @@ async def async_bulk_set_partial_config_parameters(
         },
         value=new_value,
     )
-    if response and not cast(bool, response["success"]):
+    if cmd_response and not cast(bool, cmd_response["success"]):
         raise SetValueFailed(
             "Unable to set value, refer to "
             "https://zwave-js.github.io/node-zwave-js/#/api/node?id=setvalue for "
             "possible reasons"
         )
+
+    # If we received a response that is not false, the command was successful, otherwise
+    # we've queued it
+    return CommandStatus.ACCEPTED if cmd_response else CommandStatus.QUEUED
 
 
 async def async_set_config_parameter(
@@ -174,7 +178,7 @@ async def async_set_config_parameter(
     new_value: Union[int, str],
     property_or_property_name: Union[int, str],
     property_key: Optional[Union[int, str]] = None,
-) -> ConfigurationValue:
+) -> Tuple[ConfigurationValue, CommandStatus]:
     """
     Set a value for a config parameter on this node.
 
@@ -216,11 +220,14 @@ async def async_set_config_parameter(
     new_value = _validate_and_transform_new_value(zwave_value, new_value)
 
     # Finally attempt to set the value and return the Value object if successful
-    if await node.async_set_value(zwave_value, new_value) is False:
+    cmd_response = await node.async_set_value(zwave_value, new_value)
+    if cmd_response is False:
         raise SetValueFailed(
             "Unable to set value, refer to "
             "https://zwave-js.github.io/node-zwave-js/#/api/node?id=setvalue for "
             "possible reasons"
         )
 
-    return zwave_value
+    status = CommandStatus.ACCEPTED if cmd_response else CommandStatus.QUEUED
+
+    return zwave_value, status
