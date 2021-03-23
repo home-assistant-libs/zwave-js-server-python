@@ -203,7 +203,6 @@ async def async_set_config_parameter(
                 for config_value in config_values.values()
                 if config_value.property_name == property_or_property_name
             )
-            value_id = zwave_value.value_id
         except StopIteration:
             raise NotFoundError(
                 "Configuration parameter with parameter name "
