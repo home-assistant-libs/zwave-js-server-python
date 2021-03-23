@@ -3,7 +3,7 @@ import json
 from typing import Dict, Optional, Union, cast
 
 from ..const import CommandClass, ConfigurationValueType
-from ..exceptions import InvalidNewValue, NotFoundError, SetValueFailed
+from ..exceptions import InvalidNewValue, NotFoundError, SetValueFailed, ValueTypeError
 from ..model.node import Node
 from ..model.value import ConfigurationValue, get_value_id
 
@@ -104,7 +104,7 @@ async def async_bulk_set_partial_config_parameters(
     # If we only find one value with this property_, we know this value isn't split
     # into partial params
     if len(property_values) == 1:
-        raise TypeError(
+        raise ValueTypeError(
             f"Configuration parameter {property_} for node {node.node_id} does not "
             "have partials"
         )

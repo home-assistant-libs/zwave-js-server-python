@@ -2,7 +2,7 @@
 import pytest
 
 from zwave_js_server.const import CommandClass
-from zwave_js_server.exceptions import InvalidNewValue, NotFoundError
+from zwave_js_server.exceptions import InvalidNewValue, NotFoundError, ValueTypeError
 from zwave_js_server.model.node import Node
 from zwave_js_server.model.value import ConfigurationValue
 from zwave_js_server.util.node import (
@@ -167,3 +167,7 @@ async def test_bulk_set_partial_config_parameters(multisensor_6, uuid4, mock_com
         await async_bulk_set_partial_config_parameters(
             node, 101, {128: 1, 64: 1, 32: 1, 16: 1, 2: 1}
         )
+
+    # Try to bulkset a property that isn't broken into partials
+    with pytest.raises(ValueTypeError):
+        await async_bulk_set_partial_config_parameters(node, 252, 1)
