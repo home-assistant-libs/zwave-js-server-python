@@ -1,6 +1,6 @@
 """Utility functions for Z-Wave JS nodes."""
 import json
-from typing import Optional, Union
+from typing import Dict, Optional, Union
 
 from ..const import CommandClass, ConfigurationValueType
 from ..exceptions import InvalidNewValue, NotFoundError, SetValueFailed
@@ -86,7 +86,7 @@ def partial_param_bit_shift(property_key: int) -> int:
 
 async def async_bulk_set_partial_config_parameters(
     node: Node,
-    new_value: Union[int, dict[str, Union[int, str]]],
+    new_value: Union[int, Dict[str, Union[int, str]]],
     property_: int,
 ) -> None:
     """Bulk set partial configuration values on this node."""
@@ -134,7 +134,8 @@ async def async_bulk_set_partial_config_parameters(
         )
         temp_value = new_value
 
-        # Break down the bulk value into partial values and validate them against each partial parameter's metadata
+        # Break down the bulk value into partial values and validate them against
+        # each partial parameter's metadata
         for property_key in property_keys:
             multiplication_factor = 2 ** partial_param_bit_shift(property_key)
             partial_value = int(temp_value / multiplication_factor)
