@@ -139,7 +139,7 @@ async def async_bulk_set_partial_config_parameters(
 
         new_value = temp_value
     else:
-        temp_value = new_value
+        remaining_value = new_value
 
         # Break down the bulk value into partial values and validate them against
         # each partial parameter's metadata
@@ -147,8 +147,8 @@ async def async_bulk_set_partial_config_parameters(
             [cast(int, value.property_key) for value in property_values], reverse=True
         ):
             multiplication_factor = 2 ** partial_param_bit_shift(property_key)
-            partial_value = int(temp_value / multiplication_factor)
-            temp_value = temp_value % multiplication_factor
+            partial_value = int(remaining_value / multiplication_factor)
+            remaining_value = remaining_value % multiplication_factor
             zwave_value = cast(
                 ConfigurationValue,
                 node.values[
