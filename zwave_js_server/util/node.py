@@ -94,11 +94,15 @@ async def async_bulk_set_partial_config_parameters(
     property_values = [
         value for value in config_values.values() if value.property_ == property_
     ]
+
+    # If we can't find any values with this property, the property is wrong
     if len(property_values) == 0:
         raise NotFoundError(
             f"Configuration parameter {property_} for node {node.node_id} not found"
         )
 
+    # If we only find one value with this property_, we know this value isn't split
+    # into partial params
     if len(property_values) == 1:
         raise TypeError(
             f"Configuration parameter {property_} for node {node.node_id} does not "
@@ -108,8 +112,8 @@ async def async_bulk_set_partial_config_parameters(
     # If new_value is a dictionary, we need to calculate the full value to send
     if isinstance(new_value, dict):
         temp_value = 0
-        # For each property key provided, we multiply the partial value by the multiplication factor
-        # and send them to get the number to send
+        # For each property key provided, we bit shift the partial value using the
+        # property_key
         for property_key, partial_value in new_value.items():
             value_id = get_value_id(
                 node, CommandClass.CONFIGURATION, property_, property_key=property_key
@@ -135,14 +139,13 @@ async def async_bulk_set_partial_config_parameters(
 
         new_value = temp_value
     else:
-        property_keys = sorted(
-            [cast(int, value.property_key) for value in property_values], reverse=True
-        )
         temp_value = new_value
 
         # Break down the bulk value into partial values and validate them against
         # each partial parameter's metadata
-        for property_key in property_keys:
+        for property_key in sorted(
+            [cast(int, value.property_key) for value in property_values], reverse=True
+        ):
             multiplication_factor = 2 ** partial_param_bit_shift(property_key)
             partial_value = int(temp_value / multiplication_factor)
             temp_value = temp_value % multiplication_factor
