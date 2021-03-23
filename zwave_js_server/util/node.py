@@ -153,17 +153,15 @@ async def async_bulk_set_partial_config_parameters(
             remaining_value = remaining_value % multiplication_factor
             _validate_and_transform_new_value(zwave_value, partial_value)
 
-    if (
-        await node.async_send_command(
-            "set_value",
-            valueId={
-                "commandClass": CommandClass.CONFIGURATION.value,
-                "property": property_,
-            },
-            value=new_value,
-        )
-        is False
-    ):
+    response = await node.async_send_command(
+        "set_value",
+        valueId={
+            "commandClass": CommandClass.CONFIGURATION.value,
+            "property": property_,
+        },
+        value=new_value,
+    )
+    if response and cast(bool, response["success"]) is False:
         raise SetValueFailed(
             "Unable to set value, refer to "
             "https://zwave-js.github.io/node-zwave-js/#/api/node?id=setvalue for "
