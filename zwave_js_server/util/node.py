@@ -96,7 +96,7 @@ async def async_bulk_set_partial_config_parameters(
     ]
 
     # If we can't find any values with this property, the property is wrong
-    if len(property_values) == 0:
+    if not property_values:
         raise NotFoundError(
             f"Configuration parameter {property_} for node {node.node_id} not found"
         )
