@@ -161,7 +161,7 @@ async def async_bulk_set_partial_config_parameters(
         },
         value=new_value,
     )
-    if response and cast(bool, response["success"]) is False:
+    if response and not cast(bool, response["success"]):
         raise SetValueFailed(
             "Unable to set value, refer to "
             "https://zwave-js.github.io/node-zwave-js/#/api/node?id=setvalue for "
