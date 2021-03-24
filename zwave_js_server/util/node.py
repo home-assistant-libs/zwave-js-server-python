@@ -224,14 +224,14 @@ async def async_set_config_parameter(
     new_value = _validate_and_transform_new_value(zwave_value, new_value)
 
     # Finally attempt to set the value and return the Value object if successful
-    cmd_response = await node.async_set_value(zwave_value, new_value)
-    if cmd_response is False:
+    success = await node.async_set_value(zwave_value, new_value)
+    if success is False:
         raise SetValueFailed(
             "Unable to set value, refer to "
             "https://zwave-js.github.io/node-zwave-js/#/api/node?id=setvalue for "
             "possible reasons"
         )
 
-    status = CommandStatus.ACCEPTED if cmd_response else CommandStatus.QUEUED
+    status = CommandStatus.ACCEPTED if success else CommandStatus.QUEUED
 
     return zwave_value, status
