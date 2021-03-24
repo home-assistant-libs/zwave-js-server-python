@@ -1,8 +1,13 @@
 """Test node utility functions."""
 import pytest
 
-from zwave_js_server.const import CommandClass
-from zwave_js_server.exceptions import InvalidNewValue, NotFoundError, ValueTypeError
+from zwave_js_server.const import CommandClass, CommandStatus
+from zwave_js_server.exceptions import (
+    InvalidNewValue,
+    NotFoundError,
+    SetValueFailed,
+    ValueTypeError,
+)
 from zwave_js_server.model.node import Node
 from zwave_js_server.model.value import ConfigurationValue
 from zwave_js_server.util.node import (
@@ -171,3 +176,44 @@ async def test_bulk_set_partial_config_parameters(multisensor_6, uuid4, mock_com
     # Try to bulkset a property that isn't broken into partials
     with pytest.raises(ValueTypeError):
         await async_bulk_set_partial_config_parameters(node, 252, 1)
+
+
+async def test_failures(multisensor_6, mock_command):
+    """Test setting config parameter failures."""
+    node: Node = multisensor_6
+    # We need the node to be alive so we wait for a response
+    node.handle_alive(node)
+
+    _ = mock_command(
+        {"command": "node.set_value", "nodeId": node.node_id},
+        {"success": False},
+    )
+
+    with pytest.raises(SetValueFailed):
+        await async_bulk_set_partial_config_parameters(
+            node, 101, {64: 1, 32: 1, 16: 1, 1: 1}
+        )
+
+    with pytest.raises(SetValueFailed):
+        await async_set_config_parameter(node, 1, 101, 64)
+
+
+async def test_returned_values(multisensor_6, mock_command):
+    """Test returned values from setting config parameters."""
+    node: Node = multisensor_6
+    # We need the node to be alive so we wait for a response
+    node.handle_alive(node)
+
+    _ = mock_command(
+        {"command": "node.set_value", "nodeId": node.node_id},
+        {"success": True},
+    )
+
+    cmd_status = await async_bulk_set_partial_config_parameters(
+        node, 101, {64: 1, 32: 1, 16: 1, 1: 1}
+    )
+    assert cmd_status == CommandStatus.ACCEPTED
+
+    zwave_value, cmd_status = await async_set_config_parameter(node, 1, 101, 64)
+    assert isinstance(zwave_value, ConfigurationValue)
+    assert cmd_status == CommandStatus.ACCEPTED
