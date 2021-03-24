@@ -82,6 +82,10 @@ class InvalidNewValue(BaseZwaveJSServerError):
     """Exception raised when target new value is invalid based on Value metadata."""
 
 
+class ValueTypeError(BaseZwaveJSServerError):
+    """Exception raised when target Zwave value is the wrong type."""
+
+
 class SetValueFailed(BaseZwaveJSServerError):
     """
     Exception raise when setting a value fails.

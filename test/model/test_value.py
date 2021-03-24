@@ -6,6 +6,13 @@ from zwave_js_server.model.node import Node
 from zwave_js_server.model.value import get_value_id
 
 
+def test_value_size(lock_schlage_be469):
+    """Test the value size property for a value."""
+    node = lock_schlage_be469
+    zwave_value = node.values["20-112-0-3"]
+    assert zwave_value.metadata.value_size == 1
+
+
 def test_buffer_dict(client, idl_101_lock_state):
     """Test that we handle buffer dictionary correctly."""
     node_data = deepcopy(idl_101_lock_state)

@@ -325,7 +325,7 @@ class Node(EventBase):
 
         self.emit(event.type, event.data)
 
-    async def _async_send_command(
+    async def async_send_command(
         self,
         cmd: str,
         require_schema: Optional[int] = None,
@@ -367,7 +367,7 @@ class Node(EventBase):
             raise UnwriteableValue
 
         # the value object needs to be send to the server
-        result = await self._async_send_command(
+        result = await self.async_send_command(
             "set_value",
             valueId=val.data,
             value=new_value,
@@ -381,11 +381,11 @@ class Node(EventBase):
 
     async def async_refresh_info(self) -> None:
         """Send refreshInfo command to Node."""
-        await self._async_send_command("refresh_info", wait_for_result=False)
+        await self.async_send_command("refresh_info", wait_for_result=False)
 
     async def async_get_defined_value_ids(self) -> List[Value]:
         """Send getDefinedValueIDs command to Node."""
-        data = await self._async_send_command(
+        data = await self.async_send_command(
             "get_defined_value_ids", wait_for_result=True
         )
 
@@ -403,21 +403,21 @@ class Node(EventBase):
         if not isinstance(val, Value):
             val = self.values[val]
         # the value object needs to be send to the server
-        data = await self._async_send_command(
+        data = await self.async_send_command(
             "get_value_metadata", valueId=val.data, wait_for_result=True
         )
         return ValueMetadata(cast(MetaDataType, data))
 
     async def async_abort_firmware_update(self) -> None:
         """Send abortFirmwareUpdate command to Node."""
-        await self._async_send_command("abort_firmware_update", wait_for_result=False)
+        await self.async_send_command("abort_firmware_update", wait_for_result=False)
 
     async def async_poll_value(self, val: Union[Value, str]) -> None:
         """Send pollValue command to Node for given value (or value_id)."""
         # a value may be specified as value_id or the value itself
         if not isinstance(val, Value):
             val = self.values[val]
-        await self._async_send_command("poll_value", valueId=val.data, require_schema=1)
+        await self.async_send_command("poll_value", valueId=val.data, require_schema=1)
 
     def handle_wake_up(self, event: Event) -> None:
         """Process a node wake up event."""

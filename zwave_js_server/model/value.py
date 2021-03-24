@@ -23,6 +23,7 @@ class MetaDataType(TypedDict, total=False):
     states: Dict[int, str]
     ccSpecific: Dict[str, Any]
     allowManualEntry: bool
+    valueSize: int
 
 
 class ValueDataType(TypedDict, total=False):
@@ -140,6 +141,11 @@ class ValueMetadata:
     def allow_manual_entry(self) -> Optional[bool]:
         """Return allowManualEntry."""
         return self.data.get("allowManualEntry")
+
+    @property
+    def value_size(self) -> Optional[int]:
+        """Return valueSize."""
+        return self.data.get("valueSize")
 
     def update(self, data: MetaDataType) -> None:
         """Update data."""
