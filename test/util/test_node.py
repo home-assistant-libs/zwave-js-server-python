@@ -204,7 +204,7 @@ async def test_returned_values(multisensor_6, mock_command):
     # We need the node to be alive so we wait for a response
     node.handle_alive(node)
 
-    _ = mock_command(
+    mock_command(
         {"command": "node.set_value", "nodeId": node.node_id},
         {"success": True},
     )
