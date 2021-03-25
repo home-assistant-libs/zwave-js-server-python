@@ -15,7 +15,6 @@ class CommandStatus(str, Enum):
 
     ACCEPTED = "accepted"
     QUEUED = "queued"
-    FAILED = "failed"
 
 
 class EntryControlEventType(IntEnum):
