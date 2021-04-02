@@ -9,6 +9,8 @@ MAX_SERVER_SCHEMA_VERSION = 3
 
 VALUE_UNKNOWN = "unknown"
 
+INTERVIEW_FAILED = "Failed"
+
 
 class CommandStatus(str, Enum):
     """Status of a command sent to zwave-js-server."""

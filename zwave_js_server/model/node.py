@@ -2,7 +2,7 @@
 from enum import IntEnum
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
 
-from zwave_js_server.const import CommandClass
+from zwave_js_server.const import CommandClass, INTERVIEW_FAILED
 
 from ..event import Event, EventBase
 from ..exceptions import FailedCommand, UnparseableValue, UnwriteableValue
@@ -85,6 +85,7 @@ class NodeDataType(TypedDict, total=False):
     interviewStage: int
     commandClasses: List[CommandClassInfoDataType]
     values: List[ValueDataType]
+    lastInterviewStageCompleted: str  # Added internally
 
 
 class Node(EventBase):
@@ -296,6 +297,18 @@ class Node(EventBase):
         return self.data.get("interviewStage")
 
     @property
+    def last_interview_stage_completed(self) -> Optional[str]:
+        """Return the last_interview_stage_completed."""
+        return self.data.get("lastInterviewStageCompleted")
+
+    @property
+    def is_being_interviewed(self) -> bool:
+        """Return whether node is currently being interviewed."""
+        return (
+            not self.ready and self.last_interview_stage_completed != INTERVIEW_FAILED
+        )
+
+    @property
     def command_classes(self) -> List[CommandClassInfo]:
         """Return all CommandClasses supported on this node."""
         return [CommandClassInfo(cc) for cc in self.data["commandClasses"]]
@@ -439,11 +452,17 @@ class Node(EventBase):
         # pylint: disable=unused-argument
         self.data["status"] = NodeStatus.ALIVE
 
-    def handle_interview_completed(self, event: Event) -> None:
-        """Process a node interview completed event."""
+    def handle_interview_started(self, event: Event) -> None:
+        """Process a node interview started event."""
+        self.data["ready"] = False
+
+    def handle_interview_stage_completed(self, event: Event) -> None:
+        """Process a node interview stage completed event."""
+        self.data["lastInterviewStageCompleted"] = event.data["stageName"]
 
     def handle_interview_failed(self, event: Event) -> None:
         """Process a node interview failed event."""
+        self.data["lastInterviewStageCompleted"] = INTERVIEW_FAILED
 
     def handle_ready(self, event: Event) -> None:
         """Process a node ready event."""
@@ -457,6 +476,10 @@ class Node(EventBase):
                 self.values[value_id] = _init_value(self, value_state)
             else:
                 value.update(value_state)
+
+    def handle_not_ready(self, event: Event) -> None:
+        """Process a node not ready event."""
+        self.data["ready"] = False
 
     def handle_value_added(self, event: Event) -> None:
         """Process a node value added event."""
