@@ -105,6 +105,8 @@ async def async_bulk_set_partial_config_parameters(
         # If we find a value with this property_, we know this value isn't split
         # into partial params
         if get_value_id(node, CommandClass.CONFIGURATION, property_) in config_values:
+            # If the new value is provided as a dict, we don't have enough information
+            # to set the parameter.
             if isinstance(new_value, dict):
                 raise ValueTypeError(
                     f"Configuration parameter {property_} for node {node.node_id} "
@@ -112,12 +114,11 @@ async def async_bulk_set_partial_config_parameters(
                 )
             # If the new value is provided as an int, we may as well try to set it
             # using the standard utility function
-            else:
-                _LOGGER.info(
-                    "Falling back to async_set_config_parameter because no partials "
-                    "were found"
-                )
-                return await async_set_config_parameter(node, new_value, property_)
+            _LOGGER.info(
+                "Falling back to async_set_config_parameter because no partials "
+                "were found"
+            )
+            return await async_set_config_parameter(node, new_value, property_)
 
         # Otherwise this config parameter does not exist
         raise NotFoundError(
