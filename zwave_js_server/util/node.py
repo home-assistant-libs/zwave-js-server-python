@@ -92,21 +92,24 @@ async def async_bulk_set_partial_config_parameters(
     """Bulk set partial configuration values on this node."""
     config_values = node.get_configuration_values()
     property_values = [
-        value for value in config_values.values() if value.property_ == property_
+        value
+        for value in config_values.values()
+        if value.property_ == property_ and value.property_key is not None
     ]
 
     # If we can't find any values with this property, the property is wrong
     if not property_values:
+        # If we find a value with this property_, we know this value isn't split
+        # into partial params
+        if get_value_id(node, CommandClass.CONFIGURATION, property_) in config_values:
+            raise ValueTypeError(
+                f"Configuration parameter {property_} for node {node.node_id} does "
+                "not have partials"
+            )
+
+        # Otherwise this config parameter does not exist
         raise NotFoundError(
             f"Configuration parameter {property_} for node {node.node_id} not found"
-        )
-
-    # If we only find one value with this property_, we know this value isn't split
-    # into partial params
-    if len(property_values) == 1:
-        raise ValueTypeError(
-            f"Configuration parameter {property_} for node {node.node_id} does not "
-            "have partials"
         )
 
     # If new_value is a dictionary, we need to calculate the full value to send

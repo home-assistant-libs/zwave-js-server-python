@@ -187,6 +187,32 @@ async def test_bulk_set_partial_config_parameters(multisensor_6, uuid4, mock_com
         await async_bulk_set_partial_config_parameters(node, 252, 1)
 
 
+async def test_bulk_set_with_full_and_partial_parameters(
+    partial_and_full_parameter, uuid4, mock_command
+):
+    """Test bulk setting config parameters when state has full and partial values."""
+    node: Node = partial_and_full_parameter
+    ack_commands = mock_command(
+        {"command": "node.set_value", "nodeId": node.node_id},
+        {"success": True},
+    )
+
+    cmd_status = await async_bulk_set_partial_config_parameters(node, 8, 34867929)
+
+    assert cmd_status == CommandStatus.ACCEPTED
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.set_value",
+        "nodeId": node.node_id,
+        "valueId": {
+            "commandClass": CommandClass.CONFIGURATION.value,
+            "property": 8,
+        },
+        "value": 34867929,
+        "messageId": uuid4,
+    }
+
+
 async def test_failures(multisensor_6, mock_command):
     """Test setting config parameter failures."""
     node: Node = multisensor_6

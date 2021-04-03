@@ -69,6 +69,12 @@ def unparseable_json_string_value_state_fixture():
     return json.loads(load_fixture("unparseable_json_string_value_state.json"))
 
 
+@pytest.fixture(name="partial_and_full_parameter_state", scope="session")
+def partial_and_full_parameter_state_fixture():
+    """Load the node that has both partial and full parameters state fixture data."""
+    return json.loads(load_fixture("partial_and_full_parameter_state.json"))
+
+
 @pytest.fixture(name="client_session")
 def client_session_fixture(ws_client):
     """Mock an aiohttp client session."""
@@ -338,5 +344,13 @@ def inovelli_switch_fixture(driver, inovelli_switch_state):
 def ring_keypad_fixture(driver, ring_keypad_state):
     """Mock a ring keypad node."""
     node = Node(driver.client, ring_keypad_state)
+    driver.controller.nodes[node.node_id] = node
+    return node
+
+
+@pytest.fixture(name="partial_and_full_parameter")
+def partial_and_full_parameter_fixture(driver, partial_and_full_parameter_state):
+    """Mock a node that has both partial and full parameters."""
+    node = Node(driver.client, partial_and_full_parameter_state)
     driver.controller.nodes[node.node_id] = node
     return node
