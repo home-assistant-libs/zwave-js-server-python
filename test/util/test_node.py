@@ -1,4 +1,6 @@
 """Test node utility functions."""
+from unittest.mock import patch
+
 import pytest
 
 from zwave_js_server.const import CommandClass, CommandStatus
@@ -182,9 +184,15 @@ async def test_bulk_set_partial_config_parameters(multisensor_6, uuid4, mock_com
             node, 101, {128: 1, 64: 1, 32: 1, 16: 1, 2: 1}
         )
 
-    # Try to bulkset a property that isn't broken into partials
+    # Try to bulkset a property that isn't broken into partials with a dictionary
     with pytest.raises(ValueTypeError):
+        await async_bulk_set_partial_config_parameters(node, 252, {1: 1})
+
+    # Try to bulkset a property that isn't broken into partials, it should fall back to
+    # async_set_config_parameter
+    with patch("zwave_js_server.util.node.async_set_config_parameter") as mock_cmd:
         await async_bulk_set_partial_config_parameters(node, 252, 1)
+        mock_cmd.assert_called_once
 
 
 async def test_bulk_set_with_full_and_partial_parameters(

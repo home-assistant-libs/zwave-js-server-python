@@ -1,11 +1,14 @@
 """Utility functions for Z-Wave JS nodes."""
 import json
+import logging
 from typing import Dict, Optional, Tuple, Union, cast
 
 from ..const import CommandClass, CommandStatus, ConfigurationValueType
 from ..exceptions import InvalidNewValue, NotFoundError, SetValueFailed, ValueTypeError
 from ..model.node import Node
 from ..model.value import ConfigurationValue, get_value_id
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def _validate_and_transform_new_value(
@@ -102,10 +105,19 @@ async def async_bulk_set_partial_config_parameters(
         # If we find a value with this property_, we know this value isn't split
         # into partial params
         if get_value_id(node, CommandClass.CONFIGURATION, property_) in config_values:
-            raise ValueTypeError(
-                f"Configuration parameter {property_} for node {node.node_id} does "
-                "not have partials"
-            )
+            if isinstance(new_value, dict):
+                raise ValueTypeError(
+                    f"Configuration parameter {property_} for node {node.node_id} "
+                    "does not have partials"
+                )
+            # If the new value is provided as an int, we may as well try to set it
+            # using the standard utility function
+            else:
+                _LOGGER.warning(
+                    "Falling back to async_set_config_parameter because no partials "
+                    "were found"
+                )
+                return await async_set_config_parameter(node, new_value, property_)
 
         # Otherwise this config parameter does not exist
         raise NotFoundError(
