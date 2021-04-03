@@ -113,7 +113,7 @@ async def async_bulk_set_partial_config_parameters(
             # If the new value is provided as an int, we may as well try to set it
             # using the standard utility function
             else:
-                _LOGGER.warning(
+                _LOGGER.info(
                     "Falling back to async_set_config_parameter because no partials "
                     "were found"
                 )
