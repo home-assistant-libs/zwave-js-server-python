@@ -119,7 +119,7 @@ async def async_bulk_set_partial_config_parameters(
             )
             return (await async_set_config_parameter(node, new_value, property_))[1]
 
-        # Otherwise ff we can't find any values with this property, this config
+        # Otherwise if we can't find any values with this property, this config
         # parameter does not exist
         raise NotFoundError(
             f"Configuration parameter {property_} for node {node.node_id} not found"
