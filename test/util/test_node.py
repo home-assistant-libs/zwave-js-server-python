@@ -190,10 +190,8 @@ async def test_bulk_set_partial_config_parameters(multisensor_6, uuid4, mock_com
 
     # Try to bulkset a property that isn't broken into partials, it should fall back to
     # async_set_config_parameter
-    with patch(
-        "zwave_js_server.util.node.async_set_config_parameter",
-        return_value=(None, None),
-    ) as mock_cmd:
+    with patch("zwave_js_server.util.node.async_set_config_parameter") as mock_cmd:
+        mock_cmd.return_value = (None, None)
         await async_bulk_set_partial_config_parameters(node, 252, 1)
         mock_cmd.assert_called_once
 
