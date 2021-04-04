@@ -135,14 +135,13 @@ async def async_bulk_set_partial_config_parameters(
             value_id = get_value_id(
                 node, CommandClass.CONFIGURATION, property_, property_key=property_key
             )
-            if value_id not in node.values:
+            if value_id not in config_values:
                 raise NotFoundError(
                     f"Bitmask {property_key} ({hex(property_key)}) not found for "
                     f"parameter {property_}"
                 )
-            zwave_value = cast(ConfigurationValue, node.values[value_id])
             partial_value = _validate_and_transform_new_value(
-                zwave_value, partial_value
+                config_values[value_id], partial_value
             )
             temp_value += partial_value << partial_param_bit_shift(property_key)
 
