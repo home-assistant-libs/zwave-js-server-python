@@ -1,11 +1,14 @@
 """Utility functions for Z-Wave JS nodes."""
 import json
+import logging
 from typing import Dict, Optional, Tuple, Union, cast
 
 from ..const import CommandClass, CommandStatus, ConfigurationValueType
 from ..exceptions import InvalidNewValue, NotFoundError, SetValueFailed, ValueTypeError
 from ..model.node import Node
 from ..model.value import ConfigurationValue, get_value_id
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def _validate_and_transform_new_value(
@@ -92,21 +95,34 @@ async def async_bulk_set_partial_config_parameters(
     """Bulk set partial configuration values on this node."""
     config_values = node.get_configuration_values()
     property_values = [
-        value for value in config_values.values() if value.property_ == property_
+        value
+        for value in config_values.values()
+        if value.property_ == property_ and value.property_key is not None
     ]
 
-    # If we can't find any values with this property, the property is wrong
     if not property_values:
+        # If we find a value with this property_, we know this value isn't split
+        # into partial params
+        if get_value_id(node, CommandClass.CONFIGURATION, property_) in config_values:
+            # If the new value is provided as a dict, we don't have enough information
+            # to set the parameter.
+            if isinstance(new_value, dict):
+                raise ValueTypeError(
+                    f"Configuration parameter {property_} for node {node.node_id} "
+                    "does not have partials"
+                )
+            # If the new value is provided as an int, we may as well try to set it
+            # using the standard utility function
+            _LOGGER.info(
+                "Falling back to async_set_config_parameter because no partials "
+                "were found"
+            )
+            return (await async_set_config_parameter(node, new_value, property_))[1]
+
+        # Otherwise ff we can't find any values with this property, this config
+        # parameter does not exist
         raise NotFoundError(
             f"Configuration parameter {property_} for node {node.node_id} not found"
-        )
-
-    # If we only find one value with this property_, we know this value isn't split
-    # into partial params
-    if len(property_values) == 1:
-        raise ValueTypeError(
-            f"Configuration parameter {property_} for node {node.node_id} does not "
-            "have partials"
         )
 
     # If new_value is a dictionary, we need to calculate the full value to send
@@ -118,14 +134,13 @@ async def async_bulk_set_partial_config_parameters(
             value_id = get_value_id(
                 node, CommandClass.CONFIGURATION, property_, property_key=property_key
             )
-            if value_id not in node.values:
+            if value_id not in config_values:
                 raise NotFoundError(
                     f"Bitmask {property_key} ({hex(property_key)}) not found for "
                     f"parameter {property_}"
                 )
-            zwave_value = cast(ConfigurationValue, node.values[value_id])
             partial_value = _validate_and_transform_new_value(
-                zwave_value, partial_value
+                config_values[value_id], partial_value
             )
             temp_value += partial_value << partial_param_bit_shift(property_key)
 

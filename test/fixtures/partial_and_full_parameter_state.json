@@ -1,0 +1,1095 @@
+{
+	"nodeId": 32,
+	"index": 0,
+	"installerIcon": 1793,
+	"userIcon": 1793,
+	"status": 4,
+	"ready": true,
+	"isListening": true,
+	"isRouting": true,
+	"isSecure": false,
+	"manufacturerId": 798,
+	"productId": 1,
+	"productType": 2,
+	"firmwareVersion": "1.9",
+	"zwavePlusVersion": 1,
+	"deviceConfig": {
+		"filename": "/usr/src/app/node_modules/@zwave-js/config/config/devices/0x031e/lzw30-sn.json",
+		"manufacturer": "Inovelli",
+		"manufacturerId": 798,
+		"label": "LZW30-SN",
+		"description": "Red Series On/Off Switch",
+		"devices": [{
+			"productType": 2,
+			"productId": 1
+		}],
+		"firmwareVersion": {
+			"min": "0.0",
+			"max": "255.255"
+		},
+		"paramInformation": {
+			"_map": {}
+		}
+	},
+	"label": "LZW30-SN",
+	"neighbors": [
+		1,
+		10,
+		11,
+		14,
+		15,
+		16,
+		19,
+		20,
+		22,
+		26,
+		27,
+		28,
+		29,
+		31,
+		33,
+		36,
+		38,
+		39,
+		41,
+		42,
+		6,
+		8,
+		9
+	],
+	"interviewAttempts": 0,
+	"interviewStage": 6,
+	"endpoints": [{
+		"nodeId": 32,
+		"index": 0,
+		"installerIcon": 1793,
+		"userIcon": 1793,
+		"deviceClass": {
+			"basic": {
+				"key": 4,
+				"label": "Routing Slave"
+			},
+			"generic": {
+				"key": 16,
+				"label": "Binary Switch"
+			},
+			"specific": {
+				"key": 1,
+				"label": "Binary Power Switch"
+			},
+			"mandatorySupportedCCs": [
+				32,
+				37,
+				39
+			],
+			"mandatoryControlledCCs": []
+		}
+	}],
+	"values": [{
+			"endpoint": 0,
+			"commandClass": 37,
+			"commandClassName": "Binary Switch",
+			"property": "currentValue",
+			"propertyName": "currentValue",
+			"ccVersion": 1,
+			"metadata": {
+				"type": "boolean",
+				"readable": true,
+				"writeable": false,
+				"label": "Current value"
+			},
+			"value": false
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 37,
+			"commandClassName": "Binary Switch",
+			"property": "targetValue",
+			"propertyName": "targetValue",
+			"ccVersion": 1,
+			"metadata": {
+				"type": "boolean",
+				"readable": true,
+				"writeable": true,
+				"label": "Target value"
+			},
+			"value": true
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 50,
+			"commandClassName": "Meter",
+			"property": "value",
+			"propertyKey": 65537,
+			"propertyName": "value",
+			"propertyKeyName": "Electric_kWh_Consumed",
+			"ccVersion": 3,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": false,
+				"label": "Electric Consumed [kWh]",
+				"ccSpecific": {
+					"meterType": 1,
+					"rateType": 1,
+					"scale": 0
+				},
+				"unit": "kWh"
+			},
+			"value": 7.384
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 50,
+			"commandClassName": "Meter",
+			"property": "previousValue",
+			"propertyKey": 65537,
+			"propertyName": "previousValue",
+			"propertyKeyName": "65537",
+			"ccVersion": 3,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": false,
+				"label": "Electric Consumed [kWh] (prev. value)",
+				"ccSpecific": {
+					"meterType": 1,
+					"rateType": 1,
+					"scale": 0
+				},
+				"unit": "kWh"
+			},
+			"value": 7.202
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 50,
+			"commandClassName": "Meter",
+			"property": "deltaTime",
+			"propertyKey": 65537,
+			"propertyName": "deltaTime",
+			"propertyKeyName": "65537",
+			"ccVersion": 3,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": false,
+				"label": "Electric Consumed [kWh] (prev. time delta)",
+				"ccSpecific": {
+					"meterType": 1,
+					"rateType": 1,
+					"scale": 0
+				},
+				"unit": "s"
+			},
+			"value": 3600
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 50,
+			"commandClassName": "Meter",
+			"property": "value",
+			"propertyKey": 66049,
+			"propertyName": "value",
+			"propertyKeyName": "Electric_W_Consumed",
+			"ccVersion": 3,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": false,
+				"label": "Electric Consumed [W]",
+				"ccSpecific": {
+					"meterType": 1,
+					"rateType": 1,
+					"scale": 2
+				},
+				"unit": "W"
+			},
+			"value": 0
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 50,
+			"commandClassName": "Meter",
+			"property": "deltaTime",
+			"propertyKey": 66049,
+			"propertyName": "deltaTime",
+			"propertyKeyName": "66049",
+			"ccVersion": 3,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": false,
+				"label": "Electric Consumed [W] (prev. time delta)",
+				"ccSpecific": {
+					"meterType": 1,
+					"rateType": 1,
+					"scale": 2
+				},
+				"unit": "s"
+			},
+			"value": 0
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 50,
+			"commandClassName": "Meter",
+			"property": "previousValue",
+			"propertyKey": 66049,
+			"propertyName": "previousValue",
+			"propertyKeyName": "66049",
+			"ccVersion": 3,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": false,
+				"label": "Electric Consumed [W] (prev. value)",
+				"ccSpecific": {
+					"meterType": 1,
+					"rateType": 1,
+					"scale": 2
+				},
+				"unit": "W"
+			}
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 50,
+			"commandClassName": "Meter",
+			"property": "reset",
+			"propertyName": "reset",
+			"ccVersion": 3,
+			"metadata": {
+				"type": "boolean",
+				"readable": false,
+				"writeable": true,
+				"label": "Reset accumulated values"
+			}
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 91,
+			"commandClassName": "Central Scene",
+			"property": "slowRefresh",
+			"propertyName": "slowRefresh",
+			"ccVersion": 3,
+			"metadata": {
+				"type": "boolean",
+				"readable": true,
+				"writeable": true,
+				"description": "When this is true, KeyHeldDown notifications are sent every 55s. When this is false, the notifications are sent every 200ms.",
+				"label": "Send held down notifications at a slow rate"
+			}
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 91,
+			"commandClassName": "Central Scene",
+			"property": "scene",
+			"propertyKey": "001",
+			"propertyName": "scene",
+			"propertyKeyName": "001",
+			"ccVersion": 3,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": false,
+				"label": "Scene 001",
+				"min": 0,
+				"max": 255,
+				"states": {
+					"0": "KeyPressed",
+					"1": "KeyReleased",
+					"2": "KeyHeldDown",
+					"3": "KeyPressed2x",
+					"4": "KeyPressed3x",
+					"5": "KeyPressed4x",
+					"6": "KeyPressed5x"
+				}
+			}
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 91,
+			"commandClassName": "Central Scene",
+			"property": "scene",
+			"propertyKey": "002",
+			"propertyName": "scene",
+			"propertyKeyName": "002",
+			"ccVersion": 3,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": false,
+				"label": "Scene 002",
+				"min": 0,
+				"max": 255,
+				"states": {
+					"0": "KeyPressed",
+					"1": "KeyReleased",
+					"2": "KeyHeldDown",
+					"3": "KeyPressed2x",
+					"4": "KeyPressed3x",
+					"5": "KeyPressed4x",
+					"6": "KeyPressed5x"
+				}
+			}
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 91,
+			"commandClassName": "Central Scene",
+			"property": "scene",
+			"propertyKey": "003",
+			"propertyName": "scene",
+			"propertyKeyName": "003",
+			"ccVersion": 3,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": false,
+				"label": "Scene 003",
+				"min": 0,
+				"max": 255,
+				"states": {
+					"0": "KeyPressed"
+				}
+			}
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 112,
+			"commandClassName": "Configuration",
+			"property": 1,
+			"propertyName": "Power On State",
+			"ccVersion": 1,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": true,
+				"label": "Power On State",
+				"default": 0,
+				"min": 0,
+				"max": 2,
+				"states": {
+					"0": "Prior State",
+					"1": "On",
+					"2": "Off"
+				},
+				"valueSize": 1,
+				"format": 0,
+				"allowManualEntry": false,
+				"isFromConfig": true
+			},
+			"value": 0
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 112,
+			"commandClassName": "Configuration",
+			"property": 2,
+			"propertyName": "Invert Switch",
+			"ccVersion": 1,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": true,
+				"label": "Invert Switch",
+				"default": 0,
+				"min": 0,
+				"max": 1,
+				"states": {
+					"0": "Disabled",
+					"1": "Enabled"
+				},
+				"valueSize": 1,
+				"format": 0,
+				"allowManualEntry": false,
+				"isFromConfig": true
+			},
+			"value": 0
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 112,
+			"commandClassName": "Configuration",
+			"property": 3,
+			"propertyName": "Auto Off Timer",
+			"ccVersion": 1,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": true,
+				"label": "Auto Off Timer",
+				"default": 0,
+				"min": 0,
+				"max": 32767,
+				"unit": "seconds",
+				"valueSize": 2,
+				"format": 0,
+				"allowManualEntry": true,
+				"isFromConfig": true
+			},
+			"value": 0
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 112,
+			"commandClassName": "Configuration",
+			"property": 4,
+			"propertyName": "Association Behavior",
+			"ccVersion": 1,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": true,
+				"label": "Association Behavior",
+				"default": 15,
+				"min": 0,
+				"max": 15,
+				"valueSize": 1,
+				"format": 0,
+				"allowManualEntry": true,
+				"isFromConfig": true
+			},
+			"value": 15
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 112,
+			"commandClassName": "Configuration",
+			"property": 5,
+			"propertyName": "LED Indicator Color",
+			"ccVersion": 1,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": true,
+				"description": "Uses a scaled hue value (realHue / 360 * 255).",
+				"label": "LED Indicator Color",
+				"default": 170,
+				"min": 0,
+				"max": 255,
+				"states": {
+					"0": "Red",
+					"21": "Orange",
+					"42": "Yellow",
+					"85": "Green",
+					"127": "Cyan",
+					"170": "Blue",
+					"212": "Violet",
+					"234": "Pink"
+				},
+				"valueSize": 2,
+				"format": 0,
+				"allowManualEntry": true,
+				"isFromConfig": true
+			},
+			"value": 234
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 112,
+			"commandClassName": "Configuration",
+			"property": 6,
+			"propertyName": "LED Indicator Brightness",
+			"ccVersion": 1,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": true,
+				"label": "LED Indicator Brightness",
+				"default": 5,
+				"min": 0,
+				"max": 10,
+				"states": {
+					"0": "Off",
+					"1": "10%",
+					"2": "20%",
+					"3": "30%",
+					"4": "40%",
+					"5": "50%",
+					"6": "60%",
+					"7": "70%",
+					"8": "80%",
+					"9": "90%",
+					"10": "100%"
+				},
+				"valueSize": 1,
+				"format": 0,
+				"allowManualEntry": false,
+				"isFromConfig": true
+			},
+			"value": 5
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 112,
+			"commandClassName": "Configuration",
+			"property": 7,
+			"propertyName": "LED Indicator Brightness When Off",
+			"ccVersion": 1,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": true,
+				"label": "LED Indicator Brightness When Off",
+				"default": 1,
+				"min": 0,
+				"max": 10,
+				"states": {
+					"0": "Off",
+					"1": "10%",
+					"2": "20%",
+					"3": "30%",
+					"4": "40%",
+					"5": "50%",
+					"6": "60%",
+					"7": "70%",
+					"8": "80%",
+					"9": "90%",
+					"10": "100%"
+				},
+				"valueSize": 1,
+				"format": 0,
+				"allowManualEntry": false,
+				"isFromConfig": true
+			},
+			"value": 1
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 112,
+			"commandClassName": "Configuration",
+			"property": 9,
+			"propertyName": "LED Strip Timeout",
+			"ccVersion": 1,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": true,
+				"label": "LED Strip Timeout",
+				"default": 0,
+				"min": 0,
+				"max": 10,
+				"states": {
+					"0": "Stay Off",
+					"1": "One Second",
+					"2": "Two Seconds",
+					"3": "Three Seconds",
+					"4": "Four Seconds",
+					"5": "Five Seconds",
+					"6": "Six Seconds",
+					"7": "Seven Seconds",
+					"8": "Eight Seconds",
+					"9": "Nine Seconds",
+					"10": "Ten Seconds"
+				},
+				"unit": "seconds",
+				"valueSize": 1,
+				"format": 0,
+				"allowManualEntry": false,
+				"isFromConfig": true
+			},
+			"value": 3
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 112,
+			"commandClassName": "Configuration",
+			"property": 10,
+			"propertyName": "Active Power Reports",
+			"ccVersion": 1,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": true,
+				"label": "Active Power Reports",
+				"default": 10,
+				"min": 0,
+				"max": 100,
+				"unit": "%",
+				"valueSize": 1,
+				"format": 0,
+				"allowManualEntry": true,
+				"isFromConfig": true
+			},
+			"value": 10
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 112,
+			"commandClassName": "Configuration",
+			"property": 11,
+			"propertyName": "Periodic Power & Energy Reports",
+			"ccVersion": 1,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": true,
+				"label": "Periodic Power & Energy Reports",
+				"default": 3600,
+				"min": 0,
+				"max": 32767,
+				"unit": "seconds",
+				"valueSize": 2,
+				"format": 0,
+				"allowManualEntry": true,
+				"isFromConfig": true
+			},
+			"value": 3600
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 112,
+			"commandClassName": "Configuration",
+			"property": 12,
+			"propertyName": "Energy Reports",
+			"ccVersion": 1,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": true,
+				"label": "Energy Reports",
+				"default": 10,
+				"min": 0,
+				"max": 100,
+				"unit": "%",
+				"valueSize": 1,
+				"format": 0,
+				"allowManualEntry": true,
+				"isFromConfig": true
+			},
+			"value": 10
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 112,
+			"commandClassName": "Configuration",
+			"property": 8,
+			"propertyKey": 255,
+			"propertyName": "LED Effect Color",
+			"ccVersion": 1,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": true,
+				"description": "Uses a scaled hue value (realHue / 360 * 255).",
+				"label": "LED Effect Color",
+				"default": 0,
+				"min": 0,
+				"max": 255,
+				"states": {
+					"0": "Red",
+					"21": "Orange",
+					"42": "Yellow",
+					"85": "Green",
+					"127": "Cyan",
+					"170": "Blue",
+					"212": "Violet",
+					"234": "Pink"
+				},
+				"valueSize": 4,
+				"format": 0,
+				"allowManualEntry": true,
+				"isFromConfig": true
+			},
+			"value": 70
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 112,
+			"commandClassName": "Configuration",
+			"property": 8,
+			"propertyKey": 65280,
+			"propertyName": "LED Effect Brightness",
+			"ccVersion": 1,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": true,
+				"label": "LED Effect Brightness",
+				"default": 3,
+				"min": 0,
+				"max": 10,
+				"states": {
+					"0": "Off",
+					"1": "10%",
+					"2": "20%",
+					"3": "30%",
+					"4": "40%",
+					"5": "50%",
+					"6": "60%",
+					"7": "70%",
+					"8": "80%",
+					"9": "90%",
+					"10": "100%"
+				},
+				"valueSize": 4,
+				"format": 0,
+				"allowManualEntry": false,
+				"isFromConfig": true
+			},
+			"value": 10
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 112,
+			"commandClassName": "Configuration",
+			"property": 8,
+			"propertyKey": 16711680,
+			"propertyName": "LED Effect Duration",
+			"ccVersion": 1,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": true,
+				"description": "1 to 60 = seconds, 61 to 120 = minutes (minus 60), 121 - 254 = hours (minus 120), 255 = indefinitely",
+				"label": "LED Effect Duration",
+				"default": 255,
+				"min": 0,
+				"max": 255,
+				"valueSize": 4,
+				"format": 0,
+				"allowManualEntry": true,
+				"isFromConfig": true
+			},
+			"value": 15
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 112,
+			"commandClassName": "Configuration",
+			"property": 8,
+			"propertyKey": 2130706432,
+			"propertyName": "LED Effect Type",
+			"ccVersion": 1,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": true,
+				"label": "LED Effect Type",
+				"default": 0,
+				"min": 0,
+				"max": 4,
+				"states": {
+					"0": "Off",
+					"1": "Solid",
+					"2": "Fast Blink",
+					"3": "Slow Blink",
+					"4": "Pulse"
+				},
+				"valueSize": 4,
+				"format": 0,
+				"allowManualEntry": false,
+				"isFromConfig": true
+			},
+			"value": 2
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 112,
+			"commandClassName": "Configuration",
+			"property": 8,
+			"propertyName": "param008",
+			"ccVersion": 1,
+			"metadata": {
+				"type": "any",
+				"readable": true,
+				"writeable": true
+			},
+			"value": 34540102
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 114,
+			"commandClassName": "Manufacturer Specific",
+			"property": "manufacturerId",
+			"propertyName": "manufacturerId",
+			"ccVersion": 2,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": false,
+				"label": "Manufacturer ID",
+				"min": 0,
+				"max": 65535
+			},
+			"value": 798
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 114,
+			"commandClassName": "Manufacturer Specific",
+			"property": "productType",
+			"propertyName": "productType",
+			"ccVersion": 2,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": false,
+				"label": "Product type",
+				"min": 0,
+				"max": 65535
+			},
+			"value": 2
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 114,
+			"commandClassName": "Manufacturer Specific",
+			"property": "productId",
+			"propertyName": "productId",
+			"ccVersion": 2,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": false,
+				"label": "Product ID",
+				"min": 0,
+				"max": 65535
+			},
+			"value": 1
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 117,
+			"commandClassName": "Protection",
+			"property": "local",
+			"propertyName": "local",
+			"ccVersion": 2,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": true,
+				"label": "Local protection state",
+				"states": {
+					"8": "unknown (0x08)",
+					"9": "unknown (0x09)",
+					"10": "unknown (0x0a)"
+				}
+			},
+			"value": 0
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 117,
+			"commandClassName": "Protection",
+			"property": "rf",
+			"propertyName": "rf",
+			"ccVersion": 2,
+			"metadata": {
+				"type": "number",
+				"readable": true,
+				"writeable": true,
+				"label": "RF protection state",
+				"states": {
+					"8": "unknown (0x08)",
+					"9": "unknown (0x09)",
+					"10": "unknown (0x0a)"
+				}
+			},
+			"value": 0
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 117,
+			"commandClassName": "Protection",
+			"property": "exclusiveControlNodeId",
+			"propertyName": "exclusiveControlNodeId",
+			"ccVersion": 2,
+			"metadata": {
+				"type": "any",
+				"readable": true,
+				"writeable": true
+			}
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 117,
+			"commandClassName": "Protection",
+			"property": "timeout",
+			"propertyName": "timeout",
+			"ccVersion": 2,
+			"metadata": {
+				"type": "any",
+				"readable": true,
+				"writeable": true
+			}
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 134,
+			"commandClassName": "Version",
+			"property": "libraryType",
+			"propertyName": "libraryType",
+			"ccVersion": 2,
+			"metadata": {
+				"type": "any",
+				"readable": true,
+				"writeable": false,
+				"label": "Library type"
+			},
+			"value": 3
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 134,
+			"commandClassName": "Version",
+			"property": "protocolVersion",
+			"propertyName": "protocolVersion",
+			"ccVersion": 2,
+			"metadata": {
+				"type": "any",
+				"readable": true,
+				"writeable": false,
+				"label": "Z-Wave protocol version"
+			},
+			"value": "6.4"
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 134,
+			"commandClassName": "Version",
+			"property": "firmwareVersions",
+			"propertyName": "firmwareVersions",
+			"ccVersion": 2,
+			"metadata": {
+				"type": "any",
+				"readable": true,
+				"writeable": false,
+				"label": "Z-Wave chip firmware versions"
+			},
+			"value": [
+				"1.9"
+			]
+		},
+		{
+			"endpoint": 0,
+			"commandClass": 134,
+			"commandClassName": "Version",
+			"property": "hardwareVersion",
+			"propertyName": "hardwareVersion",
+			"ccVersion": 2,
+			"metadata": {
+				"type": "any",
+				"readable": true,
+				"writeable": false,
+				"label": "Z-Wave chip hardware version"
+			}
+		}
+	],
+	"isFrequentListening": false,
+	"maxDataRate": 40000,
+	"supportedDataRates": [
+		40000
+	],
+	"protocolVersion": 3,
+	"zwavePlusNodeType": 0,
+	"zwavePlusRoleType": 5,
+	"deviceClass": {
+		"basic": {
+			"key": 4,
+			"label": "Routing Slave"
+		},
+		"generic": {
+			"key": 16,
+			"label": "Binary Switch"
+		},
+		"specific": {
+			"key": 1,
+			"label": "Binary Power Switch"
+		},
+		"mandatorySupportedCCs": [
+			32,
+			37,
+			39
+		],
+		"mandatoryControlledCCs": []
+	},
+	"commandClasses": [{
+			"id": 37,
+			"name": "Binary Switch",
+			"version": 1,
+			"isSecure": false
+		},
+		{
+			"id": 50,
+			"name": "Meter",
+			"version": 3,
+			"isSecure": false
+		},
+		{
+			"id": 89,
+			"name": "Association Group Information",
+			"version": 1,
+			"isSecure": false
+		},
+		{
+			"id": 90,
+			"name": "Device Reset Locally",
+			"version": 1,
+			"isSecure": false
+		},
+		{
+			"id": 91,
+			"name": "Central Scene",
+			"version": 3,
+			"isSecure": false
+		},
+		{
+			"id": 94,
+			"name": "Z-Wave Plus Info",
+			"version": 2,
+			"isSecure": false
+		},
+		{
+			"id": 108,
+			"name": "Supervision",
+			"version": 1,
+			"isSecure": false
+		},
+		{
+			"id": 112,
+			"name": "Configuration",
+			"version": 1,
+			"isSecure": false
+		},
+		{
+			"id": 114,
+			"name": "Manufacturer Specific",
+			"version": 2,
+			"isSecure": false
+		},
+		{
+			"id": 117,
+			"name": "Protection",
+			"version": 2,
+			"isSecure": false
+		},
+		{
+			"id": 122,
+			"name": "Firmware Update Meta Data",
+			"version": 4,
+			"isSecure": false
+		},
+		{
+			"id": 133,
+			"name": "Association",
+			"version": 2,
+			"isSecure": false
+		},
+		{
+			"id": 134,
+			"name": "Version",
+			"version": 2,
+			"isSecure": false
+		},
+		{
+			"id": 152,
+			"name": "Security",
+			"version": 1,
+			"isSecure": true
+		}
+	]
+}

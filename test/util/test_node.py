@@ -1,4 +1,6 @@
 """Test node utility functions."""
+from unittest.mock import patch
+
 import pytest
 
 from zwave_js_server.const import CommandClass, CommandStatus
@@ -182,9 +184,42 @@ async def test_bulk_set_partial_config_parameters(multisensor_6, uuid4, mock_com
             node, 101, {128: 1, 64: 1, 32: 1, 16: 1, 2: 1}
         )
 
-    # Try to bulkset a property that isn't broken into partials
+    # Try to bulkset a property that isn't broken into partials with a dictionary
     with pytest.raises(ValueTypeError):
+        await async_bulk_set_partial_config_parameters(node, 252, {1: 1})
+
+    # Try to bulkset a property that isn't broken into partials, it should fall back to
+    # async_set_config_parameter
+    with patch("zwave_js_server.util.node.async_set_config_parameter") as mock_cmd:
+        mock_cmd.return_value = (None, None)
         await async_bulk_set_partial_config_parameters(node, 252, 1)
+        mock_cmd.assert_called_once
+
+
+async def test_bulk_set_with_full_and_partial_parameters(
+    partial_and_full_parameter, uuid4, mock_command
+):
+    """Test bulk setting config parameters when state has full and partial values."""
+    node: Node = partial_and_full_parameter
+    ack_commands = mock_command(
+        {"command": "node.set_value", "nodeId": node.node_id},
+        {"success": True},
+    )
+
+    cmd_status = await async_bulk_set_partial_config_parameters(node, 8, 34867929)
+
+    assert cmd_status == CommandStatus.ACCEPTED
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.set_value",
+        "nodeId": node.node_id,
+        "valueId": {
+            "commandClass": CommandClass.CONFIGURATION.value,
+            "property": 8,
+        },
+        "value": 34867929,
+        "messageId": uuid4,
+    }
 
 
 async def test_failures(multisensor_6, mock_command):
