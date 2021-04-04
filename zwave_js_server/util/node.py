@@ -118,8 +118,7 @@ async def async_bulk_set_partial_config_parameters(
                 "Falling back to async_set_config_parameter because no partials "
                 "were found"
             )
-            _, cmd_status = await async_set_config_parameter(node, new_value, property_)
-            return cmd_status
+            return (await async_set_config_parameter(node, new_value, property_))[1]
 
         # Otherwise this config parameter does not exist
         raise NotFoundError(
