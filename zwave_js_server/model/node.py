@@ -461,6 +461,9 @@ class Node(EventBase):
         # pylint: disable=unused-argument
         self.last_interview_stage_completed = INTERVIEW_FAILED
 
+    def handle_interview_completed(self, event: Event) -> None:
+        """Process a node interview completed event."""
+
     def handle_ready(self, event: Event) -> None:
         """Process a node ready event."""
         # the event contains a full dump of the node
