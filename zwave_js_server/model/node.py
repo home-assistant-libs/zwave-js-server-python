@@ -477,10 +477,6 @@ class Node(EventBase):
             else:
                 value.update(value_state)
 
-    def handle_not_ready(self, event: Event) -> None:
-        """Process a node not ready event."""
-        self.data["ready"] = False
-
     def handle_value_added(self, event: Event) -> None:
         """Process a node value added event."""
         value = _init_value(self, event.data["args"])
