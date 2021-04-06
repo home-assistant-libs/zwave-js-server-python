@@ -85,7 +85,6 @@ class NodeDataType(TypedDict, total=False):
     interviewStage: int
     commandClasses: List[CommandClassInfoDataType]
     values: List[ValueDataType]
-    lastInterviewStageCompleted: str  # Added internally
 
 
 class Node(EventBase):
@@ -96,6 +95,7 @@ class Node(EventBase):
         super().__init__()
         self.client = client
         self.data = data
+        self.last_interview_stage_completed = None
         self.values: Dict[str, Union[Value, ConfigurationValue]] = {}
         for val in data["values"]:
             value_id = _get_value_id_from_dict(self, val)
@@ -297,11 +297,6 @@ class Node(EventBase):
         return self.data.get("interviewStage")
 
     @property
-    def last_interview_stage_completed(self) -> Optional[str]:
-        """Return the last_interview_stage_completed."""
-        return self.data.get("lastInterviewStageCompleted")
-
-    @property
     def is_being_interviewed(self) -> bool:
         """Return whether node is currently being interviewed."""
         return (
@@ -458,11 +453,11 @@ class Node(EventBase):
 
     def handle_interview_stage_completed(self, event: Event) -> None:
         """Process a node interview stage completed event."""
-        self.data["lastInterviewStageCompleted"] = event.data["stageName"]
+        self.last_interview_stage_completed = event.data["stageName"]
 
     def handle_interview_failed(self, event: Event) -> None:
         """Process a node interview failed event."""
-        self.data["lastInterviewStageCompleted"] = INTERVIEW_FAILED
+        self.last_interview_stage_completed = INTERVIEW_FAILED
 
     def handle_ready(self, event: Event) -> None:
         """Process a node ready event."""
