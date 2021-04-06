@@ -8,6 +8,7 @@ from zwave_js_server.const import (
     CommandClass,
     EntryControlDataType,
     EntryControlEventType,
+    INTERVIEW_FAILED,
     ProtocolVersion,
 )
 from zwave_js_server.event import Event
@@ -565,3 +566,51 @@ async def test_entry_control_notification(ring_keypad):
     assert event.data["notification"].event_type == EntryControlEventType.ARM_AWAY
     assert event.data["notification"].data_type == EntryControlDataType.ASCII
     assert event.data["notification"].event_data == "555"
+
+
+async def test_interview_events(multisensor_6):
+    """Test Node interview events."""
+    node = multisensor_6
+    assert node.last_interview_stage_completed is None
+    assert node.ready
+    assert not node.is_being_interviewed
+
+    event = Event(
+        type="interview started",
+        data={
+            "source": "node",
+            "event": "interview started",
+            "nodeId": 52,
+        },
+    )
+    node.handle_interview_started(event)
+    assert node.last_interview_stage_completed is None
+    assert not node.ready
+    assert node.is_being_interviewed
+
+    event = Event(
+        type="interview stage completed",
+        data={
+            "source": "node",
+            "event": "interview stage completed",
+            "nodeId": 52,
+            "stageName": "test",
+        },
+    )
+    node.handle_interview_stage_completed(event)
+    assert node.last_interview_stage_completed == "test"
+    assert not node.ready
+    assert node.is_being_interviewed
+
+    event = Event(
+        type="interview failed",
+        data={
+            "source": "node",
+            "event": "interview failed",
+            "nodeId": 52,
+        },
+    )
+    node.handle_interview_failed(event)
+    assert node.last_interview_stage_completed == INTERVIEW_FAILED
+    assert not node.ready
+    assert not node.is_being_interviewed
