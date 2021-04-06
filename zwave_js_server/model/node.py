@@ -449,6 +449,7 @@ class Node(EventBase):
 
     def handle_interview_started(self, event: Event) -> None:
         """Process a node interview started event."""
+        # pylint: disable=unused-argument
         self.data["ready"] = False
 
     def handle_interview_stage_completed(self, event: Event) -> None:
@@ -457,6 +458,7 @@ class Node(EventBase):
 
     def handle_interview_failed(self, event: Event) -> None:
         """Process a node interview failed event."""
+        # pylint: disable=unused-argument
         self.last_interview_stage_completed = INTERVIEW_FAILED
 
     def handle_ready(self, event: Event) -> None:
