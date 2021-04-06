@@ -95,7 +95,7 @@ class Node(EventBase):
         super().__init__()
         self.client = client
         self.data = data
-        self.last_interview_stage_completed = None
+        self.last_interview_stage_completed: Optional[str] = None
         self.values: Dict[str, Union[Value, ConfigurationValue]] = {}
         for val in data["values"]:
             value_id = _get_value_id_from_dict(self, val)
