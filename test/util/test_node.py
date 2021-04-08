@@ -174,6 +174,30 @@ async def test_bulk_set_partial_config_parameters(multisensor_6, uuid4, mock_com
         "messageId": uuid4,
     }
 
+    # Use property key names instead of bitmasks for dict key
+    cmd_status = await async_bulk_set_partial_config_parameters(
+        node,
+        101,
+        {
+            "Group 1: Send humidity reports": 1,
+            "Group 1: Send temperature reports": 1,
+            "Group 1: Send ultraviolet reports": 1,
+            "Group 1: Send battery reports": 1,
+        },
+    )
+    assert cmd_status == CommandStatus.QUEUED
+    assert len(ack_commands) == 4
+    assert ack_commands[3] == {
+        "command": "node.set_value",
+        "nodeId": node.node_id,
+        "valueId": {
+            "commandClass": CommandClass.CONFIGURATION.value,
+            "property": 101,
+        },
+        "value": 241,
+        "messageId": uuid4,
+    }
+
     # Use an invalid property
     with pytest.raises(NotFoundError):
         await async_bulk_set_partial_config_parameters(node, 999, 99)
@@ -182,6 +206,12 @@ async def test_bulk_set_partial_config_parameters(multisensor_6, uuid4, mock_com
     with pytest.raises(NotFoundError):
         await async_bulk_set_partial_config_parameters(
             node, 101, {128: 1, 64: 1, 32: 1, 16: 1, 2: 1}
+        )
+
+    # use an invalid property name
+    with pytest.raises(NotFoundError):
+        await async_bulk_set_partial_config_parameters(
+            node, 101, {"Invalid property name": 1}
         )
 
     # Try to bulkset a property that isn't broken into partials with a dictionary
