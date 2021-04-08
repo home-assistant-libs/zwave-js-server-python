@@ -81,7 +81,7 @@ async def async_set_config_parameter(
 async def async_bulk_set_partial_config_parameters(
     node: Node,
     property_: int,
-    new_value: Union[int, Dict[int, Union[int, str]]],
+    new_value: Union[int, Dict[Union[int, str], Union[int, str]]],
 ) -> CommandStatus:
     """Bulk set partial configuration values on this node."""
     config_values = node.get_configuration_values()
@@ -222,33 +222,57 @@ def _get_int_from_partials_dict(
     node: Node,
     partial_param_values: Dict[str, ConfigurationValue],
     property_: int,
-    new_value: Dict[int, Union[int, str]],
+    new_value: Dict[Union[int, str], Union[int, str]],
 ) -> int:
     """Take an input dict for a set of partial values and compute the raw int value."""
     int_value = 0
+    provided_partial_values = []
     # For each property key provided, we bit shift the partial value using the
     # property_key
-    for property_key, partial_value in new_value.items():
-        value_id = get_value_id(
-            node, CommandClass.CONFIGURATION, property_, property_key=property_key
-        )
-        if value_id not in partial_param_values:
-            raise NotFoundError(
-                f"Bitmask {property_key} ({hex(property_key)}) not found for "
-                f"parameter {property_}"
+    for property_key_or_name, partial_value in new_value.items():
+        # If the dict key is a property key, we can generate the value ID to find the
+        # partial value
+        if isinstance(property_key_or_name, int):
+            value_id = get_value_id(
+                node,
+                CommandClass.CONFIGURATION,
+                property_,
+                property_key=property_key_or_name,
             )
-        partial_value = _validate_and_transform_new_value(
-            partial_param_values[value_id], partial_value
-        )
-        int_value += partial_value << partial_param_bit_shift(property_key)
+            if value_id not in partial_param_values:
+                raise NotFoundError(
+                    f"Bitmask {property_key_or_name} ({hex(property_key_or_name)}) "
+                    f"not found for parameter {property_}"
+                )
+            zwave_value = partial_param_values[value_id]
+        # If the dict key is a property name, we have to find the value from the list
+        # of partial param values
+        else:
+            try:
+                zwave_value = next(
+                    value
+                    for value in partial_param_values.values()
+                    if value.property_name == property_key_or_name
+                )
+            except StopIteration:
+                raise NotFoundError(
+                    f"Partial parameter with label '{property_key_or_name}'"
+                    f"not found for parameter {property_}"
+                ) from None
+
+        provided_partial_values.append(zwave_value)
+        partial_value = _validate_and_transform_new_value(zwave_value, partial_value)
+        bit_shift = partial_param_bit_shift(cast(int, zwave_value.property_key))
+        int_value += partial_value << bit_shift
 
     # To set partial parameters in bulk, we also have to include cached values for
     # property keys that haven't been specified
-    for property_value in partial_param_values.values():
-        if property_value.property_key not in new_value:
-            int_value += cast(int, property_value.value) << partial_param_bit_shift(
-                cast(int, property_value.property_key)
-            )
+    missing_values = set(partial_param_values.values()) - set(provided_partial_values)
+    int_value += sum(
+        cast(int, property_value.value)
+        << partial_param_bit_shift(cast(int, property_value.property_key))
+        for property_value in missing_values
+    )
 
     return int_value
 
