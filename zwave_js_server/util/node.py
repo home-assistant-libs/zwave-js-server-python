@@ -228,7 +228,7 @@ def _bulk_set_validate_and_transform_new_value(
     zwave_value: ConfigurationValue,
     property_key: int,
     new_partial_value: Union[int, str],
-) -> Union[int, str]:
+) -> int:
     """
     Validate and transform new value for a bulk set function call.
 
@@ -287,9 +287,11 @@ def _get_int_from_partials_dict(
 
         provided_partial_values.append(zwave_value)
         partial_value = _bulk_set_validate_and_transform_new_value(
-            zwave_value, property_key_or_name, partial_value
+            zwave_value, cast(int, zwave_value.property_key), partial_value
         )
-        int_value += partial_value << partial_param_bit_shift(zwave_value.property_key)
+        int_value += partial_value << partial_param_bit_shift(
+            cast(int, zwave_value.property_key)
+        )
 
     # To set partial parameters in bulk, we also have to include cached values for
     # property keys that haven't been specified
