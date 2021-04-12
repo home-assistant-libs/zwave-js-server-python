@@ -93,3 +93,11 @@ class SetValueFailed(BaseZwaveJSServerError):
     Refer to https://zwave-js.github.io/node-zwave-js/#/api/node?id=setvalue for
     possible reasons.
     """
+
+
+class BulkSetConfigParameterFailed(BaseZwaveJSServerError):
+    """
+    Exception raised when bulk setting a config parameter fails.
+
+    Derived from another exception
+    """

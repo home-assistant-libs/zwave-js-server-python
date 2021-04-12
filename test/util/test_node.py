@@ -5,6 +5,7 @@ import pytest
 
 from zwave_js_server.const import CommandClass, CommandStatus
 from zwave_js_server.exceptions import (
+    BulkSetConfigParameterFailed,
     InvalidNewValue,
     NotFoundError,
     SetValueFailed,
@@ -212,6 +213,12 @@ async def test_bulk_set_partial_config_parameters(multisensor_6, uuid4, mock_com
     with pytest.raises(NotFoundError):
         await async_bulk_set_partial_config_parameters(
             node, 101, {"Invalid property name": 1}
+        )
+
+    # use an invalid bitmask
+    with pytest.raises(BulkSetConfigParameterFailed):
+        await async_bulk_set_partial_config_parameters(
+            node, 101, {128: 1, 64: 1, 32: 1, 16: 1, 1: 99999}
         )
 
     # Try to bulkset a property that isn't broken into partials with a dictionary
