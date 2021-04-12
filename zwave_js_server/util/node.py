@@ -286,12 +286,11 @@ def _get_int_from_partials_dict(
                 ) from None
 
         provided_partial_values.append(zwave_value)
+        property_key = cast(int, zwave_value.property_key)
         partial_value = _bulk_set_validate_and_transform_new_value(
-            zwave_value, cast(int, zwave_value.property_key), partial_value
+            zwave_value, property_key, partial_value
         )
-        int_value += partial_value << partial_param_bit_shift(
-            cast(int, zwave_value.property_key)
-        )
+        int_value += partial_value << partial_param_bit_shift(property_key)
 
     # To set partial parameters in bulk, we also have to include cached values for
     # property keys that haven't been specified
