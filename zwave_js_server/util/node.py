@@ -4,7 +4,13 @@ import logging
 from typing import Dict, Optional, Tuple, Union, cast
 
 from ..const import CommandClass, CommandStatus, ConfigurationValueType
-from ..exceptions import InvalidNewValue, NotFoundError, SetValueFailed, ValueTypeError
+from ..exceptions import (
+    BulkSetConfigParameterFailed,
+    InvalidNewValue,
+    NotFoundError,
+    SetValueFailed,
+    ValueTypeError,
+)
 from ..model.node import Node
 from ..model.value import ConfigurationValue, get_value_id
 
@@ -218,6 +224,25 @@ def _validate_and_transform_new_value(
     return new_value
 
 
+def _bulk_set_validate_and_transform_new_value(
+    zwave_value: ConfigurationValue,
+    property_key: int,
+    new_partial_value: Union[int, str],
+) -> int:
+    """
+    Validate and transform new value for a bulk set function call.
+
+    Returns a bulk set friendly error if validation fails.
+    """
+    try:
+        return _validate_and_transform_new_value(zwave_value, new_partial_value)
+    except (InvalidNewValue, NotImplementedError) as err:
+        raise BulkSetConfigParameterFailed(
+            f"Config parameter {zwave_value.property_} failed validation on partial "
+            f"parameter {property_key}"
+        ) from err
+
+
 def _get_int_from_partials_dict(
     node: Node,
     partial_param_values: Dict[str, ConfigurationValue],
@@ -261,9 +286,11 @@ def _get_int_from_partials_dict(
                 ) from None
 
         provided_partial_values.append(zwave_value)
-        partial_value = _validate_and_transform_new_value(zwave_value, partial_value)
-        bit_shift = partial_param_bit_shift(cast(int, zwave_value.property_key))
-        int_value += partial_value << bit_shift
+        property_key = cast(int, zwave_value.property_key)
+        partial_value = _bulk_set_validate_and_transform_new_value(
+            zwave_value, property_key, partial_value
+        )
+        int_value += partial_value << partial_param_bit_shift(property_key)
 
     # To set partial parameters in bulk, we also have to include cached values for
     # property keys that haven't been specified
@@ -297,4 +324,6 @@ def _validate_raw_int(
         multiplication_factor = 2 ** partial_param_bit_shift(property_key)
         partial_value = int(new_value / multiplication_factor)
         new_value = new_value % multiplication_factor
-        _validate_and_transform_new_value(zwave_value, partial_value)
+        _bulk_set_validate_and_transform_new_value(
+            zwave_value, property_key, partial_value
+        )
