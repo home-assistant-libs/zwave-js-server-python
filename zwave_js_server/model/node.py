@@ -82,7 +82,7 @@ class NodeDataType(TypedDict, total=False):
     individualEndpointCount: int
     aggregatedEndpointCount: int
     interviewAttempts: int
-    interviewStage: int
+    interviewStage: Optional[str]
     commandClasses: List[CommandClassInfoDataType]
     values: List[ValueDataType]
 
@@ -298,9 +298,7 @@ class Node(EventBase):
     @property
     def is_being_interviewed(self) -> bool:
         """Return whether node is currently being interviewed."""
-        return (
-            not self.ready and self.interview_stage != INTERVIEW_FAILED
-        )
+        return not self.ready and self.interview_stage != INTERVIEW_FAILED
 
     @property
     def command_classes(self) -> List[CommandClassInfo]:

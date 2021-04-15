@@ -71,7 +71,7 @@
   "individualEndpointCount": 4,
   "aggregatedEndpointCount": 0,
   "interviewAttempts": 1,
-  "interviewStage": 3,
+  "interviewStage": "NodeInfo",
   "commandClasses": [
     {
       "id": 89,
