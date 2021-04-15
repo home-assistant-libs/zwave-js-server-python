@@ -571,7 +571,7 @@ async def test_entry_control_notification(ring_keypad):
 async def test_interview_events(multisensor_6):
     """Test Node interview events."""
     node = multisensor_6
-    assert node.last_interview_stage_completed is None
+    assert node.interview_stage is None
     assert node.ready
     assert not node.is_being_interviewed
 
@@ -584,7 +584,7 @@ async def test_interview_events(multisensor_6):
         },
     )
     node.handle_interview_started(event)
-    assert node.last_interview_stage_completed is None
+    assert node.interview_stage is None
     assert not node.ready
     assert node.is_being_interviewed
 
@@ -598,7 +598,7 @@ async def test_interview_events(multisensor_6):
         },
     )
     node.handle_interview_stage_completed(event)
-    assert node.last_interview_stage_completed == "test"
+    assert node.interview_stage == "test"
     assert not node.ready
     assert node.is_being_interviewed
 
@@ -611,6 +611,6 @@ async def test_interview_events(multisensor_6):
         },
     )
     node.handle_interview_failed(event)
-    assert node.last_interview_stage_completed == INTERVIEW_FAILED
+    assert node.interview_stage == INTERVIEW_FAILED
     assert not node.ready
     assert not node.is_being_interviewed

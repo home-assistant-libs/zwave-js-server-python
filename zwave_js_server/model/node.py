@@ -95,7 +95,6 @@ class Node(EventBase):
         super().__init__()
         self.client = client
         self.data = data
-        self.last_interview_stage_completed: Optional[str] = None
         self.values: Dict[str, Union[Value, ConfigurationValue]] = {}
         for val in data["values"]:
             value_id = _get_value_id_from_dict(self, val)
@@ -292,7 +291,7 @@ class Node(EventBase):
         return self.data.get("interviewAttempts")
 
     @property
-    def interview_stage(self) -> Optional[int]:
+    def interview_stage(self) -> Optional[str]:
         """Return the interview_stage."""
         return self.data.get("interviewStage")
 
@@ -300,7 +299,7 @@ class Node(EventBase):
     def is_being_interviewed(self) -> bool:
         """Return whether node is currently being interviewed."""
         return (
-            not self.ready and self.last_interview_stage_completed != INTERVIEW_FAILED
+            not self.ready and self.interview_stage != INTERVIEW_FAILED
         )
 
     @property
@@ -451,18 +450,20 @@ class Node(EventBase):
         """Process a node interview started event."""
         # pylint: disable=unused-argument
         self.data["ready"] = False
+        self.data["interviewStage"] = None
 
     def handle_interview_stage_completed(self, event: Event) -> None:
         """Process a node interview stage completed event."""
-        self.last_interview_stage_completed = event.data["stageName"]
+        self.data["interviewStage"] = event.data["stageName"]
 
     def handle_interview_failed(self, event: Event) -> None:
         """Process a node interview failed event."""
         # pylint: disable=unused-argument
-        self.last_interview_stage_completed = INTERVIEW_FAILED
+        self.data["interviewStage"] = INTERVIEW_FAILED
 
     def handle_interview_completed(self, event: Event) -> None:
         """Process a node interview completed event."""
+        self.data["ready"] = True
 
     def handle_ready(self, event: Event) -> None:
         """Process a node ready event."""
