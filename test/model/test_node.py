@@ -78,7 +78,7 @@ def test_from_state():
     assert node.endpoints_have_identical_capabilities is None
     assert node.individual_endpoint_count is None
     assert node.aggregated_endpoint_count is None
-    assert node.interview_stage == 6
+    assert node.interview_stage == "Neighbors"
     assert len(node.command_classes) == 0
     assert len(node.endpoints) == 1
     assert node.endpoints[0].index == 0
