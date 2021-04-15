@@ -82,7 +82,7 @@ class NodeDataType(TypedDict, total=False):
     individualEndpointCount: int
     aggregatedEndpointCount: int
     interviewAttempts: int
-    interviewStage: Optional[str]
+    interviewStage: Optional[Union[int, str]]
     commandClasses: List[CommandClassInfoDataType]
     values: List[ValueDataType]
 
@@ -291,7 +291,7 @@ class Node(EventBase):
         return self.data.get("interviewAttempts")
 
     @property
-    def interview_stage(self) -> Optional[str]:
+    def interview_stage(self) -> Optional[Union[int, str]]:
         """Return the interview_stage."""
         return self.data.get("interviewStage")
 
