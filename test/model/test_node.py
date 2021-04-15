@@ -515,7 +515,7 @@ async def test_metadata_updated(climate_radio_thermostat_ct100_plus: Node):
 
 
 async def test_notification(lock_schlage_be469: Node):
-    """Test notification events."""
+    """Test notification CC notification events."""
     node = lock_schlage_be469
 
     # Validate that Notification CC notification event is received as expected
@@ -547,6 +547,7 @@ async def test_notification(lock_schlage_be469: Node):
 
 
 async def test_entry_control_notification(ring_keypad):
+    """Test entry control CC notification events."""
     node = ring_keypad
 
     # Validate that Entry Control CC notification event is received as expected
@@ -613,4 +614,16 @@ async def test_interview_events(multisensor_6):
     node.handle_interview_failed(event)
     assert node.interview_stage == INTERVIEW_FAILED
     assert not node.ready
+    assert not node.is_being_interviewed
+
+    event = Event(
+        type="interview completed",
+        data={
+            "source": "node",
+            "event": "interview completed",
+            "nodeId": 52,
+        },
+    )
+    node.handle_interview_completed(event)
+    assert node.ready
     assert not node.is_being_interviewed
