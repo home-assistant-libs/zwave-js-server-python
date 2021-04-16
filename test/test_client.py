@@ -78,7 +78,7 @@ async def test_send_command_schema(
 
 async def test_min_schema_version(client_session, url, version_data):
     """Test client connect with invalid schema version."""
-    version_data["minSchemaVersion"] = 4
+    version_data["minSchemaVersion"] = 100
     client = Client(url, client_session)
 
     with pytest.raises(InvalidServerVersion):
