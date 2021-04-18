@@ -37,7 +37,6 @@ class LogMessage:
     @property
     def message(self) -> List[str]:
         """Return message."""
-        self.data["message"].rstrip("\n")
         return self._process_message("message")
 
     @property
