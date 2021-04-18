@@ -44,7 +44,6 @@ class Driver(EventBase):
         """Process a driver logging event."""
         event.data["log_message"] = LogMessage(event.data)
 
-
     def handle_all_nodes_ready(self, event: Event) -> None:
         """Process a driver all nodes ready event."""
 

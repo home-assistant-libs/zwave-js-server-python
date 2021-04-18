@@ -18,7 +18,6 @@ class LogMessageDataType(TypedDict, total=False):
     label: str
 
 
-
 class LogMessage:
     """Represent a log message."""
 
@@ -30,7 +29,7 @@ class LogMessage:
         """Process a message and always return a list."""
         if isinstance(self.data[field_name], str):
             return self.data[field_name].splitlines()
-        
+
         # We will assume each item in the array is on a separate line so we can
         # remove trailing line breaks
         return [message.rstrip("\n") for message in self.data[field_name]]
