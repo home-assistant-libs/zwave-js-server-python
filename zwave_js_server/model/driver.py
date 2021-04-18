@@ -1,6 +1,6 @@
 """Provide a model for the Z-Wave JS Driver."""
-from typing import TYPE_CHECKING
-from zwave_js_server.model.log_message import LogMessage
+from typing import Any, TYPE_CHECKING, cast
+from zwave_js_server.model.log_message import LogMessage, LogMessageDataType
 
 from zwave_js_server.model.log_config import LogConfig
 
@@ -42,12 +42,12 @@ class Driver(EventBase):
 
     def handle_logging(self, event: Event) -> None:
         """Process a driver logging event."""
-        event.data["log_message"] = LogMessage(event.data)
+        event.data["log_message"] = LogMessage(cast(LogMessageDataType, event.data))
 
     def handle_all_nodes_ready(self, event: Event) -> None:
         """Process a driver all nodes ready event."""
 
-    async def async_send_command(self, command: str, **kwargs) -> dict:
+    async def async_send_command(self, command: str, **kwargs: Any) -> dict:
         """Send a driver command."""
         return await self.client.async_send_command(
             {
