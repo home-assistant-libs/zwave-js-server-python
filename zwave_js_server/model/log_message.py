@@ -25,7 +25,9 @@ class LogMessage:
         """Initialize log message."""
         self.data = data
 
-    def _process_message(self, field_name: Union[Literal["message"], Literal["formattedMessage"]]) -> List[str]:
+    def _process_message(
+        self, field_name: Union[Literal["message"], Literal["formattedMessage"]]
+    ) -> List[str]:
         """Process a message and always return a list."""
         if isinstance(self.data[field_name], str):
             return str(self.data[field_name]).splitlines()
