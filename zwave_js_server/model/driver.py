@@ -47,16 +47,28 @@ class Driver(EventBase):
     def handle_all_nodes_ready(self, event: Event) -> None:
         """Process a driver all nodes ready event."""
 
-    async def async_update_log_config(self, log_config: LogConfig) -> None:
-        """Update log config for driver."""
-        await self.client.async_send_command(
+    async def async_send_command(self, command: str, **kwargs) -> dict:
+        """Send a driver command."""
+        return await self.client.async_send_command(
             {
-                "command": "update_log_config",
-                "config": log_config.to_dict(),
+                "command": f"driver.{command}",
+                **kwargs,
             }
         )
 
+    async def async_update_log_config(self, log_config: LogConfig) -> None:
+        """Update log config for driver."""
+        await self.async_send_command("update_log_config", config=log_config.to_dict())
+
     async def async_get_log_config(self) -> LogConfig:
         """Return current log config for driver."""
-        result = await self.client.async_send_command({"command": "get_log_config"})
+        result = await self.async_send_command("get_log_config")
         return LogConfig.from_dict(result["config"])
+
+    async def async_start_listening_to_logs(self) -> None:
+        """Send command to start listening to logs."""
+        await self.async_send_command("start_listening_to_logs")
+
+    async def async_stop_listening_to_logs(self) -> None:
+        """Send command to stop listening to logs."""
+        await self.async_send_command("stop_listening_to_logs")
