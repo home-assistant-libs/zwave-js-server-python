@@ -54,6 +54,14 @@ class Client:
         """Return if we're currently connected."""
         return self._client is not None and not self._client.closed
 
+    async def async_start_listening_to_logs(self):
+        """Send command to start listening to logs."""
+        await self.async_send_command("start_listening_to_logs")
+
+    async def async_stop_listening_to_logs(self):
+        """Send command to stop listening to logs."""
+        await self.async_send_command("stop_listening_to_logs")
+
     async def async_send_command(
         self,
         message: Dict[str, Any],

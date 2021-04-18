@@ -1,5 +1,6 @@
 """Provide a model for the Z-Wave JS Driver."""
 from typing import TYPE_CHECKING
+from zwave_js_server.model.log_message import LogMessage
 
 from zwave_js_server.model.log_config import LogConfig
 
@@ -38,6 +39,11 @@ class Driver(EventBase):
         self._handle_event_protocol(event)
 
         self.emit(event.type, event.data)
+
+    def handle_logging(self, event: Event) -> None:
+        """Process a driver logging event."""
+        event.data["log_message"] = LogMessage(event.data)
+
 
     def handle_all_nodes_ready(self, event: Event) -> None:
         """Process a driver all nodes ready event."""
