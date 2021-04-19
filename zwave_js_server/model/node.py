@@ -388,6 +388,21 @@ class Node(EventBase):
         """Send refreshInfo command to Node."""
         await self.async_send_command("refresh_info", wait_for_result=False)
 
+    async def async_refresh_values(self) -> None:
+        """Send refreshValues command to Node."""
+        await self.async_send_command(
+            "refresh_values", wait_for_result=False, require_schema=4
+        )
+
+    async def async_refresh_cc_values(self, command_class: CommandClass) -> None:
+        """Send refreshCCValues command to Node."""
+        await self.async_send_command(
+            "refresh_cc_values",
+            commandClass=command_class,
+            wait_for_result=False,
+            require_schema=4,
+        )
+
     async def async_get_defined_value_ids(self) -> List[Value]:
         """Send getDefinedValueIDs command to Node."""
         data = await self.async_send_command(
