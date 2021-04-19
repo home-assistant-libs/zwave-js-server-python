@@ -627,3 +627,36 @@ async def test_interview_events(multisensor_6):
     node.handle_interview_completed(event)
     assert node.ready
     assert not node.in_interview
+
+
+async def test_refresh_values(multisensor_6, uuid4, mock_command):
+    """Test refresh_values and refresh_cc_values commands."""
+    node: Node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.refresh_values", "nodeId": node.node_id},
+        {"success": True},
+    )
+    await node.async_refresh_values()
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.refresh_values",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }
+
+    ack_commands = mock_command(
+        {
+            "command": "node.refresh_cc_values",
+            "nodeId": node.node_id,
+            "commandClass": 1,
+        },
+        {"success": True},
+    )
+    await node.async_refresh_cc_values(1)
+    assert len(ack_commands) == 2
+    assert ack_commands[1] == {
+        "command": "node.refresh_cc_values",
+        "nodeId": node.node_id,
+        "commandClass": 1,
+        "messageId": uuid4,
+    }
