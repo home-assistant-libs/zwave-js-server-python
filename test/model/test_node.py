@@ -574,7 +574,7 @@ async def test_interview_events(multisensor_6):
     node = multisensor_6
     assert node.interview_stage is None
     assert node.ready
-    assert not node.is_being_interviewed
+    assert not node.in_interview
 
     event = Event(
         type="interview started",
@@ -587,7 +587,7 @@ async def test_interview_events(multisensor_6):
     node.handle_interview_started(event)
     assert node.interview_stage is None
     assert not node.ready
-    assert node.is_being_interviewed
+    assert node.in_interview
 
     event = Event(
         type="interview stage completed",
@@ -601,7 +601,7 @@ async def test_interview_events(multisensor_6):
     node.handle_interview_stage_completed(event)
     assert node.interview_stage == "test"
     assert not node.ready
-    assert node.is_being_interviewed
+    assert node.in_interview
 
     event = Event(
         type="interview failed",
@@ -614,7 +614,7 @@ async def test_interview_events(multisensor_6):
     node.handle_interview_failed(event)
     assert node.interview_stage == INTERVIEW_FAILED
     assert not node.ready
-    assert not node.is_being_interviewed
+    assert not node.in_interview
 
     event = Event(
         type="interview completed",
@@ -626,4 +626,4 @@ async def test_interview_events(multisensor_6):
     )
     node.handle_interview_completed(event)
     assert node.ready
-    assert not node.is_being_interviewed
+    assert not node.in_interview
