@@ -149,8 +149,6 @@ async def test_listening_logs(driver, uuid4, mock_command):
     event = Event(
         type="logging",
         data={
-            "source": "node",
-            "event": "value removed",
             "source": "driver",
             "event": "logging",
             "formattedMessage": [
