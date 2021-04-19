@@ -69,11 +69,13 @@ class Driver(EventBase):
         """Send command to enable data collection."""
         await self._async_send_command("enable_statistics", require_schema=4)
 
-    async def async_disable_statics(self) -> None:
+    async def async_disable_statistics(self) -> None:
         """Send command to stop listening to log events."""
         await self._async_send_command("disable_statistics", require_schema=4)
 
     async def async_is_statistics_enabled(self) -> bool:
         """Send command to start listening to log events."""
-        result = await self._async_send_command("start_listening_logs", require_schema=4)
+        result = await self._async_send_command(
+            "start_listening_logs", require_schema=4
+        )
         return cast(bool, result["statisticsEnabled"])
