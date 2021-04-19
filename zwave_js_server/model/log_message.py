@@ -53,7 +53,7 @@ class LogMessage:
         return self.data["direction"]
 
     @property
-    def level(self) -> Optional[str]:
+    def level(self) -> str:
         """Return level."""
         return self.data["level"]
 
