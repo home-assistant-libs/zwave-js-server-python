@@ -1,5 +1,5 @@
 """Provide a model for the Z-Wave JS Driver."""
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING, cast
 
 from zwave_js_server.model.log_config import LogConfig
 
@@ -42,16 +42,38 @@ class Driver(EventBase):
     def handle_all_nodes_ready(self, event: Event) -> None:
         """Process a driver all nodes ready event."""
 
+    async def _async_send_command(
+        self, command: str, require_schema: int = None, **kwargs: Any
+    ) -> dict:
+        """Send a driver command. For internal use only."""
+        return await self.client.async_send_command(
+            {
+                "command": f"driver.{command}",
+                **kwargs,
+            },
+            require_schema,
+        )
+
     async def async_update_log_config(self, log_config: LogConfig) -> None:
         """Update log config for driver."""
-        await self.client.async_send_command(
-            {
-                "command": "update_log_config",
-                "config": log_config.to_dict(),
-            }
+        await self._async_send_command(
+            "update_log_config", config=log_config.to_dict(), require_schema=4
         )
 
     async def async_get_log_config(self) -> LogConfig:
         """Return current log config for driver."""
-        result = await self.client.async_send_command({"command": "get_log_config"})
+        result = await self._async_send_command("get_log_config", require_schema=4)
         return LogConfig.from_dict(result["config"])
+
+    async def async_enable_statistics(self) -> None:
+        """Send command to enable data collection."""
+        await self._async_send_command("enable_statistics", require_schema=4)
+
+    async def async_disable_statics(self) -> None:
+        """Send command to stop listening to log events."""
+        await self._async_send_command("disable_statistics", require_schema=4)
+
+    async def async_is_statistics_enabled(self) -> bool:
+        """Send command to start listening to log events."""
+        result = await self._async_send_command("start_listening_logs", require_schema=4)
+        return cast(bool, result["statisticsEnabled"])
