@@ -394,7 +394,7 @@ class Node(EventBase):
             "refresh_values", wait_for_result=False, require_schema=4
         )
 
-    async def async_refresh_cc_values(self, command_class: int) -> None:
+    async def async_refresh_cc_values(self, command_class: CommandClass) -> None:
         """Send refreshCCValues command to Node."""
         await self.async_send_command(
             "refresh_cc_values",
