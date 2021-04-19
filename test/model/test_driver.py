@@ -3,7 +3,11 @@ import json
 
 from zwave_js_server.const import LogLevel
 from zwave_js_server.event import Event
-from zwave_js_server.model import driver as driver_pkg, log_config as log_config_pkg
+from zwave_js_server.model import (
+    driver as driver_pkg,
+    log_config as log_config_pkg,
+    log_message as log_message_pkg,
+)
 
 from .. import load_fixture
 
@@ -111,3 +115,70 @@ async def test_get_log_config(driver, uuid4, mock_command):
     assert log_config.log_to_file is False
     assert log_config.filename == "/test.txt"
     assert log_config.force_console is False
+
+
+async def test_listening_logs(driver, uuid4, mock_command):
+    """Test listening to logs helpers."""
+    ack_commands = mock_command(
+        {"command": "driver.start_listening_logs"},
+        {"success": True},
+    )
+    await driver.async_start_listening_logs()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.start_listening_logs",
+        "messageId": uuid4,
+    }
+
+    ack_commands = mock_command(
+        {"command": "driver.stop_listening_logs"},
+        {"success": True},
+    )
+    await driver.async_stop_listening_logs()
+
+    assert len(ack_commands) == 2
+    assert ack_commands[1] == {
+        "command": "driver.stop_listening_logs",
+        "messageId": uuid4,
+    }
+
+    event = Event(
+        type="logging",
+        data={
+            "source": "node",
+            "event": "value removed",
+            "source": "driver",
+            "event": "logging",
+            "formattedMessage": [
+                "2021-04-18T18:03:34.051Z CNTRLR   [Node 005] [~] \n",
+                "test",
+            ],
+            "level": "debug",
+            "primaryTags": "[Node 005] [~] [Notification]",
+            "secondaryTags": "[Endpoint 0]",
+            "message": "Home Security[Motion sensor status]\n: 8 => 0",
+            "direction": "  ",
+            "label": "CNTRLR",
+            "timestamp": "2021-04-18T18:03:34.051Z",
+            "multiline": True,
+            "secondaryTagPadding": -1,
+        },
+    )
+    driver.receive_event(event)
+    assert "log_message" in event.data
+    assert isinstance(event.data["log_message"], log_message_pkg.LogMessage)
+    log_message = event.data["log_message"]
+    assert log_message.message == ["Home Security[Motion sensor status]", ": 8 => 0"]
+    assert log_message.formatted_message == [
+        "2021-04-18T18:03:34.051Z CNTRLR   [Node 005] [~] ",
+        "test",
+    ]
+    assert log_message.direction == "  "
+    assert log_message.primary_tags == "[Node 005] [~] [Notification]"
+    assert log_message.secondary_tags == "[Endpoint 0]"
+    assert log_message.level == "debug"
+    assert log_message.label == "CNTRLR"
+    assert log_message.multiline
+    assert log_message.secondary_tag_padding == -1
+    assert log_message.timestamp == "2021-04-18T18:03:34.051Z"

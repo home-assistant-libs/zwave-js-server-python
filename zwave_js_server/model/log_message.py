@@ -10,6 +10,7 @@ class LogMessageDataType(TypedDict, total=False):
     message: Union[str, List[str]]  # required
     formattedMessage: Union[str, List[str]]  # required
     direction: str  # required
+    level: str  # required
     primaryTags: str
     secondaryTags: str
     secondaryTagPadding: int
@@ -50,6 +51,11 @@ class LogMessage:
     def direction(self) -> str:
         """Return direction."""
         return self.data["direction"]
+
+    @property
+    def level(self) -> Optional[str]:
+        """Return level."""
+        return self.data["level"]
 
     @property
     def primary_tags(self) -> Optional[str]:

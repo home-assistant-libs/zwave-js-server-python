@@ -65,10 +65,10 @@ class Driver(EventBase):
         result = await self.async_send_command("get_log_config")
         return LogConfig.from_dict(result["config"])
 
-    async def async_start_listening_to_logs(self) -> None:
-        """Send command to start listening to logs."""
-        await self.async_send_command("start_listening_to_logs")
+    async def async_start_listening_logs(self) -> None:
+        """Send command to start listening to log events."""
+        await self.async_send_command("start_listening_logs")
 
-    async def async_stop_listening_to_logs(self) -> None:
-        """Send command to stop listening to logs."""
-        await self.async_send_command("stop_listening_to_logs")
+    async def async_stop_listening_logs(self) -> None:
+        """Send command to stop listening to log events."""
+        await self.async_send_command("stop_listening_logs")
