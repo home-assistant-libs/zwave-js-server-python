@@ -296,7 +296,7 @@ class Node(EventBase):
         return self.data.get("interviewStage")
 
     @property
-    def is_being_interviewed(self) -> bool:
+    def in_interview(self) -> bool:
         """Return whether node is currently being interviewed."""
         return not self.ready and self.interview_stage != INTERVIEW_FAILED
 
