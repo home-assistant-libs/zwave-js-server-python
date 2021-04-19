@@ -27,7 +27,7 @@ async def test_update_log_config(driver, uuid4, mock_command):
     """Test update log config."""
     # Update log level
     ack_commands = mock_command(
-        {"command": "update_log_config", "config": {"level": "error"}},
+        {"command": "driver.update_log_config", "config": {"level": "error"}},
         {"success": True},
     )
 
@@ -40,7 +40,7 @@ async def test_update_log_config(driver, uuid4, mock_command):
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
-        "command": "update_log_config",
+        "command": "driver.update_log_config",
         "config": {"level": "error"},
         "messageId": uuid4,
     }
@@ -48,7 +48,7 @@ async def test_update_log_config(driver, uuid4, mock_command):
     # Update all parameters
     ack_commands = mock_command(
         {
-            "command": "update_log_config",
+            "command": "driver.update_log_config",
             "config": {
                 "enabled": True,
                 "level": "error",
@@ -74,7 +74,7 @@ async def test_update_log_config(driver, uuid4, mock_command):
 
     assert len(ack_commands) == 2
     assert ack_commands[1] == {
-        "command": "update_log_config",
+        "command": "driver.update_log_config",
         "config": {
             "enabled": True,
             "level": "error",
@@ -89,7 +89,7 @@ async def test_update_log_config(driver, uuid4, mock_command):
 async def test_get_log_config(driver, uuid4, mock_command):
     """Test set value."""
     ack_commands = mock_command(
-        {"command": "get_log_config"},
+        {"command": "driver.get_log_config"},
         {
             "success": True,
             "config": {
@@ -104,10 +104,52 @@ async def test_get_log_config(driver, uuid4, mock_command):
     log_config = await driver.async_get_log_config()
 
     assert len(ack_commands) == 1
-    assert ack_commands[0] == {"command": "get_log_config", "messageId": uuid4}
+    assert ack_commands[0] == {"command": "driver.get_log_config", "messageId": uuid4}
 
     assert log_config.enabled
     assert log_config.level == LogLevel.ERROR
     assert log_config.log_to_file is False
     assert log_config.filename == "/test.txt"
     assert log_config.force_console is False
+
+
+async def test_statistics(driver, uuid4, mock_command):
+    """Test statistics commands."""
+    # Test that enable_statistics command is sent
+    ack_commands = mock_command(
+        {"command": "driver.enable_statistics"},
+        {"success": True},
+    )
+    await driver.async_enable_statistics()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.enable_statistics",
+        "messageId": uuid4,
+    }
+
+    # Test that disable_statistics command is sent
+    ack_commands = mock_command(
+        {"command": "driver.disable_statistics"},
+        {"success": True},
+    )
+    await driver.async_disable_statistics()
+
+    assert len(ack_commands) == 2
+    assert ack_commands[1] == {
+        "command": "driver.disable_statistics",
+        "messageId": uuid4,
+    }
+
+    # Test that is statistics_enabled command is sent
+    ack_commands = mock_command(
+        {"command": "driver.is_statistics_enabled"},
+        {"success": True, "statisticsEnabled": True},
+    )
+    assert await driver.async_is_statistics_enabled()
+
+    assert len(ack_commands) == 3
+    assert ack_commands[2] == {
+        "command": "driver.is_statistics_enabled",
+        "messageId": uuid4,
+    }
