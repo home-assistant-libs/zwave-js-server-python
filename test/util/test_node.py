@@ -298,36 +298,3 @@ async def test_returned_values(multisensor_6, mock_command):
     zwave_value, cmd_status = await async_set_config_parameter(node, 1, 101, 64)
     assert isinstance(zwave_value, ConfigurationValue)
     assert cmd_status == CommandStatus.ACCEPTED
-
-
-async def test_refresh_values(multisensor_6, uuid4, mock_command):
-    """Test refresh_values and refresh_cc_values commands."""
-    node: Node = multisensor_6
-    ack_commands = mock_command(
-        {"command": "node.refresh_values", "nodeId": node.node_id},
-        {"success": True},
-    )
-    await node.async_refresh_values()
-    assert len(ack_commands) == 1
-    assert ack_commands[0] == {
-        "command": "node.refresh_values",
-        "nodeId": node.node_id,
-        "messageId": uuid4,
-    }
-
-    ack_commands = mock_command(
-        {
-            "command": "node.refresh_cc_values",
-            "nodeId": node.node_id,
-            "commandClass": 1,
-        },
-        {"success": True},
-    )
-    await node.async_refresh_cc_values(1)
-    assert len(ack_commands) == 2
-    assert ack_commands[1] == {
-        "command": "node.refresh_cc_values",
-        "nodeId": node.node_id,
-        "commandClass": 1,
-        "messageId": uuid4,
-    }
