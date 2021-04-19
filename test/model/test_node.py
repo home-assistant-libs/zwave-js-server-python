@@ -648,7 +648,7 @@ async def test_refresh_values(multisensor_6, uuid4, mock_command):
         {
             "command": "node.refresh_cc_values",
             "nodeId": node.node_id,
-            "commandClass": 1,
+            "commandClass": 112,
         },
         {"success": True},
     )
