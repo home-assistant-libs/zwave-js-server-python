@@ -1,8 +1,8 @@
 """Provide a model for the Z-Wave JS Driver."""
 from typing import Any, TYPE_CHECKING, cast
-from zwave_js_server.model.log_message import LogMessage, LogMessageDataType
 
 from zwave_js_server.model.log_config import LogConfig
+from zwave_js_server.model.log_message import LogMessage, LogMessageDataType
 
 from ..event import Event, EventBase
 from .controller import Controller
@@ -77,3 +77,18 @@ class Driver(EventBase):
     async def async_stop_listening_logs(self) -> None:
         """Send command to stop listening to log events."""
         await self._async_send_command("stop_listening_logs", require_schema=4)
+
+    async def async_enable_statistics(self) -> None:
+        """Send command to enable data collection."""
+        await self._async_send_command("enable_statistics", require_schema=4)
+
+    async def async_disable_statistics(self) -> None:
+        """Send command to stop listening to log events."""
+        await self._async_send_command("disable_statistics", require_schema=4)
+
+    async def async_is_statistics_enabled(self) -> bool:
+        """Send command to start listening to log events."""
+        result = await self._async_send_command(
+            "is_statistics_enabled", require_schema=4
+        )
+        return cast(bool, result["statisticsEnabled"])
