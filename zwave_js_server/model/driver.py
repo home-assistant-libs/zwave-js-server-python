@@ -76,6 +76,6 @@ class Driver(EventBase):
     async def async_is_statistics_enabled(self) -> bool:
         """Send command to start listening to log events."""
         result = await self._async_send_command(
-            "start_listening_logs", require_schema=4
+            "is_statistics_enabled", require_schema=4
         )
         return cast(bool, result["statisticsEnabled"])
