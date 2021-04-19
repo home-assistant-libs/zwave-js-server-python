@@ -78,9 +78,16 @@ class Driver(EventBase):
         """Send command to stop listening to log events."""
         await self._async_send_command("stop_listening_logs", require_schema=4)
 
-    async def async_enable_statistics(self) -> None:
+    async def async_enable_statistics(
+        self, application_name: str, application_version: str
+    ) -> None:
         """Send command to enable data collection."""
-        await self._async_send_command("enable_statistics", require_schema=4)
+        await self._async_send_command(
+            "enable_statistics",
+            applicationName=application_name,
+            applicationVersion=application_version,
+            require_schema=4,
+        )
 
     async def async_disable_statistics(self) -> None:
         """Send command to stop listening to log events."""
