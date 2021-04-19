@@ -16,6 +16,15 @@ jobs:
       - name: "Set version numbmer"
         run: |
           sed -i '/VERSION = /c\VERSION = "${{ steps.get_version.outputs.VERSION }}"' ${{ github.workspace }}/setup.py
+      - name: Commit files
+        run: |
+          if [ $(git diff HEAD | wc -l) -gt 30 ]
+          then
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "GitHub Actions"
+          git commit -a --amend --no-edit || true
+          git push --force || true
+          fi
       - name: Set up Python 3.8
         uses: actions/setup-python@v2.2.2
         with:
