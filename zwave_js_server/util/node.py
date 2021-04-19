@@ -131,7 +131,7 @@ async def async_bulk_set_partial_config_parameters(
     else:
         _validate_raw_int(partial_param_values, new_value)
 
-    cmd_response = await node.async_send_command(
+    cmd_response = await node._async_send_command(
         "set_value",
         valueId={
             "commandClass": CommandClass.CONFIGURATION.value,

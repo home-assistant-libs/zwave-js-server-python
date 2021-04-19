@@ -351,7 +351,7 @@ class Node(EventBase):
         if wait_for_result or (
             wait_for_result is None and self.status != NodeStatus.ASLEEP
         ):
-            result = await self.client._async_send_command(message, **kwargs)
+            result = await self.client.async_send_command(message, **kwargs)
             return result
 
         await self.client.async_send_command_no_wait(message, **kwargs)
