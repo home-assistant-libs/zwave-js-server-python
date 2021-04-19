@@ -652,11 +652,11 @@ async def test_refresh_values(multisensor_6, uuid4, mock_command):
         },
         {"success": True},
     )
-    await node.async_refresh_cc_values(1)
+    await node.async_refresh_cc_values(CommandClass.CONFIGURATION)
     assert len(ack_commands) == 2
     assert ack_commands[1] == {
         "command": "node.refresh_cc_values",
         "nodeId": node.node_id,
-        "commandClass": 1,
+        "commandClass": 112,
         "messageId": uuid4,
     }
