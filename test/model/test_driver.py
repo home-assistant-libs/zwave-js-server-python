@@ -119,18 +119,18 @@ async def test_statistics(driver, uuid4, mock_command):
     ack_commands = mock_command(
         {
             "command": "driver.enable_statistics",
-            "applicationName": "test",
-            "applicationVersion": "test",
+            "applicationName": "test_name",
+            "applicationVersion": "test_version",
         },
         {"success": True},
     )
-    await driver.async_enable_statistics("test", "test")
+    await driver.async_enable_statistics("test_name", "test_version")
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "driver.enable_statistics",
-        "applicationName": "test",
-        "applicationVersion": "test",
+        "applicationName": "test_name",
+        "applicationVersion": "test_version",
         "messageId": uuid4,
     }
 
