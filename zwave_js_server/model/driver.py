@@ -2,6 +2,7 @@
 from typing import Any, TYPE_CHECKING, cast
 
 from zwave_js_server.model.log_config import LogConfig
+from zwave_js_server.model.log_message import LogMessage, LogMessageDataType
 
 from ..event import Event, EventBase
 from .controller import Controller
@@ -39,6 +40,10 @@ class Driver(EventBase):
 
         self.emit(event.type, event.data)
 
+    def handle_logging(self, event: Event) -> None:
+        """Process a driver logging event."""
+        event.data["log_message"] = LogMessage(cast(LogMessageDataType, event.data))
+
     def handle_all_nodes_ready(self, event: Event) -> None:
         """Process a driver all nodes ready event."""
 
@@ -64,6 +69,14 @@ class Driver(EventBase):
         """Return current log config for driver."""
         result = await self._async_send_command("get_log_config", require_schema=4)
         return LogConfig.from_dict(result["config"])
+
+    async def async_start_listening_logs(self) -> None:
+        """Send command to start listening to log events."""
+        await self._async_send_command("start_listening_logs", require_schema=4)
+
+    async def async_stop_listening_logs(self) -> None:
+        """Send command to stop listening to log events."""
+        await self._async_send_command("stop_listening_logs", require_schema=4)
 
     async def async_enable_statistics(
         self, application_name: str, application_version: str
