@@ -58,7 +58,7 @@
 		9
 	],
 	"interviewAttempts": 0,
-	"interviewStage": 6,
+	"interviewStage": "Neighbors",
 	"endpoints": [{
 		"nodeId": 32,
 		"index": 0,

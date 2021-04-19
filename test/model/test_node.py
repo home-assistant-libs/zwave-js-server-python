@@ -8,6 +8,7 @@ from zwave_js_server.const import (
     CommandClass,
     EntryControlDataType,
     EntryControlEventType,
+    INTERVIEW_FAILED,
     ProtocolVersion,
 )
 from zwave_js_server.event import Event
@@ -77,7 +78,7 @@ def test_from_state():
     assert node.endpoints_have_identical_capabilities is None
     assert node.individual_endpoint_count is None
     assert node.aggregated_endpoint_count is None
-    assert node.interview_stage == 6
+    assert node.interview_stage == "Neighbors"
     assert len(node.command_classes) == 0
     assert len(node.endpoints) == 1
     assert node.endpoints[0].index == 0
@@ -514,7 +515,7 @@ async def test_metadata_updated(climate_radio_thermostat_ct100_plus: Node):
 
 
 async def test_notification(lock_schlage_be469: Node):
-    """Test notification events."""
+    """Test notification CC notification events."""
     node = lock_schlage_be469
 
     # Validate that Notification CC notification event is received as expected
@@ -546,6 +547,7 @@ async def test_notification(lock_schlage_be469: Node):
 
 
 async def test_entry_control_notification(ring_keypad):
+    """Test entry control CC notification events."""
     node = ring_keypad
 
     # Validate that Entry Control CC notification event is received as expected
@@ -565,3 +567,63 @@ async def test_entry_control_notification(ring_keypad):
     assert event.data["notification"].event_type == EntryControlEventType.ARM_AWAY
     assert event.data["notification"].data_type == EntryControlDataType.ASCII
     assert event.data["notification"].event_data == "555"
+
+
+async def test_interview_events(multisensor_6):
+    """Test Node interview events."""
+    node = multisensor_6
+    assert node.interview_stage is None
+    assert node.ready
+    assert not node.in_interview
+
+    event = Event(
+        type="interview started",
+        data={
+            "source": "node",
+            "event": "interview started",
+            "nodeId": 52,
+        },
+    )
+    node.handle_interview_started(event)
+    assert node.interview_stage is None
+    assert not node.ready
+    assert node.in_interview
+
+    event = Event(
+        type="interview stage completed",
+        data={
+            "source": "node",
+            "event": "interview stage completed",
+            "nodeId": 52,
+            "stageName": "test",
+        },
+    )
+    node.handle_interview_stage_completed(event)
+    assert node.interview_stage == "test"
+    assert not node.ready
+    assert node.in_interview
+
+    event = Event(
+        type="interview failed",
+        data={
+            "source": "node",
+            "event": "interview failed",
+            "nodeId": 52,
+        },
+    )
+    node.handle_interview_failed(event)
+    assert node.interview_stage == INTERVIEW_FAILED
+    assert not node.ready
+    assert not node.in_interview
+
+    event = Event(
+        type="interview completed",
+        data={
+            "source": "node",
+            "event": "interview completed",
+            "nodeId": 52,
+        },
+    )
+    node.handle_interview_completed(event)
+    assert node.ready
+    assert not node.in_interview

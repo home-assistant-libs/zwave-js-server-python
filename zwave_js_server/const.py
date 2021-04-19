@@ -3,11 +3,13 @@ from enum import Enum, IntEnum
 from typing import Dict, List
 
 # minimal server schema version we can handle
-MIN_SERVER_SCHEMA_VERSION = 3
+MIN_SERVER_SCHEMA_VERSION = 4
 # max server schema version we can handle (and our code is compatible with)
-MAX_SERVER_SCHEMA_VERSION = 3
+MAX_SERVER_SCHEMA_VERSION = 4
 
 VALUE_UNKNOWN = "unknown"
+
+INTERVIEW_FAILED = "Failed"
 
 
 class CommandStatus(str, Enum):

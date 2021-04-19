@@ -36,7 +36,7 @@
   "label": "4AK1S7-0EN0 / 4AK1E9-0EU0",
   "neighbors": [1, 7, 16],
   "interviewAttempts": 1,
-  "interviewStage": 6,
+  "interviewStage": "Neighbors",
   "endpoints": [
     { "nodeId": 10, "index": 0, "installerIcon": 8193, "userIcon": 8193 }
   ],

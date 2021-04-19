@@ -2,7 +2,7 @@
 from enum import IntEnum
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
 
-from zwave_js_server.const import CommandClass
+from zwave_js_server.const import CommandClass, INTERVIEW_FAILED
 
 from ..event import Event, EventBase
 from ..exceptions import FailedCommand, UnparseableValue, UnwriteableValue
@@ -82,7 +82,7 @@ class NodeDataType(TypedDict, total=False):
     individualEndpointCount: int
     aggregatedEndpointCount: int
     interviewAttempts: int
-    interviewStage: int
+    interviewStage: Optional[Union[int, str]]
     commandClasses: List[CommandClassInfoDataType]
     values: List[ValueDataType]
 
@@ -291,9 +291,14 @@ class Node(EventBase):
         return self.data.get("interviewAttempts")
 
     @property
-    def interview_stage(self) -> Optional[int]:
+    def interview_stage(self) -> Optional[Union[int, str]]:
         """Return the interview_stage."""
         return self.data.get("interviewStage")
+
+    @property
+    def in_interview(self) -> bool:
+        """Return whether node is currently being interviewed."""
+        return not self.ready and self.interview_stage != INTERVIEW_FAILED
 
     @property
     def command_classes(self) -> List[CommandClassInfo]:
@@ -439,11 +444,25 @@ class Node(EventBase):
         # pylint: disable=unused-argument
         self.data["status"] = NodeStatus.ALIVE
 
-    def handle_interview_completed(self, event: Event) -> None:
-        """Process a node interview completed event."""
+    def handle_interview_started(self, event: Event) -> None:
+        """Process a node interview started event."""
+        # pylint: disable=unused-argument
+        self.data["ready"] = False
+        self.data["interviewStage"] = None
+
+    def handle_interview_stage_completed(self, event: Event) -> None:
+        """Process a node interview stage completed event."""
+        self.data["interviewStage"] = event.data["stageName"]
 
     def handle_interview_failed(self, event: Event) -> None:
         """Process a node interview failed event."""
+        # pylint: disable=unused-argument
+        self.data["interviewStage"] = INTERVIEW_FAILED
+
+    def handle_interview_completed(self, event: Event) -> None:
+        """Process a node interview completed event."""
+        # pylint: disable=unused-argument
+        self.data["ready"] = True
 
     def handle_ready(self, event: Event) -> None:
         """Process a node ready event."""
