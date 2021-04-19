@@ -119,6 +119,7 @@ async def test_get_log_config(driver, uuid4, mock_command):
 
 async def test_listening_logs(driver, uuid4, mock_command):
     """Test listening to logs helpers."""
+    # Test that start listening to logs command is sent
     ack_commands = mock_command(
         {"command": "driver.start_listening_logs"},
         {"success": True},
@@ -131,6 +132,7 @@ async def test_listening_logs(driver, uuid4, mock_command):
         "messageId": uuid4,
     }
 
+    # Test that stop listening to logs command is sent
     ack_commands = mock_command(
         {"command": "driver.stop_listening_logs"},
         {"success": True},
@@ -143,6 +145,7 @@ async def test_listening_logs(driver, uuid4, mock_command):
         "messageId": uuid4,
     }
 
+    # Test receiving a log message event
     event = Event(
         type="logging",
         data={
