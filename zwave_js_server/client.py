@@ -258,20 +258,17 @@ class Client:
             if future is None:
                 # no listener for this result
                 return
-            print("s", msg)
+
             if msg["success"]:
-                print(1, msg)
                 future.set_result(msg["result"])
                 return
 
-            if msg["errorCode"] == "zwave_error":
-                print(2)
+            if msg["errorCode"] != "zwave_error":
+                err = FailedCommand(msg["messageId"], msg["errorCode"])
+            else:
                 err = FailedZWaveCommand(
                     msg["messageId"], msg["zwaveErrorCode"], msg["zwaveErrorMessage"]
                 )
-            else:
-                print(3)
-                err = FailedCommand(msg["messageId"], msg["errorCode"])
 
             future.set_exception(err)
             return
