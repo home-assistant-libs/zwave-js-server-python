@@ -264,9 +264,12 @@ def mock_command_fixture(ws_client, client, uuid4):
                 received_message = {
                     "type": "result",
                     "messageId": uuid4,
-                    "result": response,
                     "success": success,
                 }
+                if success:
+                    received_message["result"] = response
+                else:
+                    received_message.update(response)
                 client._handle_incoming_message(received_message)
                 return
 

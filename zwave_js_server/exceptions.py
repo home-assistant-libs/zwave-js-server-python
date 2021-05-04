@@ -63,11 +63,30 @@ class InvalidServerVersion(BaseZwaveJSServerError):
 class FailedCommand(BaseZwaveJSServerError):
     """When a command has failed."""
 
-    def __init__(self, message_id: str, error_code: str):
+    def __init__(self, message_id: str, error_code: str, msg: Optional[str] = None):
         """Initialize a failed command error."""
-        super().__init__(f"Command failed: {error_code}")
+        super().__init__(msg or f"Command failed: {error_code}")
         self.message_id = message_id
         self.error_code = error_code
+
+
+class FailedZWaveCommand(FailedCommand):
+    """When a command has failed because of Z-Wave JS error."""
+
+    def __init__(
+        self,
+        message_id: str,
+        zwave_error_code: int,
+        zwave_error_message: str,
+    ):
+        """Initialize a failed command error."""
+        super().__init__(
+            message_id,
+            "zwave_error",
+            f"Z-Wave error {zwave_error_code}: {zwave_error_message}",
+        )
+        self.zwave_error_code = zwave_error_code
+        self.zwave_error_message = zwave_error_message
 
 
 class UnparseableValue(BaseZwaveJSServerError):
