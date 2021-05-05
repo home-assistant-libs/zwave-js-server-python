@@ -13,6 +13,7 @@ from zwave_js_server.exceptions import (
     CannotConnect,
     ConnectionFailed,
     FailedCommand,
+    FailedZWaveCommand,
     InvalidMessage,
     InvalidServerVersion,
     InvalidState,
@@ -286,3 +287,36 @@ async def test_listen_unknown_result_type(
     await client.listen(driver_ready)
 
     ws_client.receive.assert_awaited()
+
+
+async def test_command_error_handling(client, mock_command):
+    """Test error handling."""
+    mock_command(
+        {"command": "some_command"},
+        {
+            "errorCode": "unknown_command",
+        },
+        False,
+    )
+
+    with pytest.raises(FailedCommand) as raised:
+        await client.async_send_command({"command": "some_command"})
+
+    assert raised.value.error_code == "unknown_command"
+
+    mock_command(
+        {"command": "some_zjs_command"},
+        {
+            "errorCode": "zwave_error",
+            "zwaveErrorCode": 3,
+            "zwaveErrorMessage": "Node 5 is dead",
+        },
+        False,
+    )
+
+    with pytest.raises(FailedZWaveCommand) as raised:
+        await client.async_send_command({"command": "some_zjs_command"})
+
+    assert raised.value.error_code == "zwave_error"
+    assert raised.value.zwave_error_code == 3
+    assert raised.value.zwave_error_message == "Node 5 is dead"

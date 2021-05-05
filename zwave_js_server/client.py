@@ -15,6 +15,7 @@ from .exceptions import (
     ConnectionClosed,
     ConnectionFailed,
     FailedCommand,
+    FailedZWaveCommand,
     InvalidMessage,
     InvalidServerVersion,
     InvalidState,
@@ -262,7 +263,14 @@ class Client:
                 future.set_result(msg["result"])
                 return
 
-            future.set_exception(FailedCommand(msg["messageId"], msg["errorCode"]))
+            if msg["errorCode"] != "zwave_error":
+                err = FailedCommand(msg["messageId"], msg["errorCode"])
+            else:
+                err = FailedZWaveCommand(
+                    msg["messageId"], msg["zwaveErrorCode"], msg["zwaveErrorMessage"]
+                )
+
+            future.set_exception(err)
             return
 
         if msg["type"] != "event":
