@@ -177,10 +177,10 @@ class DeviceConfig:
             DeviceDevice(device) for device in self.data.get("devices", [])
         ]
         self._firmware_version = DeviceFirmwareVersionRange(
-            self.data.get("firmwareVersion", {})
+            self.data.get("firmwareVersion", {})  # type: ignore
         )
         self._associations = {
-            num: DeviceConditionalAssociation(conditional_association)
+            num: DeviceConditionalAssociation(conditional_association)  # type: ignore
             for num, conditional_association in self.data.get("associations", {}).items()
         }
         self._metadata = DeviceMetadata(self.data.get("metadata", {}))
