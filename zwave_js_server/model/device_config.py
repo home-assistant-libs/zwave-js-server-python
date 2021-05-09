@@ -6,7 +6,7 @@ https://zwave-js.github.io/node-zwave-js/#/api/node?id=deviceconfig
 from typing import Dict, List, Optional, TypedDict
 
 
-class DeviceDeviceDataType(TypedDict):
+class DeviceDeviceDataType(TypedDict, total=False):
     """Represent a device device data dict type."""
 
     productType: int
@@ -31,7 +31,7 @@ class DeviceDevice:
         return self.data.get("productId")
 
 
-class DeviceFirmwareVersionRangeDataType(TypedDict):
+class DeviceFirmwareVersionRangeDataType(TypedDict, total=False):
     """Represent a device firmware version range data dict type."""
 
     min: str
@@ -181,12 +181,12 @@ class DeviceConfig:
         )
         self._associations = {
             num: DeviceConditionalAssociation(conditional_association)
-            for num, conditional_association in self.data.get("associations", {})
+            for num, conditional_association in self.data.get("associations", {}).items()
         }
         self._metadata = DeviceMetadata(self.data.get("metadata", {}))
 
     @property
-    def filename(self) -> str:
+    def filename(self) -> Optional[str]:
         """Return config filename."""
         return self.data.get("filename")
 
