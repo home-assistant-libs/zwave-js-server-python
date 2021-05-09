@@ -160,6 +160,7 @@ class DeviceConfigDataType(TypedDict, total=False):
     firmwareVersion: DeviceFirmwareVersionRange
     associations: Dict[int, dict]
     paramInformation: Dict[str, dict]
+    supportsZWavePlus: bool
     proprietary: dict
     compat: Dict[str, dict]
     metadata: DeviceMetadataDataType
@@ -228,6 +229,11 @@ class DeviceConfig:
     def param_information(self) -> Dict[str, dict]:
         """Return dictionary of configuration parameters the device supports."""
         return self.data.get("paramInformation", {})
+
+    @property
+    def supports_zwave_plus(self) -> Optional[bool]:
+        """Return if the device complies with the Z-Wave+ standard."""
+        return self.data.get("supportsZWavePlus")
 
     @property
     def proprietary(self) -> dict:

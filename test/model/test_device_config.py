@@ -51,3 +51,4 @@ async def test_device_config():
     assert device_config.metadata.wakeup is None
     assert device_config.associations == {}
     assert device_config.param_information == {"_map": {}}
+    assert device_config.supports_zwave_plus is None
