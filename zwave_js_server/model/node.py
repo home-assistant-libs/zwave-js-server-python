@@ -95,6 +95,7 @@ class Node(EventBase):
         super().__init__()
         self.client = client
         self.data = data
+        self._device_config = DeviceConfig(self.data.get("deviceConfig", {}))
         self.values: Dict[str, Union[Value, ConfigurationValue]] = {}
         for val in data["values"]:
             value_id = _get_value_id_from_dict(self, val)
@@ -248,7 +249,7 @@ class Node(EventBase):
     @property
     def device_config(self) -> DeviceConfig:
         """Return the device_config."""
-        return DeviceConfig(self.data.get("deviceConfig", {}))
+        return self._device_config
 
     @property
     def label(self) -> Optional[str]:

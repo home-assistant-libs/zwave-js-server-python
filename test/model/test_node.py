@@ -1,6 +1,5 @@
 """Test the node model."""
 import json
-from zwave_js_server.model.value import ConfigurationValue
 
 import pytest
 
@@ -15,23 +14,9 @@ from zwave_js_server.event import Event
 from zwave_js_server.exceptions import UnwriteableValue
 from zwave_js_server.model import node as node_pkg
 from zwave_js_server.model.node import Node, NodeStatus
+from zwave_js_server.model.value import ConfigurationValue
 
 from .. import load_fixture
-
-DEVICE_CONFIG_FIXTURE = {
-    "manufacturer_id": 134,
-    "manufacturer": "AEON Labs",
-    "label": "ZW090",
-    "description": "Z‐Stick Gen5 USB Controller",
-    "devices": [
-        {"productType": 1, "productId": 90},
-        {"productType": 257, "productId": 90},
-        {"productType": 513, "productId": 90},
-    ],
-    "firmware_version": {"min": "0.0", "max": "255.255"},
-    "associations": {},
-    "param_information": {"_map": {}},
-}
 
 
 def test_from_state():
@@ -63,8 +48,6 @@ def test_from_state():
     assert node.manufacturer_id == 134
     assert node.product_id == 90
     assert node.product_type == 257
-    for attr, value in DEVICE_CONFIG_FIXTURE.items():
-        assert getattr(node.device_config, attr) == value
     assert node.label == "ZW090"
     assert node.neighbors == [23, 26, 5, 6]
     assert node.interview_attempts == 0
