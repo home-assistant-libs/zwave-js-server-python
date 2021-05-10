@@ -1,4 +1,4 @@
-"""Dump helper."""
+"""Firmware update helper."""
 from typing import Any, Dict
 import uuid
 

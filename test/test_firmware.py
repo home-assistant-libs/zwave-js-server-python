@@ -1,4 +1,4 @@
-"""Test for firmware functions."""
+"""Test the firmware update helper."""
 
 from zwave_js_server.firmware import (
     begin_firmware_update_guess_format,
