@@ -448,7 +448,7 @@ class Node(EventBase):
 
     async def async_begin_firmware_update_guess_format(
         self, filename: str, file: bytes
-    ) -> Dict[str, Any]:
+    ) -> Optional[Dict[str, Any]]:
         """Send beginFirmwareUpdate command to Node (format to be guessed)."""
         return await self.async_send_command(
             "begin_firmware_update_guess_format",
@@ -460,7 +460,7 @@ class Node(EventBase):
 
     async def async_begin_firmware_update_known_format(
         self, file_format: str, file: bytes
-    ) -> Dict[str, Any]:
+    ) -> Optional[Dict[str, Any]]:
         """Send beginFirmwareUpdate command to Node (format is known)."""
         return await self.async_send_command(
             "begin_firmware_update_known_format",
