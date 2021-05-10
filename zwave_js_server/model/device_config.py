@@ -181,7 +181,9 @@ class DeviceConfig:
         )
         self._associations = {
             num: DeviceConditionalAssociation(conditional_association)  # type: ignore
-            for num, conditional_association in self.data.get("associations", {}).items()
+            for num, conditional_association in self.data.get(
+                "associations", {}
+            ).items()
         }
         self._metadata = DeviceMetadata(self.data.get("metadata", {}))
 
