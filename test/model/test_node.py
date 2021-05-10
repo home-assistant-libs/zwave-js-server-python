@@ -213,6 +213,48 @@ async def test_refresh_info(multisensor_6, uuid4, mock_command):
     }
 
 
+async def test_begin_firmware_update_guess_format(multisensor_6, uuid4, mock_command):
+    """Test begin_firmware_update_guess_format."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.begin_firmware_update_guess_format", "nodeId": node.node_id},
+        {"result": "something"},
+    )
+    assert await node.async_begin_firmware_update_guess_format("test", bytes(10)) == {
+        "result": "something"
+    }
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.begin_firmware_update_guess_format",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+        "firmwareFilename": "test",
+        "firmwareFile": {"type": "Buffer", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]},
+    }
+
+
+async def test_begin_firmware_update_known_format(multisensor_6, uuid4, mock_command):
+    """Test begin_firmware_update_known_format."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.begin_firmware_update_known_format", "nodeId": node.node_id},
+        {"result": "something"},
+    )
+    assert await node.async_begin_firmware_update_known_format("test", bytes(10)) == {
+        "result": "something"
+    }
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.begin_firmware_update_known_format",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+        "firmwareFileFormat": "test",
+        "firmwareFile": {"type": "Buffer", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]},
+    }
+
+
 async def test_value_added_event(multisensor_6):
     """Test Node value removed event."""
     node = multisensor_6

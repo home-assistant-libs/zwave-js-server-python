@@ -2,8 +2,7 @@
 from enum import IntEnum
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
 
-from zwave_js_server.const import CommandClass, INTERVIEW_FAILED
-
+from ..const import CommandClass, INTERVIEW_FAILED
 from ..event import Event, EventBase
 from ..exceptions import FailedCommand, UnparseableValue, UnwriteableValue
 from .command_class import CommandClassInfo, CommandClassInfoDataType
@@ -22,6 +21,7 @@ from .notification import (
     NotificationNotification,
     NotificationNotificationDataType,
 )
+from ..util.helpers import create_buffer
 from .value import (
     ConfigurationValue,
     MetaDataType,
@@ -445,6 +445,30 @@ class Node(EventBase):
         if not isinstance(val, Value):
             val = self.values[val]
         await self.async_send_command("poll_value", valueId=val.data, require_schema=1)
+
+    async def async_begin_firmware_update_guess_format(
+        self, filename: str, file: bytes
+    ) -> Dict[str, Any]:
+        """Send beginFirmwareUpdate command to Node (format to be guessed)."""
+        return await self.async_send_command(
+            "begin_firmware_update_guess_format",
+            firmwareFilename=filename,
+            firmwareFile=create_buffer(file),
+            require_schema=5,
+            wait_for_result=True,
+        )
+
+    async def async_begin_firmware_update_known_format(
+        self, file_format: str, file: bytes
+    ) -> Dict[str, Any]:
+        """Send beginFirmwareUpdate command to Node (format is known)."""
+        return await self.async_send_command(
+            "begin_firmware_update_known_format",
+            firmwareFileFormat=file_format,
+            firmwareFile=create_buffer(file),
+            require_schema=5,
+            wait_for_result=True,
+        )
 
     def handle_wake_up(self, event: Event) -> None:
         """Process a node wake up event."""

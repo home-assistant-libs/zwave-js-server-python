@@ -1,7 +1,7 @@
 """Generic Utility helper functions."""
 
 import json
-from typing import Any, Dict, Union
+from typing import Any, Dict, List, Literal, Union
 
 from ..exceptions import UnparseableValue
 
@@ -10,6 +10,15 @@ def is_json_string(value: Any) -> bool:
     """Check if the provided string looks like json."""
     # NOTE: we do not use json.loads here as it is not strict enough
     return isinstance(value, str) and value.startswith("{") and value.endswith("}")
+
+
+def create_buffer(
+    data: Union[bytes, List[int]]
+) -> Dict[str, Union[Literal["Buffer"], List[int]]]:
+    """Create a Buffer dictionary from input data."""
+    if isinstance(data, bytes):
+        data = list(data)
+    return {"type": "Buffer", "data": data}
 
 
 def parse_buffer(value: Union[Dict[str, Any], str]) -> str:
