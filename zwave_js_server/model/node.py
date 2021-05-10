@@ -10,6 +10,12 @@ from .command_class import CommandClassInfo, CommandClassInfoDataType
 from .device_class import DeviceClass, DeviceClassDataType
 from .device_config import DeviceConfig, DeviceConfigDataType
 from .endpoint import Endpoint, EndpointDataType
+from .firmware import (
+    FirmwareUpdateFinished,
+    FirmwareUpdateFinishedDataType,
+    FirmwareUpdateProgress,
+    FirmwareUpdateProgressDataType,
+)
 from .notification import (
     EntryControlNotification,
     EntryControlNotificationDataType,
@@ -546,6 +552,12 @@ class Node(EventBase):
 
     def handle_firmware_update_progress(self, event: Event) -> None:
         """Process a node firmware update progress event."""
+        event.data["firmware_update_progress"] = FirmwareUpdateProgress(
+            self, cast(FirmwareUpdateProgressDataType, event.data)
+        )
 
     def handle_firmware_update_finished(self, event: Event) -> None:
         """Process a node firmware update finished event."""
+        event.data["firmware_update_finished"] = FirmwareUpdateFinished(
+            self, cast(FirmwareUpdateFinishedDataType, event.data)
+        )
