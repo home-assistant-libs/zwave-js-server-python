@@ -71,6 +71,52 @@ def test_from_state():
     assert device_class.specific.key == 1
 
 
+async def test_device_config(wallmote_central_scene):
+    """Test a device config."""
+    node: Node = wallmote_central_scene
+
+    device_config = node.device_config
+    assert device_config.is_embedded
+    assert device_config.filename == (
+        "/usr/src/app/node_modules/@zwave-js/config/config/devices/0x0086/zw130.json"
+    )
+    assert device_config.manufacturer == "AEON Labs"
+    assert device_config.manufacturer_id == 134
+    assert device_config.label == "ZW130"
+    assert device_config.description == "WallMote Quad"
+    assert len(device_config.devices) == 3
+    assert device_config.devices[0].product_id == 130
+    assert device_config.devices[0].product_type == 2
+    assert device_config.firmware_version.min == "0.0"
+    assert device_config.firmware_version.max == "255.255"
+    assert device_config.metadata.inclusion == (
+        "To add the ZP3111 to the Z-Wave network (inclusion), place the Z-Wave "
+        "primary controller into inclusion mode. Press the Program Switch of ZP3111 "
+        "for sending the NIF. After sending NIF, Z-Wave will send the auto inclusion, "
+        "otherwise, ZP3111 will go to sleep after 20 seconds."
+    )
+    assert device_config.metadata.exclusion == (
+        "To remove the ZP3111 from the Z-Wave network (exclusion), place the Z-Wave "
+        "primary controller into \u201cexclusion\u201d mode, and following its "
+        "instruction to delete the ZP3111 to the controller. Press the Program Switch "
+        "of ZP3111 once to be excluded."
+    )
+    assert device_config.metadata.reset == (
+        "Remove cover to trigged tamper switch, LED flash once & send out Alarm "
+        "Report. Press Program Switch 10 times within 10 seconds, ZP3111 will send "
+        "the \u201cDevice Reset Locally Notification\u201d command and reset to the "
+        "factory default. (Remark: This is to be used only in the case of primary "
+        "controller being inoperable or otherwise unavailable.)"
+    )
+    assert device_config.metadata.manual == (
+        "https://products.z-wavealliance.org/ProductManual/File?folder=&filename=MarketCertificationFiles/2479/ZP3111-5_R2_20170316.pdf"
+    )
+    assert device_config.metadata.wakeup is None
+    assert device_config.associations == {}
+    assert device_config.param_information == {"_map": {}}
+    assert device_config.supports_zwave_plus is None
+
+
 async def test_unknown_values(cover_qubino_shutter):
     """Test that values that are unknown return as None."""
     node = cover_qubino_shutter
