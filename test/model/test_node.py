@@ -1,6 +1,5 @@
 """Test the node model."""
 import json
-from zwave_js_server.model.value import ConfigurationValue
 
 import pytest
 
@@ -15,23 +14,9 @@ from zwave_js_server.event import Event
 from zwave_js_server.exceptions import UnwriteableValue
 from zwave_js_server.model import node as node_pkg
 from zwave_js_server.model.node import Node, NodeStatus
+from zwave_js_server.model.value import ConfigurationValue
 
 from .. import load_fixture
-
-DEVICE_CONFIG_FIXTURE = {
-    "manufacturer_id": 134,
-    "manufacturer": "AEON Labs",
-    "label": "ZW090",
-    "description": "Z‐Stick Gen5 USB Controller",
-    "devices": [
-        {"productType": 1, "productId": 90},
-        {"productType": 257, "productId": 90},
-        {"productType": 513, "productId": 90},
-    ],
-    "firmware_version": {"min": "0.0", "max": "255.255"},
-    "associations": {},
-    "param_information": {"_map": {}},
-}
 
 
 def test_from_state():
@@ -63,8 +48,6 @@ def test_from_state():
     assert node.manufacturer_id == 134
     assert node.product_id == 90
     assert node.product_type == 257
-    for attr, value in DEVICE_CONFIG_FIXTURE.items():
-        assert getattr(node.device_config, attr) == value
     assert node.label == "ZW090"
     assert node.neighbors == [23, 26, 5, 6]
     assert node.interview_attempts == 0
@@ -86,6 +69,52 @@ def test_from_state():
     assert device_class.basic.key == 2
     assert device_class.generic.key == 2
     assert device_class.specific.key == 1
+
+
+async def test_device_config(wallmote_central_scene):
+    """Test a device config."""
+    node: Node = wallmote_central_scene
+
+    device_config = node.device_config
+    assert device_config.is_embedded
+    assert device_config.filename == (
+        "/usr/src/app/node_modules/@zwave-js/config/config/devices/0x0086/zw130.json"
+    )
+    assert device_config.manufacturer == "AEON Labs"
+    assert device_config.manufacturer_id == 134
+    assert device_config.label == "ZW130"
+    assert device_config.description == "WallMote Quad"
+    assert len(device_config.devices) == 3
+    assert device_config.devices[0].product_id == 130
+    assert device_config.devices[0].product_type == 2
+    assert device_config.firmware_version.min == "0.0"
+    assert device_config.firmware_version.max == "255.255"
+    assert device_config.metadata.inclusion == (
+        "To add the ZP3111 to the Z-Wave network (inclusion), place the Z-Wave "
+        "primary controller into inclusion mode. Press the Program Switch of ZP3111 "
+        "for sending the NIF. After sending NIF, Z-Wave will send the auto inclusion, "
+        "otherwise, ZP3111 will go to sleep after 20 seconds."
+    )
+    assert device_config.metadata.exclusion == (
+        "To remove the ZP3111 from the Z-Wave network (exclusion), place the Z-Wave "
+        "primary controller into \u201cexclusion\u201d mode, and following its "
+        "instruction to delete the ZP3111 to the controller. Press the Program Switch "
+        "of ZP3111 once to be excluded."
+    )
+    assert device_config.metadata.reset == (
+        "Remove cover to trigged tamper switch, LED flash once & send out Alarm "
+        "Report. Press Program Switch 10 times within 10 seconds, ZP3111 will send "
+        "the \u201cDevice Reset Locally Notification\u201d command and reset to the "
+        "factory default. (Remark: This is to be used only in the case of primary "
+        "controller being inoperable or otherwise unavailable.)"
+    )
+    assert device_config.metadata.manual == (
+        "https://products.z-wavealliance.org/ProductManual/File?folder=&filename=MarketCertificationFiles/2479/ZP3111-5_R2_20170316.pdf"
+    )
+    assert device_config.metadata.wakeup is None
+    assert device_config.associations == {}
+    assert device_config.param_information == {"_map": {}}
+    assert device_config.supports_zwave_plus is None
 
 
 async def test_unknown_values(cover_qubino_shutter):
