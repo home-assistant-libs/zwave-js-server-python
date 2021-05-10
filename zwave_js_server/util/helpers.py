@@ -1,5 +1,5 @@
 """Generic Utility helper functions."""
-
+import base64
 import json
 from typing import Any, Dict, List, Literal, Union
 
@@ -12,13 +12,9 @@ def is_json_string(value: Any) -> bool:
     return isinstance(value, str) and value.startswith("{") and value.endswith("}")
 
 
-def create_buffer(
-    data: Union[bytes, List[int]]
-) -> Dict[str, Union[Literal["Buffer"], List[int]]]:
-    """Create a Buffer dictionary from input data."""
-    if isinstance(data, bytes):
-        data = list(data)
-    return {"type": "Buffer", "data": data}
+def convert_bytes_to_base64(data: bytes) -> str:
+    """Convert bytes data to base64 for serialization."""
+    return base64.b64encode(data).decode("ascii")
 
 
 def parse_buffer(value: Union[Dict[str, Any], str]) -> str:
