@@ -13,6 +13,7 @@ from zwave_js_server.const import (
 from zwave_js_server.event import Event
 from zwave_js_server.exceptions import UnwriteableValue
 from zwave_js_server.model import node as node_pkg
+from zwave_js_server.model.firmware import FirmwareUpdateStatus
 from zwave_js_server.model.node import Node, NodeStatus
 from zwave_js_server.model.value import ConfigurationValue
 
@@ -689,3 +690,41 @@ async def test_refresh_values(multisensor_6, uuid4, mock_command):
         "commandClass": 112,
         "messageId": uuid4,
     }
+
+
+async def test_firmware_events(wallmote_central_scene: Node):
+    """Test firmware events."""
+    node = wallmote_central_scene
+
+    event = Event(
+        type="firmware update progress",
+        data={
+            "source": "node",
+            "event": "firmware update progress",
+            "nodeId": 35,
+            "sentFragments": 1,
+            "totalFragments": 10,
+        },
+    )
+
+    node.handle_firmware_update_progress(event)
+    assert event.data["firmware_update_progress"].sent_fragments == 1
+    assert event.data["firmware_update_progress"].total_fragments == 10
+
+    event = Event(
+        type="firmware update finished",
+        data={
+            "source": "node",
+            "event": "firmware update finished",
+            "nodeId": 35,
+            "status": 255,
+            "waitTime": 10,
+        },
+    )
+
+    node.handle_firmware_update_finished(event)
+    assert (
+        event.data["firmware_update_finished"].status
+        == FirmwareUpdateStatus.OK_RESTART_PENDING
+    )
+    assert event.data["firmware_update_finished"].wait_time == 10
