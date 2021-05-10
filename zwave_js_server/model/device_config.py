@@ -56,55 +56,6 @@ class DeviceFirmwareVersionRange:
         return self.data.get("max")
 
 
-class DeviceConditionalAssociationDataType(TypedDict, total=False):
-    """Represent a device conditional association data dict type."""
-
-    groupId: int
-    label: str
-    description: str
-    maxNodes: int
-    isLifeline: bool
-    noEndpoint: bool
-
-
-class DeviceConditionalAssociation:
-    """Model for a Zwave Node's device config's conditional association."""
-
-    def __init__(self, data: DeviceConditionalAssociationDataType) -> None:
-        """Initialize."""
-        self.data = data
-
-    @property
-    def group_id(self) -> Optional[int]:
-        """Return group id."""
-        return self.data.get("groupId")
-
-    @property
-    def label(self) -> Optional[str]:
-        """Return label."""
-        return self.data.get("label")
-
-    @property
-    def description(self) -> Optional[str]:
-        """Return description."""
-        return self.data.get("description")
-
-    @property
-    def max_nodes(self) -> Optional[int]:
-        """Return max nodes."""
-        return self.data.get("maxNodes")
-
-    @property
-    def is_lifeline(self) -> Optional[bool]:
-        """Return whether is lifeline."""
-        return self.data.get("isLifeline")
-
-    @property
-    def no_endpoint(self) -> Optional[bool]:
-        """Return whether there is no endpoint."""
-        return self.data.get("noEndpoint")
-
-
 class DeviceMetadataDataType(TypedDict, total=False):
     """Represent a device metadata data dict type."""
 
@@ -158,7 +109,7 @@ class DeviceConfigDataType(TypedDict, total=False):
     description: str
     devices: List[DeviceDeviceDataType]
     firmwareVersion: DeviceFirmwareVersionRange
-    associations: Dict[int, dict]
+    associations: Dict[str, dict]
     paramInformation: Dict[str, dict]
     supportsZWavePlus: bool
     proprietary: dict
@@ -179,12 +130,6 @@ class DeviceConfig:
         self._firmware_version = DeviceFirmwareVersionRange(
             self.data.get("firmwareVersion", {})  # type: ignore
         )
-        self._associations = {
-            num: DeviceConditionalAssociation(conditional_association)  # type: ignore
-            for num, conditional_association in self.data.get(
-                "associations", {}
-            ).items()
-        }
         self._metadata = DeviceMetadata(self.data.get("metadata", {}))
 
     @property
@@ -223,9 +168,9 @@ class DeviceConfig:
         return self._firmware_version
 
     @property
-    def associations(self) -> Dict[int, DeviceConditionalAssociation]:
+    def associations(self) -> Dict[str, dict]:
         """Return dict of association groups the device supports."""
-        return self._associations
+        return self.data.get("associations", {})
 
     @property
     def param_information(self) -> Dict[str, dict]:
