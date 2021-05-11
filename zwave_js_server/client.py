@@ -152,7 +152,9 @@ class Client:
             await self._client.close()
             raise FailedCommand(set_api_msg["messageId"], set_api_msg["errorCode"])
 
-    async def listen(self, driver_ready: asyncio.Event) -> None:
+    async def listen(
+        self, driver_ready: asyncio.Event, schema_version: Optional[int] = None
+    ) -> None:
         """Start listening to the websocket."""
         if not self.connected:
             raise InvalidState("Not connected when start listening")
@@ -160,7 +162,7 @@ class Client:
         assert self._client
 
         try:
-            await self.set_api_schema()
+            await self.set_api_schema(schema_version)
 
             # send start_listening command to the server
             # we will receive a full state dump and from now on get events
