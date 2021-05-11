@@ -1,5 +1,5 @@
 """Firmware update helper."""
-from typing import Any, Dict
+from typing import Any
 
 import aiohttp
 
@@ -10,7 +10,7 @@ from .util.helpers import convert_bytes_to_base64
 
 async def begin_firmware_update_guess_format(
     url: str, node: Node, filename: str, file: bytes, session: aiohttp.ClientSession
-) -> Dict[str, Any]:
+) -> Any:
     """Send beginFirmwareUpdate command to Node (format to be guessed)."""
     client = await session.ws_connect(url)
     # Version info
@@ -41,7 +41,7 @@ async def begin_firmware_update_guess_format(
 
 async def begin_firmware_update_known_format(
     url: str, node: Node, file_format: str, file: bytes, session: aiohttp.ClientSession
-) -> Dict[str, Any]:
+) -> Any:
     """Send beginFirmwareUpdate command to Node (format is known)."""
     client = await session.ws_connect(url)
     # Version info
