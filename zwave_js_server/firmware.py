@@ -11,7 +11,7 @@ from .util.helpers import convert_bytes_to_base64
 async def begin_firmware_update_guess_format(
     url: str, node: Node, filename: str, file: bytes, session: aiohttp.ClientSession
 ) -> Any:
-    """Send beginFirmwareUpdate command to Node (format to be guessed)."""
+    """Send beginFirmwareUpdate command to Node (file format to be guessed)."""
     client = await session.ws_connect(url)
     # Version info
     await client.receive_json()
@@ -42,7 +42,7 @@ async def begin_firmware_update_guess_format(
 async def begin_firmware_update_known_format(
     url: str, node: Node, file_format: str, file: bytes, session: aiohttp.ClientSession
 ) -> Any:
-    """Send beginFirmwareUpdate command to Node (format is known)."""
+    """Send beginFirmwareUpdate command to Node (file format is known)."""
     client = await session.ws_connect(url)
     # Version info
     await client.receive_json()
