@@ -173,8 +173,8 @@ async def firmware_ws_client_fixture(
     This fixture only allows a single message to be received.
     """
     ws_client = AsyncMock(spec_set=ClientWebSocketResponse, closed=False)
-    ws_client.receive_json.side_effect = (version_data, set_api_schema_data, {})
-    for data in (version_data, set_api_schema_data, {}):
+    ws_client.receive_json.side_effect = (version_data, set_api_schema_data)
+    for data in (version_data, set_api_schema_data):
         messages.append(create_ws_message(data))
 
     async def receive():
@@ -193,7 +193,6 @@ async def firmware_ws_client_fixture(
         """Close the client."""
         if msg["command"] in (
             "set_api_schema",
-            "node.begin_firmware_update"
         ):
             return
 

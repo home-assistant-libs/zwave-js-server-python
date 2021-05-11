@@ -160,8 +160,6 @@ class Client:
         assert self._client
 
         try:
-            # set preferred schema version on the server
-            # note: we already check for (in)compatible schemas in the connect call
             await self.set_api_schema()
 
             # send start_listening command to the server
