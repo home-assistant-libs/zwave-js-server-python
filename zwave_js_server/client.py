@@ -136,6 +136,8 @@ class Client:
 
     async def set_api_schema(self, version: Optional[int] = None) -> None:
         """Set API schema version on server."""
+        assert self._client
+
         # set preferred schema version on the server
         # note: we already check for (in)compatible schemas in the connect call
         await self._send_json_message(
