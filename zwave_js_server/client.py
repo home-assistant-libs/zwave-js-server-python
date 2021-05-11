@@ -134,6 +134,24 @@ class Client:
             self.schema_version,
         )
 
+    async def set_api_schema(self, version: Optional[int] = None) -> None:
+        """Set API schema version on server."""
+        # set preferred schema version on the server
+        # note: we already check for (in)compatible schemas in the connect call
+        await self._send_json_message(
+            {
+                "command": "set_api_schema",
+                "messageId": "api-schema-id",
+                "schemaVersion": version or self.schema_version,
+            }
+        )
+        set_api_msg = await self._receive_json_or_raise()
+
+        if not set_api_msg["success"]:
+            # this should not happen, but just in case
+            await self._client.close()
+            raise FailedCommand(set_api_msg["messageId"], set_api_msg["errorCode"])
+
     async def listen(self, driver_ready: asyncio.Event) -> None:
         """Start listening to the websocket."""
         if not self.connected:
@@ -144,19 +162,7 @@ class Client:
         try:
             # set preferred schema version on the server
             # note: we already check for (in)compatible schemas in the connect call
-            await self._send_json_message(
-                {
-                    "command": "set_api_schema",
-                    "messageId": "api-schema-id",
-                    "schemaVersion": self.schema_version,
-                }
-            )
-            set_api_msg = await self._receive_json_or_raise()
-
-            if not set_api_msg["success"]:
-                # this should not happen, but just in case
-                await self._client.close()
-                raise FailedCommand(set_api_msg["messageId"], set_api_msg["errorCode"])
+            await self.set_api_schema()
 
             # send start_listening command to the server
             # we will receive a full state dump and from now on get events

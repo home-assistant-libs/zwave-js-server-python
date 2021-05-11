@@ -193,8 +193,7 @@ async def firmware_ws_client_fixture(
         """Close the client."""
         if msg["command"] in (
             "set_api_schema",
-            "node.begin_firmware_update_guess_format",
-            "node.begin_firmware_update_known_format",
+            "node.begin_firmware_update"
         ):
             return
 
@@ -239,7 +238,7 @@ def version_data_fixture():
         "serverVersion": "test_server_version",
         "homeId": "test_home_id",
         "minSchemaVersion": 0,
-        "maxSchemaVersion": 4,
+        "maxSchemaVersion": 5,
     }
 
 
