@@ -1,19 +1,16 @@
 """Test the firmware update helper."""
 from unittest.mock import call
 
-from zwave_js_server.firmware import (
-    begin_firmware_update_guess_format,
-    begin_firmware_update_known_format,
-)
+from zwave_js_server.firmware import begin_firmware_update
 
 
 async def test_begin_firmware_update_guess_format(
     url, firmware_client_session, firmware_ws_client, multisensor_6
 ):
-    """Test begin_firmware_update_guess_format."""
+    """Test begin_firmware_update with guessed format."""
     node = multisensor_6
     assert (
-        await begin_firmware_update_guess_format(
+        await begin_firmware_update(
             url, node, "test", bytes(10), firmware_client_session
         )
         == {}
@@ -23,8 +20,8 @@ async def test_begin_firmware_update_guess_format(
     assert firmware_ws_client.send_json.call_count == 2
     assert firmware_ws_client.send_json.call_args == call(
         {
-            "command": "node.begin_firmware_update_guess_format",
-            "messageId": "begin-firmware-update-guess-format",
+            "command": "node.begin_firmware_update",
+            "messageId": "begin-firmware-update",
             "nodeId": node.node_id,
             "firmwareFile": "AAAAAAAAAAAAAA==",
             "firmwareFilename": "test",
@@ -36,11 +33,11 @@ async def test_begin_firmware_update_guess_format(
 async def test_begin_firmware_update_known_format(
     url, firmware_client_session, firmware_ws_client, multisensor_6
 ):
-    """Test begin_firmware_update_known_format."""
+    """Test begin_firmware_update with known format."""
     node = multisensor_6
     assert (
-        await begin_firmware_update_known_format(
-            url, node, "test", bytes(10), firmware_client_session
+        await begin_firmware_update(
+            url, node, "test", bytes(10), firmware_client_session, "test"
         )
         == {}
     )
@@ -49,9 +46,10 @@ async def test_begin_firmware_update_known_format(
     assert firmware_ws_client.send_json.call_count == 2
     assert firmware_ws_client.send_json.call_args == call(
         {
-            "command": "node.begin_firmware_update_known_format",
-            "messageId": "begin-firmware-update-known-format",
+            "command": "node.begin_firmware_update",
+            "messageId": "begin-firmware-update",
             "nodeId": node.node_id,
+            "firmwareFilename": "test",
             "firmwareFile": "AAAAAAAAAAAAAA==",
             "firmwareFileFormat": "test",
         }
