@@ -1,6 +1,5 @@
 """Firmware update helper."""
 from typing import Any, Dict
-import uuid
 
 import aiohttp
 
@@ -32,7 +31,7 @@ async def begin_firmware_update_guess_format(
             "nodeId": node.node_id,
             "firmwareFilename": filename,
             "firmwareFile": convert_bytes_to_base64(file),
-            "messageId": uuid.uuid4().hex,
+            "messageId": "begin-firmware-update-guess-format",
         }
     )
     resp = await client.receive_json()
@@ -63,7 +62,7 @@ async def begin_firmware_update_known_format(
             "nodeId": node.node_id,
             "firmwareFileFormat": file_format,
             "firmwareFile": convert_bytes_to_base64(file),
-            "messageId": uuid.uuid4().hex,
+            "messageId": "begin-firmware-update-known-format",
         }
     )
     resp = await client.receive_json()

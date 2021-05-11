@@ -1,4 +1,5 @@
 """Test the firmware update helper."""
+from unittest.mock import call
 
 from zwave_js_server.firmware import (
     begin_firmware_update_guess_format,
@@ -7,54 +8,52 @@ from zwave_js_server.firmware import (
 
 
 async def test_begin_firmware_update_guess_format(
-    url, client_session, set_api_schema_data, multisensor_6, uuid4, mock_command
+    url, firmware_client_session, firmware_ws_client, multisensor_6
 ):
     """Test begin_firmware_update_guess_format."""
     node = multisensor_6
-    mock_command(
-        {"command": "set_api_schema"},
-        set_api_schema_data,
+    assert (
+        await begin_firmware_update_guess_format(
+            url, node, "test", bytes(10), firmware_client_session
+        )
+        == {}
     )
-    ack_commands = mock_command(
-        {"command": "node.begin_firmware_update_guess_format", "nodeId": node.node_id},
-        {"result": "something"},
-    )
-    assert await begin_firmware_update_guess_format(
-        url, node, "test", bytes(10), client_session
-    ) == {"result": "something"}
 
-    assert len(ack_commands) == 1
-    assert ack_commands[0] == {
-        "command": "node.begin_firmware_update_guess_format",
-        "nodeId": node.node_id,
-        "firmwareFilename": "test",
-        "firmwareFile": "AAAAAAAAAAAAAA==",
-        "messageId": uuid4,
-    }
+    assert firmware_ws_client.receive_json.call_count == 3
+    assert firmware_ws_client.send_json.call_count == 2
+    assert firmware_ws_client.send_json.call_args == call(
+        {
+            "command": "node.begin_firmware_update_guess_format",
+            "messageId": "begin-firmware-update-guess-format",
+            "nodeId": node.node_id,
+            "firmwareFile": "AAAAAAAAAAAAAA==",
+            "firmwareFilename": "test",
+        }
+    )
+    assert firmware_ws_client.close.call_count == 1
 
 
 async def test_begin_firmware_update_known_format(
-    url, client_session, set_api_schema_data, multisensor_6, uuid4, mock_command
+    url, firmware_client_session, firmware_ws_client, multisensor_6
 ):
     """Test begin_firmware_update_known_format."""
     node = multisensor_6
-    mock_command(
-        {"command": "set_api_schema"},
-        set_api_schema_data,
+    assert (
+        await begin_firmware_update_known_format(
+            url, node, "test", bytes(10), firmware_client_session
+        )
+        == {}
     )
-    ack_commands = mock_command(
-        {"command": "node.begin_firmware_update_known_format", "nodeId": node.node_id},
-        {"result": "something"},
-    )
-    assert await begin_firmware_update_known_format(
-        url, node, "test", bytes(10), client_session
-    ) == {"result": "something"}
 
-    assert len(ack_commands) == 1
-    assert ack_commands[0] == {
-        "command": "node.begin_firmware_update_known_format",
-        "nodeId": node.node_id,
-        "firmwareFileFormat": "test",
-        "firmwareFile": "AAAAAAAAAAAAAA==",
-        "messageId": uuid4,
-    }
+    assert firmware_ws_client.receive_json.call_count == 3
+    assert firmware_ws_client.send_json.call_count == 2
+    assert firmware_ws_client.send_json.call_args == call(
+        {
+            "command": "node.begin_firmware_update_known_format",
+            "messageId": "begin-firmware-update-known-format",
+            "nodeId": node.node_id,
+            "firmwareFile": "AAAAAAAAAAAAAA==",
+            "firmwareFileFormat": "test",
+        }
+    )
+    assert firmware_ws_client.close.call_count == 1

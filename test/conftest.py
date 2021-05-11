@@ -83,6 +83,16 @@ def client_session_fixture(ws_client):
     return client_session
 
 
+@pytest.fixture(name="firmware_client_session")
+def firmware_client_session_fixture(firmware_ws_client):
+    """Mock an aiohttp client session."""
+    firmware_client_session = AsyncMock(spec_set=ClientSession)
+    firmware_client_session.ws_connect.side_effect = AsyncMock(
+        return_value=firmware_ws_client
+    )
+    return firmware_client_session
+
+
 @pytest.fixture(name="inovelli_switch_state", scope="session")
 def inovelli_switch_state_fixture():
     """Load the bad string meta data node state fixture data."""
@@ -138,6 +148,54 @@ async def ws_client_fixture(
     async def close_client(msg):
         """Close the client."""
         if msg["command"] in ("set_api_schema", "start_listening"):
+            return
+
+        await asyncio.sleep(0)
+        ws_client.closed = True
+
+    ws_client.send_json.side_effect = close_client
+
+    async def reset_close():
+        """Reset the websocket client close method."""
+        ws_client.closed = True
+
+    ws_client.close.side_effect = reset_close
+
+    return ws_client
+
+
+@pytest.fixture(name="firmware_ws_client")
+async def firmware_ws_client_fixture(
+    loop, version_data, ws_message, messages, set_api_schema_data
+):
+    """Mock a websocket client.
+
+    This fixture only allows a single message to be received.
+    """
+    ws_client = AsyncMock(spec_set=ClientWebSocketResponse, closed=False)
+    ws_client.receive_json.side_effect = (version_data, set_api_schema_data, {})
+    for data in (version_data, set_api_schema_data, {}):
+        messages.append(create_ws_message(data))
+
+    async def receive():
+        """Return a websocket message."""
+        await asyncio.sleep(0)
+
+        message = messages.popleft()
+        if not messages:
+            ws_client.closed = True
+
+        return message
+
+    ws_client.receive.side_effect = receive
+
+    async def close_client(msg):
+        """Close the client."""
+        if msg["command"] in (
+            "set_api_schema",
+            "node.begin_firmware_update_guess_format",
+            "node.begin_firmware_update_known_format",
+        ):
             return
 
         await asyncio.sleep(0)
