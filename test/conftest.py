@@ -165,9 +165,7 @@ async def ws_client_fixture(
 
 
 @pytest.fixture(name="firmware_ws_client")
-async def firmware_ws_client_fixture(
-    loop, version_data, ws_message, messages, set_api_schema_data
-):
+async def firmware_ws_client_fixture(loop, version_data, messages, set_api_schema_data):
     """Mock a websocket client.
 
     This fixture only allows a single message to be received.
@@ -191,9 +189,7 @@ async def firmware_ws_client_fixture(
 
     async def close_client(msg):
         """Close the client."""
-        if msg["command"] in (
-            "set_api_schema",
-        ):
+        if msg["command"] in ("set_api_schema"):
             return
 
         await asyncio.sleep(0)

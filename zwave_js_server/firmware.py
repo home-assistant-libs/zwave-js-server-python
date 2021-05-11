@@ -4,7 +4,6 @@ from typing import Any
 import aiohttp
 
 from .client import Client
-from .const import MAX_SERVER_SCHEMA_VERSION
 from .model.node import Node
 from .util.helpers import convert_bytes_to_base64
 
