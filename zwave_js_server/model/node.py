@@ -527,7 +527,7 @@ class Node(EventBase):
         # in the event, otherwise use the event data
         event_data = event.data["args"]
         if value := self.values.get(_get_value_id_from_dict(self, event_data)):
-            value_notification = ValueNotification(self, value.data)
+            value_notification = ValueNotification(self, dict(value.data))
             value_notification.update(event_data)
         else:
             value_notification = ValueNotification(self, event_data)
