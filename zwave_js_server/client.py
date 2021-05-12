@@ -134,7 +134,7 @@ class Client:
             self.schema_version,
         )
 
-    async def set_api_schema(self, version: Optional[int] = None) -> None:
+    async def set_api_schema(self, schema_version: Optional[int] = None) -> None:
         """Set API schema version on server."""
         assert self._client
 
@@ -144,7 +144,7 @@ class Client:
             {
                 "command": "set_api_schema",
                 "messageId": "api-schema-id",
-                "schemaVersion": version or self.schema_version,
+                "schemaVersion": schema_version or self.schema_version,
             }
         )
         set_api_msg = await self._receive_json_or_raise()
