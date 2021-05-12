@@ -1,5 +1,5 @@
 """Firmware update helper."""
-from typing import Any
+from typing import Any, Optional
 
 import aiohttp
 
