@@ -14,7 +14,7 @@ async def begin_firmware_update(
     filename: str,
     file: bytes,
     session: aiohttp.ClientSession,
-    file_format: str = None,
+    file_format: Optional[str] = None,
 ) -> Any:
     """Send beginFirmwareUpdate command to Node."""
     client = Client(url, session)
