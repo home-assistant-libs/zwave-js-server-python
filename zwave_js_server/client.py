@@ -30,7 +30,12 @@ SIZE_PARSE_JSON_EXECUTOR = 8192
 class Client:
     """Class to manage the IoT connection."""
 
-    def __init__(self, ws_server_url: str, aiohttp_session: ClientSession):
+    def __init__(
+        self,
+        ws_server_url: str,
+        aiohttp_session: ClientSession,
+        schema_version: int = MAX_SERVER_SCHEMA_VERSION,
+    ):
         """Initialize the Client class."""
         self.ws_server_url = ws_server_url
         self.aiohttp_session = aiohttp_session
@@ -39,7 +44,7 @@ class Client:
         self._client: Optional[ClientWebSocketResponse] = None
         # Version of the connected server
         self.version: Optional[VersionInfo] = None
-        self.schema_version: int = MAX_SERVER_SCHEMA_VERSION
+        self.schema_version: int = schema_version
         self._logger = logging.getLogger(__package__)
         self._loop = asyncio.get_running_loop()
         self._result_futures: Dict[str, asyncio.Future] = {}
@@ -134,7 +139,7 @@ class Client:
             self.schema_version,
         )
 
-    async def set_api_schema(self, schema_version: Optional[int] = None) -> None:
+    async def set_api_schema(self) -> None:
         """Set API schema version on server."""
         assert self._client
 
@@ -144,7 +149,7 @@ class Client:
             {
                 "command": "set_api_schema",
                 "messageId": "api-schema-id",
-                "schemaVersion": schema_version or self.schema_version,
+                "schemaVersion": self.schema_version,
             }
         )
         set_api_msg = await self._receive_json_or_raise()
@@ -154,9 +159,7 @@ class Client:
             await self._client.close()
             raise FailedCommand(set_api_msg["messageId"], set_api_msg["errorCode"])
 
-    async def listen(
-        self, driver_ready: asyncio.Event, schema_version: Optional[int] = None
-    ) -> None:
+    async def listen(self, driver_ready: asyncio.Event) -> None:
         """Start listening to the websocket."""
         if not self.connected:
             raise InvalidState("Not connected when start listening")
@@ -164,7 +167,7 @@ class Client:
         assert self._client
 
         try:
-            await self.set_api_schema(schema_version)
+            await self.set_api_schema()
 
             # send start_listening command to the server
             # we will receive a full state dump and from now on get events
