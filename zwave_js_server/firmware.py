@@ -1,6 +1,4 @@
 """Firmware update helper."""
-from typing import Any
-
 import aiohttp
 
 from .client import Client
@@ -15,7 +13,7 @@ async def begin_firmware_update(
     file: bytes,
     session: aiohttp.ClientSession,
     file_format: str = None,
-) -> Any:
+) -> None:
     """Send beginFirmwareUpdate command to Node."""
     client = Client(url, session)
     await client.connect()
@@ -30,6 +28,5 @@ async def begin_firmware_update(
     if file_format is not None:
         cmd["firmwareFileFormat"] = file_format
 
-    resp = await client.async_send_command(cmd, require_schema=5)
+    await client.async_send_command(cmd, require_schema=5)
     await client.disconnect()
-    return resp
