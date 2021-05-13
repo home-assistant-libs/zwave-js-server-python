@@ -134,7 +134,29 @@ class Client:
             self.schema_version,
         )
 
-    async def listen(self, driver_ready: asyncio.Event) -> None:
+    async def set_api_schema(self, schema_version: Optional[int] = None) -> None:
+        """Set API schema version on server."""
+        assert self._client
+
+        # set preferred schema version on the server
+        # note: we already check for (in)compatible schemas in the connect call
+        await self._send_json_message(
+            {
+                "command": "set_api_schema",
+                "messageId": "api-schema-id",
+                "schemaVersion": schema_version or self.schema_version,
+            }
+        )
+        set_api_msg = await self._receive_json_or_raise()
+
+        if not set_api_msg["success"]:
+            # this should not happen, but just in case
+            await self._client.close()
+            raise FailedCommand(set_api_msg["messageId"], set_api_msg["errorCode"])
+
+    async def listen(
+        self, driver_ready: asyncio.Event, schema_version: Optional[int] = None
+    ) -> None:
         """Start listening to the websocket."""
         if not self.connected:
             raise InvalidState("Not connected when start listening")
@@ -142,21 +164,7 @@ class Client:
         assert self._client
 
         try:
-            # set preferred schema version on the server
-            # note: we already check for (in)compatible schemas in the connect call
-            await self._send_json_message(
-                {
-                    "command": "set_api_schema",
-                    "messageId": "api-schema-id",
-                    "schemaVersion": self.schema_version,
-                }
-            )
-            set_api_msg = await self._receive_json_or_raise()
-
-            if not set_api_msg["success"]:
-                # this should not happen, but just in case
-                await self._client.close()
-                raise FailedCommand(set_api_msg["messageId"], set_api_msg["errorCode"])
+            await self.set_api_schema(schema_version)
 
             # send start_listening command to the server
             # we will receive a full state dump and from now on get events

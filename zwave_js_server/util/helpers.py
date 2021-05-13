@@ -1,5 +1,5 @@
 """Generic Utility helper functions."""
-
+import base64
 import json
 from typing import Any, Dict, Union
 
@@ -10,6 +10,11 @@ def is_json_string(value: Any) -> bool:
     """Check if the provided string looks like json."""
     # NOTE: we do not use json.loads here as it is not strict enough
     return isinstance(value, str) and value.startswith("{") and value.endswith("}")
+
+
+def convert_bytes_to_base64(data: bytes) -> str:
+    """Convert bytes data to base64 for serialization."""
+    return base64.b64encode(data).decode("ascii")
 
 
 def parse_buffer(value: Union[Dict[str, Any], str]) -> str:

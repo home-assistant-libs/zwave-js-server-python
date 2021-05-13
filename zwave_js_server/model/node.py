@@ -2,8 +2,7 @@
 from enum import IntEnum
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
 
-from zwave_js_server.const import CommandClass, INTERVIEW_FAILED
-
+from ..const import CommandClass, INTERVIEW_FAILED
 from ..event import Event, EventBase
 from ..exceptions import FailedCommand, UnparseableValue, UnwriteableValue
 from .command_class import CommandClassInfo, CommandClassInfoDataType
