@@ -130,6 +130,14 @@ async def test_unknown_values(cover_qubino_shutter):
     )
 
 
+async def test_device_database_url(cover_qubino_shutter):
+    """Test that the device database URL is available."""
+    assert (
+        cover_qubino_shutter.device_database_url
+        == "https://devices.zwave-js.io/?jumpTo=0x0159:0x0003:0x0053:0.0"
+    )
+
+
 async def test_values_without_property_key_name(multisensor_6):
     """Test that values with property key and without property key name can be found."""
     node = multisensor_6
