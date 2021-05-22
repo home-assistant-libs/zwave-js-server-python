@@ -324,6 +324,16 @@ class Controller(EventBase):
             }
         )
 
+    async def async_get_node_neighbors(self, node_id: int) -> List[int]:
+        """Send getNodeNeighbors command to Controller to get node's neighbors."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.get_node_neighbors",
+                "nodeId": node_id,
+            }
+        )
+        return data["neighbors"]
+
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
         if event.data["source"] == "node":

@@ -50,7 +50,6 @@ def test_from_state():
     assert node.product_id == 90
     assert node.product_type == 257
     assert node.label == "ZW090"
-    assert node.neighbors == [23, 26, 5, 6]
     assert node.interview_attempts == 0
     assert node.installer_icon is None
     assert node.user_icon is None
