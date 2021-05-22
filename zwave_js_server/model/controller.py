@@ -332,7 +332,7 @@ class Controller(EventBase):
                 "nodeId": node_id,
             }
         )
-        return data["neighbors"]
+        return cast(List[int], data["neighbors"])
 
     def receive_event(self, event: Event) -> None:
         """Receive an event."""

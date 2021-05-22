@@ -472,7 +472,9 @@ async def test_remove_node_from_all_associations(controller, uuid4, mock_command
 async def test_get_node_neighbors(controller, uuid4, mock_command):
     """Test get node neighbors."""
 
-    ack_commands = mock_command({"command": "controller.get_node_neighbors"}, {"neighbors": [1, 2]})
+    ack_commands = mock_command(
+        {"command": "controller.get_node_neighbors"}, {"neighbors": [1, 2]}
+    )
 
     node_id = 52
     assert await controller.async_get_node_neighbors(node_id) == [1, 2]
