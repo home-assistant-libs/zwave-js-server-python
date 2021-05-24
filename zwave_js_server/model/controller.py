@@ -1,7 +1,7 @@
 """Provide a model for the Z-Wave JS controller."""
 from typing import TYPE_CHECKING, Dict, List, Optional, TypedDict, cast
-from zwave_js_server.const import HealNodeStatus
 
+from ..const import HealNodeStatus
 from ..event import Event, EventBase
 from .association import Association, AssociationGroup
 from .node import Node
