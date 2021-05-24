@@ -1,5 +1,6 @@
 """Provide a model for the Z-Wave JS controller."""
 from typing import TYPE_CHECKING, Dict, List, Optional, TypedDict, cast
+from zwave_js_server.const import HealNodeStatus
 
 from ..event import Event, EventBase
 from .association import Association, AssociationGroup
@@ -373,8 +374,23 @@ class Controller(EventBase):
         """Process a node removed event."""
         event.data["node"] = self.nodes.pop(event.data["node"]["nodeId"])
 
+    def _convert_heal_node_status(
+        self, heal_node_status: Dict[int, str]
+    ) -> Dict[Node, HealNodeStatus]:
+        """Convert a heal node status from the server into something more friendly."""
+        return {
+            self.nodes[node_id]: HealNodeStatus(status)
+            for node_id, status in heal_node_status.items()
+        }
+
     def handle_heal_network_progress(self, event: Event) -> None:
         """Process a heal network progress event."""
+        event.data["heal_network_progress"] = self._convert_heal_node_status(
+            event.data["progress"]
+        )
 
     def handle_heal_network_done(self, event: Event) -> None:
         """Process a heal network done event."""
+        event.data["heal_network_done"] = self._convert_heal_node_status(
+            event.data["result"]
+        )

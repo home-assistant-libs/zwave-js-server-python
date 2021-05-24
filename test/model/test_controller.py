@@ -1,5 +1,7 @@
 """Test the controller model."""
 import json
+from zwave_js_server.const import HealNodeStatus
+from zwave_js_server.event import Event
 from zwave_js_server.model import association as association_pkg
 from zwave_js_server.model import controller as controller_pkg
 
@@ -258,6 +260,34 @@ async def test_stop_healing_network(controller, uuid4, mock_command):
         "command": "controller.stop_healing_network",
         "messageId": uuid4,
     }
+
+
+async def test_heal_network_events(controller, multisensor_6):
+    """Test heal network events."""
+    controller.nodes[52] = multisensor_6
+    event = Event(
+        "heal network progress",
+        {
+            "source": "controller",
+            "event": "heal network progress",
+            "progress": {52: "pending"},
+        },
+    )
+    controller.receive_event(event)
+    assert event.data["heal_network_progress"] == {
+        multisensor_6: HealNodeStatus.PENDING
+    }
+
+    event = Event(
+        "heal network done",
+        {
+            "source": "controller",
+            "event": "heal network done",
+            "result": {52: "failed"},
+        },
+    )
+    controller.receive_event(event)
+    assert event.data["heal_network_done"] == {multisensor_6: HealNodeStatus.FAILED}
 
 
 async def test_is_failed_node(controller, uuid4, mock_command):

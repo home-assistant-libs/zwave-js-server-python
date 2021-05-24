@@ -87,6 +87,16 @@ class LogLevel(str, Enum):
     SILLY = "silly"
 
 
+class HealNodeStatus(str, Enum):
+    """Enum for heal node statuses."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/controller/Controller.ts#L154
+    PENDING = "pending"
+    DONE = "done"
+    FAILED = "failed"
+    SKIPPED = "skipped"
+
+
 class CommandClass(IntEnum):
     """Enum with all known CommandClasses."""
 
