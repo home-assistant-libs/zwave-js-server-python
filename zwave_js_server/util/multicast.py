@@ -76,7 +76,7 @@ async def async_multicast_endpoint_get_cc_version(
     endpoint: int,
     command_class: CommandClass,
     node_ids: Optional[List[int]] = None,
-) -> bool:
+) -> int:
     """Send a get_cc_version command to a multicast endpoint."""
     result = await _async_send_command(
         client,
@@ -86,4 +86,4 @@ async def async_multicast_endpoint_get_cc_version(
         commandClass=command_class,
         require_schema=5,
     )
-    return cast(bool, result["version"])
+    return cast(int, result["version"])
