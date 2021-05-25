@@ -197,7 +197,11 @@ class Client:
             self.driver = cast(
                 Driver,
                 await self._loop.run_in_executor(
-                    None, Driver, self, state_msg["result"]["state"], log_msg["result"]["config"]
+                    None,
+                    Driver,
+                    self,
+                    state_msg["result"]["state"],
+                    log_msg["result"]["config"],
                 ),
             )
 
