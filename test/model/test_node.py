@@ -50,7 +50,6 @@ def test_from_state():
     assert node.product_id == 90
     assert node.product_type == 257
     assert node.label == "ZW090"
-    assert node.neighbors == [23, 26, 5, 6]
     assert node.interview_attempts == 0
     assert node.installer_icon is None
     assert node.user_icon is None
@@ -128,6 +127,14 @@ async def test_unknown_values(cover_qubino_shutter):
     assert (
         "5-37-0-currentValue" in node.values
         and node.values["5-37-0-currentValue"].value is None
+    )
+
+
+async def test_device_database_url(cover_qubino_shutter):
+    """Test that the device database URL is available."""
+    assert (
+        cover_qubino_shutter.device_database_url
+        == "https://devices.zwave-js.io/?jumpTo=0x0159:0x0003:0x0053:0.0"
     )
 
 

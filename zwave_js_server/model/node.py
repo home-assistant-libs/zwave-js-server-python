@@ -74,7 +74,7 @@ class NodeDataType(TypedDict, total=False):
     productId: int
     productType: int
     deviceConfig: DeviceConfigDataType
-    neighbors: List[int]
+    deviceDatabaseUrl: str
     keepAwake: bool
     index: int
     installerIcon: int
@@ -262,9 +262,9 @@ class Node(EventBase):
         return self.data.get("label")
 
     @property
-    def neighbors(self) -> List[int]:
-        """Return the neighbors."""
-        return self.data.get("neighbors", [])
+    def device_database_url(self) -> Optional[str]:
+        """Return the device database URL."""
+        return self.data.get("deviceDatabaseUrl")
 
     @property
     def endpoints(self) -> List[Endpoint]:
