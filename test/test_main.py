@@ -67,4 +67,4 @@ def test_connect(client_session, url, ws_client):
         main()
 
     assert sys_exit.value.code == 0
-    assert ws_client.receive.call_count == 3
+    assert ws_client.receive.call_count == 4

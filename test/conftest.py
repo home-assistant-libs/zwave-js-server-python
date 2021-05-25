@@ -112,15 +112,26 @@ def messages_fixture():
 
 @pytest.fixture(name="ws_client")
 async def ws_client_fixture(
-    loop, version_data, ws_message, result, messages, set_api_schema_data
+    loop,
+    version_data,
+    ws_message,
+    result,
+    messages,
+    set_api_schema_data,
+    get_log_config_data,
 ):
     """Mock a websocket client.
 
     This fixture only allows a single message to be received.
     """
     ws_client = AsyncMock(spec_set=ClientWebSocketResponse, closed=False)
-    ws_client.receive_json.side_effect = (version_data, set_api_schema_data, result)
-    for data in (version_data, set_api_schema_data, result):
+    ws_client.receive_json.side_effect = (
+        version_data,
+        set_api_schema_data,
+        result,
+        get_log_config_data,
+    )
+    for data in (version_data, set_api_schema_data, result, get_log_config_data):
         messages.append(create_ws_message(data))
 
     async def receive():
@@ -138,6 +149,13 @@ async def ws_client_fixture(
     async def close_client(msg):
         """Close the client."""
         if msg["command"] in ("set_api_schema", "start_listening"):
+            return
+
+        # We only want to skip for the initial call
+        if (
+            msg["command"] == "driver.get_log_config"
+            and msg["messageId"] == "get-initial-log-config"
+        ):
             return
 
         await asyncio.sleep(0)
@@ -193,6 +211,29 @@ def set_api_schema_data_fixture():
         "success": True,
         "result": {},
         "messageId": "api-schema-id",
+    }
+
+
+@pytest.fixture(name="log_config")
+def log_config_fixture():
+    """Return log config."""
+    return {
+        "enabled": True,
+        "level": "info",
+        "logToFile": False,
+        "filename": "",
+        "forceConsole": True,
+    }
+
+
+@pytest.fixture(name="get_log_config_data")
+def get_log_config_data_fixture(log_config):
+    """Return mock get_log_config data."""
+    return {
+        "type": "result",
+        "success": True,
+        "result": {"config": log_config},
+        "messageId": "get-initial-log-config",
     }
 
 
@@ -281,9 +322,9 @@ def mock_command_fixture(ws_client, client, uuid4):
 
 
 @pytest.fixture(name="driver")
-def driver_fixture(client, controller_state):
+def driver_fixture(client, controller_state, log_config):
     """Return a driver instance with a supporting client."""
-    return Driver(client, controller_state)
+    return Driver(client, controller_state, log_config)
 
 
 @pytest.fixture(name="multisensor_6")
