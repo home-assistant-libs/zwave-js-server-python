@@ -190,6 +190,7 @@ class Client:
 
             log_msg = await self._receive_json_or_raise()
 
+            # this should not happen, but just in case
             if not log_msg["success"]:
                 await self._client.close()
                 raise FailedCommand(log_msg["messageId"], log_msg["errorCode"])
