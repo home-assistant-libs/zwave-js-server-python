@@ -70,13 +70,9 @@ class Driver(EventBase):
 
     async def async_update_log_config(self, log_config: LogConfig) -> None:
         """Update log config for driver."""
-        log_config_dict = log_config.to_dict()
         await self._async_send_command(
-            "update_log_config", config=log_config_dict, require_schema=4
+            "update_log_config", config=log_config.to_dict(), require_schema=4
         )
-        new_log_config_dict = self.log_config.to_dict()
-        new_log_config_dict.update(log_config_dict)
-        self.log_config = LogConfig.from_dict(new_log_config_dict)
 
     async def async_get_log_config(self) -> LogConfig:
         """Return current log config for driver."""
