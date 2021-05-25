@@ -1,10 +1,10 @@
 """Support for multicast commands."""
 
 from typing import Any, List, Optional, Union, cast
-from zwave_js_server.model.value import Value, ValueDataType
 
 from ..client import Client
 from ..const import CommandClass
+from ..model.value import Value, ValueDataType
 
 
 async def _async_send_command(
