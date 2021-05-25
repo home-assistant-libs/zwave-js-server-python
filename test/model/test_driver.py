@@ -31,6 +31,11 @@ def test_from_state(log_config):
 
 async def test_update_log_config(driver, uuid4, mock_command):
     """Test update log config."""
+    assert driver.log_config.level != LogLevel.ERROR
+    assert not driver.log_config.log_to_file
+    assert driver.log_config.filename == ""
+    assert not driver.log_config.force_console
+
     # Update log level
     ack_commands = mock_command(
         {"command": "driver.update_log_config", "config": {"level": "error"}},
@@ -50,6 +55,8 @@ async def test_update_log_config(driver, uuid4, mock_command):
         "config": {"level": "error"},
         "messageId": uuid4,
     }
+
+    assert driver.log_config.level == LogLevel.ERROR
 
     # Update all parameters
     ack_commands = mock_command(
@@ -90,6 +97,11 @@ async def test_update_log_config(driver, uuid4, mock_command):
         },
         "messageId": uuid4,
     }
+
+    assert driver.log_config.level == LogLevel.ERROR
+    assert driver.log_config.log_to_file
+    assert driver.log_config.filename == "/test.txt"
+    assert driver.log_config.force_console
 
 
 async def test_get_log_config(driver, uuid4, mock_command):

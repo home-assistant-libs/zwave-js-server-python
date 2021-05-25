@@ -222,7 +222,7 @@ def log_config_fixture():
         "level": "info",
         "logToFile": False,
         "filename": "",
-        "forceConsole": True,
+        "forceConsole": False,
     }
 
 
