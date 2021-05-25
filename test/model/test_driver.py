@@ -238,6 +238,7 @@ async def test_statistics(driver, uuid4, mock_command):
 async def test_log_config_updated(driver):
     """Test the log_config_updated event."""
     # Modify current log config in an update and assert that it changed
+    assert driver.log_config.level != LogLevel.SILLY
     log_config = driver.log_config.to_dict()
     log_config["level"] = "silly"
     event = Event(
