@@ -445,6 +445,16 @@ class Node(EventBase):
             val = self.values[val]
         await self.async_send_command("poll_value", valueId=val.data, require_schema=1)
 
+    async def async_ping(self) -> bool:
+        """Send ping command to Node."""
+        data = (
+            await self.async_send_command(
+                "ping", require_schema=5, wait_for_result=True
+            )
+            or {}
+        )
+        return cast(bool, data.get("responded", False))
+
     def handle_wake_up(self, event: Event) -> None:
         """Process a node wake up event."""
         # pylint: disable=unused-argument

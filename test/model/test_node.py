@@ -203,6 +203,23 @@ async def test_poll_value(multisensor_6, uuid4, mock_command):
     }
 
 
+async def test_ping(multisensor_6, uuid4, mock_command):
+    """Test ping."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.ping", "nodeId": node.node_id},
+        {"responded": True},
+    )
+    assert await node.async_ping()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.ping",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }
+
+
 async def test_refresh_info(multisensor_6, uuid4, mock_command):
     """Test refresh info."""
     node = multisensor_6
