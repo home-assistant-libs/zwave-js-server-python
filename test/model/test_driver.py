@@ -51,8 +51,6 @@ async def test_update_log_config(driver, uuid4, mock_command):
         "messageId": uuid4,
     }
 
-    assert driver.log_config.level == LogLevel.ERROR
-
     # Update all parameters
     ack_commands = mock_command(
         {
