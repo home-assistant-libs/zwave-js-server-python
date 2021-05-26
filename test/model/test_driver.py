@@ -247,3 +247,37 @@ async def test_log_config_updated(driver):
     )
     driver.receive_event(event)
     assert driver.log_config.level == LogLevel.SILLY
+
+
+async def test_check_for_config_updates(driver, uuid4, mock_command):
+    """Test driver.check_for_config_updates command."""
+    ack_commands = mock_command(
+        {"command": "driver.check_for_config_updates"},
+        {"updateAvailable": False},
+    )
+
+    check_config_updates = await driver.async_check_for_config_updates()
+    assert check_config_updates.update_available is False
+    assert check_config_updates.new_version is None
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.check_for_config_updates",
+        "messageId": uuid4,
+    }
+
+
+async def test_install_config_update(driver, uuid4, mock_command):
+    """Test driver.install_config_update command."""
+    ack_commands = mock_command(
+        {"command": "driver.install_config_update"},
+        {"success": False},
+    )
+
+    assert not await driver.async_install_config_update()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.install_config_update",
+        "messageId": uuid4,
+    }

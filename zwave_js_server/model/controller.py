@@ -29,6 +29,7 @@ class ControllerDataType(TypedDict, total=False):
     supportedFunctionTypes: List[int]
     sucNodeId: int
     supportsTimers: bool
+    isHealNetworkActive: bool
 
 
 class Controller(EventBase):
@@ -142,6 +143,11 @@ class Controller(EventBase):
     def supports_timers(self) -> Optional[bool]:
         """Return supports_timers."""
         return self.data.get("supportsTimers")
+
+    @property
+    def is_heal_network_active(self) -> bool:
+        """Return is_heal_network_active."""
+        return self.data["isHealNetworkActive"]
 
     async def async_begin_inclusion(
         self, include_non_secure: Optional[bool] = None
@@ -385,6 +391,10 @@ class Controller(EventBase):
 
     def handle_heal_network_progress(self, event: Event) -> None:
         """Process a heal network progress event."""
+        # pylint: disable=unused-argument
+        self.data["isHealNetworkActive"] = True
 
     def handle_heal_network_done(self, event: Event) -> None:
         """Process a heal network done event."""
+        # pylint: disable=unused-argument
+        self.data["isHealNetworkActive"] = False

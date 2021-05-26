@@ -1,5 +1,5 @@
 """Provide a model for the Z-Wave JS Driver."""
-from typing import Any, TYPE_CHECKING, cast
+from typing import Any, Optional, TYPE_CHECKING, cast
 
 from zwave_js_server.model.log_config import LogConfig, LogConfigDataType
 from zwave_js_server.model.log_message import LogMessage, LogMessageDataType
@@ -9,6 +9,15 @@ from .controller import Controller
 
 if TYPE_CHECKING:
     from ..client import Client
+
+
+class CheckConfigUpdates:
+    """Represent config updates check."""
+
+    def __init__(self, data: dict) -> None:
+        """Initialize class."""
+        self.update_available: bool = data["updateAvailable"]
+        self.new_version: Optional[str] = data.get("newVersion")
 
 
 class Driver(EventBase):
@@ -108,3 +117,17 @@ class Driver(EventBase):
             "is_statistics_enabled", require_schema=4
         )
         return cast(bool, result["statisticsEnabled"])
+
+    async def async_check_for_config_updates(self) -> CheckConfigUpdates:
+        """Send command to check for config updates."""
+        result = await self._async_send_command(
+            "check_for_config_updates", require_schema=5
+        )
+        return CheckConfigUpdates(result)
+
+    async def async_install_config_update(self) -> bool:
+        """Send command to install config update."""
+        result = await self._async_send_command(
+            "install_config_update", require_schema=5
+        )
+        return cast(bool, result["success"])
