@@ -334,6 +334,13 @@ class Controller(EventBase):
         )
         return cast(List[int], data["neighbors"])
 
+    async def async_is_heal_network_active(self) -> bool:
+        """Send isHealNetworkActive command to Controller."""
+        result = await self.client.async_send_command(
+            {"command": "controller.is_heal_network_active"}
+        )
+        return cast(bool, result["active"])
+
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
         if event.data["source"] == "node":

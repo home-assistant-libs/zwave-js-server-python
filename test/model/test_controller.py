@@ -485,3 +485,18 @@ async def test_get_node_neighbors(controller, uuid4, mock_command):
         "messageId": uuid4,
         "nodeId": node_id,
     }
+
+
+async def test_is_heal_network_active(controller, uuid4, mock_command):
+    """Test is_heal_network_active."""
+    ack_commands = mock_command(
+        {"command": "controller.is_heal_network_active"}, {"active": True}
+    )
+
+    assert await controller.async_is_heal_network_active()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.is_heal_network_active",
+        "messageId": uuid4,
+    }
