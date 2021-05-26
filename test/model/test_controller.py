@@ -1,5 +1,6 @@
 """Test the controller model."""
 import json
+from zwave_js_server.event import Event
 from zwave_js_server.model import association as association_pkg
 from zwave_js_server.model import controller as controller_pkg
 
@@ -104,6 +105,7 @@ def test_from_state():
     ]
     assert ctrl.suc_node_id == 1
     assert ctrl.supports_timers is False
+    assert ctrl.is_heal_network_active is False
 
 
 async def test_begin_inclusion(controller, uuid4, mock_command):
@@ -485,3 +487,28 @@ async def test_get_node_neighbors(controller, uuid4, mock_command):
         "messageId": uuid4,
         "nodeId": node_id,
     }
+
+
+async def test_heal_network_active(controller):
+    """Test that is_heal_network_active changes on events."""
+    assert controller.is_heal_network_active is False
+    event = Event(
+        "heal network progress",
+        {
+            "source": "controller",
+            "event": "heal network progress",
+            "progress": {52: "pending"},
+        },
+    )
+    controller.receive_event(event)
+    assert controller.is_heal_network_active
+    event = Event(
+        "heal network done",
+        {
+            "source": "controller",
+            "event": "heal network done",
+            "result": {52: "failed"},
+        },
+    )
+    controller.receive_event(event)
+    assert controller.is_heal_network_active is False
