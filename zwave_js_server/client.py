@@ -181,10 +181,28 @@ class Client:
                 await self._client.close()
                 raise FailedCommand(state_msg["messageId"], state_msg["errorCode"])
 
+            await self._send_json_message(
+                {
+                    "command": "driver.get_log_config",
+                    "messageId": "get-initial-log-config",
+                }
+            )
+
+            log_msg = await self._receive_json_or_raise()
+
+            # this should not happen, but just in case
+            if not log_msg["success"]:
+                await self._client.close()
+                raise FailedCommand(log_msg["messageId"], log_msg["errorCode"])
+
             self.driver = cast(
                 Driver,
                 await self._loop.run_in_executor(
-                    None, Driver, self, state_msg["result"]["state"]
+                    None,
+                    Driver,
+                    self,
+                    state_msg["result"]["state"],
+                    log_msg["result"]["config"],
                 ),
             )
 

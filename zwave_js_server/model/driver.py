@@ -1,7 +1,7 @@
 """Provide a model for the Z-Wave JS Driver."""
 from typing import Any, Optional, TYPE_CHECKING, cast
 
-from zwave_js_server.model.log_config import LogConfig
+from zwave_js_server.model.log_config import LogConfig, LogConfigDataType
 from zwave_js_server.model.log_message import LogMessage, LogMessageDataType
 
 from ..event import Event, EventBase
@@ -23,11 +23,14 @@ class CheckConfigUpdates:
 class Driver(EventBase):
     """Represent a Z-Wave JS driver."""
 
-    def __init__(self, client: "Client", state: dict) -> None:
+    def __init__(
+        self, client: "Client", state: dict, log_config: LogConfigDataType
+    ) -> None:
         """Initialize driver."""
         super().__init__()
         self.client = client
         self.controller = Controller(client, state)
+        self.log_config = LogConfig.from_dict(log_config)
 
     def __hash__(self) -> int:
         """Return the hash."""
@@ -52,6 +55,12 @@ class Driver(EventBase):
     def handle_logging(self, event: Event) -> None:
         """Process a driver logging event."""
         event.data["log_message"] = LogMessage(cast(LogMessageDataType, event.data))
+
+    def handle_log_config_updated(self, event: Event) -> None:
+        """Process a driver log config updated event."""
+        event.data["log_config"] = self.log_config = LogConfig.from_dict(
+            event.data["config"]
+        )
 
     def handle_all_nodes_ready(self, event: Event) -> None:
         """Process a driver all nodes ready event."""

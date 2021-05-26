@@ -12,11 +12,13 @@ from zwave_js_server.model import (
 from .. import load_fixture
 
 
-def test_from_state():
+def test_from_state(log_config):
     """Test from_state method."""
     ws_msgs = load_fixture("basic_dump.txt").strip().split("\n")
 
-    driver = driver_pkg.Driver(None, json.loads(ws_msgs[0])["result"]["state"])
+    driver = driver_pkg.Driver(
+        None, json.loads(ws_msgs[0])["result"]["state"], log_config
+    )
 
     for msg in ws_msgs[1:]:
         msg = json.loads(msg)
@@ -231,6 +233,20 @@ async def test_statistics(driver, uuid4, mock_command):
         "command": "driver.is_statistics_enabled",
         "messageId": uuid4,
     }
+
+
+async def test_log_config_updated(driver):
+    """Test the log_config_updated event."""
+    # Modify current log config in an update and assert that it changed
+    assert driver.log_config.level != LogLevel.SILLY
+    log_config = driver.log_config.to_dict()
+    log_config["level"] = "silly"
+    event = Event(
+        "log config updated",
+        data={"source": "driver", "event": "log config updated", "config": log_config},
+    )
+    driver.receive_event(event)
+    assert driver.log_config.level == LogLevel.SILLY
 
 
 async def test_check_for_config_updates(driver, uuid4, mock_command):
