@@ -17,7 +17,11 @@ async def _async_send_command(
 ) -> dict:
     """Send a multicast command."""
     if nodes:
-        cmd = {"command": f"multicast_group.{command}", "nodeIDs": [node.node_id for node in nodes], **kwargs}
+        cmd = {
+            "command": f"multicast_group.{command}",
+            "nodeIDs": [node.node_id for node in nodes],
+            **kwargs,
+        }
     else:
         cmd = {"command": f"broadcast_node.{command}", **kwargs}
 

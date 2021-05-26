@@ -19,7 +19,12 @@ async def test_endpoint_get_cc_version_multicast(
         {"version": 1},
     )
 
-    assert await async_multicast_endpoint_get_cc_version(client, 1, CommandClass.ALARM, [node1, node2]) == 1
+    assert (
+        await async_multicast_endpoint_get_cc_version(
+            client, 1, CommandClass.ALARM, [node1, node2]
+        )
+        == 1
+    )
 
     assert ack_commands[0] == {
         "command": "multicast_group.get_cc_version",
@@ -30,16 +35,17 @@ async def test_endpoint_get_cc_version_multicast(
     }
 
 
-async def test_endpoint_get_cc_version_broadcast(
-    client, uuid4, mock_command
-):
+async def test_endpoint_get_cc_version_broadcast(client, uuid4, mock_command):
     """Test broadcast_node.get_cc_version command."""
     ack_commands = mock_command(
         {"command": "broadcast_node.get_cc_version"},
         {"version": 1},
     )
 
-    assert await async_multicast_endpoint_get_cc_version(client, 1, CommandClass.ALARM) == 1
+    assert (
+        await async_multicast_endpoint_get_cc_version(client, 1, CommandClass.ALARM)
+        == 1
+    )
 
     assert ack_commands[0] == {
         "command": "broadcast_node.get_cc_version",
@@ -88,7 +94,9 @@ async def test_set_value(client, uuid4, mock_command):
         {"success": True},
     )
 
-    assert await async_multicast_set_value(client, 1, {"commandClass": 1, "property": 1})
+    assert await async_multicast_set_value(
+        client, 1, {"commandClass": 1, "property": 1}
+    )
 
     assert ack_commands[0] == {
         "command": "broadcast_node.set_value",
