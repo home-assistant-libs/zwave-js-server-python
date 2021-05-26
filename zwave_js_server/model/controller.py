@@ -41,7 +41,6 @@ class Controller(EventBase):
         self.client = client
         self.data: ControllerDataType = state["controller"]
         self.nodes: Dict[int, Node] = {}
-        self._is_heal_network_active = self.data["isHealNetworkActive"]
         for node_state in state["nodes"]:
             node = Node(client, node_state)
             self.nodes[node.node_id] = node
