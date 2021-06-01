@@ -145,9 +145,9 @@ class Controller(EventBase):
         return self.data.get("supportsTimers")
 
     @property
-    def is_heal_network_active(self) -> bool:
+    def is_heal_network_active(self) -> Optional[bool]:
         """Return is_heal_network_active."""
-        return self.data["isHealNetworkActive"]
+        return self.data.get("isHealNetworkActive")
 
     async def async_begin_inclusion(
         self, include_non_secure: Optional[bool] = None
