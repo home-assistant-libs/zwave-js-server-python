@@ -128,10 +128,10 @@ async def ws_client_fixture(
     ws_client.receive_json.side_effect = (
         version_data,
         set_api_schema_data,
-        result,
         get_log_config_data,
+        result,
     )
-    for data in (version_data, set_api_schema_data, result, get_log_config_data):
+    for data in (version_data, set_api_schema_data, get_log_config_data, result):
         messages.append(create_ws_message(data))
 
     async def receive():
@@ -170,6 +170,62 @@ async def ws_client_fixture(
     ws_client.close.side_effect = reset_close
 
     return ws_client
+
+
+@pytest.fixture(name="no_get_log_config_ws_client")
+async def no_get_log_config_ws_client_fixture(
+    loop,
+    version_data,
+    ws_message,
+    result,
+    messages,
+    set_api_schema_data,
+    get_log_config_data,
+):
+    """Mock a websocket client without calling get_log_config.
+
+    This fixture only allows a single message to be received.
+    """
+    no_get_log_config_ws_client = AsyncMock(
+        spec_set=ClientWebSocketResponse, closed=False
+    )
+    no_get_log_config_ws_client.receive_json.side_effect = (
+        version_data,
+        set_api_schema_data,
+        result,
+    )
+    for data in (version_data, set_api_schema_data, result):
+        messages.append(create_ws_message(data))
+
+    async def receive():
+        """Return a websocket message."""
+        await asyncio.sleep(0)
+
+        message = messages.popleft()
+        if not messages:
+            no_get_log_config_ws_client.closed = True
+
+        return message
+
+    no_get_log_config_ws_client.receive.side_effect = receive
+
+    async def close_client(msg):
+        """Close the client."""
+        if msg["command"] in ("set_api_schema", "start_listening"):
+            return
+
+        await asyncio.sleep(0)
+        no_get_log_config_ws_client.closed = True
+
+    no_get_log_config_ws_client.send_json.side_effect = close_client
+
+    async def reset_close():
+        """Reset the websocket client close method."""
+        no_get_log_config_ws_client.closed = True
+
+    no_get_log_config_ws_client.close.side_effect = reset_close
+
+    return no_get_log_config_ws_client
 
 
 @pytest.fixture(name="await_other")
