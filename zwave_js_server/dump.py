@@ -25,10 +25,6 @@ async def dump_msgs(
             "messageId": "api-schema-id",
             "schemaVersion": MAX_SERVER_SCHEMA_VERSION,
         },
-        {
-            "command": "driver.get_log_config",
-            "messageId": "get-initial-log-config",
-        },
         {"command": "start_listening", "messageId": "listen-id"},
     ):
         await client.send_json(to_send)

@@ -37,8 +37,7 @@ def test_server_version(client_session, url, ws_client, result, capsys):
     assert ws_client.close.call_count == 1
 
 
-@pytest.mark.parametrize("result", ["test_result"])
-def test_dump_state(client_session, url, ws_client, result, capsys):
+def test_dump_state(dump_client_session, url, dump_ws_client, capsys):
     """Test dump state."""
     with patch.object(
         sys, "argv", ["zwave_js_server", url, "--dump-state"]
@@ -52,14 +51,11 @@ def test_dump_state(client_session, url, ws_client, result, capsys):
         "'serverVersion': 'test_server_version', 'homeId': 'test_home_id', "
         "'minSchemaVersion': 0, 'maxSchemaVersion': 5}\n"
         "{'type': 'result', 'success': True, 'result': {}, 'messageId': 'api-schema-id'}\n"
-        "{'type': 'result', 'success': True, 'result': {'config': {'enabled': True, "
-        "'level': 'info', 'logToFile': False, 'filename': '', 'forceConsole': "
-        "False}}, 'messageId': 'get-initial-log-config'}\n"
         "test_result\n"
     )
 
-    assert ws_client.receive_json.call_count == 4
-    assert ws_client.close.call_count == 1
+    assert dump_ws_client.receive_json.call_count == 3
+    assert dump_ws_client.close.call_count == 1
 
 
 def test_connect(client_session, url, ws_client):

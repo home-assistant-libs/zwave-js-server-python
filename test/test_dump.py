@@ -32,33 +32,37 @@ def event_fixture():
 
 
 async def test_dump(
-    client_session,
+    dump_client_session,
     result,
     url,
     version_data,
-    get_log_config_data,
     set_api_schema_data,
-    ws_client,
+    dump_ws_client,
 ):
     """Test the dump function."""
-    messages = await dump_msgs(url, client_session)
+    messages = await dump_msgs(url, dump_client_session)
 
-    assert ws_client.receive_json.call_count == 4
-    assert ws_client.send_json.call_count == 3
-    assert ws_client.send_json.call_args == call(
+    assert dump_ws_client.receive_json.call_count == 3
+    assert dump_ws_client.send_json.call_count == 2
+    assert dump_ws_client.send_json.call_args == call(
         {"command": "start_listening", "messageId": "listen-id"}
     )
-    assert ws_client.close.call_count == 1
+    assert dump_ws_client.close.call_count == 1
     assert messages
-    assert len(messages) == 4
+    assert len(messages) == 3
     assert messages[0] == version_data
     assert messages[1] == set_api_schema_data
-    assert messages[2] == get_log_config_data
-    assert messages[3] == result
+    assert messages[2] == result
 
 
 async def test_dump_timeout(
-    client_session, result, url, event, version_data, set_api_schema_data, ws_client
+    dump_client_session,
+    result,
+    url,
+    event,
+    version_data,
+    set_api_schema_data,
+    dump_ws_client,
 ):
     """Test the dump function with timeout."""
     to_receive = asyncio.Queue()
@@ -68,15 +72,15 @@ async def test_dump_timeout(
     async def receive_json():
         return await to_receive.get()
 
-    ws_client.receive_json = AsyncMock(side_effect=receive_json)
-    messages = await dump_msgs(url, client_session, 0.05)
+    dump_ws_client.receive_json = AsyncMock(side_effect=receive_json)
+    messages = await dump_msgs(url, dump_client_session, 0.05)
 
-    assert ws_client.receive_json.call_count == 5
-    assert ws_client.send_json.call_count == 3
-    assert ws_client.send_json.call_args == call(
+    assert dump_ws_client.receive_json.call_count == 5
+    assert dump_ws_client.send_json.call_count == 2
+    assert dump_ws_client.send_json.call_args == call(
         {"command": "start_listening", "messageId": "listen-id"}
     )
-    assert ws_client.close.call_count == 1
+    assert dump_ws_client.close.call_count == 1
     assert messages
     assert len(messages) == 4
     assert messages[0] == version_data
