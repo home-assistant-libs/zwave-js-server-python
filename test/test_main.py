@@ -52,10 +52,13 @@ def test_dump_state(client_session, url, ws_client, result, capsys):
         "'serverVersion': 'test_server_version', 'homeId': 'test_home_id', "
         "'minSchemaVersion': 0, 'maxSchemaVersion': 5}\n"
         "{'type': 'result', 'success': True, 'result': {}, 'messageId': 'api-schema-id'}\n"
+        "{'type': 'result', 'success': True, 'result': {'config': {'enabled': True, "
+        "'level': 'info', 'logToFile': False, 'filename': '', 'forceConsole': "
+        "False}}, 'messageId': 'get-initial-log-config'}\n"
         "test_result\n"
     )
 
-    assert ws_client.receive_json.call_count == 3
+    assert ws_client.receive_json.call_count == 4
     assert ws_client.close.call_count == 1
 
 

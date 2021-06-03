@@ -169,18 +169,6 @@ class Client:
         try:
             await self.set_api_schema()
 
-            # send start_listening command to the server
-            # we will receive a full state dump and from now on get events
-            await self._send_json_message(
-                {"command": "start_listening", "messageId": "listen-id"}
-            )
-
-            state_msg = await self._receive_json_or_raise()
-
-            if not state_msg["success"]:
-                await self._client.close()
-                raise FailedCommand(state_msg["messageId"], state_msg["errorCode"])
-
             await self._send_json_message(
                 {
                     "command": "driver.get_log_config",
@@ -194,6 +182,18 @@ class Client:
             if not log_msg["success"]:
                 await self._client.close()
                 raise FailedCommand(log_msg["messageId"], log_msg["errorCode"])
+
+            # send start_listening command to the server
+            # we will receive a full state dump and from now on get events
+            await self._send_json_message(
+                {"command": "start_listening", "messageId": "listen-id"}
+            )
+
+            state_msg = await self._receive_json_or_raise()
+
+            if not state_msg["success"]:
+                await self._client.close()
+                raise FailedCommand(state_msg["messageId"], state_msg["errorCode"])
 
             self.driver = cast(
                 Driver,

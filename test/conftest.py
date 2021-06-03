@@ -128,10 +128,10 @@ async def ws_client_fixture(
     ws_client.receive_json.side_effect = (
         version_data,
         set_api_schema_data,
-        result,
         get_log_config_data,
+        result,
     )
-    for data in (version_data, set_api_schema_data, result, get_log_config_data):
+    for data in (version_data, set_api_schema_data, get_log_config_data, result):
         messages.append(create_ws_message(data))
 
     async def receive():
