@@ -83,14 +83,6 @@ def client_session_fixture(ws_client):
     return client_session
 
 
-@pytest.fixture(name="dump_client_session")
-def dump_client_session_fixture(dump_ws_client):
-    """Mock an aiohttp client session to test dumps."""
-    dump_client_session = AsyncMock(spec_set=ClientSession)
-    dump_client_session.ws_connect.side_effect = AsyncMock(return_value=dump_ws_client)
-    return dump_client_session
-
-
 @pytest.fixture(name="inovelli_switch_state", scope="session")
 def inovelli_switch_state_fixture():
     """Load the bad string meta data node state fixture data."""
@@ -180,8 +172,8 @@ async def ws_client_fixture(
     return ws_client
 
 
-@pytest.fixture(name="dump_ws_client")
-async def dump_ws_client_fixture(
+@pytest.fixture(name="no_get_log_config_ws_client")
+async def no_get_log_config_ws_client_fixture(
     loop,
     version_data,
     ws_message,
@@ -190,12 +182,14 @@ async def dump_ws_client_fixture(
     set_api_schema_data,
     get_log_config_data,
 ):
-    """Mock a websocket client to test dumps.
+    """Mock a websocket client without calling get_log_config.
 
     This fixture only allows a single message to be received.
     """
-    dump_ws_client = AsyncMock(spec_set=ClientWebSocketResponse, closed=False)
-    dump_ws_client.receive_json.side_effect = (
+    no_get_log_config_ws_client = AsyncMock(
+        spec_set=ClientWebSocketResponse, closed=False
+    )
+    no_get_log_config_ws_client.receive_json.side_effect = (
         version_data,
         set_api_schema_data,
         result,
@@ -209,11 +203,11 @@ async def dump_ws_client_fixture(
 
         message = messages.popleft()
         if not messages:
-            dump_ws_client.closed = True
+            no_get_log_config_ws_client.closed = True
 
         return message
 
-    dump_ws_client.receive.side_effect = receive
+    no_get_log_config_ws_client.receive.side_effect = receive
 
     async def close_client(msg):
         """Close the client."""
@@ -221,17 +215,17 @@ async def dump_ws_client_fixture(
             return
 
         await asyncio.sleep(0)
-        dump_ws_client.closed = True
+        no_get_log_config_ws_client.closed = True
 
-    dump_ws_client.send_json.side_effect = close_client
+    no_get_log_config_ws_client.send_json.side_effect = close_client
 
     async def reset_close():
         """Reset the websocket client close method."""
-        dump_ws_client.closed = True
+        no_get_log_config_ws_client.closed = True
 
-    dump_ws_client.close.side_effect = reset_close
+    no_get_log_config_ws_client.close.side_effect = reset_close
 
-    return dump_ws_client
+    return no_get_log_config_ws_client
 
 
 @pytest.fixture(name="await_other")
