@@ -37,7 +37,8 @@ def test_server_version(client_session, url, ws_client, result, capsys):
     assert ws_client.close.call_count == 1
 
 
-def test_dump_state(dump_client_session, url, dump_ws_client, capsys):
+@pytest.mark.parametrize("result", ["test_result"])
+def test_dump_state(dump_client_session, url, dump_ws_client, result, capsys):
     """Test dump state."""
     with patch.object(
         sys, "argv", ["zwave_js_server", url, "--dump-state"]
