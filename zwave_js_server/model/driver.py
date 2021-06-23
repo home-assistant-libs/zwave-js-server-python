@@ -1,5 +1,5 @@
 """Provide a model for the Z-Wave JS Driver."""
-from typing import Any, Optional, TYPE_CHECKING, cast
+from typing import Any, Dict, Optional, TYPE_CHECKING, Union, cast
 
 from zwave_js_server.model.log_config import LogConfig, LogConfigDataType
 from zwave_js_server.model.log_message import LogMessage, LogMessageDataType
@@ -131,3 +131,11 @@ class Driver(EventBase):
             "install_config_update", require_schema=5
         )
         return cast(bool, result["success"])
+
+    async def async_set_preferred_scales(
+        self, scales: Dict[Union[str, int], Union[str, int]]
+    ) -> None:
+        """Send command to set preferred sensor scales."""
+        await self._async_send_command(
+            "set_preferred_scales", scales=scales, require_schema=6
+        )

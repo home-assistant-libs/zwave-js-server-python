@@ -367,6 +367,7 @@ class Node(EventBase):
         self,
         val: Union[Value, str],
         new_value: Any,
+        options: dict = None,
         wait_for_result: Optional[bool] = None,
     ) -> Optional[bool]:
         """Send setValue command to Node for given value (or value_id)."""
@@ -377,12 +378,16 @@ class Node(EventBase):
         if val.metadata.writeable is False:
             raise UnwriteableValue
 
+        cmd_args = {
+            "valueId": val.data,
+            "value": new_value,
+        }
+        if options:
+            cmd_args["options"] = options
+
         # the value object needs to be send to the server
         result = await self.async_send_command(
-            "set_value",
-            valueId=val.data,
-            value=new_value,
-            wait_for_result=wait_for_result,
+            "set_value", **cmd_args, wait_for_result=wait_for_result
         )
 
         if result is None:
