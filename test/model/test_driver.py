@@ -281,3 +281,17 @@ async def test_install_config_update(driver, uuid4, mock_command):
         "command": "driver.install_config_update",
         "messageId": uuid4,
     }
+
+
+async def test_set_preferred_scales(driver, uuid4, mock_command):
+    """Test driver.set_preferred_scales command."""
+    ack_commands = mock_command({"command": "driver.set_preferred_scales"}, {})
+
+    assert not await driver.async_set_preferred_scales({1: 1})
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.set_preferred_scales",
+        "scales": {1: 1},
+        "messageId": uuid4,
+    }

@@ -182,6 +182,20 @@ async def test_set_value(multisensor_6, uuid4, mock_command):
         "messageId": uuid4,
     }
 
+    # Set value with options
+
+    assert await node.async_set_value(value_id, 42, {"transitionDuration": 1}) is None
+
+    assert len(ack_commands) == 2
+    assert ack_commands[1] == {
+        "command": "node.set_value",
+        "nodeId": node.node_id,
+        "valueId": value.data,
+        "value": 42,
+        "options": {"transitionDuration": 1},
+        "messageId": uuid4,
+    }
+
 
 async def test_poll_value(multisensor_6, uuid4, mock_command):
     """Test poll value."""
