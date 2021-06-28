@@ -1,5 +1,5 @@
 """Provide a model for the Z-Wave JS value."""
-from typing import TYPE_CHECKING, Any, Dict, Optional, TypedDict, Union
+from typing import List, TYPE_CHECKING, Any, Dict, Optional, TypedDict, Union
 
 from ..const import VALUE_UNKNOWN, CommandClass, ConfigurationValueType
 from ..event import Event
@@ -22,6 +22,7 @@ class MetaDataType(TypedDict, total=False):
     unit: str
     states: Dict[int, str]
     ccSpecific: Dict[str, Any]
+    valueChangeOptions: List[str]
     allowManualEntry: bool
     valueSize: int
 
@@ -136,6 +137,11 @@ class ValueMetadata:
     def cc_specific(self) -> Dict[str, Any]:
         """Return ccSpecific."""
         return self.data.get("ccSpecific", {})
+
+    @property
+    def value_change_options(self) -> List[str]:
+        """Return valueChangeOptions."""
+        return self.data.get("valueChangeOptions", [])
 
     @property
     def allow_manual_entry(self) -> Optional[bool]:
