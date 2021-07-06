@@ -64,6 +64,20 @@ class Node(Endpoint):
                 # If we can't parse the value, don't store it
                 pass
 
+        self.endpoints: List[Endpoint] = []
+        for endpoint in self.data["endpoints"]:
+            self.endpoints.append(
+                Endpoint(
+                    self.client,
+                    endpoint,
+                    {
+                        value_id: value
+                        for value_id, value in self.values.items()
+                        if self.index == value.endpoint
+                    },
+                )
+            )
+
     def __repr__(self) -> str:
         """Return the representation."""
         return f"{type(self).__name__}(node_id={self.node_id})"
@@ -194,11 +208,6 @@ class Node(Endpoint):
     def device_database_url(self) -> Optional[str]:
         """Return the device database URL."""
         return self.data.get("deviceDatabaseUrl")
-
-    @property
-    def endpoints(self) -> List[Endpoint]:
-        """Return the endpoints."""
-        return [Endpoint(self.client, endpoint) for endpoint in self.data["endpoints"]]
 
     @property
     def endpoint_count_is_dynamic(self) -> Optional[bool]:

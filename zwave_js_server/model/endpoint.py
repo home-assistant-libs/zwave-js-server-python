@@ -4,14 +4,13 @@ Model for a Zwave Node's endpoints.
 https://zwave-js.github.io/node-zwave-js/#/api/endpoint?id=endpoint-properties
 """
 
-from typing import List, TYPE_CHECKING, Optional, TypedDict, Union
-from zwave_js_server.model.value import ValueDataType
-from zwave_js_server.model.command_class import CommandClassInfoDataType
-from zwave_js_server.model.device_config import DeviceConfigDataType
+from typing import Dict, List, TYPE_CHECKING, Optional, TypedDict, Union
 
-from zwave_js_server.event import EventBase
-
+from .command_class import CommandClassInfoDataType
 from .device_class import DeviceClass, DeviceClassDataType
+from .device_config import DeviceConfigDataType
+from ..event import EventBase
+from .value import ConfigurationValue, Value, ValueDataType
 
 if TYPE_CHECKING:
     from ..client import Client
@@ -66,11 +65,18 @@ class EndpointDataType(TypedDict, total=False):
 class Endpoint(EventBase):
     """Model for a Zwave Node's endpoint."""
 
-    def __init__(self, client: "Client", data: EndpointDataType) -> None:
+    def __init__(
+        self,
+        client: "Client",
+        data: EndpointDataType,
+        values: Dict[str, Union[ConfigurationValue, Value]] = None,
+    ) -> None:
         """Initialize."""
         super().__init__()
         self.client = client
         self.data = data
+        if values is not None:
+            self.values = values
 
     @property
     def node_id(self) -> int:
