@@ -3,10 +3,10 @@ from enum import IntEnum
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
 
 from ..const import CommandClass, INTERVIEW_FAILED
-from ..event import Event, EventBase
+from ..event import Event
 from ..exceptions import FailedCommand, UnparseableValue, UnwriteableValue
 from .command_class import CommandClassInfo, CommandClassInfoDataType
-from .device_class import DeviceClass, DeviceClassDataType
+from .device_class import DeviceClassDataType
 from .device_config import DeviceConfig, DeviceConfigDataType
 from .endpoint import Endpoint, EndpointDataType
 from .firmware import (
@@ -92,14 +92,12 @@ class NodeDataType(TypedDict, total=False):
     values: List[ValueDataType]
 
 
-class Node(EventBase):
+class Node(Endpoint):
     """Represent a Z-Wave JS node."""
 
     def __init__(self, client: "Client", data: NodeDataType) -> None:
         """Initialize the node."""
-        super().__init__()
-        self.client = client
-        self.data = data
+        super().__init__(client, data)
         self._device_config = DeviceConfig(self.data.get("deviceConfig", {}))
         self.values: Dict[str, Union[Value, ConfigurationValue]] = {}
         for val in data["values"]:
@@ -127,26 +125,6 @@ class Node(EventBase):
         )
 
     @property
-    def node_id(self) -> int:
-        """Return the node_id."""
-        return self.data["nodeId"]
-
-    @property
-    def index(self) -> Optional[int]:
-        """Return the index."""
-        return self.data.get("index")
-
-    @property
-    def installer_icon(self) -> Optional[int]:
-        """Return the installer_icon."""
-        return self.data.get("installerIcon")
-
-    @property
-    def user_icon(self) -> Optional[int]:
-        """Return the user_icon."""
-        return self.data.get("userIcon")
-
-    @property
     def status(self) -> NodeStatus:
         """Return the status."""
         return NodeStatus(self.data["status"])
@@ -155,11 +133,6 @@ class Node(EventBase):
     def ready(self) -> Optional[bool]:
         """Return the ready."""
         return self.data.get("ready")
-
-    @property
-    def device_class(self) -> DeviceClass:
-        """Return the device_class."""
-        return DeviceClass(self.data["deviceClass"])
 
     @property
     def is_listening(self) -> Optional[bool]:
@@ -269,7 +242,7 @@ class Node(EventBase):
     @property
     def endpoints(self) -> List[Endpoint]:
         """Return the endpoints."""
-        return [Endpoint(endpoint) for endpoint in self.data["endpoints"]]
+        return [Endpoint(self.client, endpoint) for endpoint in self.data["endpoints"]]
 
     @property
     def endpoint_count_is_dynamic(self) -> Optional[bool]:
