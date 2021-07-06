@@ -4,7 +4,8 @@ Model for a Zwave Node's endpoints.
 https://zwave-js.github.io/node-zwave-js/#/api/endpoint?id=endpoint-properties
 """
 
-from typing import Optional, TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING, Optional, TypedDict
+
 from zwave_js_server.event import EventBase
 
 from .device_class import DeviceClass, DeviceClassDataType

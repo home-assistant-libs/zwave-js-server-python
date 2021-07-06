@@ -2,7 +2,7 @@
 from enum import IntEnum
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
 
-from ..const import CommandClass, INTERVIEW_FAILED
+from ..const import INTERVIEW_FAILED, CommandClass
 from ..event import Event
 from ..exceptions import FailedCommand, UnparseableValue, UnwriteableValue
 from .command_class import CommandClassInfo, CommandClassInfoDataType

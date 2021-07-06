@@ -1,6 +1,7 @@
 """Support for multicast commands."""
 
 from typing import Any, List, Optional, Union, cast
+
 from zwave_js_server.model.node import Node
 
 from ..client import Client
