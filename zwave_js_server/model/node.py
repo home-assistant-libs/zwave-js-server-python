@@ -1,13 +1,12 @@
 """Provide a model for the Z-Wave JS node."""
 from enum import IntEnum
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, cast
 
 from ..const import INTERVIEW_FAILED, CommandClass
 from ..event import Event
 from ..exceptions import FailedCommand, UnparseableValue, UnwriteableValue
-from .command_class import CommandClassInfo, CommandClassInfoDataType
-from .device_class import DeviceClassDataType
-from .device_config import DeviceConfig, DeviceConfigDataType
+from .command_class import CommandClassInfo
+from .device_config import DeviceConfig
 from .endpoint import Endpoint, EndpointDataType
 from .firmware import (
     FirmwareUpdateFinished,
@@ -49,53 +48,10 @@ class NodeStatus(IntEnum):
     ALIVE = 4
 
 
-class NodeDataType(TypedDict, total=False):
-    """Represent a node data dict type."""
-
-    nodeId: int  # required
-    name: str
-    location: str
-    status: int  # 0-4  # required
-    deviceClass: DeviceClassDataType
-    zwavePlusVersion: int
-    zwavePlusNodeType: int
-    zwavePlusRoleType: int
-    isListening: bool
-    isFrequentListening: Union[bool, str]
-    isRouting: bool
-    maxDataRate: int
-    supportedDataRates: List[int]
-    isSecure: bool
-    supportsBeaming: bool
-    supportsSecurity: bool
-    protocolVersion: int
-    firmwareVersion: str
-    manufacturerId: int
-    productId: int
-    productType: int
-    deviceConfig: DeviceConfigDataType
-    deviceDatabaseUrl: str
-    keepAwake: bool
-    index: int
-    installerIcon: int
-    userIcon: int
-    ready: bool
-    label: str
-    endpoints: List[EndpointDataType]
-    endpointCountIsDynamic: bool
-    endpointsHaveIdenticalCapabilities: bool
-    individualEndpointCount: int
-    aggregatedEndpointCount: int
-    interviewAttempts: int
-    interviewStage: Optional[Union[int, str]]
-    commandClasses: List[CommandClassInfoDataType]
-    values: List[ValueDataType]
-
-
 class Node(Endpoint):
     """Represent a Z-Wave JS node."""
 
-    def __init__(self, client: "Client", data: NodeDataType) -> None:
+    def __init__(self, client: "Client", data: EndpointDataType) -> None:
         """Initialize the node."""
         super().__init__(client, data)
         self._device_config = DeviceConfig(self.data.get("deviceConfig", {}))
