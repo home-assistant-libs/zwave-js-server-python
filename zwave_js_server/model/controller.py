@@ -62,7 +62,11 @@ class ControllerStatistics:
 
     @property
     def messages_dropped_tx(self) -> int:
-        """Return number of outgoing messages that were dropped."""
+        """
+        Return number of outgoing messages that were dropped.
+
+        These messages could not be sent.
+        """
         return self.data["messagesDroppedTX"]
 
     @property

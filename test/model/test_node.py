@@ -14,7 +14,7 @@ from zwave_js_server.event import Event
 from zwave_js_server.exceptions import UnwriteableValue
 from zwave_js_server.model import node as node_pkg
 from zwave_js_server.model.firmware import FirmwareUpdateStatus
-from zwave_js_server.model.node import Node, NodeStatus
+from zwave_js_server.model.node import Node, NodeStatistics, NodeStatus
 from zwave_js_server.model.value import ConfigurationValue
 
 from .. import load_fixture
@@ -69,6 +69,15 @@ def test_from_state():
     assert device_class.basic.key == 2
     assert device_class.generic.key == 2
     assert device_class.specific.key == 1
+    stats = node.statistics
+    assert (
+        stats.commands_dropped_rx
+        == stats.commands_dropped_tx
+        == stats.commands_rx
+        == stats.commands_tx
+        == stats.timeout_response
+        == 0
+    )
 
 
 async def test_device_config(wallmote_central_scene):

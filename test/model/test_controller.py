@@ -106,16 +106,17 @@ def test_from_state():
     assert ctrl.suc_node_id == 1
     assert ctrl.supports_timers is False
     assert ctrl.is_heal_network_active is False
+    stats = ctrl.statistics
     assert (
-        ctrl.statistics.can
-        == ctrl.statistics.messages_dropped_rx
-        == ctrl.statistics.messages_dropped_tx
-        == ctrl.statistics.messages_rx
-        == ctrl.statistics.messages_tx
-        == ctrl.statistics.nak
-        == ctrl.statistics.timeout_ack
-        == ctrl.statistics.timeout_callback
-        == ctrl.statistics.timeout_response
+        stats.can
+        == stats.messages_dropped_rx
+        == stats.messages_dropped_tx
+        == stats.messages_rx
+        == stats.messages_tx
+        == stats.nak
+        == stats.timeout_ack
+        == stats.timeout_callback
+        == stats.timeout_response
         == 0
     )
 
@@ -550,7 +551,7 @@ async def test_statistics_updated(controller):
     controller.receive_event(event)
     # Event should be modified with the ControllerStatistics object
     assert "statistics_updated" in event.data
-    assert isinstance(
-        event.data["statistics_updated"], controller_pkg.ControllerStatistics
-    )
+    event_stats = event.data["statistics_updated"]
+    assert isinstance(event_stats, controller_pkg.ControllerStatistics)
     assert controller.statistics.nak == 1
+    assert controller.statistics == event_stats
