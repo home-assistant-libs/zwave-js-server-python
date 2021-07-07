@@ -398,3 +398,6 @@ class Controller(EventBase):
         """Process a heal network done event."""
         # pylint: disable=unused-argument
         self.data["isHealNetworkActive"] = False
+
+    def handle_statistics_updated(self, event: Event) -> None:
+        """Process a statistics updated event."""
