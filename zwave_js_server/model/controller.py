@@ -26,13 +26,8 @@ class ControllerStatisticsDataType(TypedDict):
 class ControllerStatistics:
     """Represent a controller statitics update."""
 
-    def __init__(
-        self,
-        controller: "Controller",
-        data: Optional[ControllerStatisticsDataType] = None,
-    ) -> None:
+    def __init__(self, data: Optional[ControllerStatisticsDataType] = None) -> None:
         """Initialize controller statistics."""
-        self.controller = controller
         self.data = data or ControllerStatisticsDataType(
             CAN=0,
             messagesDroppedRX=0,
@@ -116,6 +111,7 @@ class ControllerDataType(TypedDict, total=False):
     sucNodeId: int
     supportsTimers: bool
     isHealNetworkActive: bool
+    statistics: ControllerStatisticsDataType
 
 
 class Controller(EventBase):
@@ -126,7 +122,7 @@ class Controller(EventBase):
         super().__init__()
         self.client = client
         self.data: ControllerDataType = state["controller"]
-        self.statistics = ControllerStatistics(self)
+        self._statistics = ControllerStatistics(self.data.get("statistics"))
         self.nodes: Dict[int, Node] = {}
         for node_state in state["nodes"]:
             node = Node(client, node_state)
@@ -235,6 +231,11 @@ class Controller(EventBase):
     def is_heal_network_active(self) -> Optional[bool]:
         """Return is_heal_network_active."""
         return self.data.get("isHealNetworkActive")
+
+    @property
+    def statistics(self) -> ControllerStatistics:
+        """Return statistics property."""
+        return self._statistics
 
     async def async_begin_inclusion(
         self, include_non_secure: Optional[bool] = None
@@ -488,5 +489,5 @@ class Controller(EventBase):
 
     def handle_statistics_updated(self, event: Event) -> None:
         """Process a statistics updated event."""
-        self.statistics.data.update(event.data["statistics"])
+        self._statistics.data.update(event.data["statistics"])
         event.data["statistics_updated"] = self.statistics

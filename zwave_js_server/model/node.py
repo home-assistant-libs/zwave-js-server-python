@@ -49,13 +49,8 @@ class NodeStatisticsDataType(TypedDict):
 class NodeStatistics:
     """Represent a node statitics update."""
 
-    def __init__(
-        self,
-        node: "Node",
-        data: Optional[NodeStatisticsDataType] = None,
-    ) -> None:
+    def __init__(self, data: Optional[NodeStatisticsDataType] = None) -> None:
         """Initialize node statistics."""
-        self.node = node
         self.data = data or NodeStatisticsDataType(
             commandsDroppedRX=0,
             commandsDroppedTX=0,
@@ -152,6 +147,7 @@ class NodeDataType(TypedDict, total=False):
     interviewStage: Optional[Union[int, str]]
     commandClasses: List[CommandClassInfoDataType]
     values: List[ValueDataType]
+    statistics: NodeStatisticsDataType
 
 
 class Node(EventBase):
@@ -163,7 +159,7 @@ class Node(EventBase):
         self.client = client
         self.data = data
         self._device_config = DeviceConfig(self.data.get("deviceConfig", {}))
-        self.statistics = NodeStatistics(self)
+        self._statistics = NodeStatistics(self.data.get("statistics"))
         self.values: Dict[str, Union[Value, ConfigurationValue]] = {}
         for val in data["values"]:
             value_id = _get_value_id_from_dict(self, val)
@@ -373,6 +369,11 @@ class Node(EventBase):
     def command_classes(self) -> List[CommandClassInfo]:
         """Return all CommandClasses supported on this node."""
         return [CommandClassInfo(cc) for cc in self.data["commandClasses"]]
+
+    @property
+    def statistics(self) -> NodeStatistics:
+        """Return statistics property."""
+        return self._statistics
 
     def get_command_class_values(
         self, command_class: CommandClass, endpoint: int = None
@@ -645,5 +646,5 @@ class Node(EventBase):
 
     def handle_statistics_updated(self, event: Event) -> None:
         """Process a statistics updated event."""
-        self.statistics.data.update(event.data["statistics"])
+        self._statistics.data.update(event.data["statistics"])
         event.data["statistics_updated"] = self.statistics
