@@ -47,7 +47,7 @@ class NodeStatisticsDataType(TypedDict):
 
 
 class NodeStatistics:
-    """Represent a node statitics update."""
+    """Represent a node statistics update."""
 
     def __init__(self, data: Optional[NodeStatisticsDataType] = None) -> None:
         """Initialize node statistics."""

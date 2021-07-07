@@ -24,7 +24,7 @@ class ControllerStatisticsDataType(TypedDict):
 
 
 class ControllerStatistics:
-    """Represent a controller statitics update."""
+    """Represent a controller statistics update."""
 
     def __init__(self, data: Optional[ControllerStatisticsDataType] = None) -> None:
         """Initialize controller statistics."""
