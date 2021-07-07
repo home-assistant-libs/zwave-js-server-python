@@ -106,6 +106,18 @@ def test_from_state():
     assert ctrl.suc_node_id == 1
     assert ctrl.supports_timers is False
     assert ctrl.is_heal_network_active is False
+    assert (
+        ctrl.statistics.can
+        == ctrl.statistics.messages_dropped_rx
+        == ctrl.statistics.messages_dropped_tx
+        == ctrl.statistics.messages_rx
+        == ctrl.statistics.messages_tx
+        == ctrl.statistics.nak
+        == ctrl.statistics.timeout_ack
+        == ctrl.statistics.timeout_callback
+        == ctrl.statistics.timeout_response
+        == 0
+    )
 
 
 async def test_begin_inclusion(controller, uuid4, mock_command):
@@ -512,3 +524,33 @@ async def test_heal_network_active(controller):
     )
     controller.receive_event(event)
     assert controller.is_heal_network_active is False
+
+
+async def test_statistics_updated(controller):
+    """Test that statistics get updated on events."""
+    assert controller.statistics.nak == 0
+    event = Event(
+        "statistics updated",
+        {
+            "source": "controller",
+            "event": "statistics updated",
+            "statistics": {
+                "messagesTX": 1,
+                "messagesRX": 1,
+                "messagesDroppedRX": 1,
+                "NAK": 1,
+                "CAN": 1,
+                "timeoutACK": 1,
+                "timeoutResponse": 1,
+                "timeoutCallback": 1,
+                "messagesDroppedTX": 1,
+            },
+        },
+    )
+    controller.receive_event(event)
+    # Event should be modified with the ControllerStatistics object
+    assert "statistics_updated" in event.data
+    assert isinstance(
+        event.data["statistics_updated"], controller_pkg.ControllerStatistics
+    )
+    assert controller.statistics.nak == 1

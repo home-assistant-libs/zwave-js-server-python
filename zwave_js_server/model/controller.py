@@ -9,8 +9,90 @@ if TYPE_CHECKING:
     from ..client import Client
 
 
+class ControllerStatisticsDataType(TypedDict):
+    """Represent a controller statistics data dict type."""
+
+    messagesTX: int
+    messagesRX: int
+    messagesDroppedTX: int
+    messagesDroppedRX: int
+    NAK: int
+    CAN: int
+    timeoutACK: int
+    timeoutResponse: int
+    timeoutCallback: int
+
+
+class ControllerStatistics:
+    """Represent a controller statitics update."""
+
+    def __init__(
+        self,
+        controller: "Controller",
+        data: Optional[ControllerStatisticsDataType] = None,
+    ) -> None:
+        """Initialize controller statistics."""
+        self.controller = controller
+        self.data = data or ControllerStatisticsDataType(
+            CAN=0,
+            messagesDroppedRX=0,
+            messagesDroppedTX=0,
+            messagesRX=0,
+            messagesTX=0,
+            NAK=0,
+            timeoutACK=0,
+            timeoutCallback=0,
+            timeoutResponse=0,
+        )
+
+    @property
+    def messages_tx(self) -> int:
+        """Return number of messages successfully sent to controller."""
+        return self.data["messagesTX"]
+
+    @property
+    def messages_rx(self) -> int:
+        """Return number of messages received by controller."""
+        return self.data["messagesRX"]
+
+    @property
+    def messages_dropped_rx(self) -> int:
+        """Return number of messages from controller that were dropped by host."""
+        return self.data["messagesDroppedRX"]
+
+    @property
+    def messages_dropped_tx(self) -> int:
+        """Return number of outgoing messages that were dropped."""
+        return self.data["messagesDroppedTX"]
+
+    @property
+    def nak(self) -> int:
+        """Return number of messages that controller did not accept."""
+        return self.data["NAK"]
+
+    @property
+    def can(self) -> int:
+        """Return number of collisions while sending a message to controller."""
+        return self.data["CAN"]
+
+    @property
+    def timeout_ack(self) -> int:
+        """Return number of transmission attempts without an ACK from controller."""
+        return self.data["timeoutACK"]
+
+    @property
+    def timeout_response(self) -> int:
+        """Return number of transmission attempts where controller response timed out."""
+        return self.data["timeoutResponse"]
+
+    @property
+    def timeout_callback(self) -> int:
+        """Return number of transmission attempts where controller callback timed out."""
+        return self.data["timeoutCallback"]
+
+
 class ControllerDataType(TypedDict, total=False):
-    """Represent a node data dict type."""
+    """Represent a controller data dict type."""
 
     libraryVersion: str
     type: int
@@ -44,6 +126,7 @@ class Controller(EventBase):
         for node_state in state["nodes"]:
             node = Node(client, node_state)
             self.nodes[node.node_id] = node
+        self.statistics = ControllerStatistics(self)
 
     def __repr__(self) -> str:
         """Return the representation."""
@@ -401,3 +484,6 @@ class Controller(EventBase):
 
     def handle_statistics_updated(self, event: Event) -> None:
         """Process a statistics updated event."""
+        self.statistics = event.data["statistics_updated"] = ControllerStatistics(
+            self, event.data["statistics"]
+        )
