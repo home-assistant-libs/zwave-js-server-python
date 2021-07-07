@@ -484,6 +484,5 @@ class Controller(EventBase):
 
     def handle_statistics_updated(self, event: Event) -> None:
         """Process a statistics updated event."""
-        self.statistics = event.data["statistics_updated"] = ControllerStatistics(
-            self, event.data["statistics"]
-        )
+        self.statistics.data.update(event.data["statistics"])
+        event.data["statistics_updated"] = self.statistics
