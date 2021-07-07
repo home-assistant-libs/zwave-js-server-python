@@ -126,11 +126,11 @@ class Controller(EventBase):
         super().__init__()
         self.client = client
         self.data: ControllerDataType = state["controller"]
+        self.statistics = ControllerStatistics(self)
         self.nodes: Dict[int, Node] = {}
         for node_state in state["nodes"]:
             node = Node(client, node_state)
             self.nodes[node.node_id] = node
-        self.statistics = ControllerStatistics(self)
 
     def __repr__(self) -> str:
         """Return the representation."""
