@@ -787,7 +787,7 @@ async def test_value_added(climate_radio_thermostat_ct100_plus):
                     "type": "boolean",
                     "readable": True,
                     "writeable": False,
-                    "label": "Low battery level",
+                    "label": "High battery level",
                 },
                 "value": True,
             },
