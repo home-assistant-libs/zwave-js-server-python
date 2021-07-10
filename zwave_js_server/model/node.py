@@ -515,16 +515,14 @@ class Node(EventBase):
 
     def handle_value_added(self, event: Event) -> None:
         """Process a node value added event."""
-        value = _init_value(self, event.data["args"])
-        self.values[value.value_id] = event.data["value"] = value
+        self.handle_value_updated(event)
 
     def handle_value_updated(self, event: Event) -> None:
         """Process a node value updated event."""
         value = self.values.get(_get_value_id_from_dict(self, event.data["args"]))
         if value is None:
-            # received update for unknown value
-            # should not happen but just in case, treat like added value
-            self.handle_value_added(event)
+            value = _init_value(self, event.data["args"])
+            self.values[value.value_id] = event.data["value"] = value
         else:
             value.receive_event(event)
             event.data["value"] = value
