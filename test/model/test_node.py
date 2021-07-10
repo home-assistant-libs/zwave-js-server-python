@@ -766,3 +766,32 @@ async def test_firmware_events(wallmote_central_scene: Node):
         == FirmwareUpdateStatus.OK_RESTART_PENDING
     )
     assert event.data["firmware_update_finished"].wait_time == 10
+
+
+async def test_value_added(climate_radio_thermostat_ct100_plus):
+    """Test value added event."""
+    node: Node = climate_radio_thermostat_ct100_plus
+    event = Event(
+        "value added",
+        {
+            "source": "node",
+            "event": "value added",
+            "nodeId": node.node_id,
+            "args": {
+                "commandClassName": "Battery",
+                "commandClass": 128,
+                "endpoint": 1,
+                "property": "isHigh",
+                "propertyName": "isHigh",
+                "metadata": {
+                    "type": "boolean",
+                    "readable": True,
+                    "writeable": False,
+                    "label": "Low battery level",
+                },
+                "value": True,
+            },
+        },
+    )
+    node.receive_event(event)
+    assert f"{node.node_id}-128-1-isHigh" in node.values
