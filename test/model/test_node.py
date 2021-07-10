@@ -771,6 +771,9 @@ async def test_firmware_events(wallmote_central_scene: Node):
 async def test_value_added_value_exists(climate_radio_thermostat_ct100_plus):
     """Test value added event when value exists."""
     node: Node = climate_radio_thermostat_ct100_plus
+    value_id = f"{node.node_id}-128-1-isHigh"
+    value = node.values.get(value_id)
+    assert value
     event = Event(
         "value added",
         {
@@ -794,7 +797,8 @@ async def test_value_added_value_exists(climate_radio_thermostat_ct100_plus):
         },
     )
     node.receive_event(event)
-    assert f"{node.node_id}-128-1-isHigh" in node.values
+    assert value_id in node.values
+    assert value is node.values[value_id]
 
 
 async def test_value_added_new_value(climate_radio_thermostat_ct100_plus):
