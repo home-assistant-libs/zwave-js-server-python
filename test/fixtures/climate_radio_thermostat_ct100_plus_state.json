@@ -683,6 +683,19 @@
         "label": "Low battery level"
       },
       "value": false
+    },
+    {
+      "commandClassName": "Battery",
+      "commandClass": 128,
+      "endpoint": 1,
+      "property": "isHigh",
+      "propertyName": "isHigh",
+      "metadata": {
+          "type": "boolean",
+          "readable": true,
+          "writeable": false,
+          "label": "High battery level"
+      }
     }
   ]
 }
