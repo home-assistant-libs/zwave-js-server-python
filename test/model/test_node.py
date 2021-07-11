@@ -399,10 +399,14 @@ def test_node_inclusion():
     assert node.status == 1
     assert not node.ready
     assert len(node.values) == 0
+    assert node.device_config.manufacturer is None
+
     # the ready event contains a full (and complete) dump of the node, including values
     state = json.loads(load_fixture("multisensor_6_state.json"))
     event = Event("ready", {"nodeState": state})
     node.receive_event(event)
+
+    assert node.device_config.manufacturer == "AEON Labs"
     assert len(node.values) > 0
 
 

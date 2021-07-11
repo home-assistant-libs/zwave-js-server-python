@@ -504,6 +504,9 @@ class Node(EventBase):
         """Process a node ready event."""
         # the event contains a full dump of the node
         self.data.update(event.data["nodeState"])
+        # update device config
+        if new_device_config := self.data.get("deviceConfig"):
+            self._device_config = DeviceConfig(new_device_config)
         # update/add values
         for value_state in event.data["nodeState"]["values"]:
             value_id = _get_value_id_from_dict(self, value_state)
