@@ -798,7 +798,7 @@ async def test_value_added_value_exists(climate_radio_thermostat_ct100_plus):
     )
     node.receive_event(event)
     assert value_id in node.values
-    assert value is node.values[value_id]
+    assert node.values[value_id] is value
 
 
 async def test_value_added_new_value(climate_radio_thermostat_ct100_plus):
