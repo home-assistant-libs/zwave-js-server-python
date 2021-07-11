@@ -766,3 +766,65 @@ async def test_firmware_events(wallmote_central_scene: Node):
         == FirmwareUpdateStatus.OK_RESTART_PENDING
     )
     assert event.data["firmware_update_finished"].wait_time == 10
+
+
+async def test_value_added_value_exists(climate_radio_thermostat_ct100_plus):
+    """Test value added event when value exists."""
+    node: Node = climate_radio_thermostat_ct100_plus
+    value_id = f"{node.node_id}-128-1-isHigh"
+    value = node.values.get(value_id)
+    assert value
+    event = Event(
+        "value added",
+        {
+            "source": "node",
+            "event": "value added",
+            "nodeId": node.node_id,
+            "args": {
+                "commandClassName": "Battery",
+                "commandClass": 128,
+                "endpoint": 1,
+                "property": "isHigh",
+                "propertyName": "isHigh",
+                "metadata": {
+                    "type": "boolean",
+                    "readable": True,
+                    "writeable": False,
+                    "label": "High battery level",
+                },
+                "value": True,
+            },
+        },
+    )
+    node.receive_event(event)
+    assert value_id in node.values
+    assert node.values[value_id] is value
+
+
+async def test_value_added_new_value(climate_radio_thermostat_ct100_plus):
+    """Test value added event when new value is added."""
+    node: Node = climate_radio_thermostat_ct100_plus
+    event = Event(
+        "value added",
+        {
+            "source": "node",
+            "event": "value added",
+            "nodeId": node.node_id,
+            "args": {
+                "commandClassName": "Battery",
+                "commandClass": 128,
+                "endpoint": 1,
+                "property": "isMedium",
+                "propertyName": "isMedium",
+                "metadata": {
+                    "type": "boolean",
+                    "readable": True,
+                    "writeable": False,
+                    "label": "Medium battery level",
+                },
+                "value": True,
+            },
+        },
+    )
+    node.receive_event(event)
+    assert f"{node.node_id}-128-1-isMedium" in node.values
