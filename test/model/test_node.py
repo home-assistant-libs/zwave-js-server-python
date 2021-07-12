@@ -841,3 +841,30 @@ async def test_value_added_new_value(climate_radio_thermostat_ct100_plus):
     )
     node.receive_event(event)
     assert f"{node.node_id}-128-1-isMedium" in node.values
+
+
+async def test_statistics_updated(wallmote_central_scene: Node):
+    """Test that statistics get updated on events."""
+    node = wallmote_central_scene
+    assert node.statistics.commands_rx == 0
+    event = Event(
+        "statistics updated",
+        {
+            "source": "node",
+            "event": "statistics updated",
+            "statistics": {
+                "commandsTX": 1,
+                "commandsRX": 1,
+                "commandsDroppedTX": 1,
+                "commandsDroppedRX": 1,
+                "timeoutResponse": 1,
+            },
+        },
+    )
+    node.receive_event(event)
+    # Event should be modified with the NodeStatistics object
+    assert "statistics_updated" in event.data
+    event_stats = event.data["statistics_updated"]
+    assert isinstance(event_stats, NodeStatistics)
+    assert node.statistics.timeout_response == 1
+    assert node.statistics == event_stats
