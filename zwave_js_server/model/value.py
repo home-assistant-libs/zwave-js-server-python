@@ -1,5 +1,5 @@
 """Provide a model for the Z-Wave JS value."""
-from typing import List, TYPE_CHECKING, Any, Dict, Optional, TypedDict, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union
 
 from ..const import VALUE_UNKNOWN, CommandClass, ConfigurationValueType
 from ..event import Event

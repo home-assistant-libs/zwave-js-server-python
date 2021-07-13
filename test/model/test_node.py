@@ -393,7 +393,7 @@ def test_node_inclusion():
     """Emulate a node being added."""
     # when a node node is added, it has minimal info first
     node = node_pkg.Node(
-        None, {"nodeId": 52, "status": 1, "ready": False, "values": []}
+        None, {"nodeId": 52, "status": 1, "ready": False, "values": [], "endpoints": []}
     )
     assert node.node_id == 52
     assert node.status == 1

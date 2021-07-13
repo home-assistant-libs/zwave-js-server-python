@@ -1,12 +1,11 @@
 """Provide a model for the Z-Wave JS node."""
 from enum import IntEnum
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, cast
 
-from ..const import CommandClass, INTERVIEW_FAILED
-from ..event import Event, EventBase
+from ..const import INTERVIEW_FAILED, CommandClass
+from ..event import Event
 from ..exceptions import FailedCommand, UnparseableValue, UnwriteableValue
 from .command_class import CommandClassInfo, CommandClassInfoDataType
-from .device_class import DeviceClass, DeviceClassDataType
 from .device_config import DeviceConfig, DeviceConfigDataType
 from .endpoint import Endpoint, EndpointDataType
 from .firmware import (
@@ -49,14 +48,12 @@ class NodeStatus(IntEnum):
     ALIVE = 4
 
 
-class NodeDataType(TypedDict, total=False):
+class NodeDataType(EndpointDataType):
     """Represent a node data dict type."""
 
-    nodeId: int  # required
     name: str
     location: str
     status: int  # 0-4  # required
-    deviceClass: DeviceClassDataType
     zwavePlusVersion: int
     zwavePlusNodeType: int
     zwavePlusRoleType: int
@@ -76,9 +73,6 @@ class NodeDataType(TypedDict, total=False):
     deviceConfig: DeviceConfigDataType
     deviceDatabaseUrl: str
     keepAwake: bool
-    index: int
-    installerIcon: int
-    userIcon: int
     ready: bool
     label: str
     endpoints: List[EndpointDataType]
@@ -92,14 +86,13 @@ class NodeDataType(TypedDict, total=False):
     values: List[ValueDataType]
 
 
-class Node(EventBase):
+class Node(Endpoint):
     """Represent a Z-Wave JS node."""
 
     def __init__(self, client: "Client", data: NodeDataType) -> None:
         """Initialize the node."""
-        super().__init__()
-        self.client = client
-        self.data = data
+        super().__init__(client, data)
+        self.data: NodeDataType = data
         self._device_config = DeviceConfig(self.data.get("deviceConfig", {}))
         self.values: Dict[str, Union[Value, ConfigurationValue]] = {}
         for val in data["values"]:
@@ -109,6 +102,20 @@ class Node(EventBase):
             except UnparseableValue:
                 # If we can't parse the value, don't store it
                 pass
+
+        self.endpoints: List[Endpoint] = []
+        for endpoint in self.data["endpoints"]:
+            self.endpoints.append(
+                Endpoint(
+                    self.client,
+                    endpoint,
+                    {
+                        value_id: value
+                        for value_id, value in self.values.items()
+                        if self.index == value.endpoint
+                    },
+                )
+            )
 
     def __repr__(self) -> str:
         """Return the representation."""
@@ -127,26 +134,6 @@ class Node(EventBase):
         )
 
     @property
-    def node_id(self) -> int:
-        """Return the node_id."""
-        return self.data["nodeId"]
-
-    @property
-    def index(self) -> Optional[int]:
-        """Return the index."""
-        return self.data.get("index")
-
-    @property
-    def installer_icon(self) -> Optional[int]:
-        """Return the installer_icon."""
-        return self.data.get("installerIcon")
-
-    @property
-    def user_icon(self) -> Optional[int]:
-        """Return the user_icon."""
-        return self.data.get("userIcon")
-
-    @property
     def status(self) -> NodeStatus:
         """Return the status."""
         return NodeStatus(self.data["status"])
@@ -155,11 +142,6 @@ class Node(EventBase):
     def ready(self) -> Optional[bool]:
         """Return the ready."""
         return self.data.get("ready")
-
-    @property
-    def device_class(self) -> DeviceClass:
-        """Return the device_class."""
-        return DeviceClass(self.data["deviceClass"])
 
     @property
     def is_listening(self) -> Optional[bool]:
@@ -265,11 +247,6 @@ class Node(EventBase):
     def device_database_url(self) -> Optional[str]:
         """Return the device database URL."""
         return self.data.get("deviceDatabaseUrl")
-
-    @property
-    def endpoints(self) -> List[Endpoint]:
-        """Return the endpoints."""
-        return [Endpoint(endpoint) for endpoint in self.data["endpoints"]]
 
     @property
     def endpoint_count_is_dynamic(self) -> Optional[bool]:
