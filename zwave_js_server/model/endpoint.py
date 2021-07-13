@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, Dict, Optional, TypedDict, Union
 
 from ..event import EventBase
 from .device_class import DeviceClass, DeviceClassDataType
-from .node import NodeDataType
 from .value import ConfigurationValue, Value
 
 if TYPE_CHECKING:
@@ -31,7 +30,7 @@ class Endpoint(EventBase):
     def __init__(
         self,
         client: "Client",
-        data: Union[EndpointDataType, NodeDataType],
+        data: EndpointDataType,
         values: Dict[str, Union[ConfigurationValue, Value]] = None,
     ) -> None:
         """Initialize."""

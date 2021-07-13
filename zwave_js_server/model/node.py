@@ -92,7 +92,7 @@ class Node(Endpoint):
     def __init__(self, client: "Client", data: NodeDataType) -> None:
         """Initialize the node."""
         super().__init__(client, data)
-        self.data = data
+        self.data: NodeDataType = data
         self._device_config = DeviceConfig(self.data.get("deviceConfig", {}))
         self.values: Dict[str, Union[Value, ConfigurationValue]] = {}
         for val in data["values"]:
