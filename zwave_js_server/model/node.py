@@ -1,7 +1,7 @@
 """Provide a model for the Z-Wave JS node."""
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, cast
 
-from ..const import CommandClass, NodeStatus, INTERVIEW_FAILED
+from ..const import INTERVIEW_FAILED, CommandClass, NodeStatus
 from ..event import Event
 from ..exceptions import FailedCommand, UnparseableValue, UnwriteableValue
 from .command_class import CommandClassInfo, CommandClassInfoDataType

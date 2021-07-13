@@ -4,16 +4,16 @@ import json
 import pytest
 
 from zwave_js_server.const import (
+    INTERVIEW_FAILED,
     CommandClass,
     EntryControlDataType,
     EntryControlEventType,
-    INTERVIEW_FAILED,
+    NodeStatus,
     ProtocolVersion,
 )
 from zwave_js_server.event import Event
 from zwave_js_server.exceptions import UnwriteableValue
 from zwave_js_server.model import node as node_pkg
-from zwave_js_server.const import NodeStatus
 from zwave_js_server.model.firmware import FirmwareUpdateStatus
 from zwave_js_server.model.node import Node
 from zwave_js_server.model.value import ConfigurationValue
