@@ -82,7 +82,9 @@ class Endpoint(EventBase):
         or not based on the node status.
         """
         if self.client.driver is None:
-            raise FailedCommand("Command failed", "failed_command", "The client is not connected")
+            raise FailedCommand(
+                "Command failed", "failed_command", "The client is not connected"
+            )
         node = self.client.driver.controller.nodes[self.node_id]
         kwargs = {}
         message = {
