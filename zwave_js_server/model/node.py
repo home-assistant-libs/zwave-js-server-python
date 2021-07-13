@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, cast
 from ..const import INTERVIEW_FAILED, CommandClass
 from ..event import Event
 from ..exceptions import FailedCommand, UnparseableValue, UnwriteableValue
-from .command_class import CommandClassInfo
-from .device_config import DeviceConfig
+from .command_class import CommandClassInfo, CommandClassInfoDataType
+from .device_config import DeviceConfig, DeviceConfigDataType
 from .endpoint import Endpoint, EndpointDataType
 from .firmware import (
     FirmwareUpdateFinished,
@@ -48,12 +48,51 @@ class NodeStatus(IntEnum):
     ALIVE = 4
 
 
+class NodeDataType(EndpointDataType):
+    """Represent a node data dict type."""
+
+    name: str
+    location: str
+    status: int  # 0-4  # required
+    zwavePlusVersion: int
+    zwavePlusNodeType: int
+    zwavePlusRoleType: int
+    isListening: bool
+    isFrequentListening: Union[bool, str]
+    isRouting: bool
+    maxDataRate: int
+    supportedDataRates: List[int]
+    isSecure: bool
+    supportsBeaming: bool
+    supportsSecurity: bool
+    protocolVersion: int
+    firmwareVersion: str
+    manufacturerId: int
+    productId: int
+    productType: int
+    deviceConfig: DeviceConfigDataType
+    deviceDatabaseUrl: str
+    keepAwake: bool
+    ready: bool
+    label: str
+    endpoints: List[EndpointDataType]
+    endpointCountIsDynamic: bool
+    endpointsHaveIdenticalCapabilities: bool
+    individualEndpointCount: int
+    aggregatedEndpointCount: int
+    interviewAttempts: int
+    interviewStage: Optional[Union[int, str]]
+    commandClasses: List[CommandClassInfoDataType]
+    values: List[ValueDataType]
+
+
 class Node(Endpoint):
     """Represent a Z-Wave JS node."""
 
-    def __init__(self, client: "Client", data: EndpointDataType) -> None:
+    def __init__(self, client: "Client", data: NodeDataType) -> None:
         """Initialize the node."""
         super().__init__(client, data)
+        self.data = data
         self._device_config = DeviceConfig(self.data.get("deviceConfig", {}))
         self.values: Dict[str, Union[Value, ConfigurationValue]] = {}
         for val in data["values"]:
