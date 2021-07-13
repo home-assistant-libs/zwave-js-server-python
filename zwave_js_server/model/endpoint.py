@@ -18,7 +18,6 @@ if TYPE_CHECKING:
 class EndpointDataType(TypedDict, total=False):
     """Represent an endpoint data dict type."""
 
-    # Endpoint data
     nodeId: int  # required
     index: int  # required
     deviceClass: DeviceClassDataType  # required
