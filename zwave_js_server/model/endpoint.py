@@ -80,6 +80,7 @@ class Endpoint(EventBase):
         If wait_for_result is not None, it will take precedence, otherwise we will decide to wait
         or not based on the node status.
         """
+        assert self.client.driver
         node = self.client.driver.controller.nodes[self.node_id]
         kwargs = {}
         message = {
@@ -130,4 +131,6 @@ class Endpoint(EventBase):
             require_schema=7,
             wait_for_result=True,
         )
+        # We can assert this because we are forcing the client to await the response
+        assert result
         return cast(bool, result["supported"])
