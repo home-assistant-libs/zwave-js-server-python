@@ -7,6 +7,7 @@ https://zwave-js.github.io/node-zwave-js/#/api/endpoint?id=endpoint-properties
 from typing import TYPE_CHECKING, Any, Dict, Optional, TypedDict, Union, cast
 
 from ..const import NodeStatus
+from ..exceptions import FailedCommand
 from ..event import EventBase
 from .command_class import CommandClass
 from .device_class import DeviceClass, DeviceClassDataType
@@ -80,7 +81,8 @@ class Endpoint(EventBase):
         If wait_for_result is not None, it will take precedence, otherwise we will decide to wait
         or not based on the node status.
         """
-        assert self.client.driver
+        if self.client.driver is None:
+            raise FailedCommand("Command failed", "failed_command", "The client is not connected")
         node = self.client.driver.controller.nodes[self.node_id]
         kwargs = {}
         message = {
@@ -131,6 +133,7 @@ class Endpoint(EventBase):
             require_schema=7,
             wait_for_result=True,
         )
-        # We can assert this because we are forcing the client to await the response
-        assert result
+        if result is None:
+            # We should never reach this code
+            raise FailedCommand("Command failed", "failed_command")
         return cast(bool, result["supported"])
