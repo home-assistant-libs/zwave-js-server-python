@@ -1,8 +1,7 @@
 """Provide a model for the Z-Wave JS node."""
-from enum import IntEnum
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, cast
 
-from ..const import INTERVIEW_FAILED, CommandClass
+from ..const import CommandClass, NodeStatus, INTERVIEW_FAILED
 from ..event import Event
 from ..exceptions import FailedCommand, UnparseableValue, UnwriteableValue
 from .command_class import CommandClassInfo, CommandClassInfoDataType
@@ -33,19 +32,6 @@ from .value import (
 
 if TYPE_CHECKING:
     from ..client import Client
-
-
-class NodeStatus(IntEnum):
-    """Enum with all Node status values.
-
-    https://zwave-js.github.io/node-zwave-js/#/api/node?id=status
-    """
-
-    UNKNOWN = 0
-    ASLEEP = 1
-    AWAKE = 2
-    DEAD = 3
-    ALIVE = 4
 
 
 class NodeDataType(EndpointDataType):
