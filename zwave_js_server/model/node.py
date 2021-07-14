@@ -103,19 +103,18 @@ class Node(Endpoint):
                 # If we can't parse the value, don't store it
                 pass
 
-        self.endpoints: List[Endpoint] = []
-        for endpoint in self.data["endpoints"]:
-            self.endpoints.append(
-                Endpoint(
-                    self.client,
-                    endpoint,
-                    {
-                        value_id: value
-                        for value_id, value in self.values.items()
-                        if self.index == value.endpoint
-                    },
-                )
+        self.endpoints = {
+            endpoint["index"]: Endpoint(
+                self.client,
+                endpoint,
+                {
+                    value_id: value
+                    for value_id, value in self.values.items()
+                    if self.index == value.endpoint
+                },
             )
+            for endpoint in self.data["endpoints"]
+        }
 
     def __repr__(self) -> str:
         """Return the representation."""
