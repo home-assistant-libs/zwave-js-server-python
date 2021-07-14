@@ -135,7 +135,5 @@ class Endpoint(EventBase):
             require_schema=7,
             wait_for_result=True,
         )
-        if result is None:
-            # We should never reach this code
-            raise FailedCommand("Command failed", "failed_command")
+        assert result
         return cast(bool, result["supported"])
