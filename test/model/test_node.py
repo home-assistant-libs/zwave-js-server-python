@@ -1,5 +1,6 @@
 """Test the node model."""
 import json
+from unittest.mock import patch
 
 import pytest
 
@@ -897,7 +898,9 @@ async def test_supports_cc_api(multisensor_6, uuid4, mock_command):
         "messageId": uuid4,
     }
 
-    # Test that command fails if driver has been cleared
-    node.client.driver = None
+    # Test that command fails when client is disconnected
+    with patch("asyncio.Event.wait", return_value=True):
+        await node.client.disconnect()
+
     with pytest.raises(FailedCommand):
         await node.async_supports_cc_api(CommandClass.USER_CODE)
