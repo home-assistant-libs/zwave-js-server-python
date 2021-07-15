@@ -899,7 +899,7 @@ async def test_supports_cc_api(multisensor_6, uuid4, mock_command):
     }
 
     # Test that command fails when client is disconnected
-    with patch("asyncio.Event.wait", return_value=True):
+    with patch("zwave_js_server.client.asyncio.Event.wait", return_value=True):
         await node.client.disconnect()
 
     with pytest.raises(FailedCommand):
