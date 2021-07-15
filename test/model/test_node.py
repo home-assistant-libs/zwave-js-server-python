@@ -12,7 +12,7 @@ from zwave_js_server.const import (
     ProtocolVersion,
 )
 from zwave_js_server.event import Event
-from zwave_js_server.exceptions import UnwriteableValue
+from zwave_js_server.exceptions import FailedCommand, UnwriteableValue
 from zwave_js_server.model import node as node_pkg
 from zwave_js_server.model.firmware import FirmwareUpdateStatus
 from zwave_js_server.model.node import Node
@@ -896,3 +896,8 @@ async def test_supports_cc_api(multisensor_6, uuid4, mock_command):
         "commandClass": 99,
         "messageId": uuid4,
     }
+
+    # Test that command fails if driver has been cleared
+    node.client.driver = None
+    with pytest.raises(FailedCommand):
+        await node.async_supports_cc_api(CommandClass.USER_CODE)

@@ -224,6 +224,7 @@ class Client:
 
             for future in self._result_futures.values():
                 future.cancel()
+            self._result_futures.clear()
 
             if not self._client.closed:
                 await self._client.close()
@@ -248,6 +249,9 @@ class Client:
         self._shutdown_complete_event = asyncio.Event()
         await self._client.close()
         await self._shutdown_complete_event.wait()
+
+        self._shutdown_complete_event = None
+        self.driver = None
 
     async def _receive_json_or_raise(self) -> dict:
         """Receive json or raise."""
