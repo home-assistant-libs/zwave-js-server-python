@@ -7,8 +7,8 @@ https://zwave-js.github.io/node-zwave-js/#/api/endpoint?id=endpoint-properties
 from typing import TYPE_CHECKING, Any, Dict, Optional, TypedDict, Union, cast
 
 from ..const import NodeStatus
-from ..exceptions import FailedCommand
 from ..event import EventBase
+from ..exceptions import FailedCommand
 from .command_class import CommandClass
 from .device_class import DeviceClass, DeviceClassDataType
 from .value import ConfigurationValue, Value
