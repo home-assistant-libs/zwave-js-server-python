@@ -113,8 +113,7 @@ class Endpoint(EventBase):
         wait_for_result: bool = None,
     ) -> Any:
         """Call endpoint.invoke_cc_api command."""
-        result = await Endpoint._async_send_command(
-            self,
+        result = await self._async_send_command(
             "invoke_cc_api",
             commandClass=command_class.value,
             methodName=method_name,
@@ -128,8 +127,7 @@ class Endpoint(EventBase):
 
     async def async_supports_cc_api(self, command_class: CommandClass) -> bool:
         """Call endpoint.supports_cc_api command."""
-        result = await Endpoint._async_send_command(
-            self,
+        result = await self._async_send_command(
             "supports_cc_api",
             commandClass=command_class.value,
             require_schema=7,
