@@ -41,6 +41,7 @@ class Controller(EventBase):
         self.client = client
         self.data: ControllerDataType = state["controller"]
         self.nodes: Dict[int, Node] = {}
+        self.heal_network_progress: Optional[Dict[Node, str]] = None
         for node_state in state["nodes"]:
             node = Node(client, node_state)
             self.nodes[node.node_id] = node
@@ -220,7 +221,10 @@ class Controller(EventBase):
         data = await self.client.async_send_command(
             {"command": "controller.stop_healing_network"}
         )
-        return cast(bool, data["success"])
+        success = cast(bool, data["success"])
+        if success:
+            self.heal_network_progress = None
+        return success
 
     async def async_is_failed_node(self, node_id: int) -> bool:
         """Send isFailedNode command to Controller."""
@@ -391,10 +395,10 @@ class Controller(EventBase):
 
     def handle_heal_network_progress(self, event: Event) -> None:
         """Process a heal network progress event."""
-        # pylint: disable=unused-argument
+        self.heal_network_progress = event.data["progress"].copy()
         self.data["isHealNetworkActive"] = True
 
     def handle_heal_network_done(self, event: Event) -> None:
         """Process a heal network done event."""
-        # pylint: disable=unused-argument
+        self.heal_network_progress = None
         self.data["isHealNetworkActive"] = False
