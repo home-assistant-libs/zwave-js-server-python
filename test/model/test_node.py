@@ -748,6 +748,7 @@ async def test_refresh_values(multisensor_6, uuid4, mock_command):
 async def test_firmware_events(wallmote_central_scene: Node):
     """Test firmware events."""
     node = wallmote_central_scene
+    assert node.firmware_update_progress is None
 
     event = Event(
         type="firmware update progress",
@@ -763,6 +764,9 @@ async def test_firmware_events(wallmote_central_scene: Node):
     node.handle_firmware_update_progress(event)
     assert event.data["firmware_update_progress"].sent_fragments == 1
     assert event.data["firmware_update_progress"].total_fragments == 10
+    assert node.firmware_update_progress
+    assert node.firmware_update_progress.sent_fragments == 1
+    assert node.firmware_update_progress.total_fragments == 10
 
     event = Event(
         type="firmware update finished",
@@ -781,6 +785,7 @@ async def test_firmware_events(wallmote_central_scene: Node):
         == FirmwareUpdateStatus.OK_RESTART_PENDING
     )
     assert event.data["firmware_update_finished"].wait_time == 10
+    assert node.firmware_update_progress is None
 
 
 async def test_value_added_value_exists(climate_radio_thermostat_ct100_plus):
