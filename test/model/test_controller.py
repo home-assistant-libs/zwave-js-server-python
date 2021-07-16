@@ -266,6 +266,7 @@ async def test_stop_healing_network(controller, uuid4, mock_command):
         {"success": True},
     )
 
+    controller.heal_network_progress = {1: "pending"}
     assert await controller.async_stop_healing_network()
 
     assert len(ack_commands) == 1
@@ -273,6 +274,8 @@ async def test_stop_healing_network(controller, uuid4, mock_command):
         "command": "controller.stop_healing_network",
         "messageId": uuid4,
     }
+    # Verify that controller.heal_network_progress is cleared
+    assert controller.heal_network_progress is None
 
 
 async def test_is_failed_node(controller, uuid4, mock_command):
@@ -502,9 +505,10 @@ async def test_get_node_neighbors(controller, uuid4, mock_command):
     }
 
 
-async def test_heal_network_active(controller):
+async def test_heal_network_active(client, controller):
     """Test that is_heal_network_active changes on events."""
     assert controller.is_heal_network_active is False
+    assert controller.heal_network_progress is None
     event = Event(
         "heal network progress",
         {
@@ -514,6 +518,7 @@ async def test_heal_network_active(controller):
         },
     )
     controller.receive_event(event)
+    assert controller.heal_network_progress == {52: "pending"}
     assert controller.is_heal_network_active
     event = Event(
         "heal network done",
@@ -524,6 +529,7 @@ async def test_heal_network_active(controller):
         },
     )
     controller.receive_event(event)
+    assert controller.heal_network_progress is None
     assert controller.is_heal_network_active is False
 
 
