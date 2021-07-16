@@ -940,4 +940,3 @@ async def test_statistics_updated(wallmote_central_scene: Node):
     assert isinstance(event_stats, NodeStatistics)
     assert node.statistics.timeout_response == 1
     assert node.statistics == event_stats
-
