@@ -16,7 +16,7 @@ from zwave_js_server.event import Event
 from zwave_js_server.exceptions import FailedCommand, UnwriteableValue
 from zwave_js_server.model import node as node_pkg
 from zwave_js_server.model.firmware import FirmwareUpdateStatus
-from zwave_js_server.model.node import Node
+from zwave_js_server.model.node import Node, NodeStatistics
 from zwave_js_server.model.value import ConfigurationValue
 
 from .. import load_fixture
@@ -71,6 +71,15 @@ def test_from_state():
     assert device_class.basic.key == 2
     assert device_class.generic.key == 2
     assert device_class.specific.key == 1
+    stats = node.statistics
+    assert (
+        stats.commands_dropped_rx
+        == stats.commands_dropped_tx
+        == stats.commands_rx
+        == stats.commands_tx
+        == stats.timeout_response
+        == 0
+    )
 
 
 async def test_device_config(wallmote_central_scene):
@@ -904,3 +913,31 @@ async def test_supports_cc_api(multisensor_6, uuid4, mock_command):
 
     with pytest.raises(FailedCommand):
         await node.async_supports_cc_api(CommandClass.USER_CODE)
+
+
+async def test_statistics_updated(wallmote_central_scene: Node):
+    """Test that statistics get updated on events."""
+    node = wallmote_central_scene
+    assert node.statistics.commands_rx == 0
+    event = Event(
+        "statistics updated",
+        {
+            "source": "node",
+            "event": "statistics updated",
+            "statistics": {
+                "commandsTX": 1,
+                "commandsRX": 1,
+                "commandsDroppedTX": 1,
+                "commandsDroppedRX": 1,
+                "timeoutResponse": 1,
+            },
+        },
+    )
+    node.receive_event(event)
+    # Event should be modified with the NodeStatistics object
+    assert "statistics_updated" in event.data
+    event_stats = event.data["statistics_updated"]
+    assert isinstance(event_stats, NodeStatistics)
+    assert node.statistics.timeout_response == 1
+    assert node.statistics == event_stats
+
