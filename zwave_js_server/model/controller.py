@@ -400,5 +400,6 @@ class Controller(EventBase):
 
     def handle_heal_network_done(self, event: Event) -> None:
         """Process a heal network done event."""
+        # pylint: disable=unused-argument
         self.heal_network_progress = None
         self.data["isHealNetworkActive"] = False
