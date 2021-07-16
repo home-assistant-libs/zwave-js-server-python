@@ -139,6 +139,7 @@ class Node(Endpoint):
         self.data: NodeDataType = data
         self._device_config = DeviceConfig(self.data.get("deviceConfig", {}))
         self._statistics = NodeStatistics(self.data.get("statistics"))
+        self._firmware_update_progress: Optional[FirmwareUpdateProgress] = None
         self.values: Dict[str, Union[Value, ConfigurationValue]] = {}
         for val in data["values"]:
             value_id = _get_value_id_from_dict(self, val)
@@ -336,6 +337,11 @@ class Node(Endpoint):
     def statistics(self) -> NodeStatistics:
         """Return statistics property."""
         return self._statistics
+
+    @property
+    def firmware_update_progress(self) -> Optional[FirmwareUpdateProgress]:
+        """Return firmware update progress."""
+        return self._firmware_update_progress
 
     def get_command_class_values(
         self, command_class: CommandClass, endpoint: int = None
@@ -596,12 +602,15 @@ class Node(Endpoint):
 
     def handle_firmware_update_progress(self, event: Event) -> None:
         """Process a node firmware update progress event."""
-        event.data["firmware_update_progress"] = FirmwareUpdateProgress(
+        self._firmware_update_progress = event.data[
+            "firmware_update_progress"
+        ] = FirmwareUpdateProgress(
             self, cast(FirmwareUpdateProgressDataType, event.data)
         )
 
     def handle_firmware_update_finished(self, event: Event) -> None:
         """Process a node firmware update finished event."""
+        self._firmware_update_progress = None
         event.data["firmware_update_finished"] = FirmwareUpdateFinished(
             self, cast(FirmwareUpdateFinishedDataType, event.data)
         )
