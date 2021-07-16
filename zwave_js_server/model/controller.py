@@ -124,7 +124,7 @@ class Controller(EventBase):
         self.data: ControllerDataType = state["controller"]
         self._statistics = ControllerStatistics(self.data.get("statistics"))
         self.nodes: Dict[int, Node] = {}
-        self.heal_network_progress: Optional[Dict[int, str]] = None
+        self._heal_network_progress: Optional[Dict[int, str]] = None
         for node_state in state["nodes"]:
             node = Node(client, node_state)
             self.nodes[node.node_id] = node
@@ -238,6 +238,11 @@ class Controller(EventBase):
         """Return statistics property."""
         return self._statistics
 
+    @property
+    def heal_network_progress(self) -> Optional[Dict[int, str]]:
+        """Return heal network progress state."""
+        return self._heal_network_progress
+
     async def async_begin_inclusion(
         self, include_non_secure: Optional[bool] = None
     ) -> bool:
@@ -311,7 +316,8 @@ class Controller(EventBase):
         )
         success = cast(bool, data["success"])
         if success:
-            self.heal_network_progress = None
+            self._heal_network_progress = None
+            self.data["isHealNetworkActive"] = False
         return success
 
     async def async_is_failed_node(self, node_id: int) -> bool:
@@ -483,13 +489,13 @@ class Controller(EventBase):
 
     def handle_heal_network_progress(self, event: Event) -> None:
         """Process a heal network progress event."""
-        self.heal_network_progress = event.data["progress"].copy()
+        self._heal_network_progress = event.data["progress"].copy()
         self.data["isHealNetworkActive"] = True
 
     def handle_heal_network_done(self, event: Event) -> None:
         """Process a heal network done event."""
         # pylint: disable=unused-argument
-        self.heal_network_progress = None
+        self._heal_network_progress = None
         self.data["isHealNetworkActive"] = False
 
     def handle_statistics_updated(self, event: Event) -> None:
