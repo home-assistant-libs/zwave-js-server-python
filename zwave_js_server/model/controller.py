@@ -9,8 +9,89 @@ if TYPE_CHECKING:
     from ..client import Client
 
 
+class ControllerStatisticsDataType(TypedDict):
+    """Represent a controller statistics data dict type."""
+
+    messagesTX: int
+    messagesRX: int
+    messagesDroppedTX: int
+    messagesDroppedRX: int
+    NAK: int
+    CAN: int
+    timeoutACK: int
+    timeoutResponse: int
+    timeoutCallback: int
+
+
+class ControllerStatistics:
+    """Represent a controller statistics update."""
+
+    def __init__(self, data: Optional[ControllerStatisticsDataType] = None) -> None:
+        """Initialize controller statistics."""
+        self.data = data or ControllerStatisticsDataType(
+            CAN=0,
+            messagesDroppedRX=0,
+            messagesDroppedTX=0,
+            messagesRX=0,
+            messagesTX=0,
+            NAK=0,
+            timeoutACK=0,
+            timeoutCallback=0,
+            timeoutResponse=0,
+        )
+
+    @property
+    def messages_tx(self) -> int:
+        """Return number of messages successfully sent to controller."""
+        return self.data["messagesTX"]
+
+    @property
+    def messages_rx(self) -> int:
+        """Return number of messages received by controller."""
+        return self.data["messagesRX"]
+
+    @property
+    def messages_dropped_rx(self) -> int:
+        """Return number of messages from controller that were dropped by host."""
+        return self.data["messagesDroppedRX"]
+
+    @property
+    def messages_dropped_tx(self) -> int:
+        """
+        Return number of outgoing messages that were dropped.
+
+        These messages could not be sent.
+        """
+        return self.data["messagesDroppedTX"]
+
+    @property
+    def nak(self) -> int:
+        """Return number of messages that controller did not accept."""
+        return self.data["NAK"]
+
+    @property
+    def can(self) -> int:
+        """Return number of collisions while sending a message to controller."""
+        return self.data["CAN"]
+
+    @property
+    def timeout_ack(self) -> int:
+        """Return number of transmission attempts without an ACK from controller."""
+        return self.data["timeoutACK"]
+
+    @property
+    def timeout_response(self) -> int:
+        """Return number of transmission attempts where controller response timed out."""
+        return self.data["timeoutResponse"]
+
+    @property
+    def timeout_callback(self) -> int:
+        """Return number of transmission attempts where controller callback timed out."""
+        return self.data["timeoutCallback"]
+
+
 class ControllerDataType(TypedDict, total=False):
-    """Represent a node data dict type."""
+    """Represent a controller data dict type."""
 
     libraryVersion: str
     type: int
@@ -30,6 +111,7 @@ class ControllerDataType(TypedDict, total=False):
     sucNodeId: int
     supportsTimers: bool
     isHealNetworkActive: bool
+    statistics: ControllerStatisticsDataType
 
 
 class Controller(EventBase):
@@ -40,6 +122,7 @@ class Controller(EventBase):
         super().__init__()
         self.client = client
         self.data: ControllerDataType = state["controller"]
+        self._statistics = ControllerStatistics(self.data.get("statistics"))
         self.nodes: Dict[int, Node] = {}
         for node_state in state["nodes"]:
             node = Node(client, node_state)
@@ -148,6 +231,11 @@ class Controller(EventBase):
     def is_heal_network_active(self) -> Optional[bool]:
         """Return is_heal_network_active."""
         return self.data.get("isHealNetworkActive")
+
+    @property
+    def statistics(self) -> ControllerStatistics:
+        """Return statistics property."""
+        return self._statistics
 
     async def async_begin_inclusion(
         self, include_non_secure: Optional[bool] = None
@@ -398,3 +486,8 @@ class Controller(EventBase):
         """Process a heal network done event."""
         # pylint: disable=unused-argument
         self.data["isHealNetworkActive"] = False
+
+    def handle_statistics_updated(self, event: Event) -> None:
+        """Process a statistics updated event."""
+        self._statistics.data.update(event.data["statistics"])
+        event.data["statistics_updated"] = self.statistics

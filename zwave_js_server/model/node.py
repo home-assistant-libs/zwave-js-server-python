@@ -35,6 +35,63 @@ if TYPE_CHECKING:
     from ..client import Client
 
 
+class NodeStatisticsDataType(TypedDict):
+    """Represent a node statistics data dict type."""
+
+    commandsTX: int
+    commandsRX: int
+    commandsDroppedTX: int
+    commandsDroppedRX: int
+    timeoutResponse: int
+
+
+class NodeStatistics:
+    """Represent a node statistics update."""
+
+    def __init__(self, data: Optional[NodeStatisticsDataType] = None) -> None:
+        """Initialize node statistics."""
+        self.data = data or NodeStatisticsDataType(
+            commandsDroppedRX=0,
+            commandsDroppedTX=0,
+            commandsRX=0,
+            commandsTX=0,
+            timeoutResponse=0,
+        )
+
+    @property
+    def commands_tx(self) -> int:
+        """Return number of commands successfully sent to node."""
+        return self.data["commandsTX"]
+
+    @property
+    def commands_rx(self) -> int:
+        """
+        Return number of commands received from node.
+
+        Includes responses to sent commands.
+        """
+        return self.data["commandsRX"]
+
+    @property
+    def commands_dropped_rx(self) -> int:
+        """Return number of commands from node that were dropped by host."""
+        return self.data["commandsDroppedRX"]
+
+    @property
+    def commands_dropped_tx(self) -> int:
+        """
+        Return number of outgoing commands that were dropped.
+
+        These commands could not be sent.
+        """
+        return self.data["commandsDroppedTX"]
+
+    @property
+    def timeout_response(self) -> int:
+        """Return number of Get-type cmds where node's response didn't come in time."""
+        return self.data["timeoutResponse"]
+
+
 class NodeStatus(IntEnum):
     """Enum with all Node status values.
 
@@ -84,6 +141,7 @@ class NodeDataType(EndpointDataType):
     interviewStage: Optional[Union[int, str]]
     commandClasses: List[CommandClassInfoDataType]
     values: List[ValueDataType]
+    statistics: NodeStatisticsDataType
 
 
 class Node(Endpoint):
@@ -94,6 +152,7 @@ class Node(Endpoint):
         super().__init__(client, data)
         self.data: NodeDataType = data
         self._device_config = DeviceConfig(self.data.get("deviceConfig", {}))
+        self._statistics = NodeStatistics(self.data.get("statistics"))
         self.values: Dict[str, Union[Value, ConfigurationValue]] = {}
         for val in data["values"]:
             value_id = _get_value_id_from_dict(self, val)
@@ -286,6 +345,11 @@ class Node(Endpoint):
     def command_classes(self) -> List[CommandClassInfo]:
         """Return all CommandClasses supported on this node."""
         return [CommandClassInfo(cc) for cc in self.data["commandClasses"]]
+
+    @property
+    def statistics(self) -> NodeStatistics:
+        """Return statistics property."""
+        return self._statistics
 
     def get_command_class_values(
         self, command_class: CommandClass, endpoint: int = None
@@ -555,3 +619,8 @@ class Node(Endpoint):
         event.data["firmware_update_finished"] = FirmwareUpdateFinished(
             self, cast(FirmwareUpdateFinishedDataType, event.data)
         )
+
+    def handle_statistics_updated(self, event: Event) -> None:
+        """Process a statistics updated event."""
+        self._statistics.data.update(event.data["statistics"])
+        event.data["statistics_updated"] = self.statistics
