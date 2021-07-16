@@ -1,20 +1,22 @@
 """Test the node model."""
 import json
+from unittest.mock import patch
 
 import pytest
 
 from zwave_js_server.const import (
+    INTERVIEW_FAILED,
     CommandClass,
     EntryControlDataType,
     EntryControlEventType,
-    INTERVIEW_FAILED,
+    NodeStatus,
     ProtocolVersion,
 )
 from zwave_js_server.event import Event
-from zwave_js_server.exceptions import UnwriteableValue
+from zwave_js_server.exceptions import FailedCommand, UnwriteableValue
 from zwave_js_server.model import node as node_pkg
 from zwave_js_server.model.firmware import FirmwareUpdateStatus
-from zwave_js_server.model.node import Node, NodeStatistics, NodeStatus
+from zwave_js_server.model.node import Node, NodeStatistics
 from zwave_js_server.model.value import ConfigurationValue
 
 from .. import load_fixture
@@ -841,6 +843,76 @@ async def test_value_added_new_value(climate_radio_thermostat_ct100_plus):
     )
     node.receive_event(event)
     assert f"{node.node_id}-128-1-isMedium" in node.values
+
+
+async def test_invoke_cc_api(multisensor_6, uuid4, mock_command):
+    """Test endpoint.invoke_cc_api commands."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "endpoint.invoke_cc_api", "nodeId": node.node_id, "endpoint": 0},
+        {"response": "ok"},
+    )
+
+    assert (
+        await node.async_invoke_cc_api(CommandClass.USER_CODE, "set", 1, 1, "1234")
+        is None
+    )
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "endpoint.invoke_cc_api",
+        "nodeId": node.node_id,
+        "endpoint": 0,
+        "commandClass": 99,
+        "methodName": "set",
+        "args": [1, 1, "1234"],
+        "messageId": uuid4,
+    }
+
+    assert (
+        await node.async_invoke_cc_api(
+            CommandClass.USER_CODE, "set", 2, 2, "1234", wait_for_result=True
+        )
+        == "ok"
+    )
+
+    assert len(ack_commands) == 2
+    assert ack_commands[1] == {
+        "command": "endpoint.invoke_cc_api",
+        "nodeId": node.node_id,
+        "endpoint": 0,
+        "commandClass": 99,
+        "methodName": "set",
+        "args": [2, 2, "1234"],
+        "messageId": uuid4,
+    }
+
+
+async def test_supports_cc_api(multisensor_6, uuid4, mock_command):
+    """Test endpoint.supports_cc_api commands."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "endpoint.supports_cc_api", "nodeId": node.node_id, "endpoint": 0},
+        {"supported": True},
+    )
+
+    assert await node.async_supports_cc_api(CommandClass.USER_CODE)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "endpoint.supports_cc_api",
+        "nodeId": node.node_id,
+        "endpoint": 0,
+        "commandClass": 99,
+        "messageId": uuid4,
+    }
+
+    # Test that command fails when client is disconnected
+    with patch("zwave_js_server.client.asyncio.Event.wait", return_value=True):
+        await node.client.disconnect()
+
+    with pytest.raises(FailedCommand):
+        await node.async_supports_cc_api(CommandClass.USER_CODE)
 
 
 async def test_statistics_updated(wallmote_central_scene: Node):

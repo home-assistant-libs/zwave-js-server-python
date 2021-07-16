@@ -3,9 +3,9 @@ from enum import Enum, IntEnum
 from typing import Dict, List
 
 # minimal server schema version we can handle
-MIN_SERVER_SCHEMA_VERSION = 6
+MIN_SERVER_SCHEMA_VERSION = 7
 # max server schema version we can handle (and our code is compatible with)
-MAX_SERVER_SCHEMA_VERSION = 6
+MAX_SERVER_SCHEMA_VERSION = 7
 
 VALUE_UNKNOWN = "unknown"
 
@@ -411,3 +411,16 @@ class ToneID(IntEnum):
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/SoundSwitchCC.ts#L71
     OFF = 0
     DEFAULT = 255
+
+
+class NodeStatus(IntEnum):
+    """Enum with all Node status values.
+
+    https://zwave-js.github.io/node-zwave-js/#/api/node?id=status
+    """
+
+    UNKNOWN = 0
+    ASLEEP = 1
+    AWAKE = 2
+    DEAD = 3
+    ALIVE = 4

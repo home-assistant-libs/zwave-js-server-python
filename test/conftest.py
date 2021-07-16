@@ -255,7 +255,7 @@ def version_data_fixture():
         "serverVersion": "test_server_version",
         "homeId": "test_home_id",
         "minSchemaVersion": 0,
-        "maxSchemaVersion": 6,
+        "maxSchemaVersion": 7,
     }
 
 
@@ -380,7 +380,8 @@ def mock_command_fixture(ws_client, client, uuid4):
 @pytest.fixture(name="driver")
 def driver_fixture(client, controller_state, log_config):
     """Return a driver instance with a supporting client."""
-    return Driver(client, controller_state, log_config)
+    client.driver = Driver(client, controller_state, log_config)
+    return client.driver
 
 
 @pytest.fixture(name="multisensor_6")
