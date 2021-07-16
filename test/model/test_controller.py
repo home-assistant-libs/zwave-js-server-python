@@ -266,7 +266,17 @@ async def test_stop_healing_network(controller, uuid4, mock_command):
         {"success": True},
     )
 
-    controller.heal_network_progress = {1: "pending"}
+    event = Event(
+        "heal network progress",
+        {
+            "source": "controller",
+            "event": "heal network progress",
+            "progress": {52: "pending"},
+        },
+    )
+    controller.receive_event(event)
+
+    assert controller.heal_network_progress == {52: "pending"}
     assert await controller.async_stop_healing_network()
 
     assert len(ack_commands) == 1
