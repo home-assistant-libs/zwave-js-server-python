@@ -33,7 +33,10 @@ def test_get_usercode(lock_schlage_be469):
     assert all(char == "*" for char in user_code)
 
     # Test unused slot
-    assert get_usercode(node, 30) == ""
+    assert get_usercode(node, 29) == ""
+
+    # Test unknown slot
+    assert get_usercode(node, 30) is None
 
     # Test invalid slot
     with pytest.raises(NotFoundError):

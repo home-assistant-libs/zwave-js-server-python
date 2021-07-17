@@ -53,6 +53,11 @@ def _get_code_slots(
             return slots
 
         code_slot = int(value.property_key)  # type: ignore
+        in_use = (
+            None
+            if status_value.value is None
+            else status_value.value == CodeSlotStatus.ENABLED
+        )
 
         # we know that code slots will always have a property key
         # that is an int, so we can ignore mypy
@@ -60,7 +65,7 @@ def _get_code_slots(
             ATTR_CODE_SLOT: code_slot,
             ATTR_ENDPOINT: value.endpoint,
             ATTR_NAME: value.metadata.label,
-            ATTR_IN_USE: status_value.value == CodeSlotStatus.ENABLED,
+            ATTR_IN_USE: in_use,
         }
         if include_usercode:
             slot[ATTR_USERCODE] = value.value
