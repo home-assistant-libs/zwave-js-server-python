@@ -88,6 +88,9 @@ def get_usercode(node: Node, code_slot: int) -> Optional[str]:
 async def populate_usercode_in_value_db(node: Node, code_slot: int) -> None:
     """Fetch a usercode from a node to store in Z-Wave JS's ValueDB."""
     endpoint = get_code_slot_value(node, code_slot, LOCK_USERCODE_PROPERTY).endpoint
+    # We can do this because every value has an endpoint and an exception will be
+    # raised if the zwave value can't be found
+    assert endpoint
     await node.endpoints[endpoint].async_invoke_cc_api(
         CommandClass.USER_CODE, "get", code_slot
     )
