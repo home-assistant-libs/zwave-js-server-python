@@ -85,7 +85,9 @@ def get_usercode(node: Node, code_slot: int) -> Optional[str]:
     return value.value
 
 
-async def get_usercode_from_node(node: Node, code_slot: int) -> None:
+async def get_usercode_from_node(
+    node: Node, code_slot: int
+) -> Dict[str, Union[str, bool]]:
     """
     Fetch a usercode directly from a node.
 
@@ -96,9 +98,13 @@ async def get_usercode_from_node(node: Node, code_slot: int) -> None:
     # We can do this because every value has an endpoint and an exception will be
     # raised if the zwave value can't be found
     assert endpoint is not None
-    await node.endpoints[endpoint].async_invoke_cc_api(
+    resp = await node.endpoints[endpoint].async_invoke_cc_api(
         CommandClass.USER_CODE, "get", code_slot
     )
+    return {
+        ATTR_IN_USE: resp["userIdStatus"] == CodeSlotStatus.ENABLED,
+        ATTR_USERCODE: resp["userCode"],
+    }
 
 
 async def set_usercode(node: Node, code_slot: int, usercode: str) -> None:
