@@ -8,6 +8,7 @@ from zwave_js_server.util.lock import (
     get_code_slots,
     get_usercode,
     get_usercodes,
+    populate_usercode_in_value_db,
     set_usercode,
 )
 
@@ -32,7 +33,7 @@ def test_get_usercode(lock_schlage_be469):
     assert all(char == "*" for char in user_code)
 
     # Test unused slot
-    assert get_usercode(node, 30) is None
+    assert get_usercode(node, 30) == ""
 
     # Test invalid slot
     with pytest.raises(NotFoundError):
@@ -141,3 +142,25 @@ async def test_clear_usercode(lock_schlage_be469, mock_command, uuid4):
 
     # assert no new command calls
     assert len(ack_commands) == 1
+
+
+async def test_populate_usercode_in_value_db(lock_schlage_be469, mock_command, uuid4):
+    """Test populate_usercode_in_value_db utility function."""
+    node = lock_schlage_be469
+    ack_commands = mock_command(
+        {"command": "endpoint.invoke_cc_api", "nodeId": node.node_id, "endpoint": 0},
+        {"response": "test"},
+    )
+
+    # Test valid code
+    await populate_usercode_in_value_db(node, 1)
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "endpoint.invoke_cc_api",
+        "nodeId": 20,
+        "endpoint": 0,
+        "commandClass": 99,
+        "messageId": uuid4,
+        "methodName": "get",
+        "args": [1],
+    }
