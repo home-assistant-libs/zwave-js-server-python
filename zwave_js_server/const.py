@@ -258,6 +258,7 @@ ATTR_CODE_SLOT = "code_slot"
 ATTR_IN_USE = "in_use"
 ATTR_NAME = "name"
 ATTR_USERCODE = "usercode"
+ATTR_ENDPOINT = "endpoint"
 
 
 # Thermostat constants

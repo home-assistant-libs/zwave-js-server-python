@@ -3,6 +3,7 @@ from typing import Dict, List, Optional, Union
 
 from ..const import (
     ATTR_CODE_SLOT,
+    ATTR_ENDPOINT,
     ATTR_IN_USE,
     ATTR_NAME,
     ATTR_USERCODE,
@@ -57,11 +58,12 @@ def _get_code_slots(
         # that is an int, so we can ignore mypy
         slot = {
             ATTR_CODE_SLOT: code_slot,
+            ATTR_ENDPOINT: value.endpoint,
             ATTR_NAME: value.metadata.label,
             ATTR_IN_USE: status_value.value == CodeSlotStatus.ENABLED,
         }
         if include_usercode:
-            slot[ATTR_USERCODE] = value.value if value.value else None
+            slot[ATTR_USERCODE] = value.value
 
         slots.append(slot)
         code_slot += 1
@@ -80,8 +82,19 @@ def get_usercodes(node: Node) -> List[Dict[str, Optional[Union[int, bool, str]]]
 def get_usercode(node: Node, code_slot: int) -> Optional[str]:
     """Get usercode from slot X on the lock."""
     value = get_code_slot_value(node, code_slot, LOCK_USERCODE_PROPERTY)
+    return value.value
 
-    return str(value.value) if value.value else None
+
+async def populate_usercode_in_value_db(node: Node, code_slot: int) -> None:
+    """Fetch a usercode from a node to store in Z-Wave JS's ValueDB."""
+    endpoint = next(
+        value.endpoint
+        for value in node.get_command_class_values(CommandClass.USER_CODE).values()
+        if int(value.property_key) == code_slot
+    )
+    await node.endpoints[endpoint].async_invoke_cc_api(
+        CommandClass.USER_CODE, "get", [code_slot]
+    )
 
 
 async def set_usercode(node: Node, code_slot: int, usercode: str) -> None:
