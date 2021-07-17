@@ -90,7 +90,7 @@ async def populate_usercode_in_value_db(node: Node, code_slot: int) -> None:
     endpoint = get_code_slot_value(node, code_slot, LOCK_USERCODE_PROPERTY).endpoint
     # We can do this because every value has an endpoint and an exception will be
     # raised if the zwave value can't be found
-    assert endpoint
+    assert endpoint is not None
     await node.endpoints[endpoint].async_invoke_cc_api(
         CommandClass.USER_CODE, "get", code_slot
     )
