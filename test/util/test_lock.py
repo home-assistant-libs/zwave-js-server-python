@@ -8,7 +8,7 @@ from zwave_js_server.util.lock import (
     get_code_slots,
     get_usercode,
     get_usercodes,
-    populate_usercode_in_value_db,
+    get_usercode_from_node,
     set_usercode,
 )
 
@@ -144,8 +144,8 @@ async def test_clear_usercode(lock_schlage_be469, mock_command, uuid4):
     assert len(ack_commands) == 1
 
 
-async def test_populate_usercode_in_value_db(lock_schlage_be469, mock_command, uuid4):
-    """Test populate_usercode_in_value_db utility function."""
+async def test_get_usercode_from_node(lock_schlage_be469, mock_command, uuid4):
+    """Test get_usercode_from_node utility function."""
     node = lock_schlage_be469
     ack_commands = mock_command(
         {"command": "endpoint.invoke_cc_api", "nodeId": node.node_id, "endpoint": 0},
@@ -153,7 +153,7 @@ async def test_populate_usercode_in_value_db(lock_schlage_be469, mock_command, u
     )
 
     # Test valid code
-    await populate_usercode_in_value_db(node, 1)
+    await get_usercode_from_node(node, 1)
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "endpoint.invoke_cc_api",

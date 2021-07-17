@@ -85,8 +85,13 @@ def get_usercode(node: Node, code_slot: int) -> Optional[str]:
     return value.value
 
 
-async def populate_usercode_in_value_db(node: Node, code_slot: int) -> None:
-    """Fetch a usercode from a node to store in Z-Wave JS's ValueDB."""
+async def get_usercode_from_node(node: Node, code_slot: int) -> None:
+    """
+    Fetch a usercode directly from a node.
+
+    Should be used when Z-Wave JS's ValueDB hasn't been populated for this code slot.
+    This call will opulate the ValueDB.
+    """
     endpoint = get_code_slot_value(node, code_slot, LOCK_USERCODE_PROPERTY).endpoint
     # We can do this because every value has an endpoint and an exception will be
     # raised if the zwave value can't be found
