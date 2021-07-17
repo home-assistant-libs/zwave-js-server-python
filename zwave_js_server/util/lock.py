@@ -97,7 +97,8 @@ async def get_usercode_from_node(
     Fetch a usercode directly from a node.
 
     Should be used when Z-Wave JS's ValueDB hasn't been populated for this code slot.
-    This call will opulate the ValueDB.
+    This call will populate the ValueDB and trigger value update events from the
+    driver.
     """
     endpoint = get_code_slot_value(node, code_slot, LOCK_USERCODE_PROPERTY).endpoint
     # We can do this because every value has an endpoint and an exception will be
