@@ -3,7 +3,6 @@ from typing import Dict, List, Optional, Union
 
 from ..const import (
     ATTR_CODE_SLOT,
-    ATTR_ENDPOINT,
     ATTR_IN_USE,
     ATTR_NAME,
     ATTR_USERCODE,
@@ -63,7 +62,6 @@ def _get_code_slots(
         # that is an int, so we can ignore mypy
         slot = {
             ATTR_CODE_SLOT: code_slot,
-            ATTR_ENDPOINT: value.endpoint,
             ATTR_NAME: value.metadata.label,
             ATTR_IN_USE: in_use,
         }
@@ -100,11 +98,7 @@ async def get_usercode_from_node(
     This call will populate the ValueDB and trigger value update events from the
     driver.
     """
-    endpoint = get_code_slot_value(node, code_slot, LOCK_USERCODE_PROPERTY).endpoint
-    # We can do this because every value has an endpoint and an exception will be
-    # raised if the zwave value can't be found
-    assert endpoint is not None
-    resp = await node.endpoints[endpoint].async_invoke_cc_api(
+    resp = await node.endpoints[0].async_invoke_cc_api(
         CommandClass.USER_CODE, "get", code_slot
     )
     return {
