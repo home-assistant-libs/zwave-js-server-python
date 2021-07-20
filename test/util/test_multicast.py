@@ -185,9 +185,12 @@ async def test_invoke_cc_api_broadcast(client, uuid4, mock_command):
         {"response": 1},
     )
 
-    assert await async_multicast_endpoint_invoke_cc_api(
-        client, 1, 1, "test", ["test_args", "test_args2"]
-    ) == 1
+    assert (
+        await async_multicast_endpoint_invoke_cc_api(
+            client, 1, 1, "test", ["test_args", "test_args2"]
+        )
+        == 1
+    )
 
     assert ack_commands[0] == {
         "command": "broadcast_node.invoke_cc_api",
@@ -210,9 +213,12 @@ async def test_invoke_cc_api_multicast(
         {"response": 1},
     )
 
-    assert await async_multicast_endpoint_invoke_cc_api(
-        client, 1,  1, "test", ["test_args", "test_args2"], [node1, node2]
-    ) == 1
+    assert (
+        await async_multicast_endpoint_invoke_cc_api(
+            client, 1, 1, "test", ["test_args", "test_args2"], [node1, node2]
+        )
+        == 1
+    )
 
     assert ack_commands[0] == {
         "command": "multicast_group.invoke_cc_api",
@@ -232,9 +238,7 @@ async def test_supports_cc_api_broadcast(client, uuid4, mock_command):
         {"supported": True},
     )
 
-    assert await async_multicast_endpoint_supports_cc_api(
-        client, 1, 1
-    )
+    assert await async_multicast_endpoint_supports_cc_api(client, 1, 1)
 
     assert ack_commands[0] == {
         "command": "broadcast_node.supports_cc_api",
@@ -255,9 +259,7 @@ async def test_supports_cc_api_multicast(
         {"supported": True},
     )
 
-    assert await async_multicast_endpoint_supports_cc_api(
-        client, 1, 1, [node1, node2]
-    )
+    assert await async_multicast_endpoint_supports_cc_api(client, 1, 1, [node1, node2])
 
     assert ack_commands[0] == {
         "command": "multicast_group.supports_cc_api",

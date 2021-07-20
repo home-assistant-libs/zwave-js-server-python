@@ -34,7 +34,7 @@ async def async_multicast_set_value(
     new_value: Any,
     val: Union[Value, ValueDataType],
     nodes: Optional[List[Node]] = None,
-    options: dict = None,
+    options: Optional[dict] = None,
 ) -> bool:
     """Send a multicast set_value command."""
     value_id = val.data if isinstance(val, Value) else val
