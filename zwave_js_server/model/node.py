@@ -425,7 +425,7 @@ class Node(Endpoint):
             option = next(
                 (
                     option
-                    for option in options.keys()
+                    for option in options
                     if option not in val.metadata.value_change_options
                 ),
                 None,
