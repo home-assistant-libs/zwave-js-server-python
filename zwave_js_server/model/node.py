@@ -3,7 +3,12 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, c
 
 from ..const import INTERVIEW_FAILED, CommandClass, NodeStatus
 from ..event import Event
-from ..exceptions import FailedCommand, UnparseableValue, UnwriteableValue
+from ..exceptions import (
+    FailedCommand,
+    NotFoundError,
+    UnparseableValue,
+    UnwriteableValue,
+)
 from .command_class import CommandClassInfo, CommandClassInfoDataType
 from .device_config import DeviceConfig, DeviceConfigDataType
 from .endpoint import Endpoint, EndpointDataType
@@ -405,6 +410,8 @@ class Node(Endpoint):
         """Send setValue command to Node for given value (or value_id)."""
         # a value may be specified as value_id or the value itself
         if not isinstance(val, Value):
+            if val not in self.values:
+                raise NotFoundError(f"Value {val} not found on node {self}")
             val = self.values[val]
 
         if val.metadata.writeable is False:
@@ -415,6 +422,18 @@ class Node(Endpoint):
             "value": new_value,
         }
         if options:
+            option = next(
+                (
+                    option
+                    for option in options
+                    if option not in val.metadata.value_change_options
+                ),
+                None,
+            )
+            if option is not None:
+                raise NotFoundError(
+                    f"Option {option} not found on value {val} on node {self}"
+                )
             cmd_args["options"] = options
 
         # the value object needs to be send to the server
