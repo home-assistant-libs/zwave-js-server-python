@@ -399,7 +399,7 @@ class Node(Endpoint):
         self,
         val: Union[Value, str],
         new_value: Any,
-        options: dict = None,
+        options: Optional[dict] = None,
         wait_for_result: Optional[bool] = None,
     ) -> Optional[bool]:
         """Send setValue command to Node for given value (or value_id)."""

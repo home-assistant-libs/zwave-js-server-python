@@ -34,6 +34,7 @@ async def async_multicast_set_value(
     new_value: Any,
     val: Union[Value, ValueDataType],
     nodes: Optional[List[Node]] = None,
+    options: dict = None,
 ) -> bool:
     """Send a multicast set_value command."""
     value_id = val.data if isinstance(val, Value) else val
@@ -44,6 +45,7 @@ async def async_multicast_set_value(
         nodes,
         valueId=value_id,
         value=new_value,
+        options=options,
         require_schema=5,
     )
     return cast(bool, result["success"])
@@ -93,3 +95,43 @@ async def async_multicast_endpoint_get_cc_version(
         require_schema=5,
     )
     return cast(int, result["version"])
+
+
+async def async_multicast_endpoint_invoke_cc_api(
+    client: Client,
+    endpoint: int,
+    command_class: CommandClass,
+    method_name: str,
+    args: Optional[List[Any]] = None,
+    nodes: Optional[List[Node]] = None,
+) -> Any:
+    """Send a invoke_cc_api command to a multicast endpoint."""
+    result = await _async_send_command(
+        client,
+        "invoke_cc_api",
+        nodes,
+        index=endpoint,
+        commandClass=command_class,
+        methodName=method_name,
+        args=args,
+        require_schema=5,
+    )
+    return result["response"]
+
+
+async def async_multicast_endpoint_supports_cc_api(
+    client: Client,
+    endpoint: int,
+    command_class: CommandClass,
+    nodes: Optional[List[Node]] = None,
+) -> bool:
+    """Send a supports_cc_api command to a multicast endpoint."""
+    result = await _async_send_command(
+        client,
+        "supports_cc_api",
+        nodes,
+        index=endpoint,
+        commandClass=command_class,
+        require_schema=5,
+    )
+    return cast(bool, result["supported"])
