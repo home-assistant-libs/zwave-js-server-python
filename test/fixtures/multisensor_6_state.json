@@ -94,7 +94,8 @@
         "writeable": true,
         "min": 0,
         "max": 99,
-        "label": "Target value"
+        "label": "Target value",
+        "valueChangeOptions": ["transitionDuration"]
       }
     },
     {

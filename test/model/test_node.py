@@ -13,7 +13,7 @@ from zwave_js_server.const import (
     ProtocolVersion,
 )
 from zwave_js_server.event import Event
-from zwave_js_server.exceptions import FailedCommand, UnwriteableValue
+from zwave_js_server.exceptions import FailedCommand, NotFoundError, UnwriteableValue
 from zwave_js_server.model import node as node_pkg
 from zwave_js_server.model.firmware import FirmwareUpdateStatus
 from zwave_js_server.model.node import Node, NodeStatistics
@@ -194,7 +194,6 @@ async def test_set_value(multisensor_6, uuid4, mock_command):
     }
 
     # Set value with options
-
     assert await node.async_set_value(value_id, 42, {"transitionDuration": 1}) is None
 
     assert len(ack_commands) == 2
@@ -206,6 +205,14 @@ async def test_set_value(multisensor_6, uuid4, mock_command):
         "options": {"transitionDuration": 1},
         "messageId": uuid4,
     }
+
+    # Set value with illegal option
+    with pytest.raises(NotFoundError):
+        await node.async_set_value(value_id, 42, {"fake_option": 1})
+
+    # Use invalid value
+    with pytest.raises(NotFoundError):
+        await node.async_set_value(f"{value_id}_fake_value", 42)
 
 
 async def test_poll_value(multisensor_6, uuid4, mock_command):
