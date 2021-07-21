@@ -44,12 +44,11 @@ async def async_multicast_set_value(
         if value_id not in node.values:
             raise NotFoundError(f"Node {node} doesn't have value {value_id}")
         # Check that the option is valid for the value
-        if options:
-            for option in options:
-                if option not in node.values[value_id].metadata.value_change_options:
-                    raise NotFoundError(
-                        f"Node {node} value {value_id} doesn't support option {option}"
-                    )
+        for option in options or {}:
+            if option not in node.values[value_id].metadata.value_change_options:
+                raise NotFoundError(
+                    f"Node {node} value {value_id} doesn't support option {option}"
+                )
 
     result = await _async_send_command(
         client,
