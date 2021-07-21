@@ -136,7 +136,7 @@ async def test_get_endpoint_count_multicast(
     }
 
 
-async def test_set_value_broadcast(client, uuid4, mock_command):
+async def test_set_value_broadcast(client, driver, uuid4, mock_command):
     """Test broadcast_node.set_value command."""
     ack_commands = mock_command(
         {"command": "broadcast_node.set_value"},
