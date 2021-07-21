@@ -41,7 +41,7 @@ async def async_multicast_set_value(
         value_id = _get_value_id_from_dict(node, value_data)
         if value_id not in node.values:
             raise NotFoundError(f"Node {node} doesn't have value {value_id}")
-        if options and nodes:
+        if options:
             for option in options:
                 if option not in node.values[value_id].metadata.value_change_options:
                     raise NotFoundError(
