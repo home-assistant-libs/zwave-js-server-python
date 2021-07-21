@@ -37,8 +37,9 @@ async def async_multicast_set_value(
     options: Optional[dict] = None,
 ) -> bool:
     """Send a multicast set_value command."""
+    assert client.driver
     # Iterate through nodes specified or all nodes if not specified
-    for node in nodes or client.driver.controller.nodes:
+    for node in nodes or client.driver.controller.nodes.values():
         value_id = _get_value_id_from_dict(node, value_data)
         # Check that the value exists on the node
         if value_id not in node.values:
