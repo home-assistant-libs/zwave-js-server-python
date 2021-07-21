@@ -1,5 +1,6 @@
 """Test node utility functions."""
 import pytest
+
 from zwave_js_server.exceptions import NotFoundError
 from zwave_js_server.const import CommandClass
 from zwave_js_server.util.multicast import (
