@@ -1,4 +1,6 @@
 """Test node utility functions."""
+import pytest
+from zwave_js_server.exceptions import NotFoundError
 from zwave_js_server.const import CommandClass
 from zwave_js_server.util.multicast import (
     async_multicast_endpoint_get_cc_version,
@@ -165,17 +167,36 @@ async def test_set_value_multicast(
     )
 
     assert await async_multicast_set_value(
-        client, 1, {"commandClass": 1, "property": 1}, [node1, node2]
+        client, 1, {"commandClass": 112, "property": 1}, [node1, node2]
     )
 
     assert ack_commands[0] == {
         "command": "multicast_group.set_value",
         "nodeIDs": [node1.node_id, node2.node_id],
         "value": 1,
-        "valueId": {"commandClass": 1, "property": 1},
+        "valueId": {"commandClass": 112, "property": 1},
         "options": None,
         "messageId": uuid4,
     }
+
+    # Test invalid value
+    with pytest.raises(NotFoundError):
+        assert await async_multicast_set_value(
+            client,
+            1,
+            {"commandClass": 1, "property": 1, "propertyKey": "invalid property key"},
+            [node1, node2],
+        )
+
+    # Test invalid option
+    with pytest.raises(NotFoundError):
+        assert await async_multicast_set_value(
+            client,
+            1,
+            {"commandClass": 112, "property": 1},
+            nodes=[node1, node2],
+            options={"test": 1},
+        )
 
 
 async def test_invoke_cc_api_broadcast(client, uuid4, mock_command):

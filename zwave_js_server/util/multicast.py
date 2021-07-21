@@ -1,12 +1,12 @@
 """Support for multicast commands."""
-
-from typing import Any, List, Optional, Union, cast
+from typing import Any, List, Optional, cast
 
 from zwave_js_server.model.node import Node
 
 from ..client import Client
 from ..const import CommandClass
-from ..model.value import Value, ValueDataType
+from ..exceptions import NotFoundError
+from ..model.value import ValueDataType, _get_value_id_from_dict
 
 
 async def _async_send_command(
@@ -32,18 +32,27 @@ async def _async_send_command(
 async def async_multicast_set_value(
     client: Client,
     new_value: Any,
-    val: Union[Value, ValueDataType],
+    value_data: ValueDataType,
     nodes: Optional[List[Node]] = None,
     options: Optional[dict] = None,
 ) -> bool:
     """Send a multicast set_value command."""
-    value_id = val.data if isinstance(val, Value) else val
+    for node in nodes or []:
+        value_id = _get_value_id_from_dict(node, value_data)
+        if value_id not in node.values:
+            raise NotFoundError(f"Node {node} doesn't have value {value_id}")
+        if options and nodes:
+            for option in options:
+                if option not in node.values[value_id].metadata.value_change_options:
+                    raise NotFoundError(
+                        f"Node {node} value {value_id} doesn't support option {option}"
+                    )
 
     result = await _async_send_command(
         client,
         "set_value",
         nodes,
-        valueId=value_id,
+        valueId=value_data,
         value=new_value,
         options=options,
         require_schema=5,
