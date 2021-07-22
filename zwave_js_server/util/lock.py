@@ -52,16 +52,21 @@ def _get_code_slots(
             return slots
 
         code_slot = int(value.property_key)  # type: ignore
+        in_use = (
+            None
+            if status_value.value is None
+            else status_value.value == CodeSlotStatus.ENABLED
+        )
 
         # we know that code slots will always have a property key
         # that is an int, so we can ignore mypy
         slot = {
             ATTR_CODE_SLOT: code_slot,
             ATTR_NAME: value.metadata.label,
-            ATTR_IN_USE: status_value.value == CodeSlotStatus.ENABLED,
+            ATTR_IN_USE: in_use,
         }
         if include_usercode:
-            slot[ATTR_USERCODE] = value.value if value.value else None
+            slot[ATTR_USERCODE] = value.value
 
         slots.append(slot)
         code_slot += 1
@@ -80,8 +85,24 @@ def get_usercodes(node: Node) -> List[Dict[str, Optional[Union[int, bool, str]]]
 def get_usercode(node: Node, code_slot: int) -> Optional[str]:
     """Get usercode from slot X on the lock."""
     value = get_code_slot_value(node, code_slot, LOCK_USERCODE_PROPERTY)
+    return value.value
 
-    return str(value.value) if value.value else None
+
+async def get_usercode_from_node(
+    node: Node, code_slot: int
+) -> Dict[str, Union[str, bool]]:
+    """
+    Fetch a usercode directly from a node.
+
+    Should be used when Z-Wave JS's ValueDB hasn't been populated for this code slot.
+    This call will populate the ValueDB and trigger value update events from the
+    driver.
+    """
+    resp = await node.async_invoke_cc_api(CommandClass.USER_CODE, "get", code_slot)
+    return {
+        ATTR_IN_USE: resp["userIdStatus"] == CodeSlotStatus.ENABLED,
+        ATTR_USERCODE: resp["userCode"],
+    }
 
 
 async def set_usercode(node: Node, code_slot: int, usercode: str) -> None:

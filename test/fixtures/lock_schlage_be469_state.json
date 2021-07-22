@@ -1398,8 +1398,7 @@
           "1": "Enabled",
           "2": "Disabled"
         }
-      },
-      "value": 0
+      }
     },
     {
       "commandClassName": "User Code",
@@ -1416,8 +1415,7 @@
         "minLength": 4,
         "maxLength": 10,
         "label": "User Code (30)"
-      },
-      "value": ""
+      }
     },
     {
       "commandClassName": "Manufacturer Specific",
