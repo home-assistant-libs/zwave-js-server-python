@@ -414,6 +414,17 @@ class ColorComponent(IntEnum):
     INDEX = 8
 
 
+# Keys for the Color Switch CC combined colors value
+# https://github.com/zwave-js/node-zwave-js/pull/1782
+COLOR_SWITCH_COMBINED_RED = "red"
+COLOR_SWITCH_COMBINED_GREEN = "green"
+COLOR_SWITCH_COMBINED_BLUE = "blue"
+COLOR_SWITCH_COMBINED_AMBER = "amber"
+COLOR_SWITCH_COMBINED_CYAN = "cyan"
+COLOR_SWITCH_COMBINED_PURPLE = "purple"
+COLOR_SWITCH_COMBINED_WARM_WHITE = "warmWhite"
+COLOR_SWITCH_COMBINED_COLD_WHITE = "coldWhite"
+
 CURRENT_COLOR_PROPERTY = "currentColor"
 TARGET_COLOR_PROPERTY = "targetColor"
 TARGET_STATE_PROPERTY = "targetState"
