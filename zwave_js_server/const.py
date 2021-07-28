@@ -265,6 +265,7 @@ THERMOSTAT_MODE_PROPERTY = "mode"
 THERMOSTAT_SETPOINT_PROPERTY = "setpoint"
 THERMOSTAT_OPERATING_STATE_PROPERTY = "state"
 THERMOSTAT_CURRENT_TEMP_PROPERTY = "Air temperature"
+THERMOSTAT_HUMIDITY_PROPERTY = "Humidity"
 
 
 class ThermostatMode(IntEnum):
@@ -390,6 +391,14 @@ class BarrierState(IntEnum):
     OPEN = 255
 
 
+COVER_OPEN_PROPERTY = "Open"
+COVER_UP_PROPERTY = "Up"
+COVER_ON_PROPERTY = "On"
+COVER_CLOSE_PROPERTY = "Close"
+COVER_DOWN_PROPERTY = "Down"
+COVER_OFF_PROPERTY = "Off"
+
+
 class ColorComponent(IntEnum):
     """Enum with all (known/used) Color Switch CC colors."""
 
@@ -403,6 +412,17 @@ class ColorComponent(IntEnum):
     CYAN = 6
     PURPLE = 7
     INDEX = 8
+
+
+CURRENT_COLOR_PROPERTY = "currentColor"
+TARGET_COLOR_PROPERTY = "targetColor"
+TARGET_STATE_PROPERTY = "targetState"
+TARGET_VALUE_PROPERTY = "targetValue"
+
+# optional attributes when calling the Meter CC reset API.
+# https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/MeterCC.ts#L873-L881
+RESET_METER_TARGET_VALUE_PROPERTY = TARGET_VALUE_PROPERTY
+RESET_METER_TYPE_PROPERTY = "type"
 
 
 class ToneID(IntEnum):
