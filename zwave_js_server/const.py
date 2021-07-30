@@ -655,7 +655,7 @@ CoolingScale = HeatingScale
 
 ScaleEnum = Union[ElectricScale, GasScale, WaterScale, HeatingScale, CoolingScale]
 
-METER_TYPE_TO_SCALE_ENUM_MAP: Dict[MeterType, ScaleEnum] = {
+METER_TYPE_TO_SCALE_ENUM_MAP = {
     MeterType.ELECTRIC: ElectricScale,
     MeterType.GAS: GasScale,
     MeterType.WATER: WaterScale,
