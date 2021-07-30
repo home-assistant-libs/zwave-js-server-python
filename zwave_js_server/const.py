@@ -595,6 +595,8 @@ VOLTAGE_SENSORS = {
 CC_SPECIFIC_METER_TYPE = "meterType"
 CC_SPECIFIC_RATE_TYPE = "rateType"
 
+RESET_METER_CC_API = "reset"
+
 # optional attributes when calling the Meter CC reset API.
 # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/MeterCC.ts#L873-L881
 RESET_METER_OPTION_TARGET_VALUE = TARGET_VALUE_PROPERTY
