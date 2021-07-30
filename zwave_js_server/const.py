@@ -1,6 +1,6 @@
 """Constants for the Z-Wave JS python library."""
 from enum import Enum, IntEnum
-from typing import Dict, List
+from typing import Dict, List, Union
 
 # minimal server schema version we can handle
 MIN_SERVER_SCHEMA_VERSION = 7
@@ -653,7 +653,9 @@ class HeatingScale(IntEnum):
 
 CoolingScale = HeatingScale
 
-METER_TYPE_TO_SCALE_ENUM_MAP: Dict[MeterType, IntEnum] = {
+ScaleEnum = Union[ElectricScale, GasScale, WaterScale, HeatingScale, CoolingScale]
+
+METER_TYPE_TO_SCALE_ENUM_MAP: Dict[MeterType, ScaleEnum] = {
     MeterType.ELECTRIC: ElectricScale,
     MeterType.GAS: GasScale,
     MeterType.WATER: WaterScale,
