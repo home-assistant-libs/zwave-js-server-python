@@ -1,6 +1,6 @@
 """Constants for the Z-Wave JS python library."""
 from enum import Enum, IntEnum
-from typing import Dict, List, Set
+from typing import Dict, List
 
 # minimal server schema version we can handle
 MIN_SERVER_SCHEMA_VERSION = 7
@@ -430,11 +430,6 @@ TARGET_COLOR_PROPERTY = "targetColor"
 TARGET_STATE_PROPERTY = "targetState"
 TARGET_VALUE_PROPERTY = "targetValue"
 
-# optional attributes when calling the Meter CC reset API.
-# https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/MeterCC.ts#L873-L881
-RESET_METER_TARGET_VALUE_PROPERTY = TARGET_VALUE_PROPERTY
-RESET_METER_TYPE_PROPERTY = "type"
-
 
 class ToneID(IntEnum):
     """Enum with all known Sound Switch CC tone IDs."""
@@ -455,6 +450,10 @@ class NodeStatus(IntEnum):
     ALIVE = 4
 
 
+CC_SPECIFIC_SCALE = "scale"
+
+
+# Multilevel Sensor constants
 CC_SPECIFIC_SENSOR_TYPE = "sensorType"
 
 
@@ -550,16 +549,13 @@ class MultilevelSensorType(IntEnum):
     PARTICULATE_MATTER_1 = 86
 
 
-BATTERY_SENSORS: Set[MultilevelSensorType] = {}
 CO_SENSORS = {MultilevelSensorType.CARBON_MONOXIDE_LEVEL}
 CO2_SENSORS = {MultilevelSensorType.CARBON_DIOXIDE_LEVEL}
 CURRENT_SENSORS = {MultilevelSensorType.CURRENT}
 ENERGY_SENSORS = {MultilevelSensorType.BASIS_METABOLIC_RATE}
 HUMIDITY_SENSORS = {MultilevelSensorType.HUMIDITY}
 ILLUMINANCE_SENSORS = {MultilevelSensorType.ILLUMINANCE}
-MONETARY_SENSORS: Set[MultilevelSensorType] = {}
 POWER_SENSORS = {MultilevelSensorType.POWER}
-POWER_FACTOR_SENSORS: Set[MultilevelSensorType] = {}
 PRESSURE_SENSORS = {
     MultilevelSensorType.BLOOD_PRESSURE,
     MultilevelSensorType.WATER_PRESSURE,
@@ -593,12 +589,18 @@ VOLTAGE_SENSORS = {
     MultilevelSensorType.WATER_OXIDATION_REDUCTION_POTENTIAL,
 }
 
+
+# Meter CC constants
+
 CC_SPECIFIC_METER_TYPE = "meterType"
 CC_SPECIFIC_RATE_TYPE = "rateType"
-CC_SPECIFIC_SCALE = "scale"
+
+# optional attributes when calling the Meter CC reset API.
+# https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/MeterCC.ts#L873-L881
+RESET_METER_OPTION_TARGET_VALUE = TARGET_VALUE_PROPERTY
+RESET_METER_OPTION_TYPE = "type"
 
 
-# Meter enums
 # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/meters.json
 class MeterType(IntEnum):
     """Enum with all known meter types."""
@@ -649,7 +651,7 @@ class HeatingScale(IntEnum):
 
 CoolingScale = HeatingScale
 
-METER_TYPE_TO_SCALE_MAP = {
+METER_TYPE_TO_SCALE_ENUM_MAP: Dict[MeterType, IntEnum] = {
     MeterType.ELECTRIC: ElectricScale,
     MeterType.GAS: GasScale,
     MeterType.WATER: WaterScale,
@@ -657,18 +659,18 @@ METER_TYPE_TO_SCALE_MAP = {
     MeterType.COOLING: CoolingScale,
 }
 
-ENERGY_METERS = {
+ENERGY_METER_TYPES = {
     ElectricScale.KILOWATT_HOUR,
     ElectricScale.KILOVOLT_AMPERE_HOUR,
     ElectricScale.KILOVOLT_AMPERE_REACTIVE_HOUR,
     HeatingScale.KILOWATT_HOUR,
     CoolingScale.KILOWATT_HOUR,
 }
-POWER_METERS = {
+POWER_METER_TYPES = {
     ElectricScale.WATT,
     ElectricScale.PULSE,
     ElectricScale.KILOVOLT_AMPERE_REACTIVE,
 }
-POWER_FACTOR_METERS = {ElectricScale.POWER_FACTOR}
-VOLTAGE_METERS = {ElectricScale.VOLT}
-CURRENT_METERS = {ElectricScale.AMPERE}
+POWER_FACTOR_METER_TYPES = {ElectricScale.POWER_FACTOR}
+VOLTAGE_METER_TYPES = {ElectricScale.VOLT}
+CURRENT_METER_TYPES = {ElectricScale.AMPERE}
