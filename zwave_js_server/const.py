@@ -445,13 +445,230 @@ class ToneID(IntEnum):
 
 
 class NodeStatus(IntEnum):
-    """Enum with all Node status values.
+    """Enum with all Node status values."""
 
-    https://zwave-js.github.io/node-zwave-js/#/api/node?id=status
-    """
-
+    # https://zwave-js.github.io/node-zwave-js/#/api/node?id=status
     UNKNOWN = 0
     ASLEEP = 1
     AWAKE = 2
     DEAD = 3
     ALIVE = 4
+
+
+CC_SPECIFIC_SENSOR_TYPE = "sensorType"
+
+
+class MultilevelSensorType(IntEnum):
+    """Enum with all known multilevel sensor types."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
+    AIR_TEMPERATURE = 1
+    GENERAL_PURPOSE = 2
+    ILLUMINANCE = 3
+    POWER = 4
+    HUMIDITY = 5
+    VELOCITY = 6
+    DIRECTION = 7
+    ATMOSPHERIC_PRESSURE = 8
+    BAROMETRIC_PRESSURE = 9
+    SOLAR_RADIATION = 10
+    DEW_POINT = 11
+    RAIN_RATE = 12
+    TIDE_LEVEL = 13
+    WEIGHT = 14
+    VOLTAGE = 15
+    CURRENT = 16
+    CARBON_DIOXIDE_LEVEL = 17
+    AIR_FLOW = 18
+    TANK_CAPACITY = 19
+    DISTANCE = 20
+    ANGLE_POSITION = 21
+    ROTATION = 22
+    WATER_TEMPERATURE = 23
+    SOIL_TEMPERATURE = 24
+    SEISMIC_INTENSITY = 25
+    SEISMIC_MAGNITUDE = 26
+    ULTRAVIOLET = 27
+    ELECTRICAL_RESISTIVITY = 28
+    ELECTRICAL_CONDUCTIVITY = 29
+    LOUDNESS = 30
+    MOISTURE = 31
+    FREQUENCY = 32
+    TIME = 33
+    TARGET_TEMPERATURE = 34
+    PARTICULATE_MATTER_25 = 35
+    FORMALDEHYDE_LEVEL = 36
+    RADON_CONCENTRATION = 37
+    METHANE_DENSITY = 38
+    VOLATILE_ORGANIC_COMPOUND_LEVEL = 39
+    CARBON_MONOXIDE_LEVEL = 40
+    SOIL_HUMIDITY = 41
+    SOIL_REACTIVITY = 42
+    SOIL_SALINITY = 43
+    HEART_RATE = 44
+    BLOOD_PRESSURE = 45
+    MUSCLE_MASS = 46
+    FAT_MASS = 47
+    BONE_MASS = 48
+    TOTAL_BODY_WATER = 49
+    BASIS_METABOLIC_RATE = 50
+    BODY_MASS_INDEX = 51
+    ACCELERATION_X_AXIS = 52
+    ACCELERATION_Y_AXIS = 53
+    ACCELERATION_Z_AXIS = 54
+    SMOKE_DENSITY = 55
+    WATER_FLOW = 56
+    WATER_PRESSURE = 57
+    RF_SIGNAL_STRENGTH = 58
+    PARTICULATE_MATTER_10 = 59
+    RESPIRATORY_RATE = 60
+    RELATIVE_MODULATION_LEVEL = 61
+    BOILER_WATER_TEMPERATURE = 62
+    DOMESTIC_HOT_WATER_TEMPERATURE = 63
+    OUTSIDE_TEMPERATURE = 64
+    EXHAUST_TEMPERATURE = 65
+    WATER_CHLORINE_LEVEL = 66
+    WATER_ACIDITY = 67
+    WATER_OXIDATION_REDUCTION_POTENTIAL = 68
+    HEART_RATE_LF_HF_RATIO = 69
+    MOTION_DIRECTION = 70
+    APPLIED_FORCE_ON_THE_SENSOR = 71
+    RETURN_AIR_TEMPERATURE = 72
+    SUPPLY_AIR_TEMPERATURE = 73
+    CONDENSER_COIL_TEMPERATURE = 74
+    EVAPORATOR_COIL_TEMPERATURE = 75
+    LIQUID_LINE_TEMPERATURE = 76
+    DISCHARGE_LINE_TEMPERATURE = 77
+    SUCTION_PRESSURE = 78
+    DISCHARGE_PRESSURE = 79
+    DEFROST_TEMPERATURE = 80
+    OZONE = 81
+    SULFUR_DIOXIDE = 82
+    NITROGEN_DIOXIDE = 83
+    AMMONIA = 84
+    LEAD = 85
+    PARTICULATE_MATTER_1 = 86
+
+
+BATTERY_SENSORS = {}
+CO_SENSORS = {MultilevelSensorType.CARBON_MONOXIDE_LEVEL}
+CO2_SENSORS = {MultilevelSensorType.CARBON_DIOXIDE_LEVEL}
+CURRENT_SENSORS = {MultilevelSensorType.CURRENT}
+ENERGY_SENSORS = {MultilevelSensorType.BASIS_METABOLIC_RATE}
+HUMIDITY_SENSORS = {MultilevelSensorType.HUMIDITY}
+ILLUMINANCE_SENSORS = {MultilevelSensorType.ILLUMINANCE}
+MONETARY_SENSORS = {}
+POWER_SENSORS = {MultilevelSensorType.POWER}
+POWER_FACTOR_SENSORS = {}
+PRESSURE_SENSORS = {
+    MultilevelSensorType.BLOOD_PRESSURE,
+    MultilevelSensorType.WATER_PRESSURE,
+    MultilevelSensorType.SUCTION_PRESSURE,
+    MultilevelSensorType.DISCHARGE_PRESSURE,
+    MultilevelSensorType.BAROMETRIC_PRESSURE,
+    MultilevelSensorType.ATMOSPHERIC_PRESSURE,
+}
+SIGNAL_STRENGTH_SENSORS = {MultilevelSensorType.RF_SIGNAL_STRENGTH}
+TEMPERATURE_SENSORS = {
+    MultilevelSensorType.AIR_TEMPERATURE,
+    MultilevelSensorType.DEW_POINT,
+    MultilevelSensorType.WATER_TEMPERATURE,
+    MultilevelSensorType.SOIL_TEMPERATURE,
+    MultilevelSensorType.TARGET_TEMPERATURE,
+    MultilevelSensorType.BOILER_WATER_TEMPERATURE,
+    MultilevelSensorType.DOMESTIC_HOT_WATER_TEMPERATURE,
+    MultilevelSensorType.OUTSIDE_TEMPERATURE,
+    MultilevelSensorType.EXHAUST_TEMPERATURE,
+    MultilevelSensorType.RETURN_AIR_TEMPERATURE,
+    MultilevelSensorType.SUPPLY_AIR_TEMPERATURE,
+    MultilevelSensorType.CONDENSER_COIL_TEMPERATURE,
+    MultilevelSensorType.EVAPORATOR_COIL_TEMPERATURE,
+    MultilevelSensorType.LIQUID_LINE_TEMPERATURE,
+    MultilevelSensorType.DISCHARGE_LINE_TEMPERATURE,
+    MultilevelSensorType.DEFROST_TEMPERATURE,
+}
+TIMESTAMP_SENSORS = {MultilevelSensorType.TIME}
+VOLTAGE_SENSORS = {
+    MultilevelSensorType.VOLTAGE,
+    MultilevelSensorType.WATER_OXIDATION_REDUCTION_POTENTIAL,
+}
+
+CC_SPECIFIC_METER_TYPE = "meterType"
+CC_SPECIFIC_RATE_TYPE = "rateType"
+CC_SPECIFIC_SCALE = "scale"
+
+
+# Meter enums
+# https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/meters.json
+class MeterType(IntEnum):
+    """Enum with all known meter types."""
+
+    ELECTRIC = 1
+    GAS = 2
+    WATER = 3
+    HEATING = 4
+    COOLING = 5
+
+
+class ElectricScale(IntEnum):
+    """Enum with all known electric meter scale values."""
+
+    KILOWATT_HOUR = 0
+    KILOVOLT_AMPERE_HOUR = 1
+    WATT = 2
+    PULSE = 3
+    VOLT = 4
+    AMPERE = 5
+    POWER_FACTOR = 6
+    KILOVOLT_AMPERE_REACTIVE = 7
+    KILOVOLT_AMPERE_REACTIVE_HOUR = 8
+
+
+class GasScale(IntEnum):
+    """Enum with all known gas meter scale values."""
+
+    CUBIC_METER = 0
+    CUBIC_FEET = 1
+    PULSE_COUNT = 3
+
+
+class WaterScale(IntEnum):
+    """Enum with all known water meter scale values."""
+
+    CUBIC_METER = 0
+    CUBIC_FEET = 1
+    US_GALLON = 2
+    PULSE_COUNT = 3
+
+
+class HeatingScale(IntEnum):
+    """Enum with all known heating meter scale values."""
+
+    KILOWATT_HOUR = 0
+
+
+CoolingScale = HeatingScale
+
+METER_TYPE_TO_SCALE_MAP = {
+    MeterType.ELECTRIC: ElectricScale,
+    MeterType.GAS: GasScale,
+    MeterType.WATER: WaterScale,
+    MeterType.HEATING: HeatingScale,
+    MeterType.COOLING: CoolingScale,
+}
+
+ENERGY_METERS = {
+    ElectricScale.KILOWATT_HOUR,
+    ElectricScale.KILOVOLT_AMPERE_HOUR,
+    ElectricScale.KILOVOLT_AMPERE_REACTIVE_HOUR,
+    HeatingScale.KILOWATT_HOUR,
+    CoolingScale.KILOWATT_HOUR,
+}
+POWER_METERS = {
+    ElectricScale.WATT,
+    ElectricScale.PULSE,
+    ElectricScale.KILOVOLT_AMPERE_REACTIVE,
+}
+POWER_FACTOR_METERS = {ElectricScale.POWER_FACTOR}
+VOLTAGE_METERS = {ElectricScale.VOLT}
+CURRENT_METERS = {ElectricScale.AMPERE}
