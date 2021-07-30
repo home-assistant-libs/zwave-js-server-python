@@ -1,6 +1,6 @@
 """Constants for the Z-Wave JS python library."""
 from enum import Enum, IntEnum
-from typing import Dict, List
+from typing import Dict, List, Set
 
 # minimal server schema version we can handle
 MIN_SERVER_SCHEMA_VERSION = 7
@@ -550,16 +550,16 @@ class MultilevelSensorType(IntEnum):
     PARTICULATE_MATTER_1 = 86
 
 
-BATTERY_SENSORS = {}
+BATTERY_SENSORS: Set[MultilevelSensorType] = {}
 CO_SENSORS = {MultilevelSensorType.CARBON_MONOXIDE_LEVEL}
 CO2_SENSORS = {MultilevelSensorType.CARBON_DIOXIDE_LEVEL}
 CURRENT_SENSORS = {MultilevelSensorType.CURRENT}
 ENERGY_SENSORS = {MultilevelSensorType.BASIS_METABOLIC_RATE}
 HUMIDITY_SENSORS = {MultilevelSensorType.HUMIDITY}
 ILLUMINANCE_SENSORS = {MultilevelSensorType.ILLUMINANCE}
-MONETARY_SENSORS = {}
+MONETARY_SENSORS: Set[MultilevelSensorType] = {}
 POWER_SENSORS = {MultilevelSensorType.POWER}
-POWER_FACTOR_SENSORS = {}
+POWER_FACTOR_SENSORS: Set[MultilevelSensorType] = {}
 PRESSURE_SENSORS = {
     MultilevelSensorType.BLOOD_PRESSURE,
     MultilevelSensorType.WATER_PRESSURE,
