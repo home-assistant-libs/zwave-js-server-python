@@ -1,7 +1,10 @@
 """Exceptions for zwave-js-server."""
+from typing import Optional, TYPE_CHECKING
 
+from .const import CommandClass
 
-from typing import Optional
+if TYPE_CHECKING:
+    from .model.value import Value
 
 
 class BaseZwaveJSServerError(Exception):
@@ -120,3 +123,15 @@ class BulkSetConfigParameterFailed(BaseZwaveJSServerError):
 
     Derived from another exception
     """
+
+
+class InvalidCommandClass(BaseZwaveJSServerError):
+    """Exception raised when value has an invalid command class."""
+
+    def __init__(self, value: "Value", command_class: CommandClass) -> None:
+        """Initialize an invalid Command Class error."""
+        self.value = value
+        self.command_class = command_class
+        super().__init__(
+            f"Value {value} does not match expected command class: {command_class}"
+        )
