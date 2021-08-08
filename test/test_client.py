@@ -6,9 +6,9 @@ import pytest
 from aiohttp.client_exceptions import ClientError, WSServerHandshakeError
 from aiohttp.client_reqrep import ClientResponse, RequestInfo
 from aiohttp.http_websocket import WSMsgType
-from zwave_js_server.const import MAX_SERVER_SCHEMA_VERSION
 
 from zwave_js_server.client import Client
+from zwave_js_server.const import MAX_SERVER_SCHEMA_VERSION
 from zwave_js_server.exceptions import (
     CannotConnect,
     ConnectionFailed,

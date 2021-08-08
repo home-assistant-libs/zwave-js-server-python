@@ -1,5 +1,6 @@
 """Test the controller model."""
 import json
+
 from zwave_js_server.event import Event
 from zwave_js_server.model import association as association_pkg
 from zwave_js_server.model import controller as controller_pkg
