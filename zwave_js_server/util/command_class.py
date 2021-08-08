@@ -1,6 +1,4 @@
 """Command Class specific utility functions for values."""
-from typing import Union
-
 from ..const import (
     CC_SPECIFIC_METER_TYPE,
     CC_SPECIFIC_SCALE,
