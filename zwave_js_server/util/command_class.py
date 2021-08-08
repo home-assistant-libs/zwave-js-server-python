@@ -39,7 +39,7 @@ def get_meter_scale_type(
         return None
     scale_enum = METER_TYPE_TO_SCALE_ENUM_MAP[meter_type]
     try:
-        return scale_enum(value.metadata.cc_specific[CC_SPECIFIC_SCALE])
+        return scale_enum(value.metadata.cc_specific[CC_SPECIFIC_SCALE])  # type: ignore
     except ValueError:
         return None
 
