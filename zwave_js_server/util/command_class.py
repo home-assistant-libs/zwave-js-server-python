@@ -7,14 +7,9 @@ from ..const import (
     CC_SPECIFIC_SENSOR_TYPE,
     METER_TYPE_TO_SCALE_ENUM_MAP,
     CommandClass,
-    CoolingScale,
-    ElectricScale,
-    GasScale,
-    HeatingScale,
     MeterScaleType,
     MeterType,
     MultilevelSensorType,
-    WaterScale,
 )
 from ..exceptions import InvalidCommandClass
 from ..model.value import Value
