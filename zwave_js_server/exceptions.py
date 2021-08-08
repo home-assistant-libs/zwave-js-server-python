@@ -126,7 +126,7 @@ class BulkSetConfigParameterFailed(BaseZwaveJSServerError):
 
 
 class InvalidCommandClass(BaseZwaveJSServerError):
-    """Exception raised when value has an invalid command class."""
+    """Exception raised when Zwave Value has an invalid command class."""
 
     def __init__(self, value: "Value", command_class: CommandClass) -> None:
         """Initialize an invalid Command Class error."""
@@ -134,4 +134,23 @@ class InvalidCommandClass(BaseZwaveJSServerError):
         self.command_class = command_class
         super().__init__(
             f"Value {value} does not match expected command class: {command_class}"
+        )
+
+
+class UnknownValueData(BaseZwaveJSServerError):
+    """
+    Exception raised when Zwave Value has data that the library can't parse.
+
+    This can be caused by an upstream issue with the driver, or missing support in the
+    library.
+    """
+
+    def __init__(self, value: "Value", path: str) -> None:
+        """Initialize an unknown data error."""
+        self.value = value
+        self.path = path
+        super().__init__(
+            f"Value {value} has unknown data in the following location: {path}. "
+            "Please report this issue, it can be caused by either an upstream issue "
+            "with the driver or missing support for this data in the library"
         )
