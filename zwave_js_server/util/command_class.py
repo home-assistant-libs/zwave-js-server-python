@@ -11,6 +11,7 @@ from ..const import (
     ElectricScale,
     GasScale,
     HeatingScale,
+    MeterScaleType,
     MeterType,
     MultilevelSensorType,
     WaterScale,
@@ -30,9 +31,7 @@ def get_meter_type(value: Value) -> Union[MeterType, None]:
         return None
 
 
-def get_meter_scale_type(
-    value: Value,
-) -> Union[CoolingScale, ElectricScale, GasScale, HeatingScale, WaterScale, None]:
+def get_meter_scale_type(value: Value) -> Union[MeterScaleType, None]:
     """Get the ScaleType for a given value."""
     meter_type = get_meter_type(value)
     if meter_type is None:
