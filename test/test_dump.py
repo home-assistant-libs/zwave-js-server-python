@@ -2,8 +2,8 @@
 import asyncio
 from unittest.mock import AsyncMock, call
 
-from aiohttp.client import ClientSession
 import pytest
+from aiohttp.client import ClientSession
 
 from zwave_js_server.dump import dump_msgs
 

@@ -7,8 +7,8 @@ from zwave_js_server.util.lock import (
     clear_usercode,
     get_code_slots,
     get_usercode,
-    get_usercodes,
     get_usercode_from_node,
+    get_usercodes,
     set_usercode,
 )
 
