@@ -1,6 +1,6 @@
 """Provide a model for the Z-Wave JS controller."""
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Dict, List, Optional, TypedDict, cast
+from typing import Literal, TYPE_CHECKING, Dict, List, Optional, TypedDict, Union, cast
 
 from ..const import InclusionStrategy, SecurityClass
 from ..event import Event, EventBase
@@ -278,13 +278,35 @@ class Controller(EventBase):
         return self._heal_network_progress
 
     async def async_begin_inclusion(
-        self, inclusion_strategy: InclusionStrategy
+        self,
+        inclusion_strategy: Union[
+            Literal[InclusionStrategy.SECURITY_S0],
+            Literal[InclusionStrategy.SECURITY_S2],
+            Literal[InclusionStrategy.INSECURE],
+        ],
     ) -> bool:
         """Send beginInclusion command to Controller."""
         data = await self.client.async_send_command(
             {
                 "command": "controller.begin_inclusion",
                 "options": {"inclusionStrategy": inclusion_strategy},
+            },
+            require_schema=8,
+        )
+        return cast(bool, data["success"])
+
+    async def async_begin_inclusion_default(
+        self,
+        force_security: Optional[bool] = None,
+    ) -> bool:
+        """Send beginInclusion command to Controller using Default inclusion method."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.begin_inclusion",
+                "options": {
+                    "inclusionStrategy": InclusionStrategy.DEFAULT,
+                    "forceSecurity": force_security,
+                },
             },
             require_schema=8,
         )
@@ -318,7 +340,13 @@ class Controller(EventBase):
         )
 
     async def async_replace_failed_node(
-        self, node_id: int, inclusion_strategy: InclusionStrategy
+        self,
+        node_id: int,
+        inclusion_strategy: Union[
+            Literal[InclusionStrategy.SECURITY_S0],
+            Literal[InclusionStrategy.SECURITY_S2],
+            Literal[InclusionStrategy.INSECURE],
+        ],
     ) -> bool:
         """Send replaceFailedNode command to Controller."""
         data = await self.client.async_send_command(

@@ -129,12 +129,31 @@ async def test_begin_inclusion(controller, uuid4, mock_command):
         {"command": "controller.begin_inclusion"},
         {"success": True},
     )
-    assert await controller.async_begin_inclusion(InclusionStrategy.DEFAULT)
+    assert await controller.async_begin_inclusion(InclusionStrategy.SECURITY_S0)
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.begin_inclusion",
-        "options": {"inclusionStrategy": InclusionStrategy.DEFAULT.value},
+        "options": {"inclusionStrategy": InclusionStrategy.SECURITY_S0},
+        "messageId": uuid4,
+    }
+
+
+async def test_begin_inclusion_default(controller, uuid4, mock_command):
+    """Test begin inclusion."""
+    ack_commands = mock_command(
+        {"command": "controller.begin_inclusion"},
+        {"success": True},
+    )
+    assert await controller.async_begin_inclusion_default()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.begin_inclusion",
+        "options": {
+            "inclusionStrategy": InclusionStrategy.DEFAULT,
+            "forceSecurity": None,
+        },
         "messageId": uuid4,
     }
 
