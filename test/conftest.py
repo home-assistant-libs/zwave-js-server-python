@@ -255,7 +255,7 @@ def version_data_fixture():
         "serverVersion": "test_server_version",
         "homeId": "test_home_id",
         "minSchemaVersion": 0,
-        "maxSchemaVersion": 7,
+        "maxSchemaVersion": 8,
     }
 
 

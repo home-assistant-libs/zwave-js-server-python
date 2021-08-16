@@ -1,6 +1,7 @@
 """Test the controller model."""
 import json
 
+from zwave_js_server.const import InclusionStrategy, SecurityClass
 from zwave_js_server.event import Event
 from zwave_js_server.model import association as association_pkg
 from zwave_js_server.model import controller as controller_pkg
@@ -128,12 +129,12 @@ async def test_begin_inclusion(controller, uuid4, mock_command):
         {"command": "controller.begin_inclusion"},
         {"success": True},
     )
-    assert await controller.async_begin_inclusion()
+    assert await controller.async_begin_inclusion(InclusionStrategy.DEFAULT)
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.begin_inclusion",
-        "includeNonSecure": None,
+        "options": {"inclusionStrategy": InclusionStrategy.DEFAULT.value},
         "messageId": uuid4,
     }
 
@@ -214,15 +215,16 @@ async def test_replace_failed_node(controller, uuid4, mock_command):
     )
 
     node_id = 52
-    include_non_secure = True
-    assert await controller.async_replace_failed_node(node_id, include_non_secure)
+    assert await controller.async_replace_failed_node(
+        node_id, InclusionStrategy.DEFAULT
+    )
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.replace_failed_node",
         "messageId": uuid4,
         "nodeId": node_id,
-        "includeNonSecure": include_non_secure,
+        "options": {"inclusionStrategy": InclusionStrategy.DEFAULT.value},
     }
 
 
@@ -572,3 +574,50 @@ async def test_statistics_updated(controller):
     assert isinstance(event_stats, controller_pkg.ControllerStatistics)
     assert controller.statistics.nak == 1
     assert controller.statistics == event_stats
+
+
+async def test_grant_security_classes(controller, uuid4, mock_command) -> None:
+    """Test controller.grant_security_classes command and event."""
+    ack_commands = mock_command({"command": "controller.grant_security_classes"}, {})
+    inclusion_grant = controller_pkg.InclusionGrant(
+        [SecurityClass.S2_AUTHENTICATED], True
+    )
+    inclusion_grant_dict = {
+        "securityClasses": [SecurityClass.S2_AUTHENTICATED.value],
+        "clientSideAuth": True,
+    }
+    await controller.async_grant_security_classes(inclusion_grant)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.grant_security_classes",
+        "messageId": uuid4,
+        "inclusionGrant": inclusion_grant_dict,
+    }
+
+    """Test grant security classes event."""
+    event = Event(
+        "grant security classes",
+        {
+            "source": "controller",
+            "event": "grant security classes",
+            "requested": inclusion_grant_dict,
+        },
+    )
+    controller.receive_event(event)
+    assert event.data["requested_grant"] == inclusion_grant
+
+
+async def test_validate_dsk_and_enter_pin(controller, uuid4, mock_command) -> None:
+    """Test controller.validate_dsk_and_enter_pin command."""
+    ack_commands = mock_command(
+        {"command": "controller.validate_dsk_and_enter_pin"}, {}
+    )
+    await controller.async_validate_dsk_and_enter_pin("test")
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.validate_dsk_and_enter_pin",
+        "messageId": uuid4,
+        "pin": "test",
+    }

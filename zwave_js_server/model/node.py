@@ -1,7 +1,7 @@
 """Provide a model for the Z-Wave JS node."""
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
 
-from ..const import INTERVIEW_FAILED, CommandClass, NodeStatus
+from ..const import INTERVIEW_FAILED, CommandClass, NodeStatus, SecurityClass
 from ..event import Event
 from ..exceptions import (
     FailedCommand,
@@ -42,6 +42,7 @@ if TYPE_CHECKING:
 class NodeStatisticsDataType(TypedDict):
     """Represent a node statistics data dict type."""
 
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/node/NodeStatistics.ts#L21-L33
     commandsTX: int
     commandsRX: int
     commandsDroppedTX: int
@@ -510,6 +511,30 @@ class Node(Endpoint):
             or {}
         )
         return cast(bool, data.get("responded", False))
+
+    async def async_has_security_class(self, security_class: SecurityClass) -> bool:
+        """Return whether node has the given security class."""
+        data = (
+            await self.async_send_command(
+                "has_security_class",
+                securityClass=security_class,
+                require_schema=8,
+                wait_for_result=True,
+            )
+            or {}
+        )
+        return cast(bool, data["hasSecurityClass"])
+
+    async def async_get_highest_security_class(self) -> SecurityClass:
+        """Get the highest security class that a node supports."""
+        data = await self.async_send_command(
+            "get_highest_security_class", require_schema=8, wait_for_result=True
+        )
+        # We should never get here
+        if not data:
+            return SecurityClass.NONE
+
+        return SecurityClass(data["highestSecurityClass"])
 
     def handle_wake_up(self, event: Event) -> None:
         """Process a node wake up event."""
