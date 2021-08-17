@@ -33,10 +33,10 @@ class InclusionGrant:
             "clientSideAuth": self.client_side_auth,
         }
 
-    @staticmethod
-    def from_dict(data: InclusionGrantDataType) -> "InclusionGrant":
+    @classmethod
+    def from_dict(cls, data: InclusionGrantDataType) -> "InclusionGrant":
         """Return InclusionGrant from InclusionGrantDataType dict."""
-        return InclusionGrant(
+        return cls(
             [SecurityClass(sec_cls) for sec_cls in data["securityClasses"]],
             data["clientSideAuth"],
         )

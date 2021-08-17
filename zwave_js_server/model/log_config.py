@@ -38,10 +38,10 @@ class LogConfig:
         }
         return cast(LogConfigDataType, {k: v for k, v in data.items() if v is not None})
 
-    @staticmethod
-    def from_dict(data: LogConfigDataType) -> "LogConfig":
+    @classmethod
+    def from_dict(cls, data: LogConfigDataType) -> "LogConfig":
         """Return LogConfig from LogConfigDataType dict."""
-        return LogConfig(
+        return cls(
             data.get("enabled"),
             LogLevel(data["level"]) if "level" in data else None,
             data.get("logToFile"),

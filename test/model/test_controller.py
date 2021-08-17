@@ -614,7 +614,7 @@ async def test_grant_security_classes(controller, uuid4, mock_command) -> None:
         "inclusionGrant": inclusion_grant_dict,
     }
 
-    """Test grant security classes event."""
+    # Test grant security classes event
     event = Event(
         "grant security classes",
         {
