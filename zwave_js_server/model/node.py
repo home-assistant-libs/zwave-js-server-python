@@ -528,10 +528,7 @@ class Node(Endpoint):
         data = await self.async_send_command(
             "get_highest_security_class", require_schema=8, wait_for_result=True
         )
-        # We should never get here
-        if not data:
-            return SecurityClass.NONE
-
+        assert data
         return SecurityClass(data["highestSecurityClass"])
 
     def handle_wake_up(self, event: Event) -> None:
