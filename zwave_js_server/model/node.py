@@ -514,15 +514,13 @@ class Node(Endpoint):
 
     async def async_has_security_class(self, security_class: SecurityClass) -> bool:
         """Return whether node has the given security class."""
-        data = (
-            await self.async_send_command(
-                "has_security_class",
-                securityClass=security_class,
-                require_schema=8,
-                wait_for_result=True,
-            )
-            or {}
+        data = await self.async_send_command(
+            "has_security_class",
+            securityClass=security_class,
+            require_schema=8,
+            wait_for_result=True,
         )
+        assert data
         return cast(bool, data["hasSecurityClass"])
 
     async def async_get_highest_security_class(self) -> SecurityClass:
