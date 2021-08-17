@@ -1,6 +1,8 @@
 """Provide a model for the Z-Wave JS controller."""
-from typing import TYPE_CHECKING, Dict, List, Optional, TypedDict, cast
+from dataclasses import dataclass
+from typing import Literal, TYPE_CHECKING, Dict, List, Optional, TypedDict, Union, cast
 
+from ..const import InclusionStrategy, SecurityClass
 from ..event import Event, EventBase
 from .association import Association, AssociationGroup
 from .node import Node
@@ -9,9 +11,41 @@ if TYPE_CHECKING:
     from ..client import Client
 
 
+class InclusionGrantDataType(TypedDict):
+    """Representation of an inclusion grant data dict type."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/controller/Inclusion.ts#L48-L56
+    securityClasses: List[SecurityClass]
+    clientSideAuth: bool
+
+
+@dataclass
+class InclusionGrant:
+    """Representation of an inclusion grant."""
+
+    security_classes: List[SecurityClass]
+    client_side_auth: bool
+
+    def to_dict(self) -> InclusionGrantDataType:
+        """Return InclusionGrantDataType dict from self."""
+        return {
+            "securityClasses": self.security_classes,
+            "clientSideAuth": self.client_side_auth,
+        }
+
+    @classmethod
+    def from_dict(cls, data: InclusionGrantDataType) -> "InclusionGrant":
+        """Return InclusionGrant from InclusionGrantDataType dict."""
+        return cls(
+            [SecurityClass(sec_cls) for sec_cls in data["securityClasses"]],
+            data["clientSideAuth"],
+        )
+
+
 class ControllerStatisticsDataType(TypedDict):
     """Represent a controller statistics data dict type."""
 
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/controller/ControllerStatistics.ts#L20-L39
     messagesTX: int
     messagesRX: int
     messagesDroppedTX: int
@@ -244,14 +278,37 @@ class Controller(EventBase):
         return self._heal_network_progress
 
     async def async_begin_inclusion(
-        self, include_non_secure: Optional[bool] = None
+        self,
+        inclusion_strategy: Union[
+            Literal[InclusionStrategy.SECURITY_S0],
+            Literal[InclusionStrategy.SECURITY_S2],
+            Literal[InclusionStrategy.INSECURE],
+        ],
     ) -> bool:
         """Send beginInclusion command to Controller."""
         data = await self.client.async_send_command(
             {
                 "command": "controller.begin_inclusion",
-                "includeNonSecure": include_non_secure,
-            }
+                "options": {"inclusionStrategy": inclusion_strategy},
+            },
+            require_schema=8,
+        )
+        return cast(bool, data["success"])
+
+    async def async_begin_inclusion_default(
+        self,
+        force_security: Optional[bool] = None,
+    ) -> bool:
+        """Send beginInclusion command to Controller using Default inclusion method."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.begin_inclusion",
+                "options": {
+                    "inclusionStrategy": InclusionStrategy.DEFAULT,
+                    "forceSecurity": force_security,
+                },
+            },
+            require_schema=8,
         )
         return cast(bool, data["success"])
 
@@ -283,15 +340,22 @@ class Controller(EventBase):
         )
 
     async def async_replace_failed_node(
-        self, node_id: int, include_non_secure: Optional[bool] = None
+        self,
+        node_id: int,
+        inclusion_strategy: Union[
+            Literal[InclusionStrategy.SECURITY_S0],
+            Literal[InclusionStrategy.SECURITY_S2],
+            Literal[InclusionStrategy.INSECURE],
+        ],
     ) -> bool:
         """Send replaceFailedNode command to Controller."""
         data = await self.client.async_send_command(
             {
                 "command": "controller.replace_failed_node",
                 "nodeId": node_id,
-                "includeNonSecure": include_non_secure,
-            }
+                "options": {"inclusionStrategy": inclusion_strategy},
+            },
+            require_schema=8,
         )
         return cast(bool, data["success"])
 
@@ -438,6 +502,26 @@ class Controller(EventBase):
         )
         return cast(List[int], data["neighbors"])
 
+    async def async_grant_security_classes(
+        self, inclusion_grant: InclusionGrant
+    ) -> None:
+        """Send grantSecurityClasses command to Controller."""
+        await self.client.async_send_command(
+            {
+                "command": "controller.grant_security_classes",
+                "inclusionGrant": inclusion_grant.to_dict(),
+            }
+        )
+
+    async def async_validate_dsk_and_enter_pin(self, pin: str) -> None:
+        """Send validateDSKAndEnterPIN command to Controller."""
+        await self.client.async_send_command(
+            {
+                "command": "controller.validate_dsk_and_enter_pin",
+                "pin": pin,
+            }
+        )
+
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
         if event.data["source"] == "node":
@@ -502,3 +586,12 @@ class Controller(EventBase):
         """Process a statistics updated event."""
         self._statistics.data.update(event.data["statistics"])
         event.data["statistics_updated"] = self.statistics
+
+    def handle_grant_security_classes(self, event: Event) -> None:
+        """Process a grant security classes event."""
+        event.data["requested_grant"] = InclusionGrant.from_dict(
+            event.data["requested"]
+        )
+
+    def handle_validate_dsk_and_enter_pin(self, event: Event) -> None:
+        """Process a validate dsk and enter pin event."""

@@ -3,9 +3,9 @@ from enum import Enum, IntEnum
 from typing import Dict, List
 
 # minimal server schema version we can handle
-MIN_SERVER_SCHEMA_VERSION = 7
+MIN_SERVER_SCHEMA_VERSION = 8
 # max server schema version we can handle (and our code is compatible with)
-MAX_SERVER_SCHEMA_VERSION = 7
+MAX_SERVER_SCHEMA_VERSION = 8
 
 VALUE_UNKNOWN = "unknown"
 
@@ -676,3 +676,25 @@ POWER_METER_TYPES = {
 POWER_FACTOR_METER_TYPES = {ElectricScale.POWER_FACTOR}
 VOLTAGE_METER_TYPES = {ElectricScale.VOLT}
 CURRENT_METER_TYPES = {ElectricScale.AMPERE}
+
+
+class InclusionStrategy(IntEnum):
+    """Enum for all known inclusion strategies."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/controller/Inclusion.ts#L9-L46
+    DEFAULT = 0
+    SMART_START = 1
+    INSECURE = 2
+    SECURITY_S0 = 3
+    SECURITY_S2 = 4
+
+
+class SecurityClass(IntEnum):
+    """Enum for all known security classes."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/security/SecurityClass.ts#L3-L17
+    NONE = -1
+    S2_UNAUTHENTICATED = 0
+    S2_AUTHENTICATED = 1
+    S2_ACCESS_CONTROL = 2
+    S0_LEGACY = 7

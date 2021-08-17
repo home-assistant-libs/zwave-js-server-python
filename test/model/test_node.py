@@ -11,6 +11,7 @@ from zwave_js_server.const import (
     EntryControlEventType,
     NodeStatus,
     ProtocolVersion,
+    SecurityClass,
 )
 from zwave_js_server.event import Event
 from zwave_js_server.exceptions import FailedCommand, NotFoundError, UnwriteableValue
@@ -952,3 +953,40 @@ async def test_statistics_updated(wallmote_central_scene: Node):
     assert isinstance(event_stats, NodeStatistics)
     assert node.statistics.timeout_response == 1
     assert node.statistics == event_stats
+
+
+async def test_has_security_class(multisensor_6: Node, uuid4, mock_command):
+    """Test node.has_security_class command."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.has_security_class", "nodeId": node.node_id},
+        {"hasSecurityClass": True},
+    )
+    assert await node.async_has_security_class(SecurityClass.S2_AUTHENTICATED)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.has_security_class",
+        "nodeId": node.node_id,
+        "securityClass": SecurityClass.S2_AUTHENTICATED.value,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_highest_security_class(multisensor_6: Node, uuid4, mock_command):
+    """Test node.get_highest_security_class command."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.get_highest_security_class", "nodeId": node.node_id},
+        {"highestSecurityClass": SecurityClass.S2_AUTHENTICATED.value},
+    )
+    assert (
+        await node.async_get_highest_security_class() == SecurityClass.S2_AUTHENTICATED
+    )
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.get_highest_security_class",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }
