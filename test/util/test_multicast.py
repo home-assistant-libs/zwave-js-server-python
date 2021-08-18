@@ -26,7 +26,7 @@ async def test_endpoint_get_cc_version_multicast(
 
     assert (
         await async_multicast_endpoint_get_cc_version(
-            client, 1, CommandClass.ALARM, [node1, node2]
+            client, 1, CommandClass.NOTIFICATION, [node1, node2]
         )
         == 1
     )
@@ -48,7 +48,9 @@ async def test_endpoint_get_cc_version_broadcast(client, uuid4, mock_command):
     )
 
     assert (
-        await async_multicast_endpoint_get_cc_version(client, 1, CommandClass.ALARM)
+        await async_multicast_endpoint_get_cc_version(
+            client, 1, CommandClass.NOTIFICATION
+        )
         == 1
     )
 
@@ -67,7 +69,9 @@ async def test_endpoint_supports_cc_broadcast(client, uuid4, mock_command):
         {"supported": True},
     )
 
-    assert await async_multicast_endpoint_supports_cc(client, 1, CommandClass.ALARM)
+    assert await async_multicast_endpoint_supports_cc(
+        client, 1, CommandClass.NOTIFICATION
+    )
 
     assert ack_commands[0] == {
         "command": "broadcast_node.supports_cc",
@@ -89,7 +93,7 @@ async def test_endpoint_supports_cc_multicast(
     )
 
     assert await async_multicast_endpoint_supports_cc(
-        client, 1, CommandClass.ALARM, [node1, node2]
+        client, 1, CommandClass.NOTIFICATION, [node1, node2]
     )
 
     assert ack_commands[0] == {
