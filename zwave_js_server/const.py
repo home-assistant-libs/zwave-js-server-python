@@ -90,7 +90,6 @@ class LogLevel(str, Enum):
 class CommandClass(IntEnum):
     """Enum with all known CommandClasses."""
 
-    ALARM = 113
     SENSOR_ALARM = 156
     SILENCE_ALARM = 157
     SWITCH_ALL = 39
