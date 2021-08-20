@@ -662,7 +662,7 @@ METER_TYPE_TO_SCALE_ENUM_MAP: Dict[MeterType, Type[MeterScaleType]] = {
     MeterType.COOLING: CoolingScale,
 }
 
-ENERGY_METER_TYPES: Set[MeterScaleType] = {
+ENERGY_TOTAL_INCREASING_METER_TYPES: Set[MeterScaleType] = {
     ElectricScale.KILOWATT_HOUR,
     ElectricScale.KILOVOLT_AMPERE_HOUR,
     ElectricScale.KILOVOLT_AMPERE_REACTIVE_HOUR,
