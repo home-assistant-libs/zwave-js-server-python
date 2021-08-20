@@ -551,7 +551,7 @@ class MultilevelSensorType(IntEnum):
 CO_SENSORS = {MultilevelSensorType.CARBON_MONOXIDE_LEVEL}
 CO2_SENSORS = {MultilevelSensorType.CARBON_DIOXIDE_LEVEL}
 CURRENT_SENSORS = {MultilevelSensorType.CURRENT}
-ENERGY_SENSORS = {MultilevelSensorType.BASIS_METABOLIC_RATE}
+ENERGY_MEASUREMENT_SENSORS = {MultilevelSensorType.BASIS_METABOLIC_RATE}
 HUMIDITY_SENSORS = {MultilevelSensorType.HUMIDITY}
 ILLUMINANCE_SENSORS = {MultilevelSensorType.ILLUMINANCE}
 POWER_SENSORS = {MultilevelSensorType.POWER}
