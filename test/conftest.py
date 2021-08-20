@@ -75,6 +75,12 @@ def partial_and_full_parameter_state_fixture():
     return json.loads(load_fixture("partial_and_full_parameter_state.json"))
 
 
+@pytest.fixture(name="invalid_multilevel_sensor_type_state", scope="session")
+def invalid_multilevel_sensor_type_state_fixture():
+    """Load the node that has an invalid multilevel sensor type state fixture data."""
+    return json.loads(load_fixture("invalid_multilevel_sensor_type_state.json"))
+
+
 @pytest.fixture(name="client_session")
 def client_session_fixture(ws_client):
     """Mock an aiohttp client session."""
@@ -453,5 +459,15 @@ def ring_keypad_fixture(driver, ring_keypad_state):
 def partial_and_full_parameter_fixture(driver, partial_and_full_parameter_state):
     """Mock a node that has both partial and full parameters."""
     node = Node(driver.client, partial_and_full_parameter_state)
+    driver.controller.nodes[node.node_id] = node
+    return node
+
+
+@pytest.fixture(name="invalid_multilevel_sensor_type")
+def invalid_multilevel_sensor_type_fixture(
+    driver, invalid_multilevel_sensor_type_state
+):
+    """Mock a node that has invalid multilevel sensor type."""
+    node = Node(driver.client, invalid_multilevel_sensor_type_state)
     driver.controller.nodes[node.node_id] = node
     return node

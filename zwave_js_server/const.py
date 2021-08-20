@@ -1,6 +1,6 @@
 """Constants for the Z-Wave JS python library."""
 from enum import Enum, IntEnum
-from typing import Dict, List
+from typing import Dict, List, Set, Type, Union
 
 # minimal server schema version we can handle
 MIN_SERVER_SCHEMA_VERSION = 8
@@ -652,7 +652,9 @@ class HeatingScale(IntEnum):
 
 CoolingScale = HeatingScale
 
-METER_TYPE_TO_SCALE_ENUM_MAP = {
+MeterScaleType = Union[CoolingScale, ElectricScale, GasScale, HeatingScale, WaterScale]
+
+METER_TYPE_TO_SCALE_ENUM_MAP: Dict[MeterType, Type[MeterScaleType]] = {
     MeterType.ELECTRIC: ElectricScale,
     MeterType.GAS: GasScale,
     MeterType.WATER: WaterScale,
@@ -660,21 +662,21 @@ METER_TYPE_TO_SCALE_ENUM_MAP = {
     MeterType.COOLING: CoolingScale,
 }
 
-ENERGY_METER_TYPES = {
+ENERGY_METER_TYPES: Set[MeterScaleType] = {
     ElectricScale.KILOWATT_HOUR,
     ElectricScale.KILOVOLT_AMPERE_HOUR,
     ElectricScale.KILOVOLT_AMPERE_REACTIVE_HOUR,
     HeatingScale.KILOWATT_HOUR,
     CoolingScale.KILOWATT_HOUR,
 }
-POWER_METER_TYPES = {
+POWER_METER_TYPES: Set[MeterScaleType] = {
     ElectricScale.WATT,
     ElectricScale.PULSE,
     ElectricScale.KILOVOLT_AMPERE_REACTIVE,
 }
-POWER_FACTOR_METER_TYPES = {ElectricScale.POWER_FACTOR}
-VOLTAGE_METER_TYPES = {ElectricScale.VOLT}
-CURRENT_METER_TYPES = {ElectricScale.AMPERE}
+POWER_FACTOR_METER_TYPES: Set[MeterScaleType] = {ElectricScale.POWER_FACTOR}
+VOLTAGE_METER_TYPES: Set[MeterScaleType] = {ElectricScale.VOLT}
+CURRENT_METER_TYPES: Set[MeterScaleType] = {ElectricScale.AMPERE}
 
 
 class InclusionStrategy(IntEnum):
