@@ -678,7 +678,11 @@ POWER_FACTOR_METER_TYPES: Set[MeterScaleType] = {ElectricScale.POWER_FACTOR}
 VOLTAGE_METER_TYPES: Set[MeterScaleType] = {ElectricScale.VOLT}
 CURRENT_METER_TYPES: Set[MeterScaleType] = {ElectricScale.AMPERE}
 
+WAKE_UP_INTERVAL_PROPERTY = "wakeUpInterval"
+WAKE_UP_CONTROLLER_NODE_ID_PROPERTY = "controllerNodeId"
 
+
+# Inclusion enums
 class InclusionStrategy(IntEnum):
     """Enum for all known inclusion strategies."""
 
