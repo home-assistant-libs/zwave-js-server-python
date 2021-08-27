@@ -31,7 +31,7 @@ class ElectricScale(IntEnum):
     KILOWATT_HOUR = 0
     KILOVOLT_AMPERE_HOUR = 1
     WATT = 2
-    PULSE = 3
+    PULSE_COUNT = 3
     VOLT = 4
     AMPERE = 5
     POWER_FACTOR = 6
@@ -80,12 +80,23 @@ ENERGY_TOTAL_INCREASING_METER_TYPES: Set[MeterScaleType] = {
     ElectricScale.KILOVOLT_AMPERE_REACTIVE_HOUR,
     HeatingScale.KILOWATT_HOUR,
     CoolingScale.KILOWATT_HOUR,
+    ElectricScale.PULSE_COUNT,
 }
 POWER_METER_TYPES: Set[MeterScaleType] = {
     ElectricScale.WATT,
-    ElectricScale.PULSE,
     ElectricScale.KILOVOLT_AMPERE_REACTIVE,
 }
 POWER_FACTOR_METER_TYPES: Set[MeterScaleType] = {ElectricScale.POWER_FACTOR}
 VOLTAGE_METER_TYPES: Set[MeterScaleType] = {ElectricScale.VOLT}
 CURRENT_METER_TYPES: Set[MeterScaleType] = {ElectricScale.AMPERE}
+GAS_METER_TYPES: Set[MeterScaleType] = {
+    GasScale.CUBIC_METER,
+    GasScale.CUBIC_FEET,
+    GasScale.PULSE_COUNT,
+}
+WATER_METER_TYPES: Set[MeterScaleType] = {
+    WaterScale.CUBIC_METER,
+    WaterScale.CUBIC_FEET,
+    WaterScale.US_GALLON,
+    WaterScale.PULSE_COUNT,
+}
