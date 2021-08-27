@@ -1,7 +1,7 @@
 """Test lock utility functions."""
 import pytest
 
-from zwave_js_server.const import ATTR_IN_USE, ATTR_USERCODE
+from zwave_js_server.const.command_class.lock import ATTR_IN_USE, ATTR_USERCODE
 from zwave_js_server.exceptions import NotFoundError
 from zwave_js_server.util.lock import (
     clear_usercode,

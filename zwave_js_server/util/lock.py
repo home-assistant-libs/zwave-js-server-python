@@ -1,7 +1,8 @@
 """Utility functions for Z-Wave JS locks."""
 from typing import Dict, List, Optional, Union
 
-from ..const import (
+from ..const import CommandClass
+from ..const.command_class.lock import (
     ATTR_CODE_SLOT,
     ATTR_IN_USE,
     ATTR_NAME,
@@ -9,7 +10,6 @@ from ..const import (
     LOCK_USERCODE_PROPERTY,
     LOCK_USERCODE_STATUS_PROPERTY,
     CodeSlotStatus,
-    CommandClass,
 )
 from ..exceptions import NotFoundError
 from ..model.node import Node

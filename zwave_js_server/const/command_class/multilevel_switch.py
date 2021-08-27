@@ -1,0 +1,8 @@
+"""Constants for the Multilevel Switch CC."""
+
+COVER_OPEN_PROPERTY = "Open"
+COVER_UP_PROPERTY = "Up"
+COVER_ON_PROPERTY = "On"
+COVER_CLOSE_PROPERTY = "Close"
+COVER_DOWN_PROPERTY = "Down"
+COVER_OFF_PROPERTY = "Off"

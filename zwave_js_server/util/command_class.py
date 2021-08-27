@@ -1,12 +1,14 @@
 """Command Class specific utility functions for values."""
-from ..const import (
+from ..const import CommandClass
+from ..const.command_class.meter import (
     CC_SPECIFIC_METER_TYPE,
     CC_SPECIFIC_SCALE,
-    CC_SPECIFIC_SENSOR_TYPE,
     METER_TYPE_TO_SCALE_ENUM_MAP,
-    CommandClass,
     MeterScaleType,
     MeterType,
+)
+from ..const.command_class.multilevel_sensor import (
+    CC_SPECIFIC_SENSOR_TYPE,
     MultilevelSensorType,
 )
 from ..exceptions import InvalidCommandClass, UnknownValueData

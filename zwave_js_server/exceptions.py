@@ -1,7 +1,7 @@
 """Exceptions for zwave-js-server."""
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
-from .const import CommandClass
+from .const.command_class import CommandClass
 
 if TYPE_CHECKING:
     from .model.value import Value

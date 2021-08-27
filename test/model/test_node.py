@@ -7,11 +7,13 @@ import pytest
 from zwave_js_server.const import (
     INTERVIEW_FAILED,
     CommandClass,
-    EntryControlDataType,
-    EntryControlEventType,
     NodeStatus,
     ProtocolVersion,
     SecurityClass,
+)
+from zwave_js_server.const.command_class.entry_control import (
+    EntryControlDataType,
+    EntryControlEventType,
 )
 from zwave_js_server.event import Event
 from zwave_js_server.exceptions import FailedCommand, NotFoundError, UnwriteableValue
