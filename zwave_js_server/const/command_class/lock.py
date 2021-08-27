@@ -5,7 +5,7 @@ Includes Door Lock and Lock CCs.
 """
 from enum import IntEnum
 
-from . import CommandClass
+from .. import CommandClass
 
 
 class DoorLockMode(IntEnum):

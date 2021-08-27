@@ -1,6 +1,11 @@
 """Constants for utility tests."""
 
-from zwave_js_server.const import ATTR_CODE_SLOT, ATTR_IN_USE, ATTR_NAME, ATTR_USERCODE
+from zwave_js_server.const.command_class.lock import (
+    ATTR_CODE_SLOT,
+    ATTR_IN_USE,
+    ATTR_NAME,
+    ATTR_USERCODE,
+)
 
 CODE_SLOTS = [
     {
