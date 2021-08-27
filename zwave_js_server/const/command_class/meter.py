@@ -94,3 +94,9 @@ GAS_METER_TYPES: Set[MeterScaleType] = {
     GasScale.CUBIC_FEET,
     GasScale.PULSE_COUNT,
 }
+WATER_METER_TYPES: Set[MeterScaleType] = {
+    WaterScale.CUBIC_METER,
+    WaterScale.CUBIC_FEET,
+    WaterScale.US_GALLON,
+    WaterScale.PULSE_COUNT,
+}
