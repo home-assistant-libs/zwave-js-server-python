@@ -1,18 +1,14 @@
-"""Command Class specific utility functions for values."""
-from ..const import CommandClass
-from ..const.command_class.meter import (
+"""Meter Command Class specific utility functions for values."""
+from ...const import CommandClass
+from ...const.command_class.meter import (
     CC_SPECIFIC_METER_TYPE,
     CC_SPECIFIC_SCALE,
     METER_TYPE_TO_SCALE_ENUM_MAP,
     MeterScaleType,
     MeterType,
 )
-from ..const.command_class.multilevel_sensor import (
-    CC_SPECIFIC_SENSOR_TYPE,
-    MultilevelSensorType,
-)
-from ..exceptions import InvalidCommandClass, UnknownValueData
-from ..model.value import Value
+from ...exceptions import InvalidCommandClass, UnknownValueData
+from ...model.value import Value
 
 
 def get_meter_type(value: Value) -> MeterType:
@@ -36,16 +32,4 @@ def get_meter_scale_type(value: Value) -> MeterScaleType:
     except ValueError:
         raise UnknownValueData(  # pylint: disable=raise-missing-from
             value, f"metadata.cc_specific.{CC_SPECIFIC_SCALE}"
-        )
-
-
-def get_multilevel_sensor_type(value: Value) -> MultilevelSensorType:
-    """Get the MultilevelSensorType for a given value."""
-    if value.command_class != CommandClass.SENSOR_MULTILEVEL:
-        raise InvalidCommandClass(value, CommandClass.SENSOR_MULTILEVEL)
-    try:
-        return MultilevelSensorType(value.metadata.cc_specific[CC_SPECIFIC_SENSOR_TYPE])
-    except ValueError:
-        raise UnknownValueData(  # pylint: disable=raise-missing-from
-            value, f"metadata.cc_specific.{CC_SPECIFIC_SENSOR_TYPE}"
         )
