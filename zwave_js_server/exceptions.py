@@ -1,5 +1,5 @@
 """Exceptions for zwave-js-server."""
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from .const import CommandClass
 

@@ -1,6 +1,6 @@
 """Provide a model for the Z-Wave JS controller."""
 from dataclasses import dataclass
-from typing import Literal, TYPE_CHECKING, Dict, List, Optional, TypedDict, Union, cast
+from typing import TYPE_CHECKING, Dict, List, Literal, Optional, TypedDict, Union, cast
 
 from ..const import InclusionStrategy, SecurityClass
 from ..event import Event, EventBase

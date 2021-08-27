@@ -1,17 +1,17 @@
 """Test command class utility functions."""
 import pytest
 
-from zwave_js_server.const import (
+from zwave_js_server.const import CommandClass
+from zwave_js_server.const.command_class.meter import (
     CC_SPECIFIC_METER_TYPE,
     CC_SPECIFIC_SCALE,
-    CommandClass,
     ElectricScale,
     MeterType,
-    MultilevelSensorType,
 )
+from zwave_js_server.const.command_class.multilevel_sensor import MultilevelSensorType
 from zwave_js_server.exceptions import InvalidCommandClass, UnknownValueData
 from zwave_js_server.model.node import Node
-from zwave_js_server.model.value import MetaDataType, get_value_id, Value, ValueDataType
+from zwave_js_server.model.value import MetaDataType, Value, ValueDataType, get_value_id
 from zwave_js_server.util.command_class import (
     get_meter_scale_type,
     get_meter_type,
