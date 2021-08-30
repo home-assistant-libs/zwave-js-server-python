@@ -151,6 +151,8 @@ class UnknownValueData(BaseZwaveJSServerError):
         self.path = path
         super().__init__(
             f"Value {value} has unknown data in the following location: {path}. "
-            "Please report this issue, it can be caused by either an upstream issue "
-            "with the driver or missing support for this data in the library"
+            f"A reinterview of node {value.node} may correct this issue, but if it "
+            "doesn't, please report this issue as it may be caused by either an "
+            "upstream issue with the driver or missing support for this data in the "
+            "library"
         )
