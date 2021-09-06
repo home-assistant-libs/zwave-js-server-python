@@ -134,7 +134,7 @@ async def test_begin_inclusion(controller, uuid4, mock_command):
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.begin_inclusion",
-        "options": {"inclusionStrategy": InclusionStrategy.SECURITY_S0},
+        "options": {"strategy": InclusionStrategy.SECURITY_S0},
         "messageId": uuid4,
     }
 
@@ -151,7 +151,7 @@ async def test_begin_inclusion_default(controller, uuid4, mock_command):
     assert ack_commands[0] == {
         "command": "controller.begin_inclusion",
         "options": {
-            "inclusionStrategy": InclusionStrategy.DEFAULT,
+            "strategy": InclusionStrategy.DEFAULT,
             "forceSecurity": None,
         },
         "messageId": uuid4,
@@ -243,7 +243,7 @@ async def test_replace_failed_node(controller, uuid4, mock_command):
         "command": "controller.replace_failed_node",
         "messageId": uuid4,
         "nodeId": node_id,
-        "options": {"inclusionStrategy": InclusionStrategy.DEFAULT.value},
+        "options": {"strategy": InclusionStrategy.DEFAULT.value},
     }
 
 

@@ -289,7 +289,7 @@ class Controller(EventBase):
         data = await self.client.async_send_command(
             {
                 "command": "controller.begin_inclusion",
-                "options": {"inclusionStrategy": inclusion_strategy},
+                "options": {"strategy": inclusion_strategy},
             },
             require_schema=8,
         )
@@ -304,7 +304,7 @@ class Controller(EventBase):
             {
                 "command": "controller.begin_inclusion",
                 "options": {
-                    "inclusionStrategy": InclusionStrategy.DEFAULT,
+                    "strategy": InclusionStrategy.DEFAULT,
                     "forceSecurity": force_security,
                 },
             },
@@ -353,7 +353,7 @@ class Controller(EventBase):
             {
                 "command": "controller.replace_failed_node",
                 "nodeId": node_id,
-                "options": {"inclusionStrategy": inclusion_strategy},
+                "options": {"strategy": inclusion_strategy},
             },
             require_schema=8,
         )
