@@ -98,7 +98,9 @@ async def get_usercode_from_node(
     This call will populate the ValueDB and trigger value update events from the
     driver.
     """
-    resp = await node.async_invoke_cc_api(CommandClass.USER_CODE, "get", code_slot)
+    resp = await node.async_invoke_cc_api(
+        CommandClass.USER_CODE, "get", code_slot, wait_for_result=True
+    )
     return {
         ATTR_IN_USE: resp["userIdStatus"] == CodeSlotStatus.ENABLED,
         ATTR_USERCODE: resp["userCode"],
