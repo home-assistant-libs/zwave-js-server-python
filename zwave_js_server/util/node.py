@@ -204,9 +204,9 @@ def _validate_and_transform_new_value(
     # Validate that new value for range configuration parameter is within bounds
     max_ = zwave_value.metadata.max
     min_ = zwave_value.metadata.min
-    check_ = (
-        zwave_value.configuration_value_type == ConfigurationValueType.RANGE
-        or zwave_value.configuration_value_type == ConfigurationValueType.MANUAL_ENTRY
+    check_ = zwave_value.configuration_value_type in (
+        ConfigurationValueType.RANGE,
+        ConfigurationValueType.MANUAL_ENTRY,
     )
     if check_ and (
         (max_ is not None and new_value > max_)
