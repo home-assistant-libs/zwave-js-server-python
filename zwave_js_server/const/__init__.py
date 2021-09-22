@@ -12,6 +12,7 @@ INTERVIEW_FAILED = "Failed"
 
 TARGET_STATE_PROPERTY = "targetState"
 TARGET_VALUE_PROPERTY = "targetValue"
+DURATION_PROPERTY = "duration"
 
 
 class CommandStatus(str, Enum):
