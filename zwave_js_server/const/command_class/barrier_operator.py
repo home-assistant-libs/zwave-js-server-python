@@ -1,6 +1,8 @@
 """Constants for the Barrier Operator CC."""
 from enum import IntEnum
 
+SIGNALING_STATE_PROPERTY = "signalingState"
+
 
 class BarrierEventSignalingSubsystemState(IntEnum):
     """Enum with all (known/used) Z-Wave Barrier Event Signaling Subsystem States."""

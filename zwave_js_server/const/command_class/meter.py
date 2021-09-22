@@ -2,6 +2,8 @@
 from enum import IntEnum
 from typing import Dict, Set, Type, Union
 
+VALUE_PROPERTY = "value"
+
 CC_SPECIFIC_SCALE = "scale"
 CC_SPECIFIC_METER_TYPE = "meterType"
 CC_SPECIFIC_RATE_TYPE = "rateType"

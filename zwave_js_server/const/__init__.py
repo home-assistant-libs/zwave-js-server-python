@@ -10,9 +10,14 @@ VALUE_UNKNOWN = "unknown"
 
 INTERVIEW_FAILED = "Failed"
 
+CURRENT_STATE_PROPERTY = "currentState"
 TARGET_STATE_PROPERTY = "targetState"
+CURRENT_VALUE_PROPERTY = "currentValue"
 TARGET_VALUE_PROPERTY = "targetValue"
 DURATION_PROPERTY = "duration"
+
+TRANSITION_DURATION_OPTION = "transitionDuration"
+VOLUME_OPTION = "volume"
 
 
 class CommandStatus(str, Enum):
