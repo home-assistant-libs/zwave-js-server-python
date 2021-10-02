@@ -134,6 +134,7 @@ class NodeDataType(EndpointDataType):
     commandClasses: List[CommandClassInfoDataType]
     values: List[ValueDataType]
     statistics: NodeStatisticsDataType
+    highestSecurityClass: SecurityClass
 
 
 class Node(Endpoint):
@@ -348,6 +349,13 @@ class Node(Endpoint):
     def firmware_update_progress(self) -> Optional[FirmwareUpdateProgress]:
         """Return firmware update progress."""
         return self._firmware_update_progress
+
+    @property
+    def highest_security_class(self) -> Optional[SecurityClass]:
+        """Return highest security class configured on the node."""
+        if (security_class := self.data.get("highestSecurityClass")) is None:
+            return None
+        return SecurityClass(security_class)
 
     def get_command_class_values(
         self, command_class: CommandClass, endpoint: int = None
