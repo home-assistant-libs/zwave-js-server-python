@@ -4,7 +4,7 @@ from typing import List, Optional
 
 import aiohttp
 
-from .const import MAX_SERVER_SCHEMA_VERSION
+from .const import MAX_DUMP_SIZE, MAX_SERVER_SCHEMA_VERSION
 
 
 async def dump_msgs(
@@ -13,7 +13,7 @@ async def dump_msgs(
     timeout: Optional[float] = None,
 ) -> List[dict]:
     """Dump server state."""
-    client = await session.ws_connect(url)
+    client = await session.ws_connect(url, max_msg_size=MAX_DUMP_SIZE)
     msgs = []
 
     version = await client.receive_json()
