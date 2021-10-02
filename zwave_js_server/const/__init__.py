@@ -7,7 +7,7 @@ MIN_SERVER_SCHEMA_VERSION = 9
 MAX_SERVER_SCHEMA_VERSION = 9
 
 # max size of a network state dump that the client can handle
-MAX_DUMP_SIZE = 64 * 1024 * 1024
+MAX_NETWORK_STATE_SIZE = 64 * 1024 * 1024
 
 VALUE_UNKNOWN = "unknown"
 

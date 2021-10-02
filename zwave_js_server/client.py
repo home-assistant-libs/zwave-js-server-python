@@ -8,7 +8,11 @@ from typing import Any, Dict, Optional, cast
 
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, client_exceptions
 
-from .const import MAX_SERVER_SCHEMA_VERSION, MIN_SERVER_SCHEMA_VERSION
+from .const import (
+    MAX_NETWORK_STATE_SIZE,
+    MAX_SERVER_SCHEMA_VERSION,
+    MIN_SERVER_SCHEMA_VERSION,
+)
 from .event import Event
 from .exceptions import (
     CannotConnect,
@@ -102,6 +106,7 @@ class Client:
             self._client = await self.aiohttp_session.ws_connect(
                 self.ws_server_url,
                 heartbeat=55,
+                max_msg_size=MAX_NETWORK_STATE_SIZE,
             )
         except (
             client_exceptions.WSServerHandshakeError,
