@@ -85,6 +85,12 @@ def test_from_state():
     )
 
 
+async def test_highest_security_value(lock_schlage_be469, ring_keypad):
+    """Test the highest_security_class property"""
+    assert lock_schlage_be469.highest_security_class == SecurityClass.S0_LEGACY
+    assert ring_keypad.highest_security_class is None
+
+
 async def test_device_config(wallmote_central_scene):
     """Test a device config."""
     node: Node = wallmote_central_scene
