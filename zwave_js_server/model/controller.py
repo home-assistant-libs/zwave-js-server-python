@@ -29,7 +29,7 @@ class InclusionGrant:
     def to_dict(self) -> InclusionGrantDataType:
         """Return InclusionGrantDataType dict from self."""
         return {
-            "securityClasses": self.security_classes,
+            "securityClasses": [sec_cls.value for sec_cls in self.security_classes],
             "clientSideAuth": self.client_side_auth,
         }
 
