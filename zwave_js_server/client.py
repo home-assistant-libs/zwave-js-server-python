@@ -102,6 +102,7 @@ class Client:
             self._client = await self.aiohttp_session.ws_connect(
                 self.ws_server_url,
                 heartbeat=55,
+                compress=15,
             )
         except (
             client_exceptions.WSServerHandshakeError,
