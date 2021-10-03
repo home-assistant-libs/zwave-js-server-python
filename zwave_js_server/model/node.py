@@ -134,7 +134,7 @@ class NodeDataType(EndpointDataType):
     commandClasses: List[CommandClassInfoDataType]
     values: List[ValueDataType]
     statistics: NodeStatisticsDataType
-    highestSecurityClass: SecurityClass
+    highestSecurityClass: int
 
 
 class Node(Endpoint):

@@ -15,7 +15,7 @@ class InclusionGrantDataType(TypedDict):
     """Representation of an inclusion grant data dict type."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/controller/Inclusion.ts#L48-L56
-    securityClasses: List[SecurityClass]
+    securityClasses: List[int]
     clientSideAuth: bool
 
 
