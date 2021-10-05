@@ -103,6 +103,7 @@ class Client:
                 self.ws_server_url,
                 heartbeat=55,
                 compress=15,
+                max_msg_size=0,
             )
         except (
             client_exceptions.WSServerHandshakeError,

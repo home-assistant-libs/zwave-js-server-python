@@ -13,7 +13,7 @@ async def dump_msgs(
     timeout: Optional[float] = None,
 ) -> List[dict]:
     """Dump server state."""
-    client = await session.ws_connect(url, compress=15)
+    client = await session.ws_connect(url, compress=15, max_msg_size=0)
     msgs = []
 
     version = await client.receive_json()
