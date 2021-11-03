@@ -471,7 +471,6 @@ class Controller(EventBase):
             },
             require_schema=11,
         )
-        return None
 
     async def async_unprovision_smart_start_node(
         self,
