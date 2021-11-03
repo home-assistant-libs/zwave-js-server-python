@@ -47,8 +47,8 @@ class InclusionGrant:
     def from_dict(cls, data: InclusionGrantDataType) -> "InclusionGrant":
         """Return InclusionGrant from InclusionGrantDataType dict."""
         return cls(
-            [SecurityClass(sec_cls) for sec_cls in data["securityClasses"]],
-            data["clientSideAuth"],
+            security_classes=[SecurityClass(sec_cls) for sec_cls in data["securityClasses"]],
+            client_side_auth=data["clientSideAuth"],
         )
 
 
@@ -72,9 +72,9 @@ class ProvisioningEntry:
     def from_dict(cls, data: Dict[str, Any]) -> "ProvisioningEntry":
         """Return ProvisioningEntry from data dict."""
         return cls(
-            data["dsk"],
-            [SecurityClass(sec_cls) for sec_cls in data["securityClasses"]],
-            {k: v for k, v in data.items() if k not in {"dsk", "securityClasses"}},
+            dsk=data["dsk"],
+            security_classes=[SecurityClass(sec_cls) for sec_cls in data["securityClasses"]],
+            additional_properties={k: v for k, v in data.items() if k not in {"dsk", "securityClasses"}},
         )
 
 
@@ -144,19 +144,19 @@ class QRProvisioningInformation:
     ) -> "QRProvisioningInformation":
         """Return QRProvisioningInformation from QRProvisioningInformationDataType dict."""
         return cls(
-            QRCodeVersion(data["version"]),
-            [SecurityClass(sec_cls) for sec_cls in data["securityClasses"]],
-            data["dsk"],
-            data["genericDeviceClass"],
-            data["specificDeviceClass"],
-            data["installerIconType"],
-            data["manufacturerId"],
-            data["productType"],
-            data["productId"],
-            data["applicationVersion"],
-            data.get("maxInclusionRequestInterval"),
-            data.get("uuid"),
-            [
+            version=QRCodeVersion(data["version"]),
+            security_classes=[SecurityClass(sec_cls) for sec_cls in data["securityClasses"]],
+            dsk=data["dsk"],
+            generic_device_class=data["genericDeviceClass"],
+            specific_device_class=data["specificDeviceClass"],
+            installer_icon_type=data["installerIconType"],
+            manufacturer_id=data["manufacturerId"],
+            product_type=data["productType"],
+            product_id=data["productId"],
+            application_version=data["applicationVersion"],
+            max_inclusion_request_interval=data.get("maxInclusionRequestInterval"),
+            uuid=data.get("uuid"),
+            supported_protocols=[
                 Protocols(supported_protocol)
                 for supported_protocol in data.get("supportedProtocols", [])
             ],
