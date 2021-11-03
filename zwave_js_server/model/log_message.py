@@ -1,6 +1,91 @@
 """Provide a model for a log message event."""
 from typing import List, Literal, Optional, TypedDict, Union
 
+from ..const import CommandClass
+
+
+class LogMessageContextDataType(TypedDict, total=False):
+    """Represent a log message context data dict type."""
+
+    source: Literal["config", "serial", "controller", "driver"]  # required
+    type: Literal["value", "node"]
+    nodeId: int
+    header: str
+    direction: Literal["inbound", "outbound", "none"]
+    change: Literal["added", "removed", "updated", "notification"]
+    internal: bool
+    endpoint: int
+    commandClass: int
+    property: Union[int, str]
+    propertyKey: Union[int, str]
+
+
+class LogMessageContext:
+    """Represent log message context information."""
+
+    def __init__(self, data: LogMessageContextDataType) -> None:
+        """Initialize log message context."""
+        self.data = data
+
+    @property
+    def source(self) -> Literal["config", "serial", "controller", "driver"]:
+        """Return the log message source."""
+        return self.data["source"]
+
+    @property
+    def type(self) -> Optional[Literal["value", "node"]]:
+        """Return the object type for the log message if applicable."""
+        return self.data.get("type")
+
+    @property
+    def node_id(self) -> Optional[int]:
+        """Return the Node ID for the log message if applicable."""
+        return self.data.get("nodeId")
+
+    @property
+    def header(self) -> Optional[str]:
+        """Return the header for the log message if applicable."""
+        return self.data.get("header")
+
+    @property
+    def direction(self) -> Optional[Literal["inbound", "outbound", "none"]]:
+        """Return the direction for the log message if applicable."""
+        return self.data.get("direction")
+
+    @property
+    def change(
+        self,
+    ) -> Optional[Literal["added", "removed", "updated", "notification"]]:
+        """Return the change type for the log message if applicable."""
+        return self.data.get("change")
+
+    @property
+    def internal(self) -> Optional[bool]:
+        """Return the internal flag for the log message if applicable."""
+        return self.data.get("internal")
+
+    @property
+    def endpoint(self) -> Optional[int]:
+        """Return the Node/Value endpoint for the log message if applicable."""
+        return self.data.get("endpoint")
+
+    @property
+    def command_class(self) -> Optional[CommandClass]:
+        """Return the Value command class for the log message if applicable."""
+        if command_class := self.data.get("commandClass"):
+            return CommandClass(command_class)
+        return None
+
+    @property
+    def property_(self) -> Optional[Union[int, str]]:
+        """Return the Value property for the log message if applicable."""
+        return self.data.get("property")
+
+    @property
+    def property_key(self) -> Optional[Union[int, str]]:
+        """Return the Value property key for the log message if applicable."""
+        return self.data.get("propertyKey")
+
 
 class LogMessageDataType(TypedDict, total=False):
     """Represent a log message data dict type."""
@@ -11,6 +96,7 @@ class LogMessageDataType(TypedDict, total=False):
     formattedMessage: Union[str, List[str]]  # required
     direction: str  # required
     level: str  # required
+    context: LogMessageContextDataType  # required
     primaryTags: str
     secondaryTags: str
     secondaryTagPadding: int
@@ -86,3 +172,8 @@ class LogMessage:
     def label(self) -> Optional[str]:
         """Return label."""
         return self.data.get("label")
+
+    @property
+    def context(self) -> LogMessageContext:
+        """Return context."""
+        return LogMessageContext(self.data["context"])

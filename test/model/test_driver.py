@@ -164,6 +164,15 @@ async def test_listening_logs(driver, uuid4, mock_command):
             "timestamp": "2021-04-18T18:03:34.051Z",
             "multiline": True,
             "secondaryTagPadding": -1,
+            "context": {
+                "source": "controller",
+                "type": "node",
+                "nodeId": 5,
+                "header": "Notification",
+                "direction": "none",
+                "change": "notification",
+                "endpoint": 0,
+            },
         },
     )
     driver.receive_event(event)
@@ -183,6 +192,19 @@ async def test_listening_logs(driver, uuid4, mock_command):
     assert log_message.multiline
     assert log_message.secondary_tag_padding == -1
     assert log_message.timestamp == "2021-04-18T18:03:34.051Z"
+
+    context = log_message.context
+    assert context.change == "notification"
+    assert context.direction == "none"
+    assert context.endpoint == 0
+    assert context.header == "Notification"
+    assert context.node_id == 5
+    assert context.source == "controller"
+    assert context.type == "node"
+    assert context.internal is None
+    assert context.property_ is None
+    assert context.property_key is None
+    assert context.command_class is None
 
 
 async def test_statistics(driver, uuid4, mock_command):
