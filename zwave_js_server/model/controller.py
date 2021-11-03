@@ -423,7 +423,7 @@ class Controller(EventBase):
         ] = None,
     ) -> bool:
         """Send beginInclusion command to Controller."""
-        options = {"strategy": inclusion_strategy}
+        options: Dict[str, Any] = {"strategy": inclusion_strategy}
         # forceSecurity can only be used with the default inclusion strategy
         if force_security is not None:
             if inclusion_strategy != InclusionStrategy.DEFAULT:
@@ -439,11 +439,12 @@ class Controller(EventBase):
                     "`provisioning` option is only supported with inclusion_strategy=SECURITY_S2"
                 )
             # String is assumed to be the QR code string so we can pass as is
+            if isinstance(provisioning, str):
+                options["provisioning"] = provisioning
             # Otherwise we assume the data is ProvisioningEntry or
             # QRProvisioningInformation
-            if not isinstance(provisioning, str):
-                provisioning = provisioning.to_dict()
-            options["provisioning"] = provisioning
+            else:
+                options["provisioning"] = provisioning.to_dict()
 
         data = await self.client.async_send_command(
             {

@@ -292,7 +292,7 @@ async def test_begin_inclusion_s2_qr_info(controller, uuid4, mock_command):
     }
 
 
-async def test_begin_inclusion_errors(controller, uuid4, mock_command):
+async def test_begin_inclusion_errors(controller):
     """Test begin inclusion error scenarios."""
     provisioning_entry = controller_pkg.ProvisioningEntry(
         "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
