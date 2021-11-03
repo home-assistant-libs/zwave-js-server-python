@@ -243,21 +243,6 @@ async def test_begin_inclusion_s2_provisioning_entry(controller, uuid4, mock_com
     }
 
 
-async def test_begin_inclusion_errors(controller, uuid4, mock_command):
-    """Test begin inclusion error scenarios."""
-    provisioning_entry = controller_pkg.ProvisioningEntry(
-        "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
-    )
-    with pytest.raises(ValueError):
-        await controller.async_begin_inclusion(
-            InclusionStrategy.SECURITY_S0, provisioning=provisioning_entry
-        )
-    with pytest.raises(ValueError):
-        await controller.async_begin_inclusion(
-            InclusionStrategy.SECURITY_S2, force_security=True
-        )
-
-
 async def test_begin_inclusion_s2_qr_info(controller, uuid4, mock_command):
     """Test begin inclusion S2 Mode with QR info."""
     ack_commands = mock_command(
@@ -305,6 +290,21 @@ async def test_begin_inclusion_s2_qr_info(controller, uuid4, mock_command):
         },
         "messageId": uuid4,
     }
+
+
+async def test_begin_inclusion_errors(controller, uuid4, mock_command):
+    """Test begin inclusion error scenarios."""
+    provisioning_entry = controller_pkg.ProvisioningEntry(
+        "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
+    )
+    with pytest.raises(ValueError):
+        await controller.async_begin_inclusion(
+            InclusionStrategy.SECURITY_S0, provisioning=provisioning_entry
+        )
+    with pytest.raises(ValueError):
+        await controller.async_begin_inclusion(
+            InclusionStrategy.SECURITY_S2, force_security=True
+        )
 
 
 async def test_provision_smart_start_node_qr_code_string(
