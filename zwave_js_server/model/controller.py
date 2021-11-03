@@ -520,7 +520,8 @@ class Controller(EventBase):
     async def async_begin_exclusion(self, unprovision: Optional[bool] = None) -> bool:
         """Send beginExclusion command to Controller."""
         payload: Dict[str, Union[str, bool]] = {"command": "controller.begin_exclusion"}
-        payload["unprovision"] = unprovision or False
+        if unprovision is not None:
+            payload["unprovision"] = unprovision
         data = await self.client.async_send_command(payload)
         return cast(bool, data["success"])
 

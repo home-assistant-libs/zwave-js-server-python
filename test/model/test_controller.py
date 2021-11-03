@@ -467,6 +467,21 @@ async def test_begin_exclusion(controller, uuid4, mock_command):
         {"command": "controller.begin_exclusion"},
         {"success": True},
     )
+    assert await controller.async_begin_exclusion()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.begin_exclusion",
+        "messageId": uuid4,
+    }
+
+
+async def test_begin_exclusion_unprovision(controller, uuid4, mock_command):
+    """Test begin exclusion with unprovision set."""
+    ack_commands = mock_command(
+        {"command": "controller.begin_exclusion"},
+        {"success": True},
+    )
     assert await controller.async_begin_exclusion(True)
 
     assert len(ack_commands) == 1
