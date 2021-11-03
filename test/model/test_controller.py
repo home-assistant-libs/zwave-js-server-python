@@ -1,7 +1,12 @@
 """Test the controller model."""
 import json
 
-from zwave_js_server.const import InclusionStrategy, Protocols, QRCodeVersion, SecurityClass
+from zwave_js_server.const import (
+    InclusionStrategy,
+    Protocols,
+    QRCodeVersion,
+    SecurityClass,
+)
 from zwave_js_server.event import Event
 from zwave_js_server.model import association as association_pkg
 from zwave_js_server.model import controller as controller_pkg
@@ -324,9 +329,7 @@ async def test_provision_smart_start_node_qr_info(controller, uuid4, mock_comman
     }
 
 
-async def test_unprovision_smart_start_node(
-    controller, uuid4, mock_command
-):
+async def test_unprovision_smart_start_node(controller, uuid4, mock_command):
     """Test unprovision smart start node."""
     ack_commands = mock_command(
         {"command": "controller.unprovision_smart_start_node"},
@@ -342,9 +345,7 @@ async def test_unprovision_smart_start_node(
     }
 
 
-async def test_get_provisioning_entry(
-    controller, uuid4, mock_command
-):
+async def test_get_provisioning_entry(controller, uuid4, mock_command):
     """Test get_provisioning_entry."""
     ack_commands = mock_command(
         {"command": "controller.get_provisioning_entry"},
@@ -363,18 +364,18 @@ async def test_get_provisioning_entry(
     }
 
 
-async def test_get_provisioning_entries(
-    controller, uuid4, mock_command
-):
+async def test_get_provisioning_entries(controller, uuid4, mock_command):
     """Test get_provisioning_entries."""
     ack_commands = mock_command(
         {"command": "controller.get_provisioning_entries"},
         {"entries": [{"dsk": "test", "securityClasses": [0], "test": "test"}]},
     )
     provisioning_entry = await controller.async_get_provisioning_entries()
-    assert provisioning_entry == [controller_pkg.ProvisioningEntry(
-        "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
-    )]
+    assert provisioning_entry == [
+        controller_pkg.ProvisioningEntry(
+            "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
+        )
+    ]
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
