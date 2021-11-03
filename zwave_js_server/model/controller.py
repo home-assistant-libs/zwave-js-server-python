@@ -484,7 +484,6 @@ class Controller(EventBase):
             },
             require_schema=11,
         )
-        return None
 
     async def async_get_provisioning_entry(
         self, dsk: str
