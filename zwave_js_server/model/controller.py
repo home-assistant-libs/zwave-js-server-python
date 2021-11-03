@@ -423,6 +423,8 @@ class Controller(EventBase):
         ] = None,
     ) -> bool:
         """Send beginInclusion command to Controller."""
+        # Most functionality was introduced in Schema 8
+        require_schema = 8
         options: Dict[str, Any] = {"strategy": inclusion_strategy}
         # forceSecurity can only be used with the default inclusion strategy
         if force_security is not None:
@@ -432,12 +434,15 @@ class Controller(EventBase):
                 )
             options["forceSecurity"] = force_security
 
-        # provisioning can only be used with the S2 inclusion strategy and may need additional processing
+        # provisioning can only be used with the S2 inclusion strategy and may need
+        # additional processing
         if provisioning is not None:
             if inclusion_strategy != InclusionStrategy.SECURITY_S2:
                 raise ValueError(
                     "`provisioning` option is only supported with inclusion_strategy=SECURITY_S2"
                 )
+            # Provisioning option was introduced in Schema 11
+            require_schema = 11
             # String is assumed to be the QR code string so we can pass as is
             if isinstance(provisioning, str):
                 options["provisioning"] = provisioning
@@ -451,7 +456,7 @@ class Controller(EventBase):
                 "command": "controller.begin_inclusion",
                 "options": options,
             },
-            require_schema=8,
+            require_schema=require_schema,
         )
         return cast(bool, data["success"])
 
