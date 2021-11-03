@@ -1,6 +1,5 @@
 """Provide a model for the Z-Wave JS controller."""
 from dataclasses import dataclass
-import logging
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -20,8 +19,6 @@ from .node import Node
 
 if TYPE_CHECKING:
     from ..client import Client
-
-_LOGGER = logging.getLogger(__name__)
 
 
 class InclusionGrantDataType(TypedDict):
@@ -457,26 +454,6 @@ class Controller(EventBase):
                 "options": options,
             },
             require_schema=require_schema,
-        )
-        return cast(bool, data["success"])
-
-    async def async_begin_inclusion_default(
-        self,
-        force_security: Optional[bool] = None,
-    ) -> bool:
-        """Send beginInclusion command to Controller using Default inclusion method."""
-        _LOGGER.warning(
-            "This method has been deprecated, use async_begin_inclusion instead."
-        )
-        data = await self.client.async_send_command(
-            {
-                "command": "controller.begin_inclusion",
-                "options": {
-                    "strategy": InclusionStrategy.DEFAULT,
-                    "forceSecurity": force_security,
-                },
-            },
-            require_schema=8,
         )
         return cast(bool, data["success"])
 

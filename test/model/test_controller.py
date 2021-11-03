@@ -446,25 +446,6 @@ async def test_get_provisioning_entries(controller, uuid4, mock_command):
     }
 
 
-async def test_begin_inclusion_default_deprecated_cmd(controller, uuid4, mock_command):
-    """Test begin inclusion (deprecated command)."""
-    ack_commands = mock_command(
-        {"command": "controller.begin_inclusion"},
-        {"success": True},
-    )
-    assert await controller.async_begin_inclusion_default()
-
-    assert len(ack_commands) == 1
-    assert ack_commands[0] == {
-        "command": "controller.begin_inclusion",
-        "options": {
-            "strategy": InclusionStrategy.DEFAULT,
-            "forceSecurity": None,
-        },
-        "messageId": uuid4,
-    }
-
-
 async def test_stop_inclusion(controller, uuid4, mock_command):
     """Test stop inclusion."""
     ack_commands = mock_command(
