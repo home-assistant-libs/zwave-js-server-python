@@ -1,7 +1,7 @@
 """Test the controller model."""
 import json
 
-from zwave_js_server.const import InclusionStrategy, SecurityClass
+from zwave_js_server.const import InclusionStrategy, Protocols, QRCodeVersion, SecurityClass
 from zwave_js_server.event import Event
 from zwave_js_server.model import association as association_pkg
 from zwave_js_server.model import controller as controller_pkg
@@ -139,6 +139,250 @@ async def test_begin_inclusion(controller, uuid4, mock_command):
     }
 
 
+async def test_begin_inclusion_s2_no_input(controller, uuid4, mock_command):
+    """Test begin inclusion S2 Mode."""
+    ack_commands = mock_command(
+        {"command": "controller.begin_inclusion"},
+        {"success": True},
+    )
+    assert await controller.async_begin_inclusion_s2()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.begin_inclusion",
+        "options": {"strategy": InclusionStrategy.SECURITY_S2},
+        "messageId": uuid4,
+    }
+
+
+async def test_begin_inclusion_s2_qr_code_string(controller, uuid4, mock_command):
+    """Test begin inclusion S2 Mode with a QR code string."""
+    ack_commands = mock_command(
+        {"command": "controller.begin_inclusion"},
+        {"success": True},
+    )
+    assert await controller.async_begin_inclusion_s2("test")
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.begin_inclusion",
+        "options": {"strategy": InclusionStrategy.SECURITY_S2, "provisioning": "test"},
+        "messageId": uuid4,
+    }
+
+
+async def test_begin_inclusion_s2_provisioning_entry(controller, uuid4, mock_command):
+    """Test begin inclusion S2 Mode with a provisioning entry."""
+    ack_commands = mock_command(
+        {"command": "controller.begin_inclusion"},
+        {"success": True},
+    )
+    provisioning_entry = controller_pkg.ProvisioningEntry(
+        "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
+    )
+    assert await controller.async_begin_inclusion_s2(provisioning_entry)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.begin_inclusion",
+        "options": {
+            "strategy": InclusionStrategy.SECURITY_S2,
+            "provisioning": {"dsk": "test", "securityClasses": [0], "test": "test"},
+        },
+        "messageId": uuid4,
+    }
+
+
+async def test_begin_inclusion_s2_qr_info(controller, uuid4, mock_command):
+    """Test begin inclusion S2 Mode with QR info."""
+    ack_commands = mock_command(
+        {"command": "controller.begin_inclusion"},
+        {"success": True},
+    )
+    provisioning_entry = controller_pkg.QRProvisioningInformation(
+        QRCodeVersion.S2,
+        [SecurityClass.S2_UNAUTHENTICATED],
+        "test",
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        "test",
+        1,
+        "test",
+        None,
+    )
+    assert await controller.async_begin_inclusion_s2(provisioning_entry)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.begin_inclusion",
+        "options": {
+            "strategy": InclusionStrategy.SECURITY_S2,
+            "provisioning": {
+                "version": 0,
+                "securityClasses": [0],
+                "dsk": "test",
+                "genericDeviceClass": 1,
+                "specificDeviceClass": 1,
+                "installerIconType": 1,
+                "manufacturerId": 1,
+                "productType": 1,
+                "productId": 1,
+                "applicationVersion": "test",
+                "maxInclusionRequestInterval": 1,
+                "uuid": "test",
+            },
+        },
+        "messageId": uuid4,
+    }
+
+
+async def test_provision_smart_start_node_qr_code_string(
+    controller, uuid4, mock_command
+):
+    """Test provision smart start node with a QR code string."""
+    ack_commands = mock_command(
+        {"command": "controller.provision_smart_start_node"},
+        {"success": True},
+    )
+    await controller.async_provision_smart_start_node("test")
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.provision_smart_start_node",
+        "entry": "test",
+        "messageId": uuid4,
+    }
+
+
+async def test_provision_smart_start_node_provisioning_entry(
+    controller, uuid4, mock_command
+):
+    """Test provision smart start node with a provisioning entry."""
+    ack_commands = mock_command(
+        {"command": "controller.provision_smart_start_node"},
+        {"success": True},
+    )
+    provisioning_entry = controller_pkg.ProvisioningEntry(
+        "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
+    )
+    await controller.async_provision_smart_start_node(provisioning_entry)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.provision_smart_start_node",
+        "entry": {"dsk": "test", "securityClasses": [0], "test": "test"},
+        "messageId": uuid4,
+    }
+
+
+async def test_provision_smart_start_node_qr_info(controller, uuid4, mock_command):
+    """Test provision smart start with QR info."""
+    ack_commands = mock_command(
+        {"command": "controller.provision_smart_start_node"},
+        {"success": True},
+    )
+    provisioning_entry = controller_pkg.QRProvisioningInformation(
+        QRCodeVersion.S2,
+        [SecurityClass.S2_UNAUTHENTICATED],
+        "test",
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        "test",
+        1,
+        "test",
+        [Protocols.ZWAVE],
+    )
+    await controller.async_provision_smart_start_node(provisioning_entry)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.provision_smart_start_node",
+        "entry": {
+            "version": 0,
+            "securityClasses": [0],
+            "dsk": "test",
+            "genericDeviceClass": 1,
+            "specificDeviceClass": 1,
+            "installerIconType": 1,
+            "manufacturerId": 1,
+            "productType": 1,
+            "productId": 1,
+            "applicationVersion": "test",
+            "maxInclusionRequestInterval": 1,
+            "uuid": "test",
+            "supportedProtocols": [0],
+        },
+        "messageId": uuid4,
+    }
+
+
+async def test_unprovision_smart_start_node(
+    controller, uuid4, mock_command
+):
+    """Test unprovision smart start node."""
+    ack_commands = mock_command(
+        {"command": "controller.unprovision_smart_start_node"},
+        {"success": True},
+    )
+    await controller.async_unprovision_smart_start_node("test")
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.unprovision_smart_start_node",
+        "dskOrNodeId": "test",
+        "messageId": uuid4,
+    }
+
+
+async def test_get_provisioning_entry(
+    controller, uuid4, mock_command
+):
+    """Test get_provisioning_entry."""
+    ack_commands = mock_command(
+        {"command": "controller.get_provisioning_entry"},
+        {"entry": {"dsk": "test", "securityClasses": [0], "test": "test"}},
+    )
+    provisioning_entry = await controller.async_get_provisioning_entry("test")
+    assert provisioning_entry == controller_pkg.ProvisioningEntry(
+        "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
+    )
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_provisioning_entry",
+        "dsk": "test",
+        "messageId": uuid4,
+    }
+
+
+async def test_get_provisioning_entries(
+    controller, uuid4, mock_command
+):
+    """Test get_provisioning_entries."""
+    ack_commands = mock_command(
+        {"command": "controller.get_provisioning_entries"},
+        {"entries": [{"dsk": "test", "securityClasses": [0], "test": "test"}]},
+    )
+    provisioning_entry = await controller.async_get_provisioning_entries()
+    assert provisioning_entry == [controller_pkg.ProvisioningEntry(
+        "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
+    )]
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_provisioning_entries",
+        "messageId": uuid4,
+    }
+
+
 async def test_begin_inclusion_default(controller, uuid4, mock_command):
     """Test begin inclusion."""
     ack_commands = mock_command(
@@ -179,11 +423,12 @@ async def test_begin_exclusion(controller, uuid4, mock_command):
         {"command": "controller.begin_exclusion"},
         {"success": True},
     )
-    assert await controller.async_begin_exclusion()
+    assert await controller.async_begin_exclusion(True)
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.begin_exclusion",
+        "unprovision": True,
         "messageId": uuid4,
     }
 

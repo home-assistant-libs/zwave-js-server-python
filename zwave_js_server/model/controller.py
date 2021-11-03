@@ -1,8 +1,18 @@
 """Provide a model for the Z-Wave JS controller."""
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Dict, List, Literal, Optional, TypedDict, Union, cast
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    List,
+    Literal,
+    Optional,
+    TypedDict,
+    Union,
+    cast,
+)
 
-from ..const import InclusionStrategy, SecurityClass
+from ..const import InclusionStrategy, Protocols, QRCodeVersion, SecurityClass
 from ..event import Event, EventBase
 from .association import Association, AssociationGroup
 from .node import Node
@@ -39,6 +49,117 @@ class InclusionGrant:
         return cls(
             [SecurityClass(sec_cls) for sec_cls in data["securityClasses"]],
             data["clientSideAuth"],
+        )
+
+
+@dataclass
+class ProvisioningEntry:
+    """Representation of a provisioning entry."""
+
+    dsk: str
+    security_classes: List[SecurityClass]
+    additional_properties: Optional[Dict[str, Any]] = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Return PlannedProvisioning data dict from self."""
+        return {
+            "dsk": self.dsk,
+            "securityClasses": [sec_cls.value for sec_cls in self.security_classes],
+            **(self.additional_properties or {}),
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "ProvisioningEntry":
+        """Return ProvisioningEntry from data dict."""
+        return cls(
+            data["dsk"],
+            [SecurityClass(sec_cls) for sec_cls in data["securityClasses"]],
+            {k: v for k, v in data.items() if k not in {"dsk", "securityClasses"}},
+        )
+
+
+class QRProvisioningInformationDataType(TypedDict, total=False):
+    """Representation of provisioning information data dict type retrieved from a QR code."""
+
+    version: int  # required
+    securityClasses: List[int]  # required
+    dsk: str  # required
+    genericDeviceClass: int  # required
+    specificDeviceClass: int  # required
+    installerIconType: int  # required
+    manufacturerId: int  # required
+    productType: int  # required
+    productId: int  # required
+    applicationVersion: str  # required
+    maxInclusionRequestInterval: int
+    uuid: str
+    supportedProtocols: List[int]
+
+
+@dataclass
+class QRProvisioningInformation:
+    """Representation of provisioning information retrieved from a QR code."""
+
+    version: QRCodeVersion
+    security_classes: List[SecurityClass]
+    dsk: str
+    generic_device_class: int
+    specific_device_class: int
+    installer_icon_type: int
+    manufacturer_id: int
+    product_type: int
+    product_id: int
+    application_version: str
+    max_inclusion_request_interval: Optional[int]
+    uuid: Optional[str]
+    supported_protocols: Optional[List[Protocols]]
+
+    def to_dict(self) -> QRProvisioningInformationDataType:
+        """Return QRProvisioningInformationDataType dict from self."""
+        data = {
+            "version": self.version.value,
+            "securityClasses": [sec_cls.value for sec_cls in self.security_classes],
+            "dsk": self.dsk,
+            "genericDeviceClass": self.generic_device_class,
+            "specificDeviceClass": self.specific_device_class,
+            "installerIconType": self.installer_icon_type,
+            "manufacturerId": self.manufacturer_id,
+            "productType": self.product_type,
+            "productId": self.product_id,
+            "applicationVersion": self.application_version,
+        }
+        if self.max_inclusion_request_interval is not None:
+            data["maxInclusionRequestInterval"] = self.max_inclusion_request_interval
+        if self.uuid is not None:
+            data["uuid"] = self.uuid
+        if self.supported_protocols is not None:
+            data["supportedProtocols"] = [
+                protocol.value for protocol in self.supported_protocols
+            ]
+        return data
+
+    @classmethod
+    def from_dict(
+        cls, data: QRProvisioningInformationDataType
+    ) -> "QRProvisioningInformation":
+        """Return QRProvisioningInformation from QRProvisioningInformationDataType dict."""
+        return cls(
+            data["version"],
+            [SecurityClass(sec_cls) for sec_cls in data["securityClasses"]],
+            data["dsk"],
+            data["genericDeviceClass"],
+            data["specificDeviceClass"],
+            data["installerIconType"],
+            data["manufacturerId"],
+            data["productType"],
+            data["productId"],
+            data["applicationVersion"],
+            data.get("maxInclusionRequestInterval"),
+            data.get("uuid"),
+            [
+                Protocols(supported_protocol)
+                for supported_protocol in data.get("supportedProtocols", [])
+            ],
         )
 
 
@@ -279,10 +400,10 @@ class Controller(EventBase):
 
     async def async_begin_inclusion(
         self,
-        inclusion_strategy: Union[
-            Literal[InclusionStrategy.SECURITY_S0],
-            Literal[InclusionStrategy.SECURITY_S2],
-            Literal[InclusionStrategy.INSECURE],
+        inclusion_strategy: Literal[
+            InclusionStrategy.SECURITY_S0,
+            InclusionStrategy.SECURITY_S2,
+            InclusionStrategy.INSECURE,
         ],
     ) -> bool:
         """Send beginInclusion command to Controller."""
@@ -292,6 +413,31 @@ class Controller(EventBase):
                 "options": {"strategy": inclusion_strategy},
             },
             require_schema=8,
+        )
+        return cast(bool, data["success"])
+
+    async def async_begin_inclusion_s2(
+        self,
+        provisioning_info: Optional[
+            Union[ProvisioningEntry, QRProvisioningInformation, str]
+        ] = None,
+    ) -> bool:
+        """Send beginInclusion command to Controller using S2 inclusion method."""
+        options = {"strategy": InclusionStrategy.SECURITY_S2}
+        if provisioning_info:
+            # String is assumed to be the QR code string
+            if isinstance(provisioning_info, str):
+                options["provisioning"] = provisioning_info
+            # Otherwise we assume the data is ProvisioningEntry or
+            # QRProvisioningInformation
+            else:
+                options["provisioning"] = provisioning_info.to_dict()
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.begin_inclusion",
+                "options": options,
+            },
+            require_schema=11,
         )
         return cast(bool, data["success"])
 
@@ -312,6 +458,59 @@ class Controller(EventBase):
         )
         return cast(bool, data["success"])
 
+    async def async_provision_smart_start_node(
+        self,
+        provisioning_info: Union[ProvisioningEntry, QRProvisioningInformation, str],
+    ) -> None:
+        """Send provisionSmartStartNode command to Controller."""
+        await self.client.async_send_command(
+            {
+                "command": "controller.provision_smart_start_node",
+                "entry": provisioning_info
+                if isinstance(provisioning_info, str)
+                else provisioning_info.to_dict(),
+            },
+            require_schema=11,
+        )
+        return None
+
+    async def async_unprovision_smart_start_node(
+        self,
+        dsk_or_node_id: Union[str, int],
+    ) -> None:
+        """Send unprovisionSmartStartNode command to Controller."""
+        await self.client.async_send_command(
+            {
+                "command": "controller.unprovision_smart_start_node",
+                "dskOrNodeId": dsk_or_node_id,
+            },
+            require_schema=11,
+        )
+        return None
+
+    async def async_get_provisioning_entry(
+        self, dsk: str
+    ) -> Optional[ProvisioningEntry]:
+        """Send getProvisioningEntry command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.get_provisioning_entry",
+                "dsk": dsk,
+            },
+            require_schema=11,
+        )
+        return ProvisioningEntry.from_dict(data.get("entry"))
+
+    async def async_get_provisioning_entries(self) -> List[ProvisioningEntry]:
+        """Send getProvisioningEntries command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.get_provisioning_entries",
+            },
+            require_schema=11,
+        )
+        return [ProvisioningEntry.from_dict(entry) for entry in data.get("entries", [])]
+
     async def async_stop_inclusion(self) -> bool:
         """Send stopInclusion command to Controller."""
         data = await self.client.async_send_command(
@@ -319,11 +518,11 @@ class Controller(EventBase):
         )
         return cast(bool, data["success"])
 
-    async def async_begin_exclusion(self) -> bool:
+    async def async_begin_exclusion(self, unprovision: Optional[bool] = None) -> bool:
         """Send beginExclusion command to Controller."""
-        data = await self.client.async_send_command(
-            {"command": "controller.begin_exclusion"}
-        )
+        payload = {"command": "controller.begin_exclusion"}
+        payload["unprovision"] = unprovision or False
+        data = await self.client.async_send_command(payload)
         return cast(bool, data["success"])
 
     async def async_stop_exclusion(self) -> bool:

@@ -2,9 +2,9 @@
 from enum import Enum, IntEnum
 
 # minimal server schema version we can handle
-MIN_SERVER_SCHEMA_VERSION = 10
+MIN_SERVER_SCHEMA_VERSION = 11
 # max server schema version we can handle (and our code is compatible with)
-MAX_SERVER_SCHEMA_VERSION = 10
+MAX_SERVER_SCHEMA_VERSION = 11
 
 VALUE_UNKNOWN = "unknown"
 
@@ -221,3 +221,19 @@ class SecurityClass(IntEnum):
     S2_AUTHENTICATED = 1
     S2_ACCESS_CONTROL = 2
     S0_LEGACY = 7
+
+
+class QRCodeVersion(IntEnum):
+    """Enum for all known QR Code versions."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/security/QR.ts#L43-L46
+    S2 = 0
+    SMART_START = 1
+
+
+class Protocols(IntEnum):
+    """Enum for all known protocols."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/capabilities/Protocols.ts#L1-L4
+    ZWAVE = 0
+    ZWAVE_LONG_RANGE = 1
