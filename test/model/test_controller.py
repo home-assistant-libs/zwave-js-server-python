@@ -1,6 +1,8 @@
 """Test the controller model."""
 import json
 
+import pytest
+
 from zwave_js_server.const import (
     InclusionStrategy,
     Protocols,
@@ -144,13 +146,52 @@ async def test_begin_inclusion(controller, uuid4, mock_command):
     }
 
 
+async def test_begin_inclusion_default(controller, uuid4, mock_command):
+    """Test begin inclusion."""
+    ack_commands = mock_command(
+        {"command": "controller.begin_inclusion"},
+        {"success": True},
+    )
+    assert await controller.async_begin_inclusion(InclusionStrategy.DEFAULT)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.begin_inclusion",
+        "options": {
+            "strategy": InclusionStrategy.DEFAULT,
+        },
+        "messageId": uuid4,
+    }
+
+
+async def test_begin_inclusion_default_force_security(controller, uuid4, mock_command):
+    """Test begin inclusion with force_security provided."""
+    ack_commands = mock_command(
+        {"command": "controller.begin_inclusion"},
+        {"success": True},
+    )
+    assert await controller.async_begin_inclusion(
+        InclusionStrategy.DEFAULT, force_security=False
+    )
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.begin_inclusion",
+        "options": {
+            "strategy": InclusionStrategy.DEFAULT,
+            "forceSecurity": False,
+        },
+        "messageId": uuid4,
+    }
+
+
 async def test_begin_inclusion_s2_no_input(controller, uuid4, mock_command):
     """Test begin inclusion S2 Mode."""
     ack_commands = mock_command(
         {"command": "controller.begin_inclusion"},
         {"success": True},
     )
-    assert await controller.async_begin_inclusion_s2()
+    assert await controller.async_begin_inclusion(InclusionStrategy.SECURITY_S2)
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
@@ -166,7 +207,9 @@ async def test_begin_inclusion_s2_qr_code_string(controller, uuid4, mock_command
         {"command": "controller.begin_inclusion"},
         {"success": True},
     )
-    assert await controller.async_begin_inclusion_s2("test")
+    assert await controller.async_begin_inclusion(
+        InclusionStrategy.SECURITY_S2, provisioning="test"
+    )
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
@@ -185,7 +228,9 @@ async def test_begin_inclusion_s2_provisioning_entry(controller, uuid4, mock_com
     provisioning_entry = controller_pkg.ProvisioningEntry(
         "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
     )
-    assert await controller.async_begin_inclusion_s2(provisioning_entry)
+    assert await controller.async_begin_inclusion(
+        InclusionStrategy.SECURITY_S2, provisioning=provisioning_entry
+    )
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
@@ -196,6 +241,21 @@ async def test_begin_inclusion_s2_provisioning_entry(controller, uuid4, mock_com
         },
         "messageId": uuid4,
     }
+
+
+async def test_begin_inclusion_errors(controller, uuid4, mock_command):
+    """Test begin inclusion error scenarios."""
+    provisioning_entry = controller_pkg.ProvisioningEntry(
+        "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
+    )
+    with pytest.raises(ValueError):
+        await controller.async_begin_inclusion(
+            InclusionStrategy.SECURITY_S0, provisioning=provisioning_entry
+        )
+    with pytest.raises(ValueError):
+        await controller.async_begin_inclusion(
+            InclusionStrategy.SECURITY_S2, force_security=True
+        )
 
 
 async def test_begin_inclusion_s2_qr_info(controller, uuid4, mock_command):
@@ -219,7 +279,9 @@ async def test_begin_inclusion_s2_qr_info(controller, uuid4, mock_command):
         "test",
         None,
     )
-    assert await controller.async_begin_inclusion_s2(provisioning_entry)
+    assert await controller.async_begin_inclusion(
+        InclusionStrategy.SECURITY_S2, provisioning=provisioning_entry
+    )
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
@@ -384,8 +446,8 @@ async def test_get_provisioning_entries(controller, uuid4, mock_command):
     }
 
 
-async def test_begin_inclusion_default(controller, uuid4, mock_command):
-    """Test begin inclusion."""
+async def test_begin_inclusion_default_deprecated_cmd(controller, uuid4, mock_command):
+    """Test begin inclusion (deprecated command)."""
     ack_commands = mock_command(
         {"command": "controller.begin_inclusion"},
         {"success": True},

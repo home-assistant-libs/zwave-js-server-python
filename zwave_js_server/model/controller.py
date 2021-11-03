@@ -1,5 +1,6 @@
 """Provide a model for the Z-Wave JS controller."""
 from dataclasses import dataclass
+import logging
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -19,6 +20,8 @@ from .node import Node
 
 if TYPE_CHECKING:
     from ..client import Client
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class InclusionGrantDataType(TypedDict):
@@ -47,7 +50,9 @@ class InclusionGrant:
     def from_dict(cls, data: InclusionGrantDataType) -> "InclusionGrant":
         """Return InclusionGrant from InclusionGrantDataType dict."""
         return cls(
-            security_classes=[SecurityClass(sec_cls) for sec_cls in data["securityClasses"]],
+            security_classes=[
+                SecurityClass(sec_cls) for sec_cls in data["securityClasses"]
+            ],
             client_side_auth=data["clientSideAuth"],
         )
 
@@ -73,8 +78,12 @@ class ProvisioningEntry:
         """Return ProvisioningEntry from data dict."""
         return cls(
             dsk=data["dsk"],
-            security_classes=[SecurityClass(sec_cls) for sec_cls in data["securityClasses"]],
-            additional_properties={k: v for k, v in data.items() if k not in {"dsk", "securityClasses"}},
+            security_classes=[
+                SecurityClass(sec_cls) for sec_cls in data["securityClasses"]
+            ],
+            additional_properties={
+                k: v for k, v in data.items() if k not in {"dsk", "securityClasses"}
+            },
         )
 
 
@@ -145,7 +154,9 @@ class QRProvisioningInformation:
         """Return QRProvisioningInformation from QRProvisioningInformationDataType dict."""
         return cls(
             version=QRCodeVersion(data["version"]),
-            security_classes=[SecurityClass(sec_cls) for sec_cls in data["securityClasses"]],
+            security_classes=[
+                SecurityClass(sec_cls) for sec_cls in data["securityClasses"]
+            ],
             dsk=data["dsk"],
             generic_device_class=data["genericDeviceClass"],
             specific_device_class=data["specificDeviceClass"],
@@ -401,43 +412,45 @@ class Controller(EventBase):
     async def async_begin_inclusion(
         self,
         inclusion_strategy: Literal[
+            InclusionStrategy.DEFAULT,
             InclusionStrategy.SECURITY_S0,
             InclusionStrategy.SECURITY_S2,
             InclusionStrategy.INSECURE,
         ],
-    ) -> bool:
-        """Send beginInclusion command to Controller."""
-        data = await self.client.async_send_command(
-            {
-                "command": "controller.begin_inclusion",
-                "options": {"strategy": inclusion_strategy},
-            },
-            require_schema=8,
-        )
-        return cast(bool, data["success"])
-
-    async def async_begin_inclusion_s2(
-        self,
-        provisioning_info: Optional[
-            Union[ProvisioningEntry, QRProvisioningInformation, str]
+        force_security: Optional[bool] = None,
+        provisioning: Optional[
+            Union[str, ProvisioningEntry, QRProvisioningInformation]
         ] = None,
     ) -> bool:
-        """Send beginInclusion command to Controller using S2 inclusion method."""
-        options: Dict[str, Any] = {"strategy": InclusionStrategy.SECURITY_S2}
-        if provisioning_info:
-            # String is assumed to be the QR code string
-            if isinstance(provisioning_info, str):
-                options["provisioning"] = provisioning_info
+        """Send beginInclusion command to Controller."""
+        options = {"strategy": inclusion_strategy}
+        # forceSecurity can only be used with the default inclusion strategy
+        if force_security is not None:
+            if inclusion_strategy != InclusionStrategy.DEFAULT:
+                raise ValueError(
+                    "`forceSecurity` option is only supported with inclusion_strategy=DEFAULT"
+                )
+            options["forceSecurity"] = force_security
+
+        # provisioning can only be used with the S2 inclusion strategy and may need additional processing
+        if provisioning is not None:
+            if inclusion_strategy != InclusionStrategy.SECURITY_S2:
+                raise ValueError(
+                    "`provisioning` option is only supported with inclusion_strategy=SECURITY_S2"
+                )
+            # String is assumed to be the QR code string so we can pass as is
             # Otherwise we assume the data is ProvisioningEntry or
             # QRProvisioningInformation
-            else:
-                options["provisioning"] = provisioning_info.to_dict()
+            if not isinstance(provisioning, str):
+                provisioning = provisioning.to_dict()
+            options["provisioning"] = provisioning
+
         data = await self.client.async_send_command(
             {
                 "command": "controller.begin_inclusion",
                 "options": options,
             },
-            require_schema=11,
+            require_schema=8,
         )
         return cast(bool, data["success"])
 
@@ -446,6 +459,9 @@ class Controller(EventBase):
         force_security: Optional[bool] = None,
     ) -> bool:
         """Send beginInclusion command to Controller using Default inclusion method."""
+        _LOGGER.warning(
+            "This method has been deprecated, use async_begin_inclusion instead."
+        )
         data = await self.client.async_send_command(
             {
                 "command": "controller.begin_inclusion",
