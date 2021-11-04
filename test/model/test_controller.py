@@ -531,24 +531,187 @@ async def test_remove_failed_node(controller, uuid4, mock_command):
 
 
 async def test_replace_failed_node(controller, uuid4, mock_command):
-    """Test replace failed node."""
+    """Test replace_failed_node."""
     ack_commands = mock_command(
         {"command": "controller.replace_failed_node"},
         {"success": True},
     )
+    assert await controller.async_replace_failed_node(1, InclusionStrategy.SECURITY_S0)
 
-    node_id = 52
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.replace_failed_node",
+        "nodeId": 1,
+        "options": {"strategy": InclusionStrategy.SECURITY_S0},
+        "messageId": uuid4,
+    }
+
+
+async def test_replace_failed_node_default(controller, uuid4, mock_command):
+    """Test replace_failed_node."""
+    ack_commands = mock_command(
+        {"command": "controller.replace_failed_node"},
+        {"success": True},
+    )
+    assert await controller.async_replace_failed_node(1, InclusionStrategy.DEFAULT)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.replace_failed_node",
+        "nodeId": 1,
+        "options": {
+            "strategy": InclusionStrategy.DEFAULT,
+        },
+        "messageId": uuid4,
+    }
+
+
+async def test_replace_failed_node_default_force_security(controller, uuid4, mock_command):
+    """Test replace_failed_node with force_security provided."""
+    ack_commands = mock_command(
+        {"command": "controller.replace_failed_node"},
+        {"success": True},
+    )
     assert await controller.async_replace_failed_node(
-        node_id, InclusionStrategy.DEFAULT
+        1, InclusionStrategy.DEFAULT, force_security=False
     )
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.replace_failed_node",
+        "nodeId": 1,
+        "options": {
+            "strategy": InclusionStrategy.DEFAULT,
+            "forceSecurity": False,
+        },
         "messageId": uuid4,
-        "nodeId": node_id,
-        "options": {"strategy": InclusionStrategy.DEFAULT.value},
     }
+
+
+async def test_replace_failed_node_s2_no_input(controller, uuid4, mock_command):
+    """Test replace_failed_node S2 Mode."""
+    ack_commands = mock_command(
+        {"command": "controller.replace_failed_node"},
+        {"success": True},
+    )
+    assert await controller.async_replace_failed_node(1, InclusionStrategy.SECURITY_S2)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.replace_failed_node",
+        "nodeId": 1,
+        "options": {"strategy": InclusionStrategy.SECURITY_S2},
+        "messageId": uuid4,
+    }
+
+
+async def test_replace_failed_node_s2_qr_code_string(controller, uuid4, mock_command):
+    """Test replace_failed_node S2 Mode with a QR code string."""
+    ack_commands = mock_command(
+        {"command": "controller.replace_failed_node"},
+        {"success": True},
+    )
+    assert await controller.async_replace_failed_node(
+        1, InclusionStrategy.SECURITY_S2, provisioning="test"
+    )
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.replace_failed_node",
+        "nodeId": 1,
+        "options": {"strategy": InclusionStrategy.SECURITY_S2, "provisioning": "test"},
+        "messageId": uuid4,
+    }
+
+
+async def test_replace_failed_node_s2_provisioning_entry(controller, uuid4, mock_command):
+    """Test replace_failed_node S2 Mode with a provisioning entry."""
+    ack_commands = mock_command(
+        {"command": "controller.replace_failed_node"},
+        {"success": True},
+    )
+    provisioning_entry = controller_pkg.ProvisioningEntry(
+        "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
+    )
+    assert await controller.async_replace_failed_node(
+        1, InclusionStrategy.SECURITY_S2, provisioning=provisioning_entry
+    )
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.replace_failed_node",
+        "nodeId": 1,
+        "options": {
+            "strategy": InclusionStrategy.SECURITY_S2,
+            "provisioning": {"dsk": "test", "securityClasses": [0], "test": "test"},
+        },
+        "messageId": uuid4,
+    }
+
+
+async def test_replace_failed_node_s2_qr_info(controller, uuid4, mock_command):
+    """Test replace_failed_node S2 Mode with QR info."""
+    ack_commands = mock_command(
+        {"command": "controller.replace_failed_node"},
+        {"success": True},
+    )
+    provisioning_entry = controller_pkg.QRProvisioningInformation(
+        QRCodeVersion.S2,
+        [SecurityClass.S2_UNAUTHENTICATED],
+        "test",
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        "test",
+        1,
+        "test",
+        None,
+    )
+    assert await controller.async_replace_failed_node(
+        1, InclusionStrategy.SECURITY_S2, provisioning=provisioning_entry
+    )
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.replace_failed_node",
+        "nodeId": 1,
+        "options": {
+            "strategy": InclusionStrategy.SECURITY_S2,
+            "provisioning": {
+                "version": 0,
+                "securityClasses": [0],
+                "dsk": "test",
+                "genericDeviceClass": 1,
+                "specificDeviceClass": 1,
+                "installerIconType": 1,
+                "manufacturerId": 1,
+                "productType": 1,
+                "productId": 1,
+                "applicationVersion": "test",
+                "maxInclusionRequestInterval": 1,
+                "uuid": "test",
+            },
+        },
+        "messageId": uuid4,
+    }
+
+
+async def test_replace_failed_node_errors(controller):
+    """Test replace_failed_node error scenarios."""
+    provisioning_entry = controller_pkg.ProvisioningEntry(
+        "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
+    )
+    with pytest.raises(ValueError):
+        await controller.async_replace_failed_node(
+            1, InclusionStrategy.SECURITY_S0, provisioning=provisioning_entry
+        )
+    with pytest.raises(ValueError):
+        await controller.async_replace_failed_node(
+            1, InclusionStrategy.SECURITY_S2, force_security=True
+        )
 
 
 async def test_heal_node(controller, uuid4, mock_command):

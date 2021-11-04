@@ -539,20 +539,52 @@ class Controller(EventBase):
     async def async_replace_failed_node(
         self,
         node_id: int,
-        inclusion_strategy: Union[
-            Literal[InclusionStrategy.SECURITY_S0],
-            Literal[InclusionStrategy.SECURITY_S2],
-            Literal[InclusionStrategy.INSECURE],
+        inclusion_strategy: Literal[
+            InclusionStrategy.DEFAULT,
+            InclusionStrategy.SECURITY_S0,
+            InclusionStrategy.SECURITY_S2,
+            InclusionStrategy.INSECURE,
         ],
+        force_security: Optional[bool] = None,
+        provisioning: Optional[
+            Union[str, ProvisioningEntry, QRProvisioningInformation]
+        ] = None,
     ) -> bool:
         """Send replaceFailedNode command to Controller."""
+        # Most functionality was introduced in Schema 8
+        require_schema = 8
+        options: Dict[str, Any] = {"strategy": inclusion_strategy}
+        # forceSecurity can only be used with the default inclusion strategy
+        if force_security is not None:
+            if inclusion_strategy != InclusionStrategy.DEFAULT:
+                raise ValueError(
+                    "`forceSecurity` option is only supported with inclusion_strategy=DEFAULT"
+                )
+            options["forceSecurity"] = force_security
+
+        # provisioning can only be used with the S2 inclusion strategy and may need
+        # additional processing
+        if provisioning is not None:
+            if inclusion_strategy != InclusionStrategy.SECURITY_S2:
+                raise ValueError(
+                    "`provisioning` option is only supported with inclusion_strategy=SECURITY_S2"
+                )
+            # Provisioning option was introduced in Schema 11
+            require_schema = 11
+            # String is assumed to be the QR code string so we can pass as is
+            if isinstance(provisioning, str):
+                options["provisioning"] = provisioning
+            # Otherwise we assume the data is ProvisioningEntry or
+            # QRProvisioningInformation
+            else:
+                options["provisioning"] = provisioning.to_dict()
         data = await self.client.async_send_command(
             {
                 "command": "controller.replace_failed_node",
                 "nodeId": node_id,
-                "options": {"strategy": inclusion_strategy},
+                "options": options,
             },
-            require_schema=8,
+            require_schema=require_schema,
         )
         return cast(bool, data["success"])
 
