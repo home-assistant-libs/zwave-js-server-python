@@ -566,7 +566,9 @@ async def test_replace_failed_node_default(controller, uuid4, mock_command):
     }
 
 
-async def test_replace_failed_node_default_force_security(controller, uuid4, mock_command):
+async def test_replace_failed_node_default_force_security(
+    controller, uuid4, mock_command
+):
     """Test replace_failed_node with force_security provided."""
     ack_commands = mock_command(
         {"command": "controller.replace_failed_node"},
@@ -624,7 +626,9 @@ async def test_replace_failed_node_s2_qr_code_string(controller, uuid4, mock_com
     }
 
 
-async def test_replace_failed_node_s2_provisioning_entry(controller, uuid4, mock_command):
+async def test_replace_failed_node_s2_provisioning_entry(
+    controller, uuid4, mock_command
+):
     """Test replace_failed_node S2 Mode with a provisioning entry."""
     ack_commands = mock_command(
         {"command": "controller.replace_failed_node"},
