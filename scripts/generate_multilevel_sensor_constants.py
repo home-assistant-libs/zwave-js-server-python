@@ -118,7 +118,7 @@ def generate_int_enum_class_definition(
     class_def = []
     class_def.append(f"class {class_name}(IntEnum):")
     docstring = (
-        f'"""Enum with all known {docstring_info} multilevel sensor types."""'.replace(
+        f'"""Enum for known {docstring_info} multilevel sensor types."""'.replace(
             "  ", " "
         )
     )
