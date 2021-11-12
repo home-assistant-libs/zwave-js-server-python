@@ -709,7 +709,7 @@ TEMPERATURE_SENSORS = {
     MultilevelSensorType.DISCHARGE_LINE_TEMPERATURE,
     MultilevelSensorType.DEFROST_TEMPERATURE,
 }
-TIMESTAMP_SENSORS: Set[MultilevelSensorType] = {}
+TIMESTAMP_SENSORS: Set[MultilevelSensorType] = set()
 VOLTAGE_SENSORS = {
     MultilevelSensorType.VOLTAGE,
     MultilevelSensorType.WATER_OXIDATION_REDUCTION_POTENTIAL,
