@@ -1,6 +1,6 @@
 """Constants for the Multilevel Sensor CC."""
 from enum import IntEnum
-from typing import Dict, Set, Type, Union
+from typing import Dict, Type, Union
 
 CC_SPECIFIC_SCALE = "scale"
 CC_SPECIFIC_SENSOR_TYPE = "sensorType"
@@ -709,7 +709,6 @@ TEMPERATURE_SENSORS = {
     MultilevelSensorType.DISCHARGE_LINE_TEMPERATURE,
     MultilevelSensorType.DEFROST_TEMPERATURE,
 }
-TIMESTAMP_SENSORS: Set[MultilevelSensorType] = set()
 VOLTAGE_SENSORS = {
     MultilevelSensorType.VOLTAGE,
     MultilevelSensorType.WATER_OXIDATION_REDUCTION_POTENTIAL,
