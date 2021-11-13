@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 import json
-import os
+import pathlib
 import re
 import subprocess
 from typing import Callable, List
@@ -16,11 +16,8 @@ BRANCH_NAME = "master"
 SENSOR_TYPES_FILE_PATH = "packages/config/config/sensorTypes.json"
 DEFAULT_SCALES_FILE_PATH = "packages/config/config/scales.json"
 
-base_path = os.path.dirname(__file__)
-
-
-MULTILEVEL_SENSOR_CONST_FILE_PATH = os.path.join(
-    base_path, "../zwave_js_server/const/command_class/multilevel_sensor.py"
+CONST_FILE_PATH = pathlib.Path(__file__).parent.joinpath(
+    "../zwave_js_server/const/command_class/multilevel_sensor.py"
 )
 
 
@@ -94,9 +91,9 @@ sensors = {}
 for sensor_id, sensor_props in sensor_types.items():
     sensor_id = int(sensor_id, 16)
     scale_def = sensor_props["scales"]
-    remove_paranthesis_: bool = True
+    remove_paranthesis_ = True
     if sensor_id in (87, 88):
-        remove_paranthesis_: bool = False
+        remove_paranthesis_ = False
     sensor_name = enum_name_format(sensor_props["label"], remove_paranthesis_)
     sensors[sensor_name] = {"id": sensor_id}
     if isinstance(scale_def, str):
@@ -188,7 +185,7 @@ lines.extend(
     [f"MultilevelSensorScaleType = Union[{', '.join(sorted(scale_class_names))}]", ""]
 )
 
-multilevel_sensor_type_to_scale_map_line: str = (
+multilevel_sensor_type_to_scale_map_line = (
     "MULTILEVEL_SENSOR_TYPE_TO_SCALE_MAP: Dict[MultilevelSensorType, "
     "Type[MultilevelSensorScaleType]] = {"
 )
@@ -217,8 +214,7 @@ lines.extend(
     ]
 )
 
-with open(MULTILEVEL_SENSOR_CONST_FILE_PATH, "r", encoding="utf-8") as fp:
-    existing_const_file = fp.readlines()
+existing_const_file = CONST_FILE_PATH.read_text(encoding="utf-8").splitlines()
 
 manually_written_code_start_idx = (
     next(
@@ -236,12 +232,11 @@ if len(existing_const_file) > manually_written_code_start_idx:
         ]
     )
 
-with open(MULTILEVEL_SENSOR_CONST_FILE_PATH, "w", encoding="utf-8") as fp:
-    fp.write("\n".join(lines))
+CONST_FILE_PATH.write_text("\n".join(lines), encoding="utf-8")
 
 if subprocess.run(["which", "black"], capture_output=True, check=True).stdout:
     subprocess.run(
-        ["black", MULTILEVEL_SENSOR_CONST_FILE_PATH],
+        ["black", CONST_FILE_PATH],
         check=True,
     )
 else:
