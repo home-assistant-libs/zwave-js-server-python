@@ -194,7 +194,7 @@ lines.append(multilevel_sensor_type_to_scale_map_line)
 lines.append("")
 
 for unit_name, unit_enums in unit_name_to_enum_map.items():
-    lines.append(f"UNIT_{unit_name} = {{{','.join(unit_enums)}}}")
+    lines.append(f"UNIT_{unit_name} = {{{','.join(sorted(unit_enums))}}}")
 
 lines.extend(
     [

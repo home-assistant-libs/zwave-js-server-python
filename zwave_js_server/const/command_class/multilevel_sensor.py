@@ -686,18 +686,18 @@ UNIT_FAHRENHEIT = {TemperatureScale.FAHRENHEIT}
 UNIT_KILOGRAM = {MassScale.KILOGRAM, WeightScale.KILOGRAM}
 UNIT_METER_PER_SQUARE_SECOND = {AccelerationScale.METER_PER_SQUARE_SECOND}
 UNIT_PERCENTAGE_VALUE = {
-    PercentageScale.PERCENTAGE_VALUE,
-    GeneralPurposeScale.PERCENTAGE_VALUE,
-    IlluminanceScale.PERCENTAGE_VALUE,
-    HumidityScale.PERCENTAGE_VALUE,
     AnglePositionScale.PERCENTAGE_VALUE,
+    GeneralPurposeScale.PERCENTAGE_VALUE,
+    HumidityScale.PERCENTAGE_VALUE,
+    IlluminanceScale.PERCENTAGE_VALUE,
     MoistureScale.PERCENTAGE_VALUE,
+    PercentageScale.PERCENTAGE_VALUE,
 }
 UNIT_ACIDITY = {AcidityScale.ACIDITY}
 UNIT_DEGREES = {DirectionScale.DEGREES}
 UNIT_KILOPASCAL = {
-    PressureScale.KILOPASCAL,
     AirPressureScale.KILOPASCAL,
+    PressureScale.KILOPASCAL,
     WaterPressureScale.KILOPASCAL,
 }
 UNIT_POUND_PER_SQUARE_INCH = {PressureScale.POUND_PER_SQUARE_INCH}
@@ -714,8 +714,8 @@ UNIT_MPH = {VelocityScale.MPH}
 UNIT_WATT_PER_SQUARE_METER = {SolarRadiationScale.WATT_PER_SQUARE_METER}
 UNIT_MILLIMETER_HOUR = {RainRateScale.MILLIMETER_HOUR}
 UNIT_INCHES_PER_HOUR = {RainRateScale.INCHES_PER_HOUR}
-UNIT_METER = {TideLevelScale.METER, DistanceScale.METER}
-UNIT_FEET = {TideLevelScale.FEET, DistanceScale.FEET}
+UNIT_METER = {DistanceScale.METER, TideLevelScale.METER}
+UNIT_FEET = {DistanceScale.FEET, TideLevelScale.FEET}
 UNIT_POUNDS = {WeightScale.POUNDS}
 UNIT_VOLT = {VoltageScale.VOLT}
 UNIT_MILLIVOLT = {
@@ -726,8 +726,8 @@ UNIT_AMPERE = {CurrentScale.AMPERE}
 UNIT_MILLIAMPERE = {CurrentScale.MILLIAMPERE}
 UNIT_PARTS_MILLION = {
     CarbonDioxideLevelScale.PARTS_MILLION,
-    VolatileOrganicCompoundLevelScale.PARTS_MILLION,
     CarbonMonoxideLevelScale.PARTS_MILLION,
+    VolatileOrganicCompoundLevelScale.PARTS_MILLION,
 }
 UNIT_CUBIC_METER_PER_HOUR = {AirFlowScale.CUBIC_METER_PER_HOUR}
 UNIT_CUBIC_FEET_PER_MINUTE = {AirFlowScale.CUBIC_FEET_PER_MINUTE}
@@ -742,7 +742,7 @@ UNIT_DEGREES_RELATIVE_TO_SOUTH_POLE_OF_STANDING_EYE_VIEW = {
     AnglePositionScale.DEGREES_RELATIVE_TO_SOUTH_POLE_OF_STANDING_EYE_VIEW
 }
 UNIT_REVOLUTIONS_PER_MINUTE = {RotationScale.REVOLUTIONS_PER_MINUTE}
-UNIT_HERTZ = {RotationScale.HERTZ, FrequencyScale.HERTZ}
+UNIT_HERTZ = {FrequencyScale.HERTZ, RotationScale.HERTZ}
 UNIT_MERCALLI = {SeismicIntensityScale.MERCALLI}
 UNIT_EUROPEAN_MACROSEISMIC = {SeismicIntensityScale.EUROPEAN_MACROSEISMIC}
 UNIT_LIEDU = {SeismicIntensityScale.LIEDU}
@@ -762,17 +762,17 @@ UNIT_WATER_ACTIVITY = {MoistureScale.WATER_ACTIVITY}
 UNIT_KILOHERTZ = {FrequencyScale.KILOHERTZ}
 UNIT_SECOND = {TimeScale.SECOND}
 UNIT_MOLE_PER_CUBIC_METER = {
-    ParticulateMatter25Scale.MOLE_PER_CUBIC_METER,
+    CarbonMonoxideLevelScale.MOLE_PER_CUBIC_METER,
     FormaldehydeLevelScale.MOLE_PER_CUBIC_METER,
     MethaneDensityScale.MOLE_PER_CUBIC_METER,
-    VolatileOrganicCompoundLevelScale.MOLE_PER_CUBIC_METER,
-    CarbonMonoxideLevelScale.MOLE_PER_CUBIC_METER,
-    SoilSalinityScale.MOLE_PER_CUBIC_METER,
     ParticulateMatter10Scale.MOLE_PER_CUBIC_METER,
+    ParticulateMatter25Scale.MOLE_PER_CUBIC_METER,
+    SoilSalinityScale.MOLE_PER_CUBIC_METER,
+    VolatileOrganicCompoundLevelScale.MOLE_PER_CUBIC_METER,
 }
 UNIT_MICROGRAM_PER_CUBIC_METER = {
-    ParticulateMatter25Scale.MICROGRAM_PER_CUBIC_METER,
     ParticulateMatter10Scale.MICROGRAM_PER_CUBIC_METER,
+    ParticulateMatter25Scale.MICROGRAM_PER_CUBIC_METER,
 }
 UNIT_BECQUEREL_PER_CUBIC_METER = {RadonConcentrationScale.BECQUEREL_PER_CUBIC_METER}
 UNIT_PICOCURIES_PER_LITER = {RadonConcentrationScale.PICOCURIES_PER_LITER}
