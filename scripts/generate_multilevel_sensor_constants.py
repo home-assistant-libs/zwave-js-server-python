@@ -61,7 +61,7 @@ def normalize_scale_definition(scale_definitions: dict[str, dict]) -> dict[str, 
         scale_name_ = enum_name_format(scale_props["label"], True)
         scale_def_[scale_name_] = scale_id
 
-    return scale_def_
+    return dict(sorted(scale_def_.items(), key=lambda kv: kv[0]))
 
 
 sensor_types = json.loads(
@@ -106,6 +106,9 @@ for sensor_id, sensor_props in sensor_types.items():
     else:
         scales[sensor_name] = normalize_scale_definition(scale_def)
         sensors[sensor_name]["scale"] = normalize_name(sensor_name)
+
+scales = dict(sorted(scales.items(), key=lambda kv: kv[0]))
+sensors = dict(sorted(sensors.items(), key=lambda kv: kv[0]))
 
 
 def generate_int_enum_class_definition(
@@ -174,6 +177,9 @@ for scale_name, scale_dict in scales.items():
         unit_name_to_enum_map[unit_name].append(
             f"{format_for_class_name(scale_name)}.{unit_name}"
         )
+unit_name_to_enum_map = dict(sorted(unit_name_to_enum_map.items(), key=lambda kv: kv[0]))
+for unit_name, enum_list in unit_name_to_enum_map.items():
+    unit_name_to_enum_map[unit_name] = sorted(enum_list)
 
 scale_class_names = [format_for_class_name(scale_name) for scale_name in scales]
 lines.extend(
