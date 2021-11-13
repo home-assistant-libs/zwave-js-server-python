@@ -85,9 +85,10 @@ default_scales = json.loads(
     )
 )
 
-scales = {}
-for scale_name, scale_def in default_scales.items():
-    scales[normalize_name(scale_name)] = normalize_scale_definition(scale_def)
+scales = {
+    normalize_name(scale_name): normalize_scale_definition(scale_def)
+    for scale_name, scale_def in default_scales.items()
+}
 
 sensors = {}
 for sensor_id, sensor_props in sensor_types.items():
