@@ -160,7 +160,7 @@ lines.extend(
     )
 )
 
-unit_name_to_enum_map = defaultdict(set)
+unit_name_to_enum_map = defaultdict(list)
 for scale_name, scale_dict in scales.items():
     lines.extend(
         generate_int_enum_class_definition(
@@ -171,7 +171,7 @@ for scale_name, scale_dict in scales.items():
         )
     )
     for unit_name in scale_dict.keys():
-        unit_name_to_enum_map[unit_name].add(
+        unit_name_to_enum_map[unit_name].append(
             f"{format_for_class_name(scale_name)}.{unit_name}"
         )
 
