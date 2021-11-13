@@ -103,20 +103,27 @@ WATER_METER_TYPES: Set[MeterScaleType] = {
     WaterScale.PULSE_COUNT,
 }
 
-KILOWATT_HOUR = {
+UNIT_KILOWATT_HOUR: Set[MeterScaleType] = {
     ElectricScale.KILOWATT_HOUR,
     HeatingScale.KILOWATT_HOUR,
     CoolingScale.KILOWATT_HOUR,
 }
-UNIT_KILOVOLT_AMPERE_HOUR = {ElectricScale.KILOVOLT_AMPERE_HOUR}
-UNIT_WATT = {ElectricScale.WATT}
-UNIT_PULSE_COUNT = {ElectricScale.PULSE_COUNT}
-UNIT_VOLT = {ElectricScale.VOLT}
-UNIT_AMPERE = {ElectricScale.AMPERE}
-UNIT_POWER_FACTOR = {ElectricScale.POWER_FACTOR}
-UNIT_KILOVOLT_AMPERE_REACTIVE = {ElectricScale.KILOVOLT_AMPERE_REACTIVE}
-UNIT_KILOVOLT_AMPERE_REACTIVE_HOUR = {ElectricScale.KILOVOLT_AMPERE_REACTIVE_HOUR}
-UNIT_CUBIC_METER = {GasScale.CUBIC_METER, WaterScale.CUBIC_METER}
-UNIT_CUBIC_FEET = {GasScale.CUBIC_FEET, WaterScale.CUBIC_FEET}
-UNIT_US_GALLON = {WaterScale.US_GALLON}
-UNIT_PULSE_COUNT = {GasScale.PULSE_COUNT, WaterScale.PULSE_COUNT}
+UNIT_KILOVOLT_AMPERE_HOUR: Set[MeterScaleType] = {ElectricScale.KILOVOLT_AMPERE_HOUR}
+UNIT_WATT: Set[MeterScaleType] = {ElectricScale.WATT}
+UNIT_PULSE_COUNT: Set[MeterScaleType] = {
+    ElectricScale.PULSE_COUNT,
+    GasScale.PULSE_COUNT,
+    WaterScale.PULSE_COUNT,
+}
+UNIT_VOLT: Set[MeterScaleType] = {ElectricScale.VOLT}
+UNIT_AMPERE: Set[MeterScaleType] = {ElectricScale.AMPERE}
+UNIT_POWER_FACTOR: Set[MeterScaleType] = {ElectricScale.POWER_FACTOR}
+UNIT_KILOVOLT_AMPERE_REACTIVE: Set[MeterScaleType] = {
+    ElectricScale.KILOVOLT_AMPERE_REACTIVE
+}
+UNIT_KILOVOLT_AMPERE_REACTIVE_HOUR: Set[MeterScaleType] = {
+    ElectricScale.KILOVOLT_AMPERE_REACTIVE_HOUR
+}
+UNIT_CUBIC_METER: Set[MeterScaleType] = {GasScale.CUBIC_METER, WaterScale.CUBIC_METER}
+UNIT_CUBIC_FEET: Set[MeterScaleType] = {GasScale.CUBIC_FEET, WaterScale.CUBIC_FEET}
+UNIT_US_GALLON: Set[MeterScaleType] = {WaterScale.US_GALLON}
