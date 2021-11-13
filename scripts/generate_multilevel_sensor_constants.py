@@ -177,7 +177,9 @@ for scale_name, scale_dict in scales.items():
         unit_name_to_enum_map[unit_name].append(
             f"{format_for_class_name(scale_name)}.{unit_name}"
         )
-unit_name_to_enum_map = dict(sorted(unit_name_to_enum_map.items(), key=lambda kv: kv[0]))
+unit_name_to_enum_map = dict(
+    sorted(unit_name_to_enum_map.items(), key=lambda kv: kv[0])
+)
 for unit_name, enum_list in unit_name_to_enum_map.items():
     unit_name_to_enum_map[unit_name] = sorted(enum_list)
 
