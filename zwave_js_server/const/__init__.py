@@ -237,3 +237,7 @@ class Protocols(IntEnum):
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/capabilities/Protocols.ts#L1-L4
     ZWAVE = 0
     ZWAVE_LONG_RANGE = 1
+
+
+# https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/security/QR.ts#L41
+MINIMUM_QR_STRING_LENGTH = 52
