@@ -12,7 +12,14 @@ from typing import (
     cast,
 )
 
-from ..const import InclusionStrategy, Protocols, QRCodeVersion, SecurityClass
+from ..const import (
+    MINIMUM_QR_STRING_LENGTH,
+    InclusionStrategy,
+    Protocols,
+    QRCodeVersion,
+    SecurityClass,
+    ZwaveFeature,
+)
 from ..event import Event, EventBase
 from .association import Association, AssociationGroup
 from .node import Node
@@ -442,10 +449,24 @@ class Controller(EventBase):
             require_schema = 11
             # String is assumed to be the QR code string so we can pass as is
             if isinstance(provisioning, str):
+                if len(provisioning) < MINIMUM_QR_STRING_LENGTH:
+                    raise ValueError(
+                        f"QR code string must be at least {MINIMUM_QR_STRING_LENGTH} "
+                        "characters long"
+                    )
                 options["provisioning"] = provisioning
             # Otherwise we assume the data is ProvisioningEntry or
             # QRProvisioningInformation
             else:
+                if (
+                    isinstance(provisioning, QRProvisioningInformation)
+                    and provisioning.version == QRCodeVersion.SMART_START
+                ):
+                    await self.async_provision_smart_start_node(provisioning)
+                    raise ValueError(
+                        "The provided Smart Start QR code was used to create a Smart Start "
+                        "pre-provisioned entry but can't be used in the normal inclusion workflow"
+                    )
                 options["provisioning"] = provisioning.to_dict()
 
         data = await self.client.async_send_command(
@@ -462,6 +483,13 @@ class Controller(EventBase):
         provisioning_info: Union[ProvisioningEntry, QRProvisioningInformation, str],
     ) -> None:
         """Send provisionSmartStartNode command to Controller."""
+        if (
+            isinstance(provisioning_info, QRProvisioningInformation)
+            and provisioning_info.version == QRCodeVersion.S2
+        ):
+            raise ValueError(
+                "An S2 QR Code can't be used to pre-provision a Smart Start node"
+            )
         await self.client.async_send_command(
             {
                 "command": "controller.provision_smart_start_node",
@@ -573,11 +601,17 @@ class Controller(EventBase):
             require_schema = 11
             # String is assumed to be the QR code string so we can pass as is
             if isinstance(provisioning, str):
+                if len(provisioning) < MINIMUM_QR_STRING_LENGTH:
+                    raise ValueError(
+                        f"QR code string must be at least {MINIMUM_QR_STRING_LENGTH} "
+                        "characters long"
+                    )
                 options["provisioning"] = provisioning
             # Otherwise we assume the data is ProvisioningEntry or
             # QRProvisioningInformation
             else:
                 options["provisioning"] = provisioning.to_dict()
+
         data = await self.client.async_send_command(
             {
                 "command": "controller.replace_failed_node",
@@ -750,6 +784,13 @@ class Controller(EventBase):
                 "pin": pin,
             }
         )
+
+    async def async_supports_feature(self, feature: ZwaveFeature) -> Optional[bool]:
+        """Send supportsFeature command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.supports_feature", "feature": feature.value}
+        )
+        return cast(Optional[bool], data.get("supported"))
 
     def receive_event(self, event: Event) -> None:
         """Receive an event."""

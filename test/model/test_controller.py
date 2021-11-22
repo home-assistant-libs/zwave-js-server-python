@@ -8,6 +8,7 @@ from zwave_js_server.const import (
     Protocols,
     QRCodeVersion,
     SecurityClass,
+    ZwaveFeature,
 )
 from zwave_js_server.event import Event
 from zwave_js_server.model import association as association_pkg
@@ -208,15 +209,26 @@ async def test_begin_inclusion_s2_qr_code_string(controller, uuid4, mock_command
         {"success": True},
     )
     assert await controller.async_begin_inclusion(
-        InclusionStrategy.SECURITY_S2, provisioning="test"
+        InclusionStrategy.SECURITY_S2,
+        provisioning="testtesttesttesttesttesttesttesttesttesttesttesttest",
     )
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.begin_inclusion",
-        "options": {"strategy": InclusionStrategy.SECURITY_S2, "provisioning": "test"},
+        "options": {
+            "strategy": InclusionStrategy.SECURITY_S2,
+            "provisioning": "testtesttesttesttesttesttesttesttesttesttesttesttest",
+        },
         "messageId": uuid4,
     }
+
+    # Test invalid QR code length fails
+    with pytest.raises(ValueError):
+        await controller.async_begin_inclusion(
+            InclusionStrategy.SECURITY_S2,
+            provisioning="test",
+        )
 
 
 async def test_begin_inclusion_s2_provisioning_entry(controller, uuid4, mock_command):
@@ -292,7 +304,7 @@ async def test_begin_inclusion_s2_qr_info(controller, uuid4, mock_command):
     }
 
 
-async def test_begin_inclusion_errors(controller):
+async def test_begin_inclusion_errors(controller, uuid4, mock_command):
     """Test begin inclusion error scenarios."""
     provisioning_entry = controller_pkg.ProvisioningEntry(
         "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
@@ -305,6 +317,52 @@ async def test_begin_inclusion_errors(controller):
         await controller.async_begin_inclusion(
             InclusionStrategy.SECURITY_S2, force_security=True
         )
+
+    ack_commands = mock_command(
+        {"command": "controller.provision_smart_start_node"},
+        {"success": True},
+    )
+
+    provisioning_entry = controller_pkg.QRProvisioningInformation(
+        QRCodeVersion.SMART_START,
+        [SecurityClass.S2_UNAUTHENTICATED],
+        "test",
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        "test",
+        1,
+        "test",
+        [Protocols.ZWAVE],
+    )
+    with pytest.raises(ValueError):
+        await controller.async_begin_inclusion(
+            InclusionStrategy.SECURITY_S2, provisioning=provisioning_entry
+        )
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.provision_smart_start_node",
+        "entry": {
+            "version": 1,
+            "securityClasses": [0],
+            "dsk": "test",
+            "genericDeviceClass": 1,
+            "specificDeviceClass": 1,
+            "installerIconType": 1,
+            "manufacturerId": 1,
+            "productType": 1,
+            "productId": 1,
+            "applicationVersion": "test",
+            "maxInclusionRequestInterval": 1,
+            "uuid": "test",
+            "supportedProtocols": [0],
+        },
+        "messageId": uuid4,
+    }
 
 
 async def test_provision_smart_start_node_qr_code_string(
@@ -353,7 +411,7 @@ async def test_provision_smart_start_node_qr_info(controller, uuid4, mock_comman
         {"success": True},
     )
     provisioning_entry = controller_pkg.QRProvisioningInformation(
-        QRCodeVersion.S2,
+        QRCodeVersion.SMART_START,
         [SecurityClass.S2_UNAUTHENTICATED],
         "test",
         1,
@@ -373,7 +431,7 @@ async def test_provision_smart_start_node_qr_info(controller, uuid4, mock_comman
     assert ack_commands[0] == {
         "command": "controller.provision_smart_start_node",
         "entry": {
-            "version": 0,
+            "version": 1,
             "securityClasses": [0],
             "dsk": "test",
             "genericDeviceClass": 1,
@@ -389,6 +447,24 @@ async def test_provision_smart_start_node_qr_info(controller, uuid4, mock_comman
         },
         "messageId": uuid4,
     }
+
+    provisioning_entry = controller_pkg.QRProvisioningInformation(
+        QRCodeVersion.S2,
+        [SecurityClass.S2_UNAUTHENTICATED],
+        "test",
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        "test",
+        1,
+        "test",
+        [Protocols.ZWAVE],
+    )
+    with pytest.raises(ValueError):
+        await controller.async_provision_smart_start_node(provisioning_entry)
 
 
 async def test_unprovision_smart_start_node(controller, uuid4, mock_command):
@@ -614,16 +690,29 @@ async def test_replace_failed_node_s2_qr_code_string(controller, uuid4, mock_com
         {"success": True},
     )
     assert await controller.async_replace_failed_node(
-        1, InclusionStrategy.SECURITY_S2, provisioning="test"
+        1,
+        InclusionStrategy.SECURITY_S2,
+        provisioning="testtesttesttesttesttesttesttesttesttesttesttesttest",
     )
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.replace_failed_node",
         "nodeId": 1,
-        "options": {"strategy": InclusionStrategy.SECURITY_S2, "provisioning": "test"},
+        "options": {
+            "strategy": InclusionStrategy.SECURITY_S2,
+            "provisioning": "testtesttesttesttesttesttesttesttesttesttesttesttest",
+        },
         "messageId": uuid4,
     }
+
+    # Test invalid QR code length fails
+    with pytest.raises(ValueError):
+        await controller.async_replace_failed_node(
+            1,
+            InclusionStrategy.SECURITY_S2,
+            provisioning="test",
+        )
 
 
 async def test_replace_failed_node_s2_provisioning_entry(
@@ -1110,4 +1199,20 @@ async def test_validate_dsk_and_enter_pin(controller, uuid4, mock_command) -> No
         "command": "controller.validate_dsk_and_enter_pin",
         "messageId": uuid4,
         "pin": "test",
+    }
+
+
+async def test_supports_feature(controller, uuid4, mock_command):
+    """Test supports feature."""
+    ack_commands = mock_command(
+        {"command": "controller.supports_feature"},
+        {"supported": True},
+    )
+    assert await controller.async_supports_feature(ZwaveFeature.SMART_START)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.supports_feature",
+        "feature": ZwaveFeature.SMART_START.value,
+        "messageId": uuid4,
     }
