@@ -449,10 +449,13 @@ class Controller(EventBase):
             require_schema = 11
             # String is assumed to be the QR code string so we can pass as is
             if isinstance(provisioning, str):
-                if len(provisioning) < MINIMUM_QR_STRING_LENGTH:
+                if (
+                    len(provisioning) < MINIMUM_QR_STRING_LENGTH
+                    or provisioning[:2] != "90"
+                ):
                     raise ValueError(
-                        f"QR code string must be at least {MINIMUM_QR_STRING_LENGTH} "
-                        "characters long"
+                        f"QR code string must be at least {MINIMUM_QR_STRING_LENGTH} characters "
+                        "long and start with `90`"
                     )
                 options["provisioning"] = provisioning
             # Otherwise we assume the data is ProvisioningEntry or
@@ -601,10 +604,13 @@ class Controller(EventBase):
             require_schema = 11
             # String is assumed to be the QR code string so we can pass as is
             if isinstance(provisioning, str):
-                if len(provisioning) < MINIMUM_QR_STRING_LENGTH:
+                if (
+                    len(provisioning) < MINIMUM_QR_STRING_LENGTH
+                    or provisioning[:2] != "90"
+                ):
                     raise ValueError(
-                        f"QR code string must be at least {MINIMUM_QR_STRING_LENGTH} "
-                        "characters long"
+                        f"QR code string must be at least {MINIMUM_QR_STRING_LENGTH} characters "
+                        "long and start with `90`"
                     )
                 options["provisioning"] = provisioning
             # Otherwise we assume the data is ProvisioningEntry or
