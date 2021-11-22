@@ -794,7 +794,8 @@ class Controller(EventBase):
     async def async_supports_feature(self, feature: ZwaveFeature) -> Optional[bool]:
         """Send supportsFeature command to Controller."""
         data = await self.client.async_send_command(
-            {"command": "controller.supports_feature", "feature": feature.value}
+            {"command": "controller.supports_feature", "feature": feature.value},
+            require_schema=12,
         )
         return cast(Optional[bool], data.get("supported"))
 
