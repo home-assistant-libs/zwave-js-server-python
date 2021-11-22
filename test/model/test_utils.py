@@ -28,11 +28,11 @@ async def test_parse_qr_code_string(client, mock_command, uuid4):
         },
     )
     qr_provisioning_info = await async_parse_qr_code_string(
-        client, "testtesttesttesttesttesttesttesttesttesttesttesttest"
+        client, "90testtesttesttesttesttesttesttesttesttesttesttesttest"
     )
     assert ack_commands[0] == {
         "command": "utils.parse_qr_code_string",
-        "qr": "testtesttesttesttesttesttesttesttesttesttesttesttest",
+        "qr": "90testtesttesttesttesttesttesttesttesttesttesttesttest",
         "messageId": uuid4,
     }
     assert qr_provisioning_info.version == QRCodeVersion.S2

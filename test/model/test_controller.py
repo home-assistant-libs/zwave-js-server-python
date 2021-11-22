@@ -210,7 +210,7 @@ async def test_begin_inclusion_s2_qr_code_string(controller, uuid4, mock_command
     )
     assert await controller.async_begin_inclusion(
         InclusionStrategy.SECURITY_S2,
-        provisioning="testtesttesttesttesttesttesttesttesttesttesttesttest",
+        provisioning="90testtesttesttesttesttesttesttesttesttesttesttesttest",
     )
 
     assert len(ack_commands) == 1
@@ -218,7 +218,7 @@ async def test_begin_inclusion_s2_qr_code_string(controller, uuid4, mock_command
         "command": "controller.begin_inclusion",
         "options": {
             "strategy": InclusionStrategy.SECURITY_S2,
-            "provisioning": "testtesttesttesttesttesttesttesttesttesttesttesttest",
+            "provisioning": "90testtesttesttesttesttesttesttesttesttesttesttesttest",
         },
         "messageId": uuid4,
     }
@@ -692,7 +692,7 @@ async def test_replace_failed_node_s2_qr_code_string(controller, uuid4, mock_com
     assert await controller.async_replace_failed_node(
         1,
         InclusionStrategy.SECURITY_S2,
-        provisioning="testtesttesttesttesttesttesttesttesttesttesttesttest",
+        provisioning="90testtesttesttesttesttesttesttesttesttesttesttesttest",
     )
 
     assert len(ack_commands) == 1
@@ -701,7 +701,7 @@ async def test_replace_failed_node_s2_qr_code_string(controller, uuid4, mock_com
         "nodeId": 1,
         "options": {
             "strategy": InclusionStrategy.SECURITY_S2,
-            "provisioning": "testtesttesttesttesttesttesttesttesttesttesttesttest",
+            "provisioning": "90testtesttesttesttesttesttesttesttesttesttesttesttest",
         },
         "messageId": uuid4,
     }
