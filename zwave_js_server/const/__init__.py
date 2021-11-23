@@ -2,9 +2,9 @@
 from enum import Enum, IntEnum
 
 # minimal server schema version we can handle
-MIN_SERVER_SCHEMA_VERSION = 11
+MIN_SERVER_SCHEMA_VERSION = 12
 # max server schema version we can handle (and our code is compatible with)
-MAX_SERVER_SCHEMA_VERSION = 11
+MAX_SERVER_SCHEMA_VERSION = 12
 
 VALUE_UNKNOWN = "unknown"
 
@@ -237,3 +237,14 @@ class Protocols(IntEnum):
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/capabilities/Protocols.ts#L1-L4
     ZWAVE = 0
     ZWAVE_LONG_RANGE = 1
+
+
+# https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/security/QR.ts#L41
+MINIMUM_QR_STRING_LENGTH = 52
+
+
+class ZwaveFeature(IntEnum):
+    """Enum for all known Zwave features."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/controller/Features.ts#L4
+    SMART_START = 0

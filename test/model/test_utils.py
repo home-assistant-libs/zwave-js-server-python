@@ -1,4 +1,6 @@
 """Test general utility functions."""
+import pytest
+
 from zwave_js_server.const import Protocols, QRCodeVersion, SecurityClass
 from zwave_js_server.model.utils import async_parse_qr_code_string
 
@@ -25,10 +27,12 @@ async def test_parse_qr_code_string(client, mock_command, uuid4):
             }
         },
     )
-    qr_provisioning_info = await async_parse_qr_code_string(client, "test")
+    qr_provisioning_info = await async_parse_qr_code_string(
+        client, "90testtesttesttesttesttesttesttesttesttesttesttesttest"
+    )
     assert ack_commands[0] == {
         "command": "utils.parse_qr_code_string",
-        "qr": "test",
+        "qr": "90testtesttesttesttesttesttesttesttesttesttesttesttest",
         "messageId": uuid4,
     }
     assert qr_provisioning_info.version == QRCodeVersion.S2
@@ -54,3 +58,7 @@ async def test_parse_qr_code_string(client, mock_command, uuid4):
         == 1
     )
     assert qr_provisioning_info.supported_protocols == [Protocols.ZWAVE]
+
+    # Test invalid QR code length fails
+    with pytest.raises(ValueError):
+        await async_parse_qr_code_string(client, "test")
