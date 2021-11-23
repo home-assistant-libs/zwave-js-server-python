@@ -792,7 +792,12 @@ class Controller(EventBase):
         )
 
     async def async_supports_feature(self, feature: ZwaveFeature) -> Optional[bool]:
-        """Send supportsFeature command to Controller."""
+        """
+        Send supportsFeature command to Controller.
+
+        When None is returned it means the driver does not yet know whether the
+        controller supports the input feature.
+        """
         data = await self.client.async_send_command(
             {"command": "controller.supports_feature", "feature": feature.value},
             require_schema=12,
