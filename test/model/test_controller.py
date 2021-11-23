@@ -304,25 +304,12 @@ async def test_begin_inclusion_s2_qr_info(controller, uuid4, mock_command):
     }
 
 
-async def test_begin_inclusion_errors(controller, uuid4, mock_command):
-    """Test begin inclusion error scenarios."""
-    provisioning_entry = controller_pkg.ProvisioningEntry(
-        "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
-    )
-    with pytest.raises(ValueError):
-        await controller.async_begin_inclusion(
-            InclusionStrategy.SECURITY_S0, provisioning=provisioning_entry
-        )
-    with pytest.raises(ValueError):
-        await controller.async_begin_inclusion(
-            InclusionStrategy.SECURITY_S2, force_security=True
-        )
-
+async def test_begin_inclusion_smart_start_qr_code(controller, uuid4, mock_command):
+    """Test begin inclusion with a smart start QR code."""
     ack_commands = mock_command(
         {"command": "controller.provision_smart_start_node"},
         {"success": True},
     )
-
     provisioning_entry = controller_pkg.QRProvisioningInformation(
         QRCodeVersion.SMART_START,
         [SecurityClass.S2_UNAUTHENTICATED],
@@ -338,10 +325,9 @@ async def test_begin_inclusion_errors(controller, uuid4, mock_command):
         "test",
         [Protocols.ZWAVE],
     )
-    with pytest.raises(ValueError):
-        await controller.async_begin_inclusion(
-            InclusionStrategy.SECURITY_S2, provisioning=provisioning_entry
-        )
+    await controller.async_begin_inclusion(
+        InclusionStrategy.SECURITY_S2, provisioning=provisioning_entry
+    )
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
@@ -363,6 +349,21 @@ async def test_begin_inclusion_errors(controller, uuid4, mock_command):
         },
         "messageId": uuid4,
     }
+
+
+async def test_begin_inclusion_errors(controller):
+    """Test begin inclusion error scenarios."""
+    provisioning_entry = controller_pkg.ProvisioningEntry(
+        "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
+    )
+    with pytest.raises(ValueError):
+        await controller.async_begin_inclusion(
+            InclusionStrategy.SECURITY_S0, provisioning=provisioning_entry
+        )
+    with pytest.raises(ValueError):
+        await controller.async_begin_inclusion(
+            InclusionStrategy.SECURITY_S2, force_security=True
+        )
 
 
 async def test_provision_smart_start_node_qr_code_string(

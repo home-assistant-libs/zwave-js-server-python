@@ -449,27 +449,25 @@ class Controller(EventBase):
             require_schema = 11
             # String is assumed to be the QR code string so we can pass as is
             if isinstance(provisioning, str):
-                if (
-                    len(provisioning) < MINIMUM_QR_STRING_LENGTH
-                    or provisioning[:2] != "90"
-                ):
+                if len(
+                    provisioning
+                ) < MINIMUM_QR_STRING_LENGTH or not provisioning.startswith("90"):
                     raise ValueError(
                         f"QR code string must be at least {MINIMUM_QR_STRING_LENGTH} characters "
                         "long and start with `90`"
                     )
                 options["provisioning"] = provisioning
+            # If we get a Smart Start QR code, we provision the node and return because
+            # inclusion is over
+            elif (
+                isinstance(provisioning, QRProvisioningInformation)
+                and provisioning.version == QRCodeVersion.SMART_START
+            ):
+                await self.async_provision_smart_start_node(provisioning)
+                return
             # Otherwise we assume the data is ProvisioningEntry or
-            # QRProvisioningInformation
+            # QRProvisioningInformation that is not a Smart Start QR code
             else:
-                if (
-                    isinstance(provisioning, QRProvisioningInformation)
-                    and provisioning.version == QRCodeVersion.SMART_START
-                ):
-                    await self.async_provision_smart_start_node(provisioning)
-                    raise ValueError(
-                        "The provided Smart Start QR code was used to create a Smart Start "
-                        "pre-provisioned entry but can't be used in the normal inclusion workflow"
-                    )
                 options["provisioning"] = provisioning.to_dict()
 
         data = await self.client.async_send_command(
@@ -604,10 +602,9 @@ class Controller(EventBase):
             require_schema = 11
             # String is assumed to be the QR code string so we can pass as is
             if isinstance(provisioning, str):
-                if (
-                    len(provisioning) < MINIMUM_QR_STRING_LENGTH
-                    or provisioning[:2] != "90"
-                ):
+                if len(
+                    provisioning
+                ) < MINIMUM_QR_STRING_LENGTH or not provisioning.startswith("90"):
                     raise ValueError(
                         f"QR code string must be at least {MINIMUM_QR_STRING_LENGTH} characters "
                         "long and start with `90`"
