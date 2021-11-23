@@ -309,15 +309,19 @@ async def test_begin_inclusion_errors(controller, uuid4, mock_command):
     provisioning_entry = controller_pkg.ProvisioningEntry(
         "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
     )
+    # Test that Security S0 Inclusion Strategy doesn't support providing a provisioning
+    # entry
     with pytest.raises(ValueError):
         await controller.async_begin_inclusion(
             InclusionStrategy.SECURITY_S0, provisioning=provisioning_entry
         )
+    # Test that Security S2 Inclusion Strategy doesn't support providing `force_security`
     with pytest.raises(ValueError):
         await controller.async_begin_inclusion(
             InclusionStrategy.SECURITY_S2, force_security=True
         )
 
+    # Test that Smart Start QR code can't be used async_begin_inclusion
     provisioning_entry = controller_pkg.QRProvisioningInformation(
         QRCodeVersion.SMART_START,
         [SecurityClass.S2_UNAUTHENTICATED],
@@ -422,6 +426,7 @@ async def test_provision_smart_start_node_qr_info(controller, uuid4, mock_comman
         "messageId": uuid4,
     }
 
+    # Test that S2 QR Code can't be used with `async_provision_smart_start_node`
     provisioning_entry = controller_pkg.QRProvisioningInformation(
         QRCodeVersion.S2,
         [SecurityClass.S2_UNAUTHENTICATED],
@@ -771,10 +776,13 @@ async def test_replace_failed_node_errors(controller):
     provisioning_entry = controller_pkg.ProvisioningEntry(
         "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
     )
+    # Test that Security S0 Inclusion strategy can't be combined with a provisioning
+    # entry
     with pytest.raises(ValueError):
         await controller.async_replace_failed_node(
             1, InclusionStrategy.SECURITY_S0, provisioning=provisioning_entry
         )
+    # Test that Security S2 inclusion strategy can't use force_security
     with pytest.raises(ValueError):
         await controller.async_replace_failed_node(
             1, InclusionStrategy.SECURITY_S2, force_security=True
