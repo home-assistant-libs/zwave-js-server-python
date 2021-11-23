@@ -463,8 +463,10 @@ class Controller(EventBase):
                 isinstance(provisioning, QRProvisioningInformation)
                 and provisioning.version == QRCodeVersion.SMART_START
             ):
-                await self.async_provision_smart_start_node(provisioning)
-                return
+                raise ValueError(
+                    "Smart Start QR codes can't use the normal inclusion process. Use the "
+                    "provision_smart_start_node command to provision this device."
+                )
             # Otherwise we assume the data is ProvisioningEntry or
             # QRProvisioningInformation that is not a Smart Start QR code
             else:

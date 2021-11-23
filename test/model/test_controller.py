@@ -304,12 +304,20 @@ async def test_begin_inclusion_s2_qr_info(controller, uuid4, mock_command):
     }
 
 
-async def test_begin_inclusion_smart_start_qr_code(controller, uuid4, mock_command):
-    """Test begin inclusion with a smart start QR code."""
-    ack_commands = mock_command(
-        {"command": "controller.provision_smart_start_node"},
-        {"success": True},
+async def test_begin_inclusion_errors(controller, uuid4, mock_command):
+    """Test begin inclusion error scenarios."""
+    provisioning_entry = controller_pkg.ProvisioningEntry(
+        "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
     )
+    with pytest.raises(ValueError):
+        await controller.async_begin_inclusion(
+            InclusionStrategy.SECURITY_S0, provisioning=provisioning_entry
+        )
+    with pytest.raises(ValueError):
+        await controller.async_begin_inclusion(
+            InclusionStrategy.SECURITY_S2, force_security=True
+        )
+
     provisioning_entry = controller_pkg.QRProvisioningInformation(
         QRCodeVersion.SMART_START,
         [SecurityClass.S2_UNAUTHENTICATED],
@@ -325,44 +333,9 @@ async def test_begin_inclusion_smart_start_qr_code(controller, uuid4, mock_comma
         "test3",
         [Protocols.ZWAVE],
     )
-    await controller.async_begin_inclusion(
-        InclusionStrategy.SECURITY_S2, provisioning=provisioning_entry
-    )
-
-    assert len(ack_commands) == 1
-    assert ack_commands[0] == {
-        "command": "controller.provision_smart_start_node",
-        "entry": {
-            "version": 1,
-            "securityClasses": [0],
-            "dsk": "test1",
-            "genericDeviceClass": 1,
-            "specificDeviceClass": 2,
-            "installerIconType": 3,
-            "manufacturerId": 4,
-            "productType": 5,
-            "productId": 6,
-            "applicationVersion": "test2",
-            "maxInclusionRequestInterval": 7,
-            "uuid": "test3",
-            "supportedProtocols": [0],
-        },
-        "messageId": uuid4,
-    }
-
-
-async def test_begin_inclusion_errors(controller):
-    """Test begin inclusion error scenarios."""
-    provisioning_entry = controller_pkg.ProvisioningEntry(
-        "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
-    )
     with pytest.raises(ValueError):
         await controller.async_begin_inclusion(
-            InclusionStrategy.SECURITY_S0, provisioning=provisioning_entry
-        )
-    with pytest.raises(ValueError):
-        await controller.async_begin_inclusion(
-            InclusionStrategy.SECURITY_S2, force_security=True
+            InclusionStrategy.SECURITY_S2, provisioning=provisioning_entry
         )
 
 
