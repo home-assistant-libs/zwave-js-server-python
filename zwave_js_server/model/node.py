@@ -1,7 +1,14 @@
 """Provide a model for the Z-Wave JS node."""
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
 
-from ..const import INTERVIEW_FAILED, CommandClass, NodeStatus, SecurityClass
+from ..const import (
+    INTERVIEW_FAILED,
+    CommandClass,
+    NodeStatus,
+    Powerlevel,
+    SecurityClass,
+)
 from ..event import Event
 from ..exceptions import (
     FailedCommand,
@@ -95,6 +102,196 @@ class NodeStatistics:
     def timeout_response(self) -> int:
         """Return number of Get-type cmds where node's response didn't come in time."""
         return self.data["timeoutResponse"]
+
+
+class LifelineHealthCheckResultDataType(TypedDict, total=False):
+    """Represent a lifeline health check result data dict type."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/node/Types.ts#L171
+    latency: int  # required
+    numNeighbors: int  # required
+    failedPingsNode: int  # required
+    routeChanges: int
+    minPowerlevel: int
+    failedPingsController: int
+    snrMargin: int
+
+
+class LifelineHealthCheckSummaryDataType(TypedDict):
+    """Represent a lifeline health check summary data dict type."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/node/Types.ts#L211
+    results: List[LifelineHealthCheckResultDataType]
+    rating: int
+
+
+class LifelineHealthCheckResult:
+    """Represent a lifeline health check result."""
+
+    def __init__(self, data: LifelineHealthCheckResultDataType) -> None:
+        """Initialize lifeline health check result."""
+        self.data = data
+
+    @property
+    def latency(self) -> int:
+        """Return latency."""
+        return self.data["latency"]
+
+    @property
+    def num_neighbors(self) -> int:
+        """Return number of neighbors."""
+        return self.data["numNeighbors"]
+
+    @property
+    def failed_pings_node(self) -> int:
+        """Return number of failed pings to node."""
+        return self.data["failedPingsNode"]
+
+    @property
+    def route_changes(self) -> Optional[int]:
+        """Return number of route changes."""
+        return self.data.get("routeChanges")
+
+    @property
+    def min_powerlevel(self) -> Optional[Powerlevel]:
+        """Return minimum powerlevel."""
+        powerlevel = self.data.get("minPowerlevel")
+        if powerlevel is not None:
+            return Powerlevel(powerlevel)
+        return None
+
+    @property
+    def failed_pings_controller(self) -> Optional[int]:
+        """Return number of failed pings to controller."""
+        return self.data.get("failedPingsController")
+
+    @property
+    def snr_margin(self) -> Optional[int]:
+        """Return SNR margin."""
+        return self.data.get("snrMargin")
+
+
+class LifelineHealthCheckSummary:
+    """Represent a lifeline health check summary update."""
+
+    def __init__(self, data: LifelineHealthCheckSummaryDataType) -> None:
+        """Initialize lifeline health check summary."""
+        self._rating = data["rating"]
+        self._results = [
+            LifelineHealthCheckResult(r) for r in data.get("results", [])
+        ]
+
+    @property
+    def rating(self) -> int:
+        """Return rating."""
+        return self._rating
+
+    @property
+    def results(self) -> List[LifelineHealthCheckResult]:
+        """Return lifeline health check results."""
+        return self._results
+
+
+class RouteHealthCheckResultDataType(TypedDict, total=False):
+    """Represent a route health check result data dict type."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/node/Types.ts#L242
+    numNeighbors: int  # required
+    rating: int  # required
+    failedPingsToTarget: int
+    failedPingsToSource: int
+    minPowerlevelSource: int
+    minPowerlevelTarget: int
+
+
+class RouteHealthCheckSummaryDataType(TypedDict):
+    """Represent a route health check summary data dict type."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/node/Types.ts#L274
+    results: List[RouteHealthCheckResultDataType]
+    rating: int
+
+
+class RouteHealthCheckResult:
+    """Represent a route health check result."""
+
+    def __init__(self, data: RouteHealthCheckResultDataType) -> None:
+        """Initialize route health check result."""
+        self.data = data
+
+    @property
+    def num_neighbors(self) -> int:
+        """Return number of neighbors."""
+        return self.data["numNeighbors"]
+
+    @property
+    def rating(self) -> int:
+        """Return rating."""
+        return self.data["rating"]
+
+    @property
+    def failed_pings_to_target(self) -> Optional[int]:
+        """Return number of failed pings to target."""
+        return self.data.get("failedPingsToTarget")
+
+    @property
+    def failed_pings_to_source(self) -> Optional[int]:
+        """Return number of failed pings to source."""
+        return self.data.get("failedPingsToSource")
+
+    @property
+    def min_powerlevel_source(self) -> Optional[Powerlevel]:
+        """Return minimum powerlevel source."""
+        powerlevel = self.data.get("minPowerlevelSource")
+        if powerlevel is not None:
+            return Powerlevel(powerlevel)
+        return None
+
+    @property
+    def min_powerlevel_target(self) -> Optional[Powerlevel]:
+        """Return minimum powerlevel target."""
+        powerlevel = self.data.get("minPowerlevelTarget")
+        if powerlevel is not None:
+            return Powerlevel(powerlevel)
+        return None
+
+
+class RouteHealthCheckSummary:
+    """Represent a route health check summary update."""
+
+    def __init__(self, data: RouteHealthCheckSummaryDataType) -> None:
+        """Initialize route health check summary."""
+        self._rating = data["rating"]
+        self._results = [
+            RouteHealthCheckResult(r) for r in data.get("results", [])
+        ]
+
+    @property
+    def rating(self) -> int:
+        """Return rating."""
+        return self._rating
+
+    @property
+    def results(self) -> List[RouteHealthCheckResult]:
+        """Return route health check results."""
+        return self._results
+
+
+@dataclass
+class TestPowerlevelProgress:
+    """Class to represent a test powerlevel progress update."""
+
+    acknowledged: int
+    total: int
+
+
+@dataclass
+class CheckHealthProgress:
+    """Represent a check lifeline/route health progress update."""
+
+    rounds: int
+    total_rounds: int
+    last_rating: int
 
 
 class NodeDataType(EndpointDataType):
@@ -538,6 +735,74 @@ class Node(Endpoint):
         )
         assert data
         return SecurityClass(data["highestSecurityClass"])
+
+    async def async_test_powerlevel(
+        self, test_node_id: int, powerlevel: Powerlevel, test_frame_count: int
+    ) -> int:
+        """Send testPowerLevel command to Node."""
+        data = await self.async_send_command(
+            "test_powerlevel",
+            testNodeId=test_node_id,
+            powerlevel=powerlevel,
+            testFrameCount=test_frame_count,
+            require_schema=13,
+            wait_for_result=True,
+        )
+        assert data
+        return cast(int, data["framesAcked"])
+
+    async def async_check_lifeline_health(
+        self, rounds: Optional[int] = None
+    ) -> LifelineHealthCheckSummary:
+        """Send checkLifelineHealth command to Node."""
+        kwargs = {
+            "require_schema": 13,
+            "wait_for_result": True,
+        }
+        if rounds is not None:
+            kwargs["rounds"] = rounds
+        data = await self.async_send_command(
+            "check_lifeline_health",
+            **kwargs,
+        )
+        assert data
+        return LifelineHealthCheckSummary(data["summary"])
+
+    async def async_check_route_health(
+        self, target_node_id: int, rounds: Optional[int] = None
+    ) -> RouteHealthCheckSummary:
+        """Send checkRouteHealth command to Node."""
+        kwargs = {
+            "require_schema": 13,
+            "wait_for_result": True,
+            "targetNodeId": target_node_id,
+        }
+        if rounds is not None:
+            kwargs["rounds"] = rounds
+        data = await self.async_send_command(
+            "check_route_health",
+            **kwargs,
+        )
+        assert data
+        return RouteHealthCheckSummary(data["summary"])
+
+    def handle_test_powerlevel_progress(self, event: Event) -> None:
+        """Process a test powerelevel progress event."""
+        event.data["test_powerlevel_progress"] = TestPowerlevelProgress(
+            event.data["acknowledged"], event.data["total"]
+        )
+
+    def handle_check_lifeline_health_progress(self, event: Event) -> None:
+        """Process a check lifeline health progress event."""
+        event.data["check_lifeline_health_progress"] = CheckHealthProgress(
+            event.data["rounds"], event.data["totalRounds"], event.data["lastRating"]
+        )
+
+    def handle_check_route_health_progress(self, event: Event) -> None:
+        """Process a check route health progress event."""
+        event.data["check_route_health_progress"] = CheckHealthProgress(
+            event.data["rounds"], event.data["totalRounds"], event.data["lastRating"]
+        )
 
     def handle_wake_up(self, event: Event) -> None:
         """Process a node wake up event."""

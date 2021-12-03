@@ -4,7 +4,7 @@ from enum import Enum, IntEnum
 # minimal server schema version we can handle
 MIN_SERVER_SCHEMA_VERSION = 12
 # max server schema version we can handle (and our code is compatible with)
-MAX_SERVER_SCHEMA_VERSION = 12
+MAX_SERVER_SCHEMA_VERSION = 13
 
 VALUE_UNKNOWN = "unknown"
 
@@ -248,3 +248,19 @@ class ZwaveFeature(IntEnum):
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/controller/Features.ts#L4
     SMART_START = 0
+
+
+class Powerlevel(IntEnum):
+    """Enum for all known power levels."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/PowerlevelCC.ts#L38
+    NORMAL_POWER = 0
+    DBM_MINUS_1 = 1
+    DBM_MINUS_2 = 2
+    DBM_MINUS_3 = 3
+    DBM_MINUS_4 = 4
+    DBM_MINUS_5 = 5
+    DBM_MINUS_6 = 6
+    DBM_MINUS_7 = 7
+    DBM_MINUS_8 = 8
+    DBM_MINUS_9 = 9
