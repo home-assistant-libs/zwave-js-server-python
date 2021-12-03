@@ -91,24 +91,6 @@ class ProvisioningEntry:
         )
 
 
-class QRProvisioningInformationDataType(TypedDict, total=False):
-    """Representation of provisioning information data dict type retrieved from a QR code."""
-
-    version: int  # required
-    securityClasses: List[int]  # required
-    dsk: str  # required
-    genericDeviceClass: int  # required
-    specificDeviceClass: int  # required
-    installerIconType: int  # required
-    manufacturerId: int  # required
-    productType: int  # required
-    productId: int  # required
-    applicationVersion: str  # required
-    maxInclusionRequestInterval: int
-    uuid: str
-    supportedProtocols: List[int]
-
-
 @dataclass
 class QRProvisioningInformation:
     """Representation of provisioning information retrieved from a QR code."""
@@ -126,21 +108,23 @@ class QRProvisioningInformation:
     max_inclusion_request_interval: Optional[int]
     uuid: Optional[str]
     supported_protocols: Optional[List[Protocols]]
+    additional_properties: Optional[Dict[str, Any]] = None
 
-    def to_dict(self) -> QRProvisioningInformationDataType:
-        """Return QRProvisioningInformationDataType dict from self."""
-        data = QRProvisioningInformationDataType(
-            version=self.version.value,
-            securityClasses=[sec_cls.value for sec_cls in self.security_classes],
-            dsk=self.dsk,
-            genericDeviceClass=self.generic_device_class,
-            specificDeviceClass=self.specific_device_class,
-            installerIconType=self.installer_icon_type,
-            manufacturerId=self.manufacturer_id,
-            productType=self.product_type,
-            productId=self.product_id,
-            applicationVersion=self.application_version,
-        )
+    def to_dict(self) -> Dict[str, Any]:
+        """Return QRProvisioningInformation data dict from self."""
+        data = {
+            "version": self.version.value,
+            "securityClasses": [sec_cls.value for sec_cls in self.security_classes],
+            "dsk": self.dsk,
+            "genericDeviceClass": self.generic_device_class,
+            "specificDeviceClass": self.specific_device_class,
+            "installerIconType": self.installer_icon_type,
+            "manufacturerId": self.manufacturer_id,
+            "productType": self.product_type,
+            "productId": self.product_id,
+            "applicationVersion": self.application_version,
+            **(self.additional_properties or {}),
+        }
         if self.max_inclusion_request_interval is not None:
             data["maxInclusionRequestInterval"] = self.max_inclusion_request_interval
         if self.uuid is not None:
@@ -152,10 +136,8 @@ class QRProvisioningInformation:
         return data
 
     @classmethod
-    def from_dict(
-        cls, data: QRProvisioningInformationDataType
-    ) -> "QRProvisioningInformation":
-        """Return QRProvisioningInformation from QRProvisioningInformationDataType dict."""
+    def from_dict(cls, data: Dict[str, Any]) -> "QRProvisioningInformation":
+        """Return QRProvisioningInformation from data dict."""
         return cls(
             version=QRCodeVersion(data["version"]),
             security_classes=[
@@ -175,6 +157,26 @@ class QRProvisioningInformation:
                 Protocols(supported_protocol)
                 for supported_protocol in data.get("supportedProtocols", [])
             ],
+            additional_properties={
+                k: v
+                for k, v in data.items()
+                if k
+                not in {
+                    "version",
+                    "securityClasses",
+                    "dsk",
+                    "genericDeviceClass",
+                    "specificDeviceClass",
+                    "installerIconType",
+                    "manufacturerId",
+                    "productType",
+                    "productId",
+                    "applicationVersion",
+                    "maxInclusionRequestInterval",
+                    "uuid",
+                    "supportedProtocols",
+                }
+            },
         )
 
 
