@@ -751,14 +751,13 @@ class Node(Endpoint):
         self, rounds: Optional[int] = None
     ) -> LifelineHealthCheckSummary:
         """Send checkLifelineHealth command to Node."""
-        kwargs = {
-            "require_schema": 13,
-            "wait_for_result": True,
-        }
+        kwargs = {}
         if rounds is not None:
             kwargs["rounds"] = rounds
         data = await self.async_send_command(
             "check_lifeline_health",
+            require_schema=13,
+            wait_for_result=True,
             **kwargs,
         )
         assert data
@@ -768,15 +767,13 @@ class Node(Endpoint):
         self, target_node_id: int, rounds: Optional[int] = None
     ) -> RouteHealthCheckSummary:
         """Send checkRouteHealth command to Node."""
-        kwargs = {
-            "require_schema": 13,
-            "wait_for_result": True,
-            "targetNodeId": target_node_id,
-        }
+        kwargs = {"targetNodeId": target_node_id}
         if rounds is not None:
             kwargs["rounds"] = rounds
         data = await self.async_send_command(
             "check_route_health",
+            require_schema=13,
+            wait_for_result=True,
             **kwargs,
         )
         assert data
