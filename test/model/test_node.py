@@ -20,7 +20,12 @@ from zwave_js_server.event import Event
 from zwave_js_server.exceptions import FailedCommand, NotFoundError, UnwriteableValue
 from zwave_js_server.model import node as node_pkg
 from zwave_js_server.model.firmware import FirmwareUpdateStatus
-from zwave_js_server.model.node import LifelineHealthCheckResultDataType, Node, NodeStatistics, RouteHealthCheckResultDataType
+from zwave_js_server.model.node import (
+    LifelineHealthCheckResultDataType,
+    Node,
+    NodeStatistics,
+    RouteHealthCheckResultDataType,
+)
 from zwave_js_server.model.value import ConfigurationValue
 
 from .. import load_fixture
@@ -1008,9 +1013,7 @@ async def test_test_powerlevel(multisensor_6: Node, uuid4, mock_command):
         {"command": "node.test_powerlevel", "nodeId": node.node_id},
         {"framesAcked": 1},
     )
-    assert (
-        await node.async_test_powerlevel(2, Powerlevel.DBM_MINUS_1, 3) == 1
-    )
+    assert await node.async_test_powerlevel(2, Powerlevel.DBM_MINUS_1, 3) == 1
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
@@ -1046,7 +1049,22 @@ async def test_check_lifeline_health(multisensor_6: Node, uuid4, mock_command):
     node = multisensor_6
     ack_commands = mock_command(
         {"command": "node.check_lifeline_health", "nodeId": node.node_id},
-        {"summary": {"rating": 10, "results": [LifelineHealthCheckResultDataType(latency=1, numNeighbors=2, failedPingsNode=3, routeChanges=4, minPowerlevel=5, failedPingsController=6, snrMargin=7)]}},
+        {
+            "summary": {
+                "rating": 10,
+                "results": [
+                    LifelineHealthCheckResultDataType(
+                        latency=1,
+                        numNeighbors=2,
+                        failedPingsNode=3,
+                        routeChanges=4,
+                        minPowerlevel=5,
+                        failedPingsController=6,
+                        snrMargin=7,
+                    )
+                ],
+            }
+        },
     )
     summary = await node.async_check_lifeline_health(1)
 
@@ -1068,7 +1086,9 @@ async def test_check_lifeline_health(multisensor_6: Node, uuid4, mock_command):
     }
 
 
-async def test_check_lifeline_health_progress_event(multisensor_6: Node, uuid4, mock_command):
+async def test_check_lifeline_health_progress_event(
+    multisensor_6: Node, uuid4, mock_command
+):
     """Test check lifeline health progress event."""
     event = Event(
         "check lifeline health progress",
@@ -1093,7 +1113,21 @@ async def test_check_route_health(multisensor_6: Node, uuid4, mock_command):
     node = multisensor_6
     ack_commands = mock_command(
         {"command": "node.check_route_health", "nodeId": node.node_id},
-        {"summary": {"rating": 10, "results": [RouteHealthCheckResultDataType(numNeighbors=1, rating=10, failedPingsToSource=2, failedPingsToTarget=3, minPowerlevelSource=4, minPowerlevelTarget=5)]}},
+        {
+            "summary": {
+                "rating": 10,
+                "results": [
+                    RouteHealthCheckResultDataType(
+                        numNeighbors=1,
+                        rating=10,
+                        failedPingsToSource=2,
+                        failedPingsToTarget=3,
+                        minPowerlevelSource=4,
+                        minPowerlevelTarget=5,
+                    )
+                ],
+            }
+        },
     )
     summary = await node.async_check_route_health(15, 1)
 
@@ -1115,7 +1149,9 @@ async def test_check_route_health(multisensor_6: Node, uuid4, mock_command):
     }
 
 
-async def test_check_route_health_progress_event(multisensor_6: Node, uuid4, mock_command):
+async def test_check_route_health_progress_event(
+    multisensor_6: Node, uuid4, mock_command
+):
     """Test check route health progress event."""
     event = Event(
         "check route health progress",

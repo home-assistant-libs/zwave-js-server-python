@@ -177,9 +177,7 @@ class LifelineHealthCheckSummary:
     def __init__(self, data: LifelineHealthCheckSummaryDataType) -> None:
         """Initialize lifeline health check summary."""
         self._rating = data["rating"]
-        self._results = [
-            LifelineHealthCheckResult(r) for r in data.get("results", [])
-        ]
+        self._results = [LifelineHealthCheckResult(r) for r in data.get("results", [])]
 
     @property
     def rating(self) -> int:
@@ -262,9 +260,7 @@ class RouteHealthCheckSummary:
     def __init__(self, data: RouteHealthCheckSummaryDataType) -> None:
         """Initialize route health check summary."""
         self._rating = data["rating"]
-        self._results = [
-            RouteHealthCheckResult(r) for r in data.get("results", [])
-        ]
+        self._results = [RouteHealthCheckResult(r) for r in data.get("results", [])]
 
     @property
     def rating(self) -> int:
