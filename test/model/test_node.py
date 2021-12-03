@@ -8,7 +8,7 @@ from zwave_js_server.const import (
     INTERVIEW_FAILED,
     CommandClass,
     NodeStatus,
-    Powerlevel,
+    PowerLevel,
     ProtocolVersion,
     SecurityClass,
 )
@@ -1006,28 +1006,28 @@ async def test_get_highest_security_class(multisensor_6: Node, uuid4, mock_comma
     }
 
 
-async def test_test_powerlevel(multisensor_6: Node, uuid4, mock_command):
+async def test_test_power_level(multisensor_6: Node, uuid4, mock_command):
     """Test node.test_powerlevel command."""
     node = multisensor_6
     ack_commands = mock_command(
         {"command": "node.test_powerlevel", "nodeId": node.node_id},
         {"framesAcked": 1},
     )
-    assert await node.async_test_powerlevel(2, Powerlevel.DBM_MINUS_1, 3) == 1
+    assert await node.async_test_power_level(2, PowerLevel.DBM_MINUS_1, 3) == 1
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "node.test_powerlevel",
         "nodeId": node.node_id,
         "testNodeId": 2,
-        "powerlevel": Powerlevel.DBM_MINUS_1.value,
+        "powerlevel": PowerLevel.DBM_MINUS_1.value,
         "testFrameCount": 3,
         "messageId": uuid4,
     }
 
 
-async def test_test_powerlevel_progress_event(multisensor_6: Node, uuid4, mock_command):
-    """Test test powerlevel progress event."""
+async def test_test_power_level_progress_event(multisensor_6: Node, uuid4, mock_command):
+    """Test test power level progress event."""
     event = Event(
         "test powerlevel progress",
         {
@@ -1039,9 +1039,9 @@ async def test_test_powerlevel_progress_event(multisensor_6: Node, uuid4, mock_c
         },
     )
     multisensor_6.receive_event(event)
-    assert event.data["test_powerlevel_progress"]
-    assert event.data["test_powerlevel_progress"].acknowledged == 1
-    assert event.data["test_powerlevel_progress"].total == 2
+    assert event.data["test_power_level_progress"]
+    assert event.data["test_power_level_progress"].acknowledged == 1
+    assert event.data["test_power_level_progress"].total == 2
 
 
 async def test_check_lifeline_health(multisensor_6: Node, uuid4, mock_command):
@@ -1073,7 +1073,7 @@ async def test_check_lifeline_health(multisensor_6: Node, uuid4, mock_command):
     assert summary.results[0].num_neighbors == 2
     assert summary.results[0].failed_pings_node == 3
     assert summary.results[0].route_changes == 4
-    assert summary.results[0].min_powerlevel == Powerlevel.DBM_MINUS_5
+    assert summary.results[0].min_power_level == PowerLevel.DBM_MINUS_5
     assert summary.results[0].failed_pings_controller == 6
     assert summary.results[0].snr_margin == 7
 
@@ -1136,8 +1136,8 @@ async def test_check_route_health(multisensor_6: Node, uuid4, mock_command):
     assert summary.results[0].rating == 10
     assert summary.results[0].failed_pings_to_source == 2
     assert summary.results[0].failed_pings_to_target == 3
-    assert summary.results[0].min_powerlevel_source == Powerlevel.DBM_MINUS_4
-    assert summary.results[0].min_powerlevel_target == Powerlevel.DBM_MINUS_5
+    assert summary.results[0].min_power_level_source == PowerLevel.DBM_MINUS_4
+    assert summary.results[0].min_power_level_target == PowerLevel.DBM_MINUS_5
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {

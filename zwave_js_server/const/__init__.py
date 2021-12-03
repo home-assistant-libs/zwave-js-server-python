@@ -250,7 +250,7 @@ class ZwaveFeature(IntEnum):
     SMART_START = 0
 
 
-class Powerlevel(IntEnum):
+class PowerLevel(IntEnum):
     """Enum for all known power levels."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/PowerlevelCC.ts#L38

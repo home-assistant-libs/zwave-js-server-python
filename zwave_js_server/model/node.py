@@ -6,7 +6,7 @@ from ..const import (
     INTERVIEW_FAILED,
     CommandClass,
     NodeStatus,
-    Powerlevel,
+    PowerLevel,
     SecurityClass,
 )
 from ..event import Event
@@ -153,11 +153,11 @@ class LifelineHealthCheckResult:
         return self.data.get("routeChanges")
 
     @property
-    def min_powerlevel(self) -> Optional[Powerlevel]:
-        """Return minimum powerlevel."""
-        powerlevel = self.data.get("minPowerlevel")
-        if powerlevel is not None:
-            return Powerlevel(powerlevel)
+    def min_power_level(self) -> Optional[PowerLevel]:
+        """Return minimum power_level."""
+        power_level = self.data.get("minPowerlevel")
+        if power_level is not None:
+            return PowerLevel(power_level)
         return None
 
     @property
@@ -238,19 +238,19 @@ class RouteHealthCheckResult:
         return self.data.get("failedPingsToSource")
 
     @property
-    def min_powerlevel_source(self) -> Optional[Powerlevel]:
-        """Return minimum powerlevel source."""
-        powerlevel = self.data.get("minPowerlevelSource")
-        if powerlevel is not None:
-            return Powerlevel(powerlevel)
+    def min_power_level_source(self) -> Optional[PowerLevel]:
+        """Return minimum power_level source."""
+        power_level = self.data.get("minPowerlevelSource")
+        if power_level is not None:
+            return PowerLevel(power_level)
         return None
 
     @property
-    def min_powerlevel_target(self) -> Optional[Powerlevel]:
-        """Return minimum powerlevel target."""
-        powerlevel = self.data.get("minPowerlevelTarget")
-        if powerlevel is not None:
-            return Powerlevel(powerlevel)
+    def min_power_level_target(self) -> Optional[PowerLevel]:
+        """Return minimum power_level target."""
+        power_level = self.data.get("minPowerlevelTarget")
+        if power_level is not None:
+            return PowerLevel(power_level)
         return None
 
 
@@ -274,8 +274,8 @@ class RouteHealthCheckSummary:
 
 
 @dataclass
-class TestPowerlevelProgress:
-    """Class to represent a test powerlevel progress update."""
+class TestPowerLevelProgress:
+    """Class to represent a test power level progress update."""
 
     acknowledged: int
     total: int
@@ -732,14 +732,14 @@ class Node(Endpoint):
         assert data
         return SecurityClass(data["highestSecurityClass"])
 
-    async def async_test_powerlevel(
-        self, test_node_id: int, powerlevel: Powerlevel, test_frame_count: int
+    async def async_test_power_level(
+        self, test_node_id: int, power_level: PowerLevel, test_frame_count: int
     ) -> int:
         """Send testPowerLevel command to Node."""
         data = await self.async_send_command(
             "test_powerlevel",
             testNodeId=test_node_id,
-            powerlevel=powerlevel,
+            powerlevel=power_level,
             testFrameCount=test_frame_count,
             require_schema=13,
             wait_for_result=True,
@@ -781,7 +781,7 @@ class Node(Endpoint):
 
     def handle_test_powerlevel_progress(self, event: Event) -> None:
         """Process a test powerelevel progress event."""
-        event.data["test_powerlevel_progress"] = TestPowerlevelProgress(
+        event.data["test_power_level_progress"] = TestPowerLevelProgress(
             event.data["acknowledged"], event.data["total"]
         )
 
