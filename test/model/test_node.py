@@ -1026,7 +1026,9 @@ async def test_test_power_level(multisensor_6: Node, uuid4, mock_command):
     }
 
 
-async def test_test_power_level_progress_event(multisensor_6: Node, uuid4, mock_command):
+async def test_test_power_level_progress_event(
+    multisensor_6: Node, uuid4, mock_command
+):
     """Test test power level progress event."""
     event = Event(
         "test powerlevel progress",
