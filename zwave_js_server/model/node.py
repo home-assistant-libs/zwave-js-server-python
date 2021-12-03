@@ -154,7 +154,7 @@ class LifelineHealthCheckResult:
 
     @property
     def min_power_level(self) -> Optional[PowerLevel]:
-        """Return minimum power_level."""
+        """Return minimum power level."""
         power_level = self.data.get("minPowerlevel")
         if power_level is not None:
             return PowerLevel(power_level)
@@ -239,7 +239,7 @@ class RouteHealthCheckResult:
 
     @property
     def min_power_level_source(self) -> Optional[PowerLevel]:
-        """Return minimum power_level source."""
+        """Return minimum power level source."""
         power_level = self.data.get("minPowerlevelSource")
         if power_level is not None:
             return PowerLevel(power_level)
@@ -247,7 +247,7 @@ class RouteHealthCheckResult:
 
     @property
     def min_power_level_target(self) -> Optional[PowerLevel]:
-        """Return minimum power_level target."""
+        """Return minimum power level target."""
         power_level = self.data.get("minPowerlevelTarget")
         if power_level is not None:
             return PowerLevel(power_level)
@@ -780,7 +780,7 @@ class Node(Endpoint):
         return RouteHealthCheckSummary(data["summary"])
 
     def handle_test_powerlevel_progress(self, event: Event) -> None:
-        """Process a test powerelevel progress event."""
+        """Process a test power level progress event."""
         event.data["test_power_level_progress"] = TestPowerLevelProgress(
             event.data["acknowledged"], event.data["total"]
         )
