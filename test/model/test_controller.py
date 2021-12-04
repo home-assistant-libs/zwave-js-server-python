@@ -262,9 +262,9 @@ async def test_begin_inclusion_s2_qr_info(controller, uuid4, mock_command):
         {"success": True},
     )
     provisioning_entry = controller_pkg.QRProvisioningInformation(
-        QRCodeVersion.S2,
-        [SecurityClass.S2_UNAUTHENTICATED],
         "test1",
+        [SecurityClass.S2_UNAUTHENTICATED],
+        QRCodeVersion.S2,
         1,
         2,
         3,
@@ -323,9 +323,9 @@ async def test_begin_inclusion_errors(controller, uuid4, mock_command):
 
     # Test that Smart Start QR code can't be used async_begin_inclusion
     provisioning_entry = controller_pkg.QRProvisioningInformation(
-        QRCodeVersion.SMART_START,
-        [SecurityClass.S2_UNAUTHENTICATED],
         "test1",
+        [SecurityClass.S2_UNAUTHENTICATED],
+        QRCodeVersion.SMART_START,
         1,
         2,
         3,
@@ -389,9 +389,9 @@ async def test_provision_smart_start_node_qr_info(controller, uuid4, mock_comman
         {"success": True},
     )
     provisioning_entry = controller_pkg.QRProvisioningInformation(
-        QRCodeVersion.SMART_START,
-        [SecurityClass.S2_UNAUTHENTICATED],
         "test1",
+        [SecurityClass.S2_UNAUTHENTICATED],
+        QRCodeVersion.SMART_START,
         1,
         2,
         3,
@@ -428,9 +428,9 @@ async def test_provision_smart_start_node_qr_info(controller, uuid4, mock_comman
 
     # Test that S2 QR Code can't be used with `async_provision_smart_start_node`
     provisioning_entry = controller_pkg.QRProvisioningInformation(
-        QRCodeVersion.S2,
-        [SecurityClass.S2_UNAUTHENTICATED],
         "test1",
+        [SecurityClass.S2_UNAUTHENTICATED],
+        QRCodeVersion.S2,
         1,
         2,
         3,
@@ -728,9 +728,9 @@ async def test_replace_failed_node_s2_qr_info(controller, uuid4, mock_command):
         {"success": True},
     )
     provisioning_entry = controller_pkg.QRProvisioningInformation(
-        QRCodeVersion.S2,
-        [SecurityClass.S2_UNAUTHENTICATED],
         "test1",
+        [SecurityClass.S2_UNAUTHENTICATED],
+        QRCodeVersion.S2,
         1,
         2,
         3,

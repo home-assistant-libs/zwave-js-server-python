@@ -62,11 +62,17 @@ class InclusionGrant:
 
 
 @dataclass
-class ProvisioningEntry:
-    """Representation of a provisioning entry."""
+class ProvisioningEntryMixin:
+    """Mixin class to represent the base fields of a provisioning entry."""
 
     dsk: str
     security_classes: List[SecurityClass]
+
+
+@dataclass
+class ProvisioningEntry(ProvisioningEntryMixin):
+    """Representation of a provisioning entry."""
+
     additional_properties: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
@@ -92,12 +98,10 @@ class ProvisioningEntry:
 
 
 @dataclass
-class QRProvisioningInformation:
+class QRProvisioningInformation(ProvisioningEntryMixin):
     """Representation of provisioning information retrieved from a QR code."""
 
     version: QRCodeVersion
-    security_classes: List[SecurityClass]
-    dsk: str
     generic_device_class: int
     specific_device_class: int
     installer_icon_type: int
