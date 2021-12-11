@@ -62,34 +62,12 @@ class InclusionGrant:
 
 
 @dataclass
-class ProvisioningEntryMixin:
-    """Mixin class to represent the base fields of a provisioning entry."""
+class ProvisioningEntry:
+    """Class to represent the base fields of a provisioning entry."""
 
     dsk: str
     security_classes: List[SecurityClass]
     additional_properties: Optional[Dict[str, Any]] = None
-
-
-@dataclass
-class QRProvisioningInformationMixin:
-    """Mixin class to represent the base fields of a QR provisioning information."""
-
-    version: QRCodeVersion
-    generic_device_class: int
-    specific_device_class: int
-    installer_icon_type: int
-    manufacturer_id: int
-    product_type: int
-    product_id: int
-    application_version: str
-    max_inclusion_request_interval: Optional[int]
-    uuid: Optional[str]
-    supported_protocols: Optional[List[Protocols]]
-
-
-@dataclass
-class ProvisioningEntry(ProvisioningEntryMixin):
-    """Representation of a provisioning entry."""
 
     def to_dict(self) -> Dict[str, Any]:
         """Return PlannedProvisioning data dict from self."""
@@ -114,7 +92,24 @@ class ProvisioningEntry(ProvisioningEntryMixin):
 
 
 @dataclass
-class QRProvisioningInformation(ProvisioningEntryMixin, QRProvisioningInformationMixin):
+class QRProvisioningInformationMixin:
+    """Mixin class to represent the base fields of a QR provisioning information."""
+
+    version: QRCodeVersion
+    generic_device_class: int
+    specific_device_class: int
+    installer_icon_type: int
+    manufacturer_id: int
+    product_type: int
+    product_id: int
+    application_version: str
+    max_inclusion_request_interval: Optional[int]
+    uuid: Optional[str]
+    supported_protocols: Optional[List[Protocols]]
+
+
+@dataclass
+class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixin):
     """Representation of provisioning information retrieved from a QR code."""
 
     def to_dict(self) -> Dict[str, Any]:
