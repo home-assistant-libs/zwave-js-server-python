@@ -286,22 +286,27 @@ class ControllerDataType(TypedDict, total=False):
     supportsTimers: bool
     isHealNetworkActive: bool
     statistics: ControllerStatisticsDataType
+    inclusionState: int
 
 
 class Controller(EventBase):
     """Represent a Z-Wave JS controller."""
 
+    def update(self, data: ControllerDataType) -> None:
+        """Update controller data."""
+        self.data = data
+        self._statistics = ControllerStatistics(self.data.get("statistics"))
+
     def __init__(self, client: "Client", state: dict) -> None:
         """Initialize controller."""
         super().__init__()
         self.client = client
-        self.data: ControllerDataType = state["controller"]
-        self._statistics = ControllerStatistics(self.data.get("statistics"))
         self.nodes: Dict[int, Node] = {}
         self._heal_network_progress: Optional[Dict[int, str]] = None
         for node_state in state["nodes"]:
             node = Node(client, node_state)
             self.nodes[node.node_id] = node
+        self.update(state["controller"])
 
     def __repr__(self) -> str:
         """Return the representation."""
@@ -806,6 +811,14 @@ class Controller(EventBase):
             require_schema=12,
         )
         return cast(Optional[bool], data.get("supported"))
+
+    async def async_get_state(self) -> ControllerDataType:
+        """Get controller state."""
+        data = await self.client.async_send_command(
+            {"command": "controller.get_state"}, require_schema=14
+        )
+        self.update(data["state"])
+        return self.data
 
     def receive_event(self, event: Event) -> None:
         """Receive an event."""

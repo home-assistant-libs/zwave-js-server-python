@@ -34,14 +34,13 @@ class Endpoint(EventBase):
         self,
         client: "Client",
         data: EndpointDataType,
-        values: Dict[str, Union[ConfigurationValue, Value]] = None,
+        values: Optional[Dict[str, Union[ConfigurationValue, Value]]] = None,
     ) -> None:
         """Initialize."""
         super().__init__()
         self.client = client
-        self.data = data
-        if values is not None:
-            self.values = values
+        self.values: Dict[str, Union[ConfigurationValue, Value]] = {}
+        self.update(data, values)
 
     @property
     def node_id(self) -> int:
@@ -67,6 +66,17 @@ class Endpoint(EventBase):
     def user_icon(self) -> Optional[int]:
         """Return user icon property."""
         return self.data.get("userIcon")
+
+    def update(
+        self,
+        data: EndpointDataType,
+        values: Optional[Dict[str, Union[ConfigurationValue, Value]]] = None,
+    ) -> None:
+        """Update the endpoint data."""
+        self.data = data
+        for value_id, value in (values or {}).items():
+            if value_id not in self.values:
+                self.values[value_id] = value
 
     async def _async_send_command(
         self,

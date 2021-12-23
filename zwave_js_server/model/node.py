@@ -328,6 +328,7 @@ class NodeDataType(EndpointDataType):
     values: List[ValueDataType]
     statistics: NodeStatisticsDataType
     highestSecurityClass: int
+    isControllerNode: bool
 
 
 class Node(Endpoint):
@@ -336,31 +337,10 @@ class Node(Endpoint):
     def __init__(self, client: "Client", data: NodeDataType) -> None:
         """Initialize the node."""
         super().__init__(client, data)
-        self.data: NodeDataType = data
-        self._device_config = DeviceConfig(self.data.get("deviceConfig", {}))
-        self._statistics = NodeStatistics(self.data.get("statistics"))
         self._firmware_update_progress: Optional[FirmwareUpdateProgress] = None
         self.values: Dict[str, Union[Value, ConfigurationValue]] = {}
-        for val in data["values"]:
-            value_id = _get_value_id_from_dict(self, val)
-            try:
-                self.values[value_id] = _init_value(self, val)
-            except UnparseableValue:
-                # If we can't parse the value, don't store it
-                pass
-
-        self.endpoints = {
-            endpoint["index"]: Endpoint(
-                self.client,
-                endpoint,
-                {
-                    value_id: value
-                    for value_id, value in self.values.items()
-                    if self.index == value.endpoint
-                },
-            )
-            for endpoint in self.data["endpoints"]
-        }
+        self.endpoints: Dict[int, Endpoint] = {}
+        self.update_state(data)
 
     def __repr__(self) -> str:
         """Return the representation."""
@@ -549,6 +529,48 @@ class Node(Endpoint):
         if (security_class := self.data.get("highestSecurityClass")) is None:
             return None
         return SecurityClass(security_class)
+
+    @property
+    def is_controller_node(self) -> bool:
+        """Return whether the node is a controller node."""
+        return self.data["isControllerNode"]
+
+    @property
+    def keep_awake(self) -> bool:
+        """Return whether the node is set to keep awake."""
+        return self.data["keepAwake"]
+
+    def update_state(self, data: NodeDataType) -> None:
+        """Update the internal state data."""
+        self.data: NodeDataType = data
+        self._device_config = DeviceConfig(self.data.get("deviceConfig", {}))
+        self._statistics = NodeStatistics(self.data.get("statistics"))
+        for val in data["values"]:
+            value_id = _get_value_id_from_dict(self, val)
+            try:
+                if value_id in self.values:
+                    self.values[value_id].update(val)
+                else:
+                    self.values[value_id] = _init_value(self, val)
+            except UnparseableValue:
+                # If we can't parse the value, don't store it
+                pass
+
+        for endpoint in self.data["endpoints"]:
+            idx = endpoint["index"]
+            values = {
+                value_id: value
+                for value_id, value in self.values.items()
+                if self.index == value.endpoint
+            }
+            if idx in self.endpoints:
+                self.endpoints[idx].update(endpoint, values)
+            else:
+                self.endpoints[idx] = Endpoint(
+                    self.client,
+                    endpoint,
+                    values,
+                )
 
     def get_command_class_values(
         self, command_class: CommandClass, endpoint: int = None
@@ -779,6 +801,45 @@ class Node(Endpoint):
         assert data
         return RouteHealthCheckSummary(data["summary"])
 
+    async def async_get_state(self) -> NodeDataType:
+        """Get node state."""
+        data = await self.async_send_command("get_state", require_schema=14)
+        assert data
+        self.update_state(data["state"])
+        return self.data
+
+    async def async_set_name(self, name: str, update_cc: bool = True) -> None:
+        """Set node name."""
+        await self.async_send_command(
+            "set_name",
+            name=name,
+            updateCC=update_cc,
+            wait_for_result=True,
+            require_schema=14,
+        )
+        self.data["name"] = name
+
+    async def async_set_location(self, location: str, update_cc: bool = True) -> None:
+        """Set node location."""
+        await self.async_send_command(
+            "set_location",
+            location=location,
+            updateCC=update_cc,
+            wait_for_result=True,
+            require_schema=14,
+        )
+        self.data["location"] = location
+
+    async def async_set_keep_awake(self, keep_awake: bool) -> None:
+        """Set node keep awake state."""
+        await self.async_send_command(
+            "set_keep_awake",
+            keepAwake=keep_awake,
+            wait_for_result=True,
+            require_schema=14,
+        )
+        self.data["keepAwake"] = keep_awake
+
     def handle_test_powerlevel_progress(self, event: Event) -> None:
         """Process a test power level progress event."""
         event.data["test_power_level_progress"] = TestPowerLevelProgress(
@@ -840,18 +901,7 @@ class Node(Endpoint):
     def handle_ready(self, event: Event) -> None:
         """Process a node ready event."""
         # the event contains a full dump of the node
-        self.data.update(event.data["nodeState"])
-        # update device config
-        if new_device_config := self.data.get("deviceConfig"):
-            self._device_config = DeviceConfig(new_device_config)
-        # update/add values
-        for value_state in event.data["nodeState"]["values"]:
-            value_id = _get_value_id_from_dict(self, value_state)
-            value = self.values.get(value_id)
-            if value is None:
-                self.values[value_id] = _init_value(self, value_state)
-            else:
-                value.update(value_state)
+        self.update_state(event.data["nodeState"])
 
     def handle_value_added(self, event: Event) -> None:
         """Process a node value added event."""
