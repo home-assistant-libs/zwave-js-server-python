@@ -264,3 +264,14 @@ class PowerLevel(IntEnum):
     DBM_MINUS_7 = 7
     DBM_MINUS_8 = 8
     DBM_MINUS_9 = 9
+
+
+class InclusionState(IntEnum):
+    """Enum for all known inclusion states."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/controller/Inclusion.ts#L154
+    IDLE = 0
+    INCLUDING = 1
+    EXCLUDING = 2
+    BUSY = 3
+    SMART_START = 4

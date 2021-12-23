@@ -14,6 +14,7 @@ from typing import (
 
 from ..const import (
     MINIMUM_QR_STRING_LENGTH,
+    InclusionState,
     InclusionStrategy,
     Protocols,
     QRCodeVersion,
@@ -421,6 +422,11 @@ class Controller(EventBase):
     def heal_network_progress(self) -> Optional[Dict[int, str]]:
         """Return heal network progress state."""
         return self._heal_network_progress
+
+    @property
+    def inclusion_state(self) -> InclusionState:
+        """Return inclusion state."""
+        return InclusionState(self.data["inclusionState"])
 
     async def async_begin_inclusion(
         self,
