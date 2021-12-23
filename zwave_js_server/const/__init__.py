@@ -275,3 +275,22 @@ class InclusionState(IntEnum):
     EXCLUDING = 2
     BUSY = 3
     SMART_START = 4
+
+
+class RFRegion(IntEnum):
+    """Enum for all known RF regions."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/serialapi/misc/SerialAPISetupMessages.ts#L41
+    EUROPE = 0
+    USA = 1
+    AUSTRALIA_AND_NEW_ZEALAND = 2
+    HONG_KONG = 3
+    INDIA = 5
+    ISRAEL = 6
+    RUSSIA = 7
+    CHINA = 8
+    USA_LONG_RANGE = 9
+    JAPAN = 32
+    KOREA = 33
+    UNKNOWN = 254
+    DEFAULT_EU = 255

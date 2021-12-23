@@ -17,6 +17,11 @@ def convert_bytes_to_base64(data: bytes) -> str:
     return base64.b64encode(data).decode("ascii")
 
 
+def convert_base64_to_bytes(data: str) -> bytes:
+    """Convert base64 data to bytes for deserialization."""
+    return base64.b64decode(data)
+
+
 def parse_buffer(value: Union[Dict[str, Any], str]) -> str:
     """Parse value from a buffer data type."""
     if isinstance(value, dict):

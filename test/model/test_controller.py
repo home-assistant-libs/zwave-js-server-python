@@ -7,6 +7,7 @@ from zwave_js_server.const import (
     InclusionStrategy,
     Protocols,
     QRCodeVersion,
+    RFRegion,
     SecurityClass,
     ZwaveFeature,
 )
@@ -1198,3 +1199,139 @@ async def test_supports_feature(controller, uuid4, mock_command):
         "feature": ZwaveFeature.SMART_START.value,
         "messageId": uuid4,
     }
+
+
+async def test_backup_nvm_raw(controller, uuid4, mock_command):
+    """Test backup NVM raw."""
+    ack_commands = mock_command(
+        {"command": "controller.backup_nvm_raw"},
+        {"nvmData": "AAAAAAAAAAAAAA=="},
+    )
+    assert await controller.async_backup_nvm_raw() == bytes(10)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.backup_nvm_raw",
+        "messageId": uuid4,
+    }
+
+
+async def test_restore_nvm(controller, uuid4, mock_command):
+    """Test restore NVM."""
+    ack_commands = mock_command(
+        {"command": "controller.restore_nvm"},
+        {},
+    )
+    await controller.async_restore_nvm(bytes(10))
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.restore_nvm",
+        "nvmData": "AAAAAAAAAAAAAA==",
+        "messageId": uuid4,
+    }
+
+
+async def test_set_power_level(controller, uuid4, mock_command):
+    """Test set powerlevel."""
+    ack_commands = mock_command(
+        {"command": "controller.set_powerlevel"},
+        {"success": True},
+    )
+    assert await controller.async_set_power_level(1, 2)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.set_powerlevel",
+        "powerlevel": 1,
+        "measured0dBm": 2,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_power_level(controller, uuid4, mock_command):
+    """Test get powerlevel."""
+    ack_commands = mock_command(
+        {"command": "controller.get_powerlevel"},
+        {"powerlevel": 1, "measured0dBm": 2},
+    )
+    assert await controller.async_get_power_level() == {
+        "power_level": 1,
+        "measured_0_dbm": 2,
+    }
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_powerlevel",
+        "messageId": uuid4,
+    }
+
+
+async def test_set_rf_region(controller, uuid4, mock_command):
+    """Test set RF region."""
+    ack_commands = mock_command(
+        {"command": "controller.set_rf_region"},
+        {"success": True},
+    )
+    assert await controller.async_set_rf_region(RFRegion.USA)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.set_rf_region",
+        "region": RFRegion.USA.value,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_rf_region(controller, uuid4, mock_command):
+    """Test get RF region."""
+    ack_commands = mock_command(
+        {"command": "controller.get_rf_region"},
+        {"region": 1},
+    )
+    assert await controller.async_get_rf_region() == RFRegion.USA
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_rf_region",
+        "messageId": uuid4,
+    }
+
+
+async def test_nvm_events(controller):
+    """Test NVM progress events."""
+    event = Event(
+        "nvm backup progress",
+        {
+            "source": "controller",
+            "event": "nvm backup progress",
+            "bytesRead": 1,
+            "total": 2,
+        },
+    )
+    controller.receive_event(event)
+    assert event.data["nvm_backup_progress"] == controller_pkg.NVMProgress(1, 2)
+
+    event = Event(
+        "nvm convert progress",
+        {
+            "source": "controller",
+            "event": "nvm convert progress",
+            "bytesRead": 3,
+            "total": 4,
+        },
+    )
+    controller.receive_event(event)
+    assert event.data["nvm_convert_progress"] == controller_pkg.NVMProgress(3, 4)
+
+    event = Event(
+        "nvm restore progress",
+        {
+            "source": "controller",
+            "event": "nvm restore progress",
+            "bytesWritten": 5,
+            "total": 6,
+        },
+    )
+    controller.receive_event(event)
+    assert event.data["nvm_restore_progress"] == controller_pkg.NVMProgress(5, 6)
