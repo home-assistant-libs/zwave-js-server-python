@@ -8,6 +8,7 @@ from zwave_js_server.const import (
     INTERVIEW_FAILED,
     CommandClass,
     NodeStatus,
+    PowerLevel,
     ProtocolVersion,
     SecurityClass,
 )
@@ -19,7 +20,12 @@ from zwave_js_server.event import Event
 from zwave_js_server.exceptions import FailedCommand, NotFoundError, UnwriteableValue
 from zwave_js_server.model import node as node_pkg
 from zwave_js_server.model.firmware import FirmwareUpdateStatus
-from zwave_js_server.model.node import Node, NodeStatistics
+from zwave_js_server.model.node import (
+    LifelineHealthCheckResultDataType,
+    Node,
+    NodeStatistics,
+    RouteHealthCheckResultDataType,
+)
 from zwave_js_server.model.value import ConfigurationValue
 
 from .. import load_fixture
@@ -998,3 +1004,170 @@ async def test_get_highest_security_class(multisensor_6: Node, uuid4, mock_comma
         "nodeId": node.node_id,
         "messageId": uuid4,
     }
+
+
+async def test_test_power_level(multisensor_6: Node, uuid4, mock_command):
+    """Test node.test_powerlevel command."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.test_powerlevel", "nodeId": node.node_id},
+        {"framesAcked": 1},
+    )
+    assert await node.async_test_power_level(2, PowerLevel.DBM_MINUS_1, 3) == 1
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.test_powerlevel",
+        "nodeId": node.node_id,
+        "testNodeId": 2,
+        "powerlevel": PowerLevel.DBM_MINUS_1.value,
+        "testFrameCount": 3,
+        "messageId": uuid4,
+    }
+
+
+async def test_test_power_level_progress_event(
+    multisensor_6: Node, uuid4, mock_command
+):
+    """Test test power level progress event."""
+    event = Event(
+        "test powerlevel progress",
+        {
+            "source": "node",
+            "event": "test powerlevel progress",
+            "nodeId": multisensor_6.node_id,
+            "acknowledged": 1,
+            "total": 2,
+        },
+    )
+    multisensor_6.receive_event(event)
+    assert event.data["test_power_level_progress"]
+    assert event.data["test_power_level_progress"].acknowledged == 1
+    assert event.data["test_power_level_progress"].total == 2
+
+
+async def test_check_lifeline_health(multisensor_6: Node, uuid4, mock_command):
+    """Test node.check_lifeline_health command."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.check_lifeline_health", "nodeId": node.node_id},
+        {
+            "summary": {
+                "rating": 10,
+                "results": [
+                    LifelineHealthCheckResultDataType(
+                        latency=1,
+                        numNeighbors=2,
+                        failedPingsNode=3,
+                        routeChanges=4,
+                        minPowerlevel=5,
+                        failedPingsController=6,
+                        snrMargin=7,
+                    )
+                ],
+            }
+        },
+    )
+    summary = await node.async_check_lifeline_health(1)
+
+    assert summary.rating == 10
+    assert summary.results[0].latency == 1
+    assert summary.results[0].num_neighbors == 2
+    assert summary.results[0].failed_pings_node == 3
+    assert summary.results[0].route_changes == 4
+    assert summary.results[0].min_power_level == PowerLevel.DBM_MINUS_5
+    assert summary.results[0].failed_pings_controller == 6
+    assert summary.results[0].snr_margin == 7
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.check_lifeline_health",
+        "nodeId": node.node_id,
+        "rounds": 1,
+        "messageId": uuid4,
+    }
+
+
+async def test_check_lifeline_health_progress_event(
+    multisensor_6: Node, uuid4, mock_command
+):
+    """Test check lifeline health progress event."""
+    event = Event(
+        "check lifeline health progress",
+        {
+            "source": "node",
+            "event": "check lifeline health progress",
+            "nodeId": multisensor_6.node_id,
+            "rounds": 1,
+            "totalRounds": 2,
+            "lastRating": 10,
+        },
+    )
+    multisensor_6.receive_event(event)
+    assert event.data["check_lifeline_health_progress"]
+    assert event.data["check_lifeline_health_progress"].rounds == 1
+    assert event.data["check_lifeline_health_progress"].total_rounds == 2
+    assert event.data["check_lifeline_health_progress"].last_rating == 10
+
+
+async def test_check_route_health(multisensor_6: Node, uuid4, mock_command):
+    """Test node.check_route_health command."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.check_route_health", "nodeId": node.node_id},
+        {
+            "summary": {
+                "rating": 10,
+                "results": [
+                    RouteHealthCheckResultDataType(
+                        numNeighbors=1,
+                        rating=10,
+                        failedPingsToSource=2,
+                        failedPingsToTarget=3,
+                        minPowerlevelSource=4,
+                        minPowerlevelTarget=5,
+                    )
+                ],
+            }
+        },
+    )
+    summary = await node.async_check_route_health(15, 1)
+
+    assert summary.rating == 10
+    assert summary.results[0].num_neighbors == 1
+    assert summary.results[0].rating == 10
+    assert summary.results[0].failed_pings_to_source == 2
+    assert summary.results[0].failed_pings_to_target == 3
+    assert summary.results[0].min_power_level_source == PowerLevel.DBM_MINUS_4
+    assert summary.results[0].min_power_level_target == PowerLevel.DBM_MINUS_5
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.check_route_health",
+        "nodeId": node.node_id,
+        "targetNodeId": 15,
+        "rounds": 1,
+        "messageId": uuid4,
+    }
+
+
+async def test_check_route_health_progress_event(
+    multisensor_6: Node, uuid4, mock_command
+):
+    """Test check route health progress event."""
+    event = Event(
+        "check route health progress",
+        {
+            "source": "node",
+            "event": "check route health progress",
+            "nodeId": multisensor_6.node_id,
+            "rounds": 1,
+            "totalRounds": 2,
+            "lastRating": 10,
+        },
+    )
+    multisensor_6.receive_event(event)
+    assert event.data["check_route_health_progress"]
+    assert event.data["check_route_health_progress"].rounds == 1
+    assert event.data["check_route_health_progress"].total_rounds == 2
+    assert event.data["check_route_health_progress"].last_rating == 10
