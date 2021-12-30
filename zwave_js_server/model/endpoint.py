@@ -74,7 +74,9 @@ class Endpoint(EventBase):
     ) -> None:
         """Update the endpoint data."""
         self.data = data
-        for value_id, value in (values or {}).items():
+        if values is None:
+            return
+        for value_id, value in values.items():
             if value_id not in self.values:
                 self.values[value_id] = value
 
