@@ -306,11 +306,6 @@ class ControllerDataType(TypedDict, total=False):
 class Controller(EventBase):
     """Represent a Z-Wave JS controller."""
 
-    def update(self, data: ControllerDataType) -> None:
-        """Update controller data."""
-        self.data = data
-        self._statistics = ControllerStatistics(self.data.get("statistics"))
-
     def __init__(self, client: "Client", state: dict) -> None:
         """Initialize controller."""
         super().__init__()
@@ -440,6 +435,11 @@ class Controller(EventBase):
     def inclusion_state(self) -> InclusionState:
         """Return inclusion state."""
         return InclusionState(self.data["inclusionState"])
+
+    def update(self, data: ControllerDataType) -> None:
+        """Update controller data."""
+        self.data = data
+        self._statistics = ControllerStatistics(self.data.get("statistics"))
 
     async def async_begin_inclusion(
         self,
