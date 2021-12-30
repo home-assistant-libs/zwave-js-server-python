@@ -76,7 +76,7 @@ class Endpoint(EventBase):
         self.data = data
         if values is None:
             return
-        
+
         # Populate new values
         for value_id, value in values.items():
             if value_id not in self.values:
