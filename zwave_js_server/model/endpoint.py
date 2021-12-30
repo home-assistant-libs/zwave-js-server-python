@@ -76,9 +76,16 @@ class Endpoint(EventBase):
         self.data = data
         if values is None:
             return
+        
+        # Populate new values
         for value_id, value in values.items():
             if value_id not in self.values:
                 self.values[value_id] = value
+
+        # Remove stale values
+        for value_id in self.values:
+            if value_id not in values:
+                self.values.pop(value_id)
 
     async def _async_send_command(
         self,

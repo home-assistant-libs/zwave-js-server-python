@@ -545,8 +545,12 @@ class Node(Endpoint):
         self.data: NodeDataType = data
         self._device_config = DeviceConfig(self.data.get("deviceConfig", {}))
         self._statistics = NodeStatistics(self.data.get("statistics"))
+        value_ids = []
+
+        # Populate new values
         for val in data["values"]:
             value_id = _get_value_id_from_dict(self, val)
+            value_ids.append(value_id)
             try:
                 if value_id in self.values:
                     self.values[value_id].update(val)
@@ -555,6 +559,11 @@ class Node(Endpoint):
             except UnparseableValue:
                 # If we can't parse the value, don't store it
                 pass
+
+        # Remove stale values
+        for value_id in self.values:
+            if value_id not in value_ids:
+                self.values.pop(value_id)
 
         for endpoint in self.data["endpoints"]:
             idx = endpoint["index"]
