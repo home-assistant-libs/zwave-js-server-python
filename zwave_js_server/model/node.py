@@ -581,6 +581,11 @@ class Node(Endpoint):
                     values,
                 )
 
+        # Remove stale endpoints
+        for idx in self.endpoints:
+            if idx not in self.data["endpoints"]:
+                self.endpoints.pop(idx)
+
     def get_command_class_values(
         self, command_class: CommandClass, endpoint: int = None
     ) -> Dict[str, Union[ConfigurationValue, Value]]:
