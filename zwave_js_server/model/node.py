@@ -815,12 +815,11 @@ class Node(Endpoint):
         assert data
         return RouteHealthCheckSummary(data["summary"])
 
-    async def async_get_state(self) -> NodeDataType:
+    async def async_get_state(self) -> None:
         """Get node state."""
         data = await self.async_send_command("get_state", require_schema=14)
         assert data
         self.update_state(data["state"])
-        return self.data
 
     async def async_set_name(self, name: str, update_cc: bool = True) -> None:
         """Set node name."""
