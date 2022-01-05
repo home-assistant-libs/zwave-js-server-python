@@ -31,7 +31,7 @@ class MockZwaveJsServer:
         self.network_state_dump = network_state_dump
         self.app = web.Application()
         self.app.add_routes([web.get("/", self.websocket_handler)])
-        self.primary_ws_resp: web.WebSocketResponse = None
+        self.primary_ws_resp: Optional[web.WebSocketResponse] = None
 
     async def send_json(self, data: Dict[str, Any]) -> None:
         """Send JSON."""
