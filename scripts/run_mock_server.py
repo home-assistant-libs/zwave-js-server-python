@@ -12,10 +12,7 @@ from aiohttp import (
 )
 
 from zwave_js_server.client import SIZE_PARSE_JSON_EXECUTOR
-from zwave_js_server.const import (
-    MAX_SERVER_SCHEMA_VERSION,
-    MIN_SERVER_SCHEMA_VERSION,
-)
+from zwave_js_server.const import MAX_SERVER_SCHEMA_VERSION, MIN_SERVER_SCHEMA_VERSION
 from zwave_js_server.model.version import VersionInfoDataType
 
 _LOGGER = logging.getLogger(__name__)
