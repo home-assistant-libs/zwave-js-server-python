@@ -122,7 +122,7 @@ class MockZwaveJsServer:
                     self.primary_ws_resp.exception(),
                 )
 
-        logging.info("websocket connection closed")
+        logging.info("Connection closed")
 
         return self.primary_ws_resp
 
