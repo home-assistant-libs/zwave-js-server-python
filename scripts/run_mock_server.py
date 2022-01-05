@@ -66,15 +66,13 @@ async def websocket_handler(request: web_request.Request):
     await ws_resp.prepare(request)
     network_state_dump = request.app["network_state_dump"]
 
-    if request.app["network_state_dump"]:
-        request.app["network_state_dump"] = False
-        version_info: VersionInfoDataType = network_state_dump.pop(0)
-        # adjust min/max schemas if needed to get things to work
-        if MAX_SERVER_SCHEMA_VERSION > version_info["maxSchemaVersion"]:
-            version_info["maxSchemaVersion"] = MAX_SERVER_SCHEMA_VERSION
-        if MIN_SERVER_SCHEMA_VERSION < version_info["minSchemaVersion"]:
-            version_info["minSchemaVersion"] = MIN_SERVER_SCHEMA_VERSION
-        await send_json(ws_resp, version_info)
+    version_info: VersionInfoDataType = network_state_dump.pop(0)
+    # adjust min/max schemas if needed to get things to work
+    if MAX_SERVER_SCHEMA_VERSION > version_info["maxSchemaVersion"]:
+        version_info["maxSchemaVersion"] = MAX_SERVER_SCHEMA_VERSION
+    if MIN_SERVER_SCHEMA_VERSION < version_info["minSchemaVersion"]:
+        version_info["minSchemaVersion"] = MIN_SERVER_SCHEMA_VERSION
+    await send_json(ws_resp, version_info)
 
     async for msg in ws_resp:
         if msg.type == WSMsgType.TEXT:
@@ -135,7 +133,6 @@ def main():
     app = web.Application()
     app.add_routes([web.get("/", websocket_handler)])
     app["network_state_dump"] = network_state_dump
-    app["first_run"] = True
     web.run_app(app, host=args.host, port=args.port)
 
 
