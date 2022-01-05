@@ -9,7 +9,7 @@ class VersionInfoDataType(TypedDict):
 
     driverVersion: str
     serverVersion: str
-    homeId: str
+    homeId: int
     minSchemaVersion: int
     maxSchemaVersion: int
 
