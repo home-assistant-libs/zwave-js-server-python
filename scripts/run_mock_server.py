@@ -15,7 +15,6 @@ from zwave_js_server.client import SIZE_PARSE_JSON_EXECUTOR
 from zwave_js_server.const import (
     MAX_SERVER_SCHEMA_VERSION,
     MIN_SERVER_SCHEMA_VERSION,
-    LogLevel,
 )
 from zwave_js_server.model.version import VersionInfoDataType
 
@@ -38,12 +37,12 @@ class MockZwaveJsServer:
         self.network_state_dump = network_state_dump
         self.app = web.Application()
         self.app.add_routes([web.get("/", self.websocket_handler)])
-        self.ws_resp: web.WebSocketResponse = None
+        self.primary_ws_resp: web.WebSocketResponse = None
 
     async def send_json(self, data: Dict[str, Any]) -> None:
         """Send JSON."""
         _LOGGER.debug("Sending JSON: %s", data)
-        await self.ws_resp.send_json(data)
+        await self.primary_ws_resp.send_json(data)
 
     async def send_command_response(
         self,
@@ -69,8 +68,8 @@ class MockZwaveJsServer:
         self, request: web_request.Request
     ) -> web.WebSocketResponse:
         """Handle websocket requests."""
-        self.ws_resp = web.WebSocketResponse(autoclose=False)
-        await self.ws_resp.prepare(request)
+        self.primary_ws_resp = web.WebSocketResponse(autoclose=False)
+        await self.primary_ws_resp.prepare(request)
 
         version_info: VersionInfoDataType = self.network_state_dump[0]
         # adjust min/max schemas if needed to get things to work
@@ -80,14 +79,14 @@ class MockZwaveJsServer:
             version_info["minSchemaVersion"] = MIN_SERVER_SCHEMA_VERSION
         await self.send_json(version_info)
 
-        async for msg in self.ws_resp:
+        async for msg in self.primary_ws_resp:
             if msg.type == WSMsgType.TEXT:
                 try:
                     _LOGGER.debug("Message received: %s", msg.data)
                 except TypeError:
                     _LOGGER.debug("Message received: %s", msg.data)
                 if msg.data == "close":
-                    await self.ws_resp.close()
+                    await self.primary_ws_resp.close()
                 elif msg.data == "error":
                     _LOGGER.warning("Error from client: %s", msg.data)
 
@@ -128,12 +127,13 @@ class MockZwaveJsServer:
                     raise ExitException(f"Unknown data received: {data}")
             elif msg.type == WSMsgType.ERROR:
                 _LOGGER.error(
-                    "ws connection closed with exception %s", self.ws_resp.exception()
+                    "ws connection closed with exception %s",
+                    self.primary_ws_resp.exception(),
                 )
 
         _LOGGER.info("websocket connection closed")
 
-        return self.ws_resp
+        return self.primary_ws_resp
 
 
 def main() -> None:
