@@ -6,6 +6,7 @@ from typing import TypedDict
 
 class VersionInfoDataType(TypedDict):
     """Version info data dict type."""
+
     driverVersion: str
     serverVersion: str
     homeId: str
