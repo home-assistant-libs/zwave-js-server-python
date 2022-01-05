@@ -11,7 +11,8 @@ from zwave_js_server.client import SIZE_PARSE_JSON_EXECUTOR
 from zwave_js_server.const import MAX_SERVER_SCHEMA_VERSION, MIN_SERVER_SCHEMA_VERSION
 from zwave_js_server.model.version import VersionInfoDataType
 
-_LOGGER = logging.getLogger(__name__)
+DATEFMT = "%Y-%m-%d %H:%M:%S"
+FMT = "%(asctime)s [%(levelname)s] %(message)s"
 
 
 class ExitException(Exception):
@@ -34,7 +35,7 @@ class MockZwaveJsServer:
 
     async def send_json(self, data: Dict[str, Any]) -> None:
         """Send JSON."""
-        _LOGGER.debug("Sending JSON: %s", data)
+        logging.debug("Sending JSON: %s", data)
         await self.primary_ws_resp.send_json(data)
 
     async def send_command_response(
@@ -74,14 +75,11 @@ class MockZwaveJsServer:
 
         async for msg in self.primary_ws_resp:
             if msg.type == WSMsgType.TEXT:
-                try:
-                    _LOGGER.debug("Message received: %s", msg.data)
-                except TypeError:
-                    _LOGGER.debug("Message received: %s", msg.data)
+                logging.info("Message received: %s", msg.data)
                 if msg.data == "close":
                     await self.primary_ws_resp.close()
                 elif msg.data == "error":
-                    _LOGGER.warning("Error from client: %s", msg.data)
+                    logging.warning("Error from client: %s", msg.data)
 
                 try:
                     if len(msg.data) > SIZE_PARSE_JSON_EXECUTOR:
@@ -119,12 +117,12 @@ class MockZwaveJsServer:
                 else:
                     raise ExitException(f"Unknown data received: {data}")
             elif msg.type == WSMsgType.ERROR:
-                _LOGGER.error(
+                logging.error(
                     "ws connection closed with exception %s",
                     self.primary_ws_resp.exception(),
                 )
 
-        _LOGGER.info("websocket connection closed")
+        logging.info("websocket connection closed")
 
         return self.primary_ws_resp
 
@@ -148,8 +146,30 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    # TODO: set logging level properly
-    _LOGGER.setLevel(args.loglevel.upper())
+    # adapted from homeassistant.bootstrap.async_enable_logging
+    logging.basicConfig(level=args.loglevel)
+    try:
+        # pylint: disable=import-outside-toplevel
+        from colorlog import ColoredFormatter
+
+        colorfmt = f"%(log_color)s{FMT}%(reset)s"
+        logging.getLogger().handlers[0].setFormatter(
+            ColoredFormatter(
+                colorfmt,
+                datefmt=DATEFMT,
+                log_colors={
+                    "DEBUG": "cyan",
+                    "INFO": "green",
+                    "WARNING": "yellow",
+                    "ERROR": "red",
+                    "CRITICAL": "red",
+                },
+            )
+        )
+    except ImportError:
+        logging.getLogger().handlers[0].setFormatter(
+            logging.Formatter(fmt=FMT, datefmt=DATEFMT)
+        )
 
     with open(args.network_state_path, "r", encoding="utf8") as fp:
         network_state_dump: List[Dict[str, Any]] = json.load(fp)
@@ -162,4 +182,4 @@ if __name__ == "__main__":
     try:
         main()
     except ExitException as error:
-        _LOGGER.error("Fatal error: %s", error)
+        logging.error("Fatal error: %s", error)
