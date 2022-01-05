@@ -2,6 +2,7 @@
 import argparse
 import asyncio
 import json
+import logging
 from typing import Any, Dict, List, Optional
 
 from aiohttp import (
@@ -13,6 +14,8 @@ from aiohttp import (
 from zwave_js_server.client import SIZE_PARSE_JSON_EXECUTOR
 from zwave_js_server.const import MAX_SERVER_SCHEMA_VERSION, MIN_SERVER_SCHEMA_VERSION
 from zwave_js_server.model.version import VersionInfoDataType
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class ExitException(Exception):
@@ -34,7 +37,7 @@ def get_args() -> argparse.Namespace:
 
 async def send_json(ws_resp: web.WebSocketResponse, data: Dict[str, Any]) -> None:
     """Send JSON."""
-    print(f"Sending JSON: {data}")
+    _LOGGER.debug("Sending JSON: %s", json.dumps(data))
     await ws_resp.send_json(data)
 
 
@@ -76,11 +79,14 @@ async def websocket_handler(request: web_request.Request):
 
     async for msg in ws_resp:
         if msg.type == WSMsgType.TEXT:
-            print(f"Message received: {msg.data}")
+            try:
+                _LOGGER.debug("Message received: %s", json.dumps(msg.data))
+            except TypeError:
+                _LOGGER.debug("Message received: %s", msg.data)
             if msg.data == "close":
                 await ws_resp.close()
             elif msg.data == "error":
-                print(f"Error from client: {msg}")
+                _LOGGER.warning("Error from client: %s", msg.data)
 
             try:
                 if len(msg.data) > SIZE_PARSE_JSON_EXECUTOR:
@@ -90,7 +96,7 @@ async def websocket_handler(request: web_request.Request):
                 else:
                     data = msg.json()
             except ValueError as err:
-                raise ExitException("Received invalid JSON.") from err
+                raise ExitException(f"Received invalid JSON {msg.data}") from err
 
             if "command" not in data:
                 raise ExitException(f"Malformed message: {data}")
@@ -117,9 +123,9 @@ async def websocket_handler(request: web_request.Request):
             else:
                 raise ExitException(f"Unknown data received: {data}")
         elif msg.type == WSMsgType.ERROR:
-            print(f"ws connection closed with exception {ws_resp.exception()}")
+            _LOGGER.error("ws connection closed with exception %s", ws_resp.exception())
 
-    print("websocket connection closed")
+    _LOGGER.info("websocket connection closed")
 
     return ws_resp
 
@@ -140,4 +146,4 @@ if __name__ == "__main__":
     try:
         main()
     except ExitException as error:
-        print(f"Fatal error: {error}")
+        _LOGGER.error("Fatal error: %s", error)
