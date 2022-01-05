@@ -52,7 +52,7 @@ class MockZwaveJsServer:
         message_id: str,
     ) -> None:
         """Send success message."""
-        if not result:
+        if result is None:
             result = {}
         await self.send_command_response(
             {"result": result, "type": "result", "success": True}, message_id
