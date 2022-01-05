@@ -63,7 +63,7 @@ async def send_success_msg(
     )
 
 
-async def websocket_handler(request: web_request.Request):
+async def websocket_handler(request: web_request.Request) -> web.WebSocketResponse:
     """Handle websocket requests."""
     ws_resp = web.WebSocketResponse(autoclose=False)
     await ws_resp.prepare(request)
@@ -130,7 +130,7 @@ async def websocket_handler(request: web_request.Request):
     return ws_resp
 
 
-def main():
+def main() -> None:
     """Run main entrypoint."""
     args = get_args()
     with open(args.network_state_path, "r", encoding="utf8") as fp:
