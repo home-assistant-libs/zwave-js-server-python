@@ -118,7 +118,7 @@ class MockZwaveJsServer:
                     raise ExitException(f"Unknown data received: {data}")
             elif msg.type == WSMsgType.ERROR:
                 logging.error(
-                    "ws connection closed with exception %s",
+                    "Connection closed with exception %s",
                     self.primary_ws_resp.exception(),
                 )
 
