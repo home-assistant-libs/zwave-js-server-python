@@ -5,11 +5,7 @@ import json
 import logging
 from typing import Any, Dict, List, Optional
 
-from aiohttp import (
-    WSMsgType,
-    web,
-    web_request,
-)
+from aiohttp import WSMsgType, web, web_request
 
 from zwave_js_server.client import SIZE_PARSE_JSON_EXECUTOR
 from zwave_js_server.const import MAX_SERVER_SCHEMA_VERSION, MIN_SERVER_SCHEMA_VERSION
