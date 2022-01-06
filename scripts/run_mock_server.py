@@ -198,7 +198,7 @@ class MockZwaveJsServer:
             ):
                 raise ExitException(f"Malformed event: {record}")
             for record in data:
-                self.send_json(record)
+                await self.send_json(record)
             return
         if isinstance(data, dict):
             if "event" not in data:
