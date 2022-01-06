@@ -108,8 +108,8 @@ class MockZwaveJsServer:
 
     def __init__(
         self,
-        network_state_dump: List[Dict[str, Any]],
-        events_to_replay: List[Dict[str, Any]],
+        network_state_dump: List[dict],
+        events_to_replay: List[dict],
         command_responses: DefaultDict[str, DefaultDict[HashableDict, list]],
     ) -> None:
         """Initialize class."""
@@ -126,7 +126,7 @@ class MockZwaveJsServer:
         self.events_to_replay = events_to_replay
         self.command_responses = command_responses
 
-    async def send_json(self, data: Dict[str, Any]) -> None:
+    async def send_json(self, data: dict) -> None:
         """Send JSON."""
         logging.debug("Sending JSON: %s", data)
         assert self.primary_ws_resp is not None
@@ -134,7 +134,7 @@ class MockZwaveJsServer:
 
     async def send_command_response(
         self,
-        data: Dict[str, Any],
+        data: dict,
         message_id: str,
     ) -> None:
         """Send message."""
@@ -142,7 +142,7 @@ class MockZwaveJsServer:
 
     async def send_success_command_response(
         self,
-        result: Optional[Dict[str, Any]],
+        result: Optional[dict],
         message_id: str,
     ) -> None:
         """Send success message."""
@@ -252,18 +252,16 @@ def hashable_dict(dct: dict) -> HashableDict:
     return data
 
 
-def sanitize_msg(msg: Dict[str, Any], make_hashable: bool = True) -> HashableDict:
+def sanitize_msg(msg: dict) -> HashableDict:
     """Sanitize command message."""
     msg = msg.copy()
     msg.pop("messageId", None)
-    if make_hashable:
-        return hashable_dict(msg)
-    return msg
+    return hashable_dict(msg)
 
 
 def add_command_response(
     command_responses: DefaultDict[str, DefaultDict[HashableDict, list]],
-    record: Dict[str, Any],
+    record: dict,
 ) -> None:
     """Add a command response to command_responses map."""
     command = record["command"]
@@ -325,7 +323,7 @@ def main() -> None:
     args = get_args()
 
     with open(args.network_state_path, "r", encoding="utf8") as fp:
-        network_state_dump: List[Dict[str, Any]] = json.load(fp)
+        network_state_dump: List[dict] = json.load(fp)
 
     events_to_replay = []
     command_responses: DefaultDict[str, DefaultDict[HashableDict, list]] = defaultdict(
@@ -334,7 +332,7 @@ def main() -> None:
 
     if args.combined_replay_dump_path:
         with open(args.combined_replay_dump_path, "r", encoding="utf8") as fp:
-            records: List[Dict[str, Any]] = json.load(fp)
+            records: List[dict] = json.load(fp)
 
             for record in records:
                 if record["record_type"] == "event":
