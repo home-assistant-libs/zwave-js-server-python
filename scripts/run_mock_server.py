@@ -267,7 +267,10 @@ def add_command_response(
     """Add a command response to command_responses map."""
     command = record["command"]
     command_msg = sanitize_msg(record["command_msg"])
-    response_msg = sanitize_msg(record["response_msg"])
+
+    # Response message doesn't need to be sanitized here because it will be sanitized
+    # in the MockZwaveJsServer.send_command_response method.
+    response_msg = record["response_msg"]
     command_responses[command][command_msg].append(response_msg)
 
 
