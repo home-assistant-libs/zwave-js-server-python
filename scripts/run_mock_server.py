@@ -21,6 +21,7 @@ class ExitException(Exception):
     """Represent an exit error."""
 
 
+# https://stackoverflow.com/a/1151686
 class HashableDict(dict):
     """Dictionary that can be used as a key in a dictionary."""
 
