@@ -203,7 +203,7 @@ class MockZwaveJsServer:
         if isinstance(data, dict):
             if "event" not in data:
                 raise ExitException(f"Malformed event: {data}")
-            self.send_json(data)
+            await self.send_json(data)
 
     @response_decorator()
     async def add_command_response_handler(self, data: Union[dict, list]) -> None:
