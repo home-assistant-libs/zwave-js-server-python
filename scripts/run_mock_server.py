@@ -5,7 +5,7 @@ from collections import defaultdict
 from functools import wraps
 import json
 import logging
-from typing import Any, Callable, DefaultDict, Dict, List, Optional, Union
+from typing import Any, Callable, DefaultDict, List, Optional, Union
 
 from aiohttp import WSMsgType, web, web_request
 
