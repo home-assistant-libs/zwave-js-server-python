@@ -1,9 +1,11 @@
 """Run a mock zwave-js-server instance off of a network state dump."""
 import argparse
 import asyncio
+from collections import defaultdict
+from functools import wraps
 import json
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, DefaultDict, Dict, List, Optional, Union
 
 from aiohttp import WSMsgType, web, web_request
 
@@ -19,6 +21,84 @@ class ExitException(Exception):
     """Represent an exit error."""
 
 
+class HashableDict(dict):
+    """Dictionary that can be used as a key in a dictionary."""
+
+    def __key(self) -> tuple:
+        return tuple((k, self[k]) for k in sorted(self))
+
+    def __hash__(self) -> int:
+        return hash(self.__key())
+
+    def __eq__(self, other) -> bool:
+        # pylint: disable=protected-access
+        return self.__key() == other.__key()
+
+
+def response_decorator(primary_ws_response: bool = False) -> Callable:
+    """Factory to decorate a response handler."""
+
+    def decorator(orig_func: Callable) -> Callable:
+        """Decorate a response handler."""
+
+        @wraps(orig_func)
+        async def wrapper(
+            self: "MockZwaveJsServer", request: web_request.Request
+        ) -> web.WebSocketResponse:
+            """Wrap."""
+            logging.error(self)
+            ws_resp = web.WebSocketResponse(autoclose=False)
+            if primary_ws_response:
+                setattr(self, "primary_ws_resp", ws_resp)
+            await ws_resp.prepare(request)
+
+            if primary_ws_response:
+                version_info: VersionInfoDataType = self.network_state_dump[0]
+                # adjust min/max schemas if needed to get things to work
+                if MAX_SERVER_SCHEMA_VERSION > version_info["maxSchemaVersion"]:
+                    version_info["maxSchemaVersion"] = MAX_SERVER_SCHEMA_VERSION
+                if MIN_SERVER_SCHEMA_VERSION < version_info["minSchemaVersion"]:
+                    version_info["minSchemaVersion"] = MIN_SERVER_SCHEMA_VERSION
+                await self.send_json(version_info)
+
+            async for msg in ws_resp:
+                if msg.type == WSMsgType.TEXT:
+                    logging.debug("Message received: %s", msg.data)
+                    if msg.data == "close":
+                        await ws_resp.close()
+                    elif msg.data == "error":
+                        logging.warning("Error from client: %s", msg.data)
+
+                    try:
+                        if len(msg.data) > SIZE_PARSE_JSON_EXECUTOR:
+                            data: Union[
+                                dict, list
+                            ] = await asyncio.get_event_loop().run_in_executor(
+                                None, msg.json
+                            )
+                        else:
+                            data = msg.json()
+                    except ValueError as err:
+                        raise ExitException(
+                            f"Received invalid JSON {msg.data}"
+                        ) from err
+
+                    await orig_func(self, data)
+                elif msg.type == WSMsgType.ERROR:
+                    logging.error(
+                        "Connection closed with exception %s",
+                        ws_resp.exception(),
+                    )
+
+            logging.info("Connection closed")
+
+            return ws_resp
+
+        return wrapper
+
+    return decorator
+
+
 class MockZwaveJsServer:
     """
     Class to represent a mock zwave-js-server instance.
@@ -26,16 +106,30 @@ class MockZwaveJsServer:
     Only designed to handle one client at a time.
     """
 
-    def __init__(self, network_state_dump: List[Dict[str, Any]]) -> None:
+    def __init__(
+        self,
+        network_state_dump: List[Dict[str, Any]],
+        events_to_replay: List[Dict[str, Any]],
+        command_responses: DefaultDict[str, DefaultDict[HashableDict, list]],
+    ) -> None:
         """Initialize class."""
         self.network_state_dump = network_state_dump
         self.app = web.Application()
-        self.app.add_routes([web.get("/", self.websocket_handler)])
+        self.app.add_routes(
+            [
+                web.get("/", self.server_handler),
+                web.post("/replay_events", self.replay_events_handler),
+                web.post("/add_command_response", self.add_command_response_handler),
+            ]
+        )
         self.primary_ws_resp: Optional[web.WebSocketResponse] = None
+        self.events_to_replay = events_to_replay
+        self.command_responses = command_responses
 
     async def send_json(self, data: Dict[str, Any]) -> None:
         """Send JSON."""
         logging.debug("Sending JSON: %s", data)
+        assert self.primary_ws_resp is not None
         await self.primary_ws_resp.send_json(data)
 
     async def send_command_response(
@@ -58,77 +152,128 @@ class MockZwaveJsServer:
             {"result": result, "type": "result", "success": True}, message_id
         )
 
-    async def websocket_handler(
-        self, request: web_request.Request
-    ) -> web.WebSocketResponse:
-        """Handle websocket requests."""
-        self.primary_ws_resp = web.WebSocketResponse(autoclose=False)
-        await self.primary_ws_resp.prepare(request)
+    @response_decorator(True)
+    async def server_handler(self, data: dict) -> None:
+        """Handle websocket requests to the server."""
+        if "command" not in data:
+            raise ExitException(f"Malformed message: {data}")
 
-        version_info: VersionInfoDataType = self.network_state_dump[0]
-        # adjust min/max schemas if needed to get things to work
-        if MAX_SERVER_SCHEMA_VERSION > version_info["maxSchemaVersion"]:
-            version_info["maxSchemaVersion"] = MAX_SERVER_SCHEMA_VERSION
-        if MIN_SERVER_SCHEMA_VERSION < version_info["minSchemaVersion"]:
-            version_info["minSchemaVersion"] = MIN_SERVER_SCHEMA_VERSION
-        await self.send_json(version_info)
+        cmd = data["command"]
+        message_id = data["messageId"]
+        if cmd == "set_api_schema":
+            await self.send_json(self.network_state_dump[1])
+        elif cmd == "driver.get_log_config":
+            await self.send_success_command_response(
+                {
+                    "config": {
+                        "enabled": True,
+                        "level": "silly",
+                        "logToFile": False,
+                        "nodeFilter": [],
+                        "filename": None,
+                        "forceConsole": False,
+                    }
+                },
+                message_id,
+            )
+        elif cmd == "start_listening":
+            await self.send_json(self.network_state_dump[2])
+            await asyncio.sleep(1)
+            for event in self.events_to_replay:
+                await self.send_json(event)
+        elif (sanitized_data := sanitize_msg(data)) in self.command_responses.get(
+            cmd, {}
+        ) and (resp_list := self.command_responses[cmd][sanitized_data]):
+            await self.send_command_response(resp_list.pop(0), message_id)
+        else:
+            raise ExitException(f"Unhandled command received: {data}")
 
-        async for msg in self.primary_ws_resp:
-            if msg.type == WSMsgType.TEXT:
-                logging.info("Message received: %s", msg.data)
-                if msg.data == "close":
-                    await self.primary_ws_resp.close()
-                elif msg.data == "error":
-                    logging.warning("Error from client: %s", msg.data)
+    @response_decorator()
+    async def replay_events_handler(self, data: Union[dict, list]) -> None:
+        """Handle websocket requests to replay events."""
+        if isinstance(data, list):
+            if record := next(
+                (record for record in data if "event" not in record), None
+            ):
+                raise ExitException(f"Malformed event: {record}")
+            for record in data:
+                self.send_json(record)
+            return
+        if isinstance(data, dict):
+            if "event" not in data:
+                raise ExitException(f"Malformed event: {data}")
+            self.send_json(data)
 
-                try:
-                    if len(msg.data) > SIZE_PARSE_JSON_EXECUTOR:
-                        data: dict = await asyncio.get_event_loop().run_in_executor(
-                            None, msg.json
-                        )
-                    else:
-                        data = msg.json()
-                except ValueError as err:
-                    raise ExitException(f"Received invalid JSON {msg.data}") from err
+    @response_decorator()
+    async def add_command_response_handler(self, data: Union[dict, list]) -> None:
+        """Handle websocket requests to replay events."""
+        if isinstance(data, list):
+            if record := next(
+                (record for record in data if "command" not in record), None
+            ):
+                raise ExitException(f"Malformed command response: {record}")
+            for record in data:
+                add_command_response(self.command_responses, record)
+                await self.send_json({"success": True})
+            return
 
-                if "command" not in data:
-                    raise ExitException(f"Malformed message: {data}")
-
-                cmd = data["command"]
-                message_id = data["messageId"]
-                if cmd == "set_api_schema":
-                    await self.send_json(self.network_state_dump[1])
-                elif cmd == "driver.get_log_config":
-                    await self.send_success_command_response(
-                        {
-                            "config": {
-                                "enabled": True,
-                                "level": "silly",
-                                "logToFile": False,
-                                "nodeFilter": [],
-                                "filename": None,
-                                "forceConsole": False,
-                            }
-                        },
-                        message_id,
-                    )
-                elif cmd == "start_listening":
-                    await self.send_json(self.network_state_dump[2])
-                else:
-                    raise ExitException(f"Unknown data received: {data}")
-            elif msg.type == WSMsgType.ERROR:
-                logging.error(
-                    "Connection closed with exception %s",
-                    self.primary_ws_resp.exception(),
-                )
-
-        logging.info("Connection closed")
-
-        return self.primary_ws_resp
+        if isinstance(data, dict):
+            if "command" not in data:
+                raise ExitException(f"Malformed command response: {data}")
+            add_command_response(self.command_responses, data)
+            await self.send_json({"success": True})
 
 
-def main() -> None:
-    """Run main entrypoint."""
+def hashable_list(lst: list) -> tuple:
+    """Make a list hashable."""
+    data: List[Any] = []
+    for item in lst:
+        if isinstance(item, dict):
+            data.append(hashable_dict(item))
+        elif isinstance(item, list):
+            data.append(hashable_list(item))
+        else:
+            data.append(item)
+
+    return tuple(data)
+
+
+def hashable_dict(dct: dict) -> HashableDict:
+    """Convert a dictionary to a hashable dictionary."""
+    data = HashableDict()
+    for key in dct:
+        if isinstance(dct[key], dict):
+            data[key] = hashable_dict(dct[key])
+        elif isinstance(dct[key], list):
+            data[key] = hashable_list(dct[key])
+        else:
+            data[key] = dct[key]
+
+    return data
+
+
+def sanitize_msg(msg: Dict[str, Any], make_hashable: bool = True) -> HashableDict:
+    """Sanitize command message."""
+    msg = msg.copy()
+    msg.pop("messageId", None)
+    if make_hashable:
+        return hashable_dict(msg)
+    return msg
+
+
+def add_command_response(
+    command_responses: DefaultDict[str, DefaultDict[HashableDict, list]],
+    record: Dict[str, Any],
+) -> None:
+    """Add a command response to command_responses map."""
+    command = record["command"]
+    command_msg = sanitize_msg(record["command_msg"])
+    response_msg = sanitize_msg(record["response_msg"])
+    command_responses[command][command_msg].append(response_msg)
+
+
+def get_args() -> argparse.Namespace:
+    """Get arguments."""
     parser = argparse.ArgumentParser(description="Dump Instance")
     parser.add_argument(
         "network_state_path", type=str, help="File path to network state dump JSON."
@@ -138,16 +283,85 @@ def main() -> None:
         "--port", type=int, help="Port to run on (defaults to 3000)", default=3000
     )
     parser.add_argument(
-        "--loglevel",
+        "--log-level",
         type=str.upper,
         help="Log level",
         default="INFO",
         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
     )
-    args = parser.parse_args()
+    parser.add_argument(
+        "--events-to-replay-path",
+        type=str,
+        help=(
+            "File path to events to replay JSON. Events provided by --combined-replay-dump-path"
+            "option will be first, followed by events from this file."
+        ),
+        default=None,
+    )
+    parser.add_argument(
+        "--command-responses-path",
+        type=str,
+        help=(
+            "File path to command response JSON. Command responses provided by "
+            "--combined-replay-dump-path option will be first, followed by responses from this"
+            "file."
+        ),
+        default=None,
+    )
+    parser.add_argument(
+        "--combined-replay-dump-path",
+        type=str,
+        help=(
+            "File path to the combined event and command response dump JSON. Events and "
+            "command responses will be extracted in the order they were received."
+        ),
+        default=None,
+    )
+    return parser.parse_args()
+
+
+def main() -> None:
+    """Run main entrypoint."""
+    args = get_args()
+
+    with open(args.network_state_path, "r", encoding="utf8") as fp:
+        network_state_dump: List[Dict[str, Any]] = json.load(fp)
+
+    events_to_replay = []
+    command_responses: DefaultDict[str, DefaultDict[HashableDict, list]] = defaultdict(
+        lambda: defaultdict(list)
+    )
+
+    if args.combined_replay_dump_path:
+        with open(args.combined_replay_dump_path, "r", encoding="utf8") as fp:
+            records: List[Dict[str, Any]] = json.load(fp)
+
+            for record in records:
+                if record["record_type"] == "event":
+                    events_to_replay.append(record["data"])
+                elif record["record_type"] == "command":
+                    add_command_response(command_responses, record)
+
+    if args.events_to_replay_path:
+        with open(args.events_to_replay_path, "r", encoding="utf8") as fp:
+            records = json.load(fp)
+            if any(record["record_type"] != "event" for record in records):
+                raise ExitException("Invalid record type in event replay dump file")
+            for record in records:
+                events_to_replay.append(record["data"])
+
+    if args.command_responses_path:
+        with open(args.command_responses_path, "r", encoding="utf8") as fp:
+            records = json.load(fp)
+            if any(record["record_type"] != "command" for record in records):
+                raise ExitException(
+                    "Invalid record type in command responses dump file"
+                )
+            for record in records:
+                add_command_response(command_responses, record)
 
     # adapted from homeassistant.bootstrap.async_enable_logging
-    logging.basicConfig(level=args.loglevel)
+    logging.basicConfig(level=args.log_level)
     try:
         # pylint: disable=import-outside-toplevel
         from colorlog import ColoredFormatter
@@ -171,10 +385,7 @@ def main() -> None:
             logging.Formatter(fmt=FMT, datefmt=DATEFMT)
         )
 
-    with open(args.network_state_path, "r", encoding="utf8") as fp:
-        network_state_dump: List[Dict[str, Any]] = json.load(fp)
-
-    server = MockZwaveJsServer(network_state_dump)
+    server = MockZwaveJsServer(network_state_dump, events_to_replay, command_responses)
     web.run_app(server.app, host=args.host, port=args.port)
 
 
