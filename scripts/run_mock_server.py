@@ -40,7 +40,7 @@ class MockZwaveJsServer:
     """
     Class to represent a mock zwave-js-server instance.
 
-    Only designed to handle one client at a time.
+    The last client that connected to the server will be the one that receives ws msgs.
     """
 
     def __init__(
