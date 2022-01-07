@@ -4,6 +4,7 @@ from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime
 import logging
+from operator import itemgetter
 import pprint
 import uuid
 from types import TracebackType
@@ -294,7 +295,7 @@ class Client:
 
         data = sorted(
             (*self._recorded_commands.values(), *self._recorded_events),
-            key=lambda x: x["ts"],
+            key=itemgetter("ts"),
         )
         self._recorded_commands.clear()
         self._recorded_events.clear()
