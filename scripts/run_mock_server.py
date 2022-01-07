@@ -112,7 +112,7 @@ class MockZwaveJsServer:
         self,
         network_state_dump: List[dict],
         events_to_replay: List[dict],
-        command_responses: DefaultDict[str, DefaultDict[HashableDict, list]],
+        command_responses: DefaultDict[HashableDict, list],
     ) -> None:
         """Initialize class."""
         self.network_state_dump = network_state_dump
@@ -183,9 +183,7 @@ class MockZwaveJsServer:
             await asyncio.sleep(1)
             for event in self.events_to_replay:
                 await self.send_json(event)
-        elif (sanitized_data := sanitize_msg(data)) in self.command_responses.get(
-            cmd, {}
-        ) and (resp_list := self.command_responses[cmd][sanitized_data]):
+        elif resp_list := self.command_responses[sanitize_msg(data)]:
             await self.send_command_response(resp_list.pop(0), message_id)
         else:
             raise ExitException(f"Unhandled command received: {data}")
@@ -253,17 +251,15 @@ def sanitize_msg(msg: dict) -> HashableDict:
 
 
 def add_command_response(
-    command_responses: DefaultDict[str, DefaultDict[HashableDict, list]],
+    command_responses: DefaultDict[HashableDict, list],
     record: dict,
 ) -> None:
     """Add a command response to command_responses map."""
-    command = record["command"]
     command_msg = sanitize_msg(record["command_msg"])
-
     # Response message doesn't need to be sanitized here because it will be sanitized
     # in the MockZwaveJsServer.send_command_response method.
     response_msg = record["response_msg"]
-    command_responses[command][command_msg].append(response_msg)
+    command_responses[command_msg].append(response_msg)
 
 
 def get_args() -> argparse.Namespace:
@@ -322,9 +318,7 @@ def main() -> None:
         network_state_dump: List[dict] = json.load(fp)
 
     events_to_replay = []
-    command_responses: DefaultDict[str, DefaultDict[HashableDict, list]] = defaultdict(
-        lambda: defaultdict(list)
-    )
+    command_responses: DefaultDict[HashableDict, list] = defaultdict(list)
 
     if args.combined_replay_dump_path:
         with open(args.combined_replay_dump_path, "r", encoding="utf8") as fp:
