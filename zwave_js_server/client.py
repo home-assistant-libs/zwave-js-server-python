@@ -292,14 +292,14 @@ class Client:
 
         self._record_messages = False
 
-        data: List[dict] = sorted(
+        data = sorted(
             (*self._recorded_commands.values(), *self._recorded_events),
             key=lambda x: x["ts"],
         )
         self._recorded_commands.clear()
         self._recorded_events.clear()
 
-        return data
+        return list(data)
 
     async def _receive_json_or_raise(self) -> dict:
         """Receive json or raise."""
