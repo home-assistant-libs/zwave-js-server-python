@@ -350,6 +350,9 @@ async def test_record_messages(wallmote_central_scene, mock_command, uuid4):
         {},
     )
 
+    with pytest.raises(InvalidState):
+        client.begin_recording_messages()
+
     await client.async_send_command({"command": "some_command"})
 
     assert len(client._recorded_commands) == 1
@@ -417,3 +420,6 @@ async def test_record_messages(wallmote_central_scene, mock_command, uuid4):
     assert len(client.end_recording_messages()) == 2
     assert len(client._recorded_commands) == 0
     assert len(client._recorded_events) == 0
+
+    with pytest.raises(InvalidState):
+        client.end_recording_messages()
