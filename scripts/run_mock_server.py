@@ -2,10 +2,11 @@
 import argparse
 import asyncio
 from collections import defaultdict
+from collections.abc import Hashable
 from functools import wraps
 import json
 import logging
-from typing import Any, Callable, DefaultDict, List, Optional, Union
+from typing import Callable, DefaultDict, List, Optional, Union
 
 from aiohttp import WSMsgType, web, web_request
 
@@ -225,39 +226,30 @@ class MockZwaveJsServer:
             await self.send_json({"success": True})
 
 
-def hashable_list(lst: list) -> tuple:
+def hashable_value(item: Union[dict, list, Hashable]) -> Union[tuple, list, Hashable]:
+    """Return hashable value from item."""
+    if isinstance(item, dict):
+        return make_dict_hashable(item)
+    if isinstance(item, list):
+        return make_list_hashable(item)
+    return item
+
+
+def make_list_hashable(lst: list) -> tuple:
     """Make a list hashable."""
-    data: List[Any] = []
-    for item in lst:
-        if isinstance(item, dict):
-            data.append(hashable_dict(item))
-        elif isinstance(item, list):
-            data.append(hashable_list(item))
-        else:
-            data.append(item)
-
-    return tuple(data)
+    return tuple(hashable_value(item) for item in lst)
 
 
-def hashable_dict(dct: dict) -> HashableDict:
+def make_dict_hashable(dct: dict) -> HashableDict:
     """Convert a dictionary to a hashable dictionary."""
-    data = HashableDict()
-    for key in dct:
-        if isinstance(dct[key], dict):
-            data[key] = hashable_dict(dct[key])
-        elif isinstance(dct[key], list):
-            data[key] = hashable_list(dct[key])
-        else:
-            data[key] = dct[key]
-
-    return data
+    return HashableDict({key: hashable_value(value) for key, value in dct.items()})
 
 
 def sanitize_msg(msg: dict) -> HashableDict:
     """Sanitize command message."""
     msg = msg.copy()
     msg.pop("messageId", None)
-    return hashable_dict(msg)
+    return make_dict_hashable(msg)
 
 
 def add_command_response(
