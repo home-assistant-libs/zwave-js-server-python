@@ -7,7 +7,7 @@ import logging
 import pprint
 import uuid
 from types import TracebackType
-from typing import Any, DefaultDict, Dict, Optional, cast
+from typing import Any, DefaultDict, Dict, List, Optional, cast
 
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, client_exceptions
 
@@ -66,7 +66,7 @@ class Client:
         self._shutdown_complete_event: Optional[asyncio.Event] = None
         self._record_messages = record_messages
         self._recorded_commands: DefaultDict[str, dict] = defaultdict(dict)
-        self._recorded_events: list[dict] = []
+        self._recorded_events: List[dict] = []
 
     def __repr__(self) -> str:
         """Return the representation."""
@@ -285,14 +285,14 @@ class Client:
 
         self._record_messages = True
 
-    def end_recording_messages(self) -> list[dict]:
+    def end_recording_messages(self) -> List[dict]:
         """End recording messages and return messages that were recorded."""
         if not self._record_messages:
             raise InvalidState("Not recording messages")
 
         self._record_messages = False
 
-        data = sorted(
+        data: List[dict] = sorted(
             (*self._recorded_commands.values(), *self._recorded_events),
             key=lambda x: x["ts"],
         )
