@@ -37,70 +37,6 @@ class HashableDict(dict):
         return self.__key() == other.__key()
 
 
-def response_decorator(primary_ws_response: bool = False) -> Callable:
-    """Factory to decorate a response handler."""
-
-    def decorator(orig_func: Callable) -> Callable:
-        """Decorate a response handler."""
-
-        @wraps(orig_func)
-        async def wrapper(
-            self: "MockZwaveJsServer", request: web_request.Request
-        ) -> web.WebSocketResponse:
-            """Wrap."""
-            logging.error(self)
-            ws_resp = web.WebSocketResponse(autoclose=False)
-            if primary_ws_response:
-                setattr(self, "primary_ws_resp", ws_resp)
-            await ws_resp.prepare(request)
-
-            if primary_ws_response:
-                version_info: VersionInfoDataType = self.network_state_dump[0]
-                # adjust min/max schemas if needed to get things to work
-                if MAX_SERVER_SCHEMA_VERSION > version_info["maxSchemaVersion"]:
-                    version_info["maxSchemaVersion"] = MAX_SERVER_SCHEMA_VERSION
-                if MIN_SERVER_SCHEMA_VERSION < version_info["minSchemaVersion"]:
-                    version_info["minSchemaVersion"] = MIN_SERVER_SCHEMA_VERSION
-                await self.send_json(version_info)
-
-            async for msg in ws_resp:
-                if msg.type == WSMsgType.TEXT:
-                    logging.debug("Message received: %s", msg.data)
-                    if msg.data == "close":
-                        await ws_resp.close()
-                    elif msg.data == "error":
-                        logging.warning("Error from client: %s", msg.data)
-
-                    try:
-                        if len(msg.data) > SIZE_PARSE_JSON_EXECUTOR:
-                            data: Union[
-                                dict, list
-                            ] = await asyncio.get_event_loop().run_in_executor(
-                                None, msg.json
-                            )
-                        else:
-                            data = msg.json()
-                    except ValueError as err:
-                        raise ExitException(
-                            f"Received invalid JSON {msg.data}"
-                        ) from err
-
-                    await orig_func(self, data)
-                elif msg.type == WSMsgType.ERROR:
-                    logging.error(
-                        "Connection closed with exception %s",
-                        ws_resp.exception(),
-                    )
-
-            logging.info("Connection closed")
-
-            return ws_resp
-
-        return wrapper
-
-    return decorator
-
-
 class MockZwaveJsServer:
     """
     Class to represent a mock zwave-js-server instance.
@@ -120,8 +56,7 @@ class MockZwaveJsServer:
         self.app.add_routes(
             [
                 web.get("/", self.server_handler),
-                web.post("/replay_events", self.replay_events_handler),
-                web.post("/add_command_response", self.add_command_response_handler),
+                web.post("/replay", self.replay_handler),
             ]
         )
         self.primary_ws_resp: Optional[web.WebSocketResponse] = None
@@ -154,74 +89,106 @@ class MockZwaveJsServer:
             {"result": result, "type": "result", "success": True}, message_id
         )
 
-    @response_decorator(True)
-    async def server_handler(self, data: dict) -> None:
-        """Handle websocket requests to the server."""
-        if "command" not in data:
-            raise ExitException(f"Malformed message: {data}")
-
-        cmd = data["command"]
-        message_id = data["messageId"]
-        if cmd == "set_api_schema":
-            await self.send_json(self.network_state_dump[1])
-        elif cmd == "driver.get_log_config":
-            await self.send_success_command_response(
-                {
-                    "config": {
-                        "enabled": True,
-                        "level": "silly",
-                        "logToFile": False,
-                        "nodeFilter": [],
-                        "filename": None,
-                        "forceConsole": False,
-                    }
-                },
-                message_id,
-            )
-        elif cmd == "start_listening":
-            await self.send_json(self.network_state_dump[2])
-            await asyncio.sleep(1)
-            for event in self.events_to_replay:
-                await self.send_json(event)
-        elif resp_list := self.command_responses[sanitize_msg(data)]:
-            await self.send_command_response(resp_list.pop(0), message_id)
+    async def process_record(self, record: dict) -> None:
+        """Process a replay dump record."""
+        if record["record_type"] == "event":
+            await self.send_json(record)
+        elif record["record_type"] == "command":
+            add_command_response(self.command_responses, record)
         else:
-            raise ExitException(f"Unhandled command received: {data}")
+            raise ExitException(f"Malformed record: {record}")
 
-    @response_decorator()
-    async def replay_events_handler(self, data: Union[dict, list]) -> None:
-        """Handle websocket requests to replay events."""
+    async def server_handler(self, request: web_request.Request) -> web.WebSocketResponse:
+        """Handle websocket requests to the server."""
+        ws_resp = web.WebSocketResponse(autoclose=False)
+        self.primary_ws_resp = ws_resp
+        await ws_resp.prepare(request)
+
+        version_info: VersionInfoDataType = self.network_state_dump[0]
+        # adjust min/max schemas if needed to get things to work
+        if MAX_SERVER_SCHEMA_VERSION > version_info["maxSchemaVersion"]:
+            version_info["maxSchemaVersion"] = MAX_SERVER_SCHEMA_VERSION
+        if MIN_SERVER_SCHEMA_VERSION < version_info["minSchemaVersion"]:
+            version_info["minSchemaVersion"] = MIN_SERVER_SCHEMA_VERSION
+        await self.send_json(version_info)
+
+        async for msg in ws_resp:
+            if msg.type == WSMsgType.TEXT:
+                logging.debug("Message received: %s", msg.data)
+                if msg.data == "close":
+                    await ws_resp.close()
+                elif msg.data == "error":
+                    logging.warning("Error from client: %s", msg.data)
+
+                try:
+                    if len(msg.data) > SIZE_PARSE_JSON_EXECUTOR:
+                        data: Union[
+                            dict, list
+                        ] = await asyncio.get_event_loop().run_in_executor(
+                            None, msg.json
+                        )
+                    else:
+                        data = msg.json()
+                except ValueError as err:
+                    raise ExitException(
+                        f"Received invalid JSON {msg.data}"
+                    ) from err
+
+                if "command" not in data:
+                    raise ExitException(f"Malformed message: {data}")
+
+                cmd = data["command"]
+                message_id = data["messageId"]
+                if cmd == "set_api_schema":
+                    await self.send_json(self.network_state_dump[1])
+                elif cmd == "driver.get_log_config":
+                    await self.send_success_command_response(
+                        {
+                            "config": {
+                                "enabled": True,
+                                "level": "silly",
+                                "logToFile": False,
+                                "nodeFilter": [],
+                                "filename": None,
+                                "forceConsole": False,
+                            }
+                        },
+                        message_id,
+                    )
+                elif cmd == "start_listening":
+                    await self.send_json(self.network_state_dump[2])
+                    await asyncio.sleep(1)
+                    for event in self.events_to_replay:
+                        await self.send_json(event)
+                elif resp_list := self.command_responses[sanitize_msg(data)]:
+                    await self.send_command_response(resp_list.pop(0), message_id)
+                else:
+                    raise ExitException(f"Unhandled command received: {data}")
+            elif msg.type == WSMsgType.ERROR:
+                logging.error(
+                    "Connection closed with exception %s",
+                    ws_resp.exception(),
+                )
+
+        logging.info("Connection closed")
+
+        return ws_resp
+
+    async def replay_handler(self, request: web_request.Request) -> web.Response:
+        """Handle requests to replay dump."""
+        try:
+            data = await request.json()
+        except json.decoder.JSONDecodeError:
+            return web.Response(status=400, reason="Invalid JSON.")
+
         if isinstance(data, list):
-            if record := next(
-                (record for record in data if "event" not in record), None
-            ):
-                raise ExitException(f"Malformed event: {record}")
             for record in data:
-                await self.send_json(record)
-            return
-        if isinstance(data, dict):
-            if "event" not in data:
-                raise ExitException(f"Malformed event: {data}")
-            await self.send_json(data)
-
-    @response_decorator()
-    async def add_command_response_handler(self, data: Union[dict, list]) -> None:
-        """Handle websocket requests to replay events."""
-        if isinstance(data, list):
-            if record := next(
-                (record for record in data if "command" not in record), None
-            ):
-                raise ExitException(f"Malformed command response: {record}")
-            for record in data:
-                add_command_response(self.command_responses, record)
-                await self.send_json({"success": True})
-            return
-
-        if isinstance(data, dict):
-            if "command" not in data:
-                raise ExitException(f"Malformed command response: {data}")
-            add_command_response(self.command_responses, data)
-            await self.send_json({"success": True})
+                self.process_record(record)
+        elif isinstance(data, dict):
+            self.process_record(data)
+        else:
+            return web.Response(status=400, reason=f"Malformed message: {data}")
+        return web.Response(status=200)
 
 
 def _hashable_value(item: Union[dict, list, Hashable]) -> Union[tuple, list, Hashable]:
