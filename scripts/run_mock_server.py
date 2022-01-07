@@ -226,7 +226,7 @@ class MockZwaveJsServer:
             await self.send_json({"success": True})
 
 
-def hashable_value(item: Union[dict, list, Hashable]) -> Union[tuple, list, Hashable]:
+def _hashable_value(item: Union[dict, list, Hashable]) -> Union[tuple, list, Hashable]:
     """Return hashable value from item."""
     if isinstance(item, dict):
         return make_dict_hashable(item)
@@ -237,12 +237,12 @@ def hashable_value(item: Union[dict, list, Hashable]) -> Union[tuple, list, Hash
 
 def make_list_hashable(lst: list) -> tuple:
     """Make a list hashable."""
-    return tuple(hashable_value(item) for item in lst)
+    return tuple(_hashable_value(item) for item in lst)
 
 
 def make_dict_hashable(dct: dict) -> HashableDict:
     """Convert a dictionary to a hashable dictionary."""
-    return HashableDict({key: hashable_value(value) for key, value in dct.items()})
+    return HashableDict({key: _hashable_value(value) for key, value in dct.items()})
 
 
 def sanitize_msg(msg: dict) -> HashableDict:
