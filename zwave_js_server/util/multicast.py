@@ -6,7 +6,7 @@ from zwave_js_server.model.node import Node
 from ..client import Client
 from ..const import CommandClass
 from ..exceptions import NotFoundError
-from ..model.value import ValueDataType, _get_value_id_from_dict
+from ..model.value import ValueDataType, get_value_id_from_dict
 
 
 async def _async_send_command(
@@ -40,7 +40,7 @@ async def async_multicast_set_value(
     assert client.driver
     # Iterate through nodes specified or all nodes if not specified
     for node in nodes or client.driver.controller.nodes.values():
-        value_id = _get_value_id_from_dict(node, value_data)
+        value_id = get_value_id_from_dict(node, value_data)
         # Check that the value exists on the node
         if value_id not in node.values:
             raise NotFoundError(f"Node {node} doesn't have value {value_id}")

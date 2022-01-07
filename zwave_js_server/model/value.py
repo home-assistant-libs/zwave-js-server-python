@@ -53,7 +53,7 @@ def _init_value(
     return Value(node, val)
 
 
-def _get_value_id_from_dict(node: "Node", val: ValueDataType) -> str:
+def get_value_id_from_dict(node: "Node", val: ValueDataType) -> str:
     """Return ID of value from ValueDataType dict."""
     return get_value_id(
         node,
@@ -186,7 +186,7 @@ class Value:
     @property
     def value_id(self) -> str:
         """Return value ID."""
-        return _get_value_id_from_dict(self.node, self.data)
+        return get_value_id_from_dict(self.node, self.data)
 
     @property
     def metadata(self) -> ValueMetadata:
