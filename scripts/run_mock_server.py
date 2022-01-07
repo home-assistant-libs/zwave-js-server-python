@@ -90,12 +90,12 @@ class MockZwaveJsServer:
 
     async def process_record(self, record: dict) -> None:
         """Process a replay dump record."""
+        if record.get("record_type") not in ("event", "command"):
+            raise TypeError(f"Malformed record: {record}")
         if record["record_type"] == "event":
             await self.send_json(record["data"])
-        elif record["record_type"] == "command":
-            add_command_response(self.command_responses, record)
         else:
-            raise ExitException(f"Malformed record: {record}")
+            add_command_response(self.command_responses, record)
 
     async def server_handler(
         self, request: web_request.Request
@@ -180,9 +180,15 @@ class MockZwaveJsServer:
 
         if isinstance(data, list):
             for record in data:
-                await self.process_record(record)
+                try:
+                    await self.process_record(record)
+                except Exception as err:
+                    return web.Response(status=400, reason=err.args[0])
         elif isinstance(data, dict):
-            await self.process_record(data)
+            try:
+                await self.process_record(data)
+            except Exception as err:
+                return web.Response(status=400, reason=err.args[0])
         else:
             return web.Response(status=400, reason=f"Malformed message: {data}")
         return web.Response(status=200)
@@ -290,25 +296,35 @@ def main() -> None:
             records: List[dict] = json.load(fp)
 
             for record in records:
+                if record.get("record_type") not in ("event", "command"):
+                    raise ExitException(
+                        f"Invalid record in combined replay dump file: {record}"
+                    )
                 if record["record_type"] == "event":
                     events_to_replay.append(record["data"])
-                elif record["record_type"] == "command":
+                else:
                     add_command_response(command_responses, record)
 
     if args.events_to_replay_path:
         with open(args.events_to_replay_path, "r", encoding="utf8") as fp:
             records = json.load(fp)
-            if any(record["record_type"] != "event" for record in records):
-                raise ExitException("Invalid record type in event replay dump file")
+            if record := next(
+                (record.get("record_type") != "event" for record in records), None
+            ):
+                raise ExitException(
+                    f"Malformed record in events to replay file: {record}"
+                )
             for record in records:
                 events_to_replay.append(record["data"])
 
     if args.command_responses_path:
         with open(args.command_responses_path, "r", encoding="utf8") as fp:
             records = json.load(fp)
-            if any(record["record_type"] != "command" for record in records):
+            if record := next(
+                (record.get("record_type") != "event" for record in records), None
+            ):
                 raise ExitException(
-                    "Invalid record type in command responses dump file"
+                    f"Malformed record in command responses dump file: {record}"
                 )
             for record in records:
                 add_command_response(command_responses, record)
