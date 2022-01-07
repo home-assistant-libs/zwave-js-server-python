@@ -1,7 +1,8 @@
 """Test the client."""
 import asyncio
+from datetime import datetime
 import logging
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import pytest
 from aiohttp.client_exceptions import ClientError, WSServerHandshakeError
@@ -353,7 +354,8 @@ async def test_record_messages(wallmote_central_scene, mock_command, uuid4):
     with pytest.raises(InvalidState):
         client.begin_recording_messages()
 
-    await client.async_send_command({"command": "some_command"})
+    with patch("zwave_js_server.client.Client._now", return_value=datetime(2022, 1, 7, 1)):
+        await client.async_send_command({"command": "some_command"})
 
     assert len(client._recorded_commands) == 1
     assert len(client._recorded_events) == 0
@@ -373,25 +375,26 @@ async def test_record_messages(wallmote_central_scene, mock_command, uuid4):
     assert "ts" in client._recorded_commands[uuid4]
     assert "result_ts" in client._recorded_commands[uuid4]
 
-    client._handle_incoming_message(
-        {
-            "type": "event",
-            "event": {
-                "source": "node",
-                "event": "value updated",
-                "nodeId": wallmote_central_scene.node_id,
-                "args": {
-                    "commandClassName": "Binary Switch",
-                    "commandClass": 37,
-                    "endpoint": 0,
-                    "property": "currentValue",
-                    "newValue": False,
-                    "prevValue": True,
-                    "propertyName": "currentValue",
+    with patch("zwave_js_server.client.Client._now", return_value=datetime(2022, 1, 7, 0)):
+        client._handle_incoming_message(
+            {
+                "type": "event",
+                "event": {
+                    "source": "node",
+                    "event": "value updated",
+                    "nodeId": wallmote_central_scene.node_id,
+                    "args": {
+                        "commandClassName": "Binary Switch",
+                        "commandClass": 37,
+                        "endpoint": 0,
+                        "property": "currentValue",
+                        "newValue": False,
+                        "prevValue": True,
+                        "propertyName": "currentValue",
+                    },
                 },
-            },
-        }
-    )
+            }
+        )
     assert len(client._recorded_commands) == 1
     assert len(client._recorded_events) == 1
     logging.getLogger(__name__).error(client._recorded_events)
@@ -417,9 +420,15 @@ async def test_record_messages(wallmote_central_scene, mock_command, uuid4):
     }
     assert "ts" in event
 
-    assert len(client.end_recording_messages()) == 2
+    replay_dump = client.end_recording_messages()
+
+    assert len(replay_dump) == 2
     assert len(client._recorded_commands) == 0
     assert len(client._recorded_events) == 0
+
+    # Testing that events are properly sorted by timestamp. Even though the event
+    # comes after the command in the code, the patch should make the event appear first
+    assert replay_dump[0]["record_type"] == "event"
 
     with pytest.raises(InvalidState):
         client.end_recording_messages()

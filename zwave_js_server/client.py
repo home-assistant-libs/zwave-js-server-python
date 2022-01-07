@@ -302,6 +302,10 @@ class Client:
 
         return list(data)
 
+    @classmethod
+    def _now(self) -> datetime:
+        return datetime.utcnow()
+
     async def _receive_json_or_raise(self) -> dict:
         """Receive json or raise."""
         assert self._client
@@ -344,7 +348,7 @@ class Client:
             if self._record_messages and msg["messageId"] not in LISTEN_MESSAGE_IDS:
                 self._recorded_commands[msg["messageId"]].update(
                     {
-                        "result_ts": datetime.utcnow().isoformat(),
+                        "result_ts": self._now().isoformat(),
                         "result_msg": deepcopy(msg),
                     }
                 )
@@ -376,7 +380,7 @@ class Client:
             self._recorded_events.append(
                 {
                     "record_type": "event",
-                    "ts": datetime.utcnow().isoformat(),
+                    "ts": self._now().isoformat(),
                     "type": msg["event"]["event"],
                     "event": deepcopy(msg),
                 }
@@ -403,7 +407,7 @@ class Client:
             self._recorded_commands[message["messageId"]].update(
                 {
                     "record_type": "command",
-                    "ts": datetime.utcnow().isoformat(),
+                    "ts": self._now().isoformat(),
                     "command": message["command"],
                     "command_msg": message,
                 }
