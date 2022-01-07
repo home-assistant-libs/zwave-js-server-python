@@ -247,8 +247,9 @@ def get_args() -> argparse.Namespace:
         "--events-to-replay-path",
         type=str,
         help=(
-            "File path to events to replay JSON. Events provided by --combined-replay-dump-path"
-            "option will be first, followed by events from this file."
+            "File path to events to replay JSON. Events provided by "
+            "--combined-replay-dump-path option will be first, followed by events "
+            "from this file."
         ),
         default=None,
     )
@@ -257,8 +258,8 @@ def get_args() -> argparse.Namespace:
         type=str,
         help=(
             "File path to command response JSON. Command responses provided by "
-            "--combined-replay-dump-path option will be first, followed by responses from this"
-            "file."
+            "--combined-replay-dump-path option will be first, followed by responses "
+            "from this file."
         ),
         default=None,
     )
