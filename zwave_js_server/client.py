@@ -1,6 +1,7 @@
 """Client."""
 import asyncio
 from collections import defaultdict
+from copy import deepcopy
 from datetime import datetime
 import logging
 import pprint
@@ -277,14 +278,14 @@ class Client:
         self._shutdown_complete_event = None
         self.driver = None
 
-    async def begin_recording_messages(self) -> None:
+    def begin_recording_messages(self) -> None:
         """Begin recording messages for replay later."""
         if self._record_messages:
             raise InvalidState("Already recording messages")
 
         self._record_messages = True
 
-    async def end_recording_messages(self) -> list[dict]:
+    def end_recording_messages(self) -> list[dict]:
         """End recording messages and return messages that were recorded."""
         if not self._record_messages:
             raise InvalidState("Not recording messages")
@@ -339,11 +340,11 @@ class Client:
                 # no listener for this result
                 return
 
-            if self._record_messages and msg["messageId"] in LISTEN_MESSAGE_IDS:
+            if self._record_messages and msg["messageId"] not in LISTEN_MESSAGE_IDS:
                 self._recorded_commands[msg["messageId"]].update(
                     {
-                        "response_ts": datetime.utcnow().isoformat(),
-                        "response_msg": msg,
+                        "result_ts": datetime.utcnow().isoformat(),
+                        "result_msg": deepcopy(msg),
                     }
                 )
 
@@ -376,7 +377,7 @@ class Client:
                     "record_type": "event",
                     "ts": datetime.utcnow().isoformat(),
                     "type": msg["event"]["event"],
-                    "event": msg,
+                    "event": deepcopy(msg),
                 }
             )
 
