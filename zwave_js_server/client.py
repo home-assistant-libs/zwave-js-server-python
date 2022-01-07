@@ -344,7 +344,7 @@ class Client:
             if self._record_messages and msg["messageId"] not in LISTEN_MESSAGE_IDS:
                 self._recorded_commands[msg["messageId"]].update(
                     {
-                        "result_ts": self._now().isoformat(),
+                        "result_ts": _now().isoformat(),
                         "result_msg": deepcopy(msg),
                     }
                 )
@@ -376,7 +376,7 @@ class Client:
             self._recorded_events.append(
                 {
                     "record_type": "event",
-                    "ts": self._now().isoformat(),
+                    "ts": _now().isoformat(),
                     "type": msg["event"]["event"],
                     "event": deepcopy(msg),
                 }
@@ -403,7 +403,7 @@ class Client:
             self._recorded_commands[message["messageId"]].update(
                 {
                     "record_type": "command",
-                    "ts": self._now().isoformat(),
+                    "ts": _now().isoformat(),
                     "command": message["command"],
                     "command_msg": message,
                 }
@@ -422,6 +422,6 @@ class Client:
         """Disconnect from the websocket."""
         await self.disconnect()
 
-    @classmethod
-    def _now(cls) -> datetime:
-        return datetime.utcnow()
+
+def _now() -> datetime:
+    return datetime.utcnow()
