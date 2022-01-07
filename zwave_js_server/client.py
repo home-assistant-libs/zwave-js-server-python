@@ -302,10 +302,6 @@ class Client:
 
         return list(data)
 
-    @classmethod
-    def _now(self) -> datetime:
-        return datetime.utcnow()
-
     async def _receive_json_or_raise(self) -> dict:
         """Receive json or raise."""
         assert self._client
@@ -425,3 +421,7 @@ class Client:
     ) -> None:
         """Disconnect from the websocket."""
         await self.disconnect()
+
+    @classmethod
+    def _now(cls) -> datetime:
+        return datetime.utcnow()
