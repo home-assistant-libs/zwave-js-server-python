@@ -123,9 +123,7 @@ class MockZwaveJsServer:
 
                 try:
                     if len(msg.data) > SIZE_PARSE_JSON_EXECUTOR:
-                        data: Union[
-                            dict, list
-                        ] = await asyncio.get_event_loop().run_in_executor(
+                        data: dict = await asyncio.get_event_loop().run_in_executor(
                             None, msg.json
                         )
                     else:
