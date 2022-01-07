@@ -308,11 +308,18 @@ def main() -> None:
     if args.events_to_replay_path:
         with open(args.events_to_replay_path, "r", encoding="utf8") as fp:
             records = json.load(fp)
-            if record := next(
-                (record.get("record_type") != "event" for record in records), None
-            ):
+            if (
+                bad_record := next(
+                    (
+                        record
+                        for record in records
+                        if record.get("record_type") != "event"
+                    ),
+                    None,
+                )
+            ) is not None:
                 raise ExitException(
-                    f"Malformed record in events to replay file: {record}"
+                    f"Malformed record in events to replay file: {bad_record}"
                 )
             for record in records:
                 events_to_replay.append(record["data"])
@@ -320,11 +327,18 @@ def main() -> None:
     if args.command_responses_path:
         with open(args.command_responses_path, "r", encoding="utf8") as fp:
             records = json.load(fp)
-            if record := next(
-                (record.get("record_type") != "event" for record in records), None
-            ):
+            if (
+                bad_record := next(
+                    (
+                        record
+                        for record in records
+                        if record.get("record_type") != "command"
+                    ),
+                    None,
+                )
+            ) is not None:
                 raise ExitException(
-                    f"Malformed record in command responses dump file: {record}"
+                    f"Malformed record in command responses dump file: {bad_record}"
                 )
             for record in records:
                 add_command_response(command_responses, record)
