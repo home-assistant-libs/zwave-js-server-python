@@ -5,7 +5,7 @@ from collections import defaultdict
 from collections.abc import Hashable
 import json
 import logging
-from typing import DefaultDict, List, Optional, Union
+from typing import Any, DefaultDict, List, Optional, Union
 
 from aiohttp import WSMsgType, web, web_request
 
@@ -28,12 +28,12 @@ class HashableDict(dict):
     def __key(self) -> tuple:
         return tuple((k, self[k]) for k in sorted(self))
 
-    def __hash__(self) -> int:
+    def __hash__(self) -> int:  # type: ignore
         return hash(self.__key())
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         # pylint: disable=protected-access
-        return self.__key() == other.__key()
+        return type(self) == type(other) and self.__key() == other.__key()
 
 
 class MockZwaveJsServer:
