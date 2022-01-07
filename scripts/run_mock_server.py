@@ -3,10 +3,9 @@ import argparse
 import asyncio
 from collections import defaultdict
 from collections.abc import Hashable
-from functools import wraps
 import json
 import logging
-from typing import Callable, DefaultDict, List, Optional, Union
+from typing import DefaultDict, List, Optional, Union
 
 from aiohttp import WSMsgType, web, web_request
 
@@ -98,7 +97,9 @@ class MockZwaveJsServer:
         else:
             raise ExitException(f"Malformed record: {record}")
 
-    async def server_handler(self, request: web_request.Request) -> web.WebSocketResponse:
+    async def server_handler(
+        self, request: web_request.Request
+    ) -> web.WebSocketResponse:
         """Handle websocket requests to the server."""
         ws_resp = web.WebSocketResponse(autoclose=False)
         self.primary_ws_resp = ws_resp
@@ -130,9 +131,7 @@ class MockZwaveJsServer:
                     else:
                         data = msg.json()
                 except ValueError as err:
-                    raise ExitException(
-                        f"Received invalid JSON {msg.data}"
-                    ) from err
+                    raise ExitException(f"Received invalid JSON {msg.data}") from err
 
                 if "command" not in data:
                     raise ExitException(f"Malformed message: {data}")
