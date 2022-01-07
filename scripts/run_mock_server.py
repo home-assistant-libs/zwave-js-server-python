@@ -91,7 +91,7 @@ class MockZwaveJsServer:
     async def process_record(self, record: dict) -> None:
         """Process a replay dump record."""
         if record["record_type"] == "event":
-            await self.send_json(record)
+            await self.send_json(record["data"])
         elif record["record_type"] == "command":
             add_command_response(self.command_responses, record)
         else:
@@ -182,9 +182,9 @@ class MockZwaveJsServer:
 
         if isinstance(data, list):
             for record in data:
-                self.process_record(record)
+                await self.process_record(record)
         elif isinstance(data, dict):
-            self.process_record(data)
+            await self.process_record(data)
         else:
             return web.Response(status=400, reason=f"Malformed message: {data}")
         return web.Response(status=200)
