@@ -33,7 +33,7 @@ class HashableDict(dict):
 
     def __eq__(self, other: Any) -> bool:
         # pylint: disable=protected-access
-        return type(self) == type(other) and self.__key() == other.__key()
+        return isinstance(other, HashableDict) and self.__key() == other.__key()
 
 
 class MockZwaveJsServer:
