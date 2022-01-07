@@ -47,7 +47,7 @@ class MockZwaveJsServer:
         self,
         network_state_dump: List[dict],
         events_to_replay: List[dict],
-        command_responses: DefaultDict[HashableDict, list],
+        command_results: DefaultDict[HashableDict, list],
     ) -> None:
         """Initialize class."""
         self.network_state_dump = network_state_dump
@@ -60,7 +60,7 @@ class MockZwaveJsServer:
         )
         self.primary_ws_resp: Optional[web.WebSocketResponse] = None
         self.events_to_replay = events_to_replay
-        self.command_responses = command_responses
+        self.command_results = command_results
 
     async def send_json(self, data: dict) -> None:
         """Send JSON."""
@@ -68,7 +68,7 @@ class MockZwaveJsServer:
         assert self.primary_ws_resp is not None
         await self.primary_ws_resp.send_json(data)
 
-    async def send_command_response(
+    async def send_command_result(
         self,
         data: dict,
         message_id: str,
@@ -76,7 +76,7 @@ class MockZwaveJsServer:
         """Send message."""
         await self.send_json({**data, "messageId": message_id})
 
-    async def send_success_command_response(
+    async def send_success_command_result(
         self,
         result: Optional[dict],
         message_id: str,
@@ -84,7 +84,7 @@ class MockZwaveJsServer:
         """Send success message."""
         if result is None:
             result = {}
-        await self.send_command_response(
+        await self.send_command_result(
             {"result": result, "type": "result", "success": True}, message_id
         )
 
@@ -95,7 +95,7 @@ class MockZwaveJsServer:
         if record["record_type"] == "event":
             await self.send_json(record["data"])
         else:
-            add_command_response(self.command_responses, record)
+            add_command_result(self.command_results, record)
 
     async def server_handler(
         self, request: web_request.Request
@@ -139,7 +139,7 @@ class MockZwaveJsServer:
                 if cmd == "set_api_schema":
                     await self.send_json(self.network_state_dump[1])
                 elif cmd == "driver.get_log_config":
-                    await self.send_success_command_response(
+                    await self.send_success_command_result(
                         {
                             "config": {
                                 "enabled": True,
@@ -157,8 +157,8 @@ class MockZwaveJsServer:
                     await asyncio.sleep(1)
                     for event in self.events_to_replay:
                         await self.send_json(event)
-                elif resp_list := self.command_responses[sanitize_msg(data)]:
-                    await self.send_command_response(resp_list.pop(0), message_id)
+                elif resp_list := self.command_results[sanitize_msg(data)]:
+                    await self.send_command_result(resp_list.pop(0), message_id)
                 else:
                     raise ExitException(f"Unhandled command received: {data}")
             elif msg.type == WSMsgType.ERROR:
@@ -220,16 +220,16 @@ def sanitize_msg(msg: dict) -> HashableDict:
     return make_dict_hashable(msg)
 
 
-def add_command_response(
-    command_responses: DefaultDict[HashableDict, list],
+def add_command_result(
+    command_results: DefaultDict[HashableDict, list],
     record: dict,
 ) -> None:
-    """Add a command response to command_responses map."""
+    """Add a command result to command_results map."""
     command_msg = sanitize_msg(record["command_msg"])
     # Response message doesn't need to be sanitized here because it will be sanitized
-    # in the MockZwaveJsServer.send_command_response method.
-    response_msg = record["response_msg"]
-    command_responses[command_msg].append(response_msg)
+    # in the MockZwaveJsServer.send_command_result method.
+    result_msg = record["result_msg"]
+    command_results[command_msg].append(result_msg)
 
 
 def get_args() -> argparse.Namespace:
@@ -260,11 +260,11 @@ def get_args() -> argparse.Namespace:
         default=None,
     )
     parser.add_argument(
-        "--command-responses-path",
+        "--command-results-path",
         type=str,
         help=(
-            "File path to command response JSON. Command responses provided by "
-            "--combined-replay-dump-path option will be first, followed by responses "
+            "File path to command result JSON. Command results provided by "
+            "--combined-replay-dump-path option will be first, followed by results "
             "from this file."
         ),
         default=None,
@@ -273,8 +273,8 @@ def get_args() -> argparse.Namespace:
         "--combined-replay-dump-path",
         type=str,
         help=(
-            "File path to the combined event and command response dump JSON. Events and "
-            "command responses will be extracted in the order they were received."
+            "File path to the combined event and command result dump JSON. Events and "
+            "command results will be extracted in the order they were received."
         ),
         default=None,
     )
@@ -289,7 +289,7 @@ def main() -> None:
         network_state_dump: List[dict] = json.load(fp)
 
     events_to_replay = []
-    command_responses: DefaultDict[HashableDict, list] = defaultdict(list)
+    command_results: DefaultDict[HashableDict, list] = defaultdict(list)
 
     if args.combined_replay_dump_path:
         with open(args.combined_replay_dump_path, "r", encoding="utf8") as fp:
@@ -303,7 +303,7 @@ def main() -> None:
                 if record["record_type"] == "event":
                     events_to_replay.append(record["data"])
                 else:
-                    add_command_response(command_responses, record)
+                    add_command_result(command_results, record)
 
     if args.events_to_replay_path:
         with open(args.events_to_replay_path, "r", encoding="utf8") as fp:
@@ -324,8 +324,8 @@ def main() -> None:
             for record in records:
                 events_to_replay.append(record["data"])
 
-    if args.command_responses_path:
-        with open(args.command_responses_path, "r", encoding="utf8") as fp:
+    if args.command_results_path:
+        with open(args.command_results_path, "r", encoding="utf8") as fp:
             records = json.load(fp)
             if (
                 bad_record := next(
@@ -338,10 +338,10 @@ def main() -> None:
                 )
             ) is not None:
                 raise ExitException(
-                    f"Malformed record in command responses dump file: {bad_record}"
+                    f"Malformed record in command results dump file: {bad_record}"
                 )
             for record in records:
-                add_command_response(command_responses, record)
+                add_command_result(command_results, record)
 
     # adapted from homeassistant.bootstrap.async_enable_logging
     logging.basicConfig(level=args.log_level)
@@ -368,7 +368,7 @@ def main() -> None:
             logging.Formatter(fmt=FMT, datefmt=DATEFMT)
         )
 
-    server = MockZwaveJsServer(network_state_dump, events_to_replay, command_responses)
+    server = MockZwaveJsServer(network_state_dump, events_to_replay, command_results)
     web.run_app(server.app, host=args.host, port=args.port)
 
 
