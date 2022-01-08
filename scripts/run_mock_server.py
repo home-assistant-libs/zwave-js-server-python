@@ -225,6 +225,13 @@ def add_command_result(
     record: dict,
 ) -> None:
     """Add a command result to command_results map."""
+    if "result_msg" not in record:
+        logging.warning(
+            "The following record cannot be used because the client did not wait for "
+            "a response: %s",
+            record,
+        )
+        return
     command_msg = sanitize_msg(record["command_msg"])
     # Response message doesn't need to be sanitized here because it will be sanitized
     # in the MockZwaveJsServer.send_command_result method.
@@ -321,8 +328,7 @@ def main() -> None:
                 raise ExitException(
                     f"Malformed record in events to replay file: {bad_record}"
                 )
-            for record in records:
-                events_to_replay.append(record["data"])
+            events_to_replay.extend([record["data"] for record in records])
 
     if args.command_results_path:
         with open(args.command_results_path, "r", encoding="utf8") as fp:
