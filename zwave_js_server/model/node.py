@@ -336,10 +336,9 @@ class Node(Endpoint):
 
     def __init__(self, client: "Client", data: NodeDataType) -> None:
         """Initialize the node."""
-        super().__init__(client, data)
         self._firmware_update_progress: Optional[FirmwareUpdateProgress] = None
-        self.values: Dict[str, Union[Value, ConfigurationValue]] = {}
         self.endpoints: Dict[int, Endpoint] = {}
+        super().__init__(client, data)
         self.update_state(data)
 
     def __repr__(self) -> str:

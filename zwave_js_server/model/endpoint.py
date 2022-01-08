@@ -73,7 +73,7 @@ class Endpoint(EventBase):
         values: Optional[Dict[str, Union[ConfigurationValue, Value]]] = None,
     ) -> None:
         """Update the endpoint data."""
-        self.data = data
+        self.data: EndpointDataType = data
         if values is None:
             return
 
