@@ -9,7 +9,7 @@ from ..const import (
     PowerLevel,
     SecurityClass,
 )
-from ..event import Event
+from ..event import Event, EventBase
 from ..exceptions import (
     FailedCommand,
     NotFoundError,
@@ -17,6 +17,7 @@ from ..exceptions import (
     UnwriteableValue,
 )
 from .command_class import CommandClassInfo, CommandClassInfoDataType
+from .device_class import DeviceClass, DeviceClassDataType
 from .device_config import DeviceConfig, DeviceConfigDataType
 from .endpoint import Endpoint, EndpointDataType
 from .firmware import (
@@ -290,9 +291,14 @@ class CheckHealthProgress:
     last_rating: int
 
 
-class NodeDataType(EndpointDataType):
+class NodeDataType(TypedDict, total=False):
     """Represent a node data dict type."""
 
+    nodeId: int  # required
+    index: int  # required
+    deviceClass: DeviceClassDataType  # required
+    installerIcon: int
+    userIcon: int
     name: str
     location: str
     status: int  # 0-4  # required
@@ -331,15 +337,17 @@ class NodeDataType(EndpointDataType):
     isControllerNode: bool
 
 
-class Node(Endpoint):
+class Node(EventBase):
     """Represent a Z-Wave JS node."""
 
     def __init__(self, client: "Client", data: NodeDataType) -> None:
         """Initialize the node."""
+        super().__init__()
+        self.client = client
+        self.values: Dict[str, Union[ConfigurationValue, Value]] = {}
         self._firmware_update_progress: Optional[FirmwareUpdateProgress] = None
         self.endpoints: Dict[int, Endpoint] = {}
-        super().__init__(client, data)
-        self.update_state(data)
+        self.update(data)
 
     def __repr__(self) -> str:
         """Return the representation."""
@@ -356,6 +364,31 @@ class Node(Endpoint):
         return (
             self.client.driver == other.client.driver and self.node_id == other.node_id
         )
+
+    @property
+    def node_id(self) -> int:
+        """Return node ID property."""
+        return self.data["nodeId"]
+
+    @property
+    def index(self) -> int:
+        """Return index property."""
+        return self.data["index"]
+
+    @property
+    def device_class(self) -> DeviceClass:
+        """Return the device_class."""
+        return DeviceClass(self.data["deviceClass"])
+
+    @property
+    def installer_icon(self) -> Optional[int]:
+        """Return installer icon property."""
+        return self.data.get("installerIcon")
+
+    @property
+    def user_icon(self) -> Optional[int]:
+        """Return user icon property."""
+        return self.data.get("userIcon")
 
     @property
     def status(self) -> NodeStatus:
@@ -539,19 +572,24 @@ class Node(Endpoint):
         """Return whether the node is set to keep awake."""
         return self.data["keepAwake"]
 
-    def update_state(self, data: NodeDataType) -> None:
+    def update(self, data: NodeDataType) -> None:
         """Update the internal state data."""
         self.data: NodeDataType = data
         self._device_config = DeviceConfig(self.data.get("deviceConfig", {}))
         self._statistics = NodeStatistics(self.data.get("statistics"))
-        value_ids = []
+
+        # Remove stale values
+        value_ids = (_get_value_id_from_dict(self, val) for val in data["values"])
+        self.values = {
+            value_id: val
+            for value_id, val in self.values.items()
+            if value_id in value_ids
+        }
 
         # Populate new values
         for val in data["values"]:
-            value_id = _get_value_id_from_dict(self, val)
-            value_ids.append(value_id)
             try:
-                if value_id in self.values:
+                if (value_id := _get_value_id_from_dict(self, val)) in self.values:
                     self.values[value_id].update(val)
                 else:
                     self.values[value_id] = _init_value(self, val)
@@ -559,11 +597,14 @@ class Node(Endpoint):
                 # If we can't parse the value, don't store it
                 pass
 
-        # Remove stale values
-        for value_id in self.values:
-            if value_id not in value_ids:
-                self.values.pop(value_id)
+        # Remove stale endpoints
+        self.endpoints = {
+            idx: endpoint
+            for idx, endpoint in self.endpoints.items()
+            if idx in (endpoint["index"] for endpoint in self.data["endpoints"])
+        }
 
+        # Add new endpoints or update existing ones
         for endpoint in self.data["endpoints"]:
             idx = endpoint["index"]
             values = {
@@ -579,11 +620,6 @@ class Node(Endpoint):
                     endpoint,
                     values,
                 )
-
-        # Remove stale endpoints
-        for idx in self.endpoints:
-            if idx not in self.data["endpoints"]:
-                self.endpoints.pop(idx)
 
     def get_command_class_values(
         self, command_class: CommandClass, endpoint: int = None
@@ -748,6 +784,22 @@ class Node(Endpoint):
         )
         return cast(bool, data.get("responded", False))
 
+    async def async_invoke_cc_api(
+        self,
+        command_class: CommandClass,
+        method_name: str,
+        *args: Any,
+        wait_for_result: Optional[bool] = None,
+    ) -> Any:
+        """Call endpoint.invoke_cc_api command."""
+        return await self.endpoints[0].async_invoke_cc_api(
+            command_class, method_name, *args, wait_for_result=wait_for_result
+        )
+
+    async def async_supports_cc_api(self, command_class: CommandClass) -> bool:
+        """Call endpoint.supports_cc_api command."""
+        return await self.endpoints[0].async_supports_cc_api(command_class)
+
     async def async_has_security_class(self, security_class: SecurityClass) -> bool:
         """Return whether node has the given security class."""
         data = await self.async_send_command(
@@ -816,28 +868,45 @@ class Node(Endpoint):
 
     async def async_get_state(self) -> None:
         """Get node state."""
-        data = await self.async_send_command("get_state", require_schema=14)
+        data = await self.async_send_command(
+            "get_state", require_schema=14, wait_for_result=True
+        )
         assert data
-        self.update_state(data["state"])
+        self.update(data["state"])
 
-    async def async_set_name(self, name: str, update_cc: bool = True) -> None:
+    async def async_set_name(
+        self, name: str, update_cc: bool = True, wait_for_result: Optional[bool] = None
+    ) -> None:
         """Set node name."""
+        # If we may not potentially update the name CC, we should just wait for the
+        # result because the change is local to the driver
+        if not update_cc:
+            wait_for_result = True
         await self.async_send_command(
             "set_name",
             name=name,
             updateCC=update_cc,
-            wait_for_result=True,
+            wait_for_result=wait_for_result,
             require_schema=14,
         )
         self.data["name"] = name
 
-    async def async_set_location(self, location: str, update_cc: bool = True) -> None:
+    async def async_set_location(
+        self,
+        location: str,
+        update_cc: bool = True,
+        wait_for_result: Optional[bool] = None,
+    ) -> None:
         """Set node location."""
+        # If we may not potentially update the location CC, we should just wait for the
+        # result because the change is local to the driver
+        if not update_cc:
+            wait_for_result = True
         await self.async_send_command(
             "set_location",
             location=location,
             updateCC=update_cc,
-            wait_for_result=True,
+            wait_for_result=wait_for_result,
             require_schema=14,
         )
         self.data["location"] = location
@@ -913,7 +982,7 @@ class Node(Endpoint):
     def handle_ready(self, event: Event) -> None:
         """Process a node ready event."""
         # the event contains a full dump of the node
-        self.update_state(event.data["nodeState"])
+        self.update(event.data["nodeState"])
 
     def handle_value_added(self, event: Event) -> None:
         """Process a node value added event."""

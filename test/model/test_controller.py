@@ -1,9 +1,11 @@
 """Test the controller model."""
+from copy import deepcopy
 import json
 
 import pytest
 
 from zwave_js_server.const import (
+    InclusionState,
     InclusionStrategy,
     Protocols,
     QRCodeVersion,
@@ -117,6 +119,7 @@ def test_from_state():
     assert ctrl.suc_node_id == 1
     assert ctrl.supports_timers is False
     assert ctrl.is_heal_network_active is False
+    assert ctrl.inclusion_state == InclusionState.IDLE
     stats = ctrl.statistics
     assert (
         stats.can
@@ -1335,3 +1338,22 @@ async def test_nvm_events(controller):
     )
     controller.receive_event(event)
     assert event.data["nvm_restore_progress"] == controller_pkg.NVMProgress(5, 6)
+
+
+async def test_get_state(controller, controller_state, uuid4, mock_command):
+    """Test get state."""
+    new_state = deepcopy(controller_state)
+    new_state["inclusionState"] = 1
+    ack_commands = mock_command(
+        {"command": "controller.get_state"},
+        {"state": new_state},
+    )
+    assert controller.inclusion_state == InclusionState.IDLE
+    assert await controller.async_get_state() is None
+    assert controller.inclusion_state == InclusionState.INCLUDING
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_state",
+        "messageId": uuid4,
+    }

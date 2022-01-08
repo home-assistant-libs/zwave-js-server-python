@@ -1,4 +1,5 @@
 """Test the node model."""
+from copy import deepcopy
 import json
 from unittest.mock import patch
 
@@ -23,10 +24,11 @@ from zwave_js_server.model.firmware import FirmwareUpdateStatus
 from zwave_js_server.model.node import (
     LifelineHealthCheckResultDataType,
     Node,
+    NodeDataType,
     NodeStatistics,
     RouteHealthCheckResultDataType,
 )
-from zwave_js_server.model.value import ConfigurationValue
+from zwave_js_server.model.value import ConfigurationValue, get_value_id
 
 from .. import load_fixture
 
@@ -73,9 +75,13 @@ def test_from_state():
     assert node.individual_endpoint_count is None
     assert node.aggregated_endpoint_count is None
     assert node.interview_stage == "Neighbors"
+    assert not node.is_controller_node
+    assert not node.keep_awake
     assert len(node.command_classes) == 0
     assert len(node.endpoints) == 1
     assert node.endpoints[0].index == 0
+    assert node.endpoints[0].installer_icon is None
+    assert node.endpoints[0].user_icon is None
     device_class = node.endpoints[0].device_class
     assert device_class.basic.key == 2
     assert device_class.generic.key == 2
@@ -873,7 +879,7 @@ async def test_value_added_new_value(climate_radio_thermostat_ct100_plus):
 
 
 async def test_invoke_cc_api(multisensor_6, uuid4, mock_command):
-    """Test endpoint.invoke_cc_api commands."""
+    """Test endpoint. commands."""
     node = multisensor_6
     ack_commands = mock_command(
         {"command": "endpoint.invoke_cc_api", "nodeId": node.node_id, "endpoint": 0},
@@ -1171,3 +1177,117 @@ async def test_check_route_health_progress_event(
     assert event.data["check_route_health_progress"].rounds == 1
     assert event.data["check_route_health_progress"].total_rounds == 2
     assert event.data["check_route_health_progress"].last_rating == 10
+
+
+async def test_get_state(
+    multisensor_6: Node, multisensor_6_state: NodeDataType, uuid4, mock_command
+):
+    """Test node.get_state command."""
+    node = multisensor_6
+    value_id = get_value_id(node, 32, "currentValue", 0)
+
+    # Verify original values
+    assert node.endpoints[0].installer_icon == 3079
+    assert node.values[value_id].value == 255
+
+    new_state = deepcopy(multisensor_6_state)
+    # Update endpoint 0 installer icon
+    new_state["endpoints"][0]["installerIcon"] = 1
+    # Update value of {nodeId}-32-0-currentValue
+    new_state["values"][0] = {
+        "commandClassName": "Basic",
+        "commandClass": 32,
+        "endpoint": 0,
+        "property": "currentValue",
+        "propertyName": "currentValue",
+        "metadata": {
+            "type": "number",
+            "readable": True,
+            "writeable": False,
+            "min": 0,
+            "max": 99,
+            "label": "Current value",
+        },
+        "value": 0,
+    }
+    ack_commands = mock_command(
+        {"command": "node.get_state", "nodeId": node.node_id},
+        {"state": new_state},
+    )
+
+    # Verify new values
+    assert await node.async_get_state() is None
+    assert node.endpoints[0].installer_icon == 1
+    assert node.values[value_id].value == 0
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.get_state",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }
+
+
+async def test_set_name(multisensor_6: Node, uuid4, mock_command):
+    """Test node.set_name command."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.set_name", "nodeId": node.node_id},
+        {},
+    )
+
+    assert node.name != "new_name"
+    assert await node.async_set_name("new_name", False) is None
+    assert node.name == "new_name"
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.set_name",
+        "nodeId": node.node_id,
+        "name": "new_name",
+        "updateCC": False,
+        "messageId": uuid4,
+    }
+
+
+async def test_set_location(multisensor_6: Node, uuid4, mock_command):
+    """Test node.set_location command."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.set_location", "nodeId": node.node_id},
+        {},
+    )
+
+    assert node.location != "new_location"
+    assert await node.async_set_location("new_location", False) is None
+    assert node.location == "new_location"
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.set_location",
+        "nodeId": node.node_id,
+        "location": "new_location",
+        "updateCC": False,
+        "messageId": uuid4,
+    }
+
+
+async def test_set_keep_awake(multisensor_6: Node, uuid4, mock_command):
+    """Test node.set_keep_awake command."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.set_keep_awake", "nodeId": node.node_id},
+        {},
+    )
+
+    assert node.keep_awake
+    assert await node.async_set_keep_awake(False) is None
+    assert node.keep_awake is False
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.set_keep_awake",
+        "nodeId": node.node_id,
+        "keepAwake": False,
+        "messageId": uuid4,
+    }

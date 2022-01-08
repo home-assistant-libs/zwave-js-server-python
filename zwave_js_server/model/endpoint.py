@@ -34,7 +34,7 @@ class Endpoint(EventBase):
         self,
         client: "Client",
         data: EndpointDataType,
-        values: Optional[Dict[str, Union[ConfigurationValue, Value]]] = None,
+        values: Dict[str, Union[ConfigurationValue, Value]],
     ) -> None:
         """Initialize."""
         super().__init__()
@@ -70,24 +70,22 @@ class Endpoint(EventBase):
     def update(
         self,
         data: EndpointDataType,
-        values: Optional[Dict[str, Union[ConfigurationValue, Value]]] = None,
+        values: Dict[str, Union[ConfigurationValue, Value]],
     ) -> None:
         """Update the endpoint data."""
         self.data: EndpointDataType = data
-        if values is None:
-            return
+
+        # Remove stale values
+        self.values = {
+            value_id: val for value_id, val in self.values.items() if value_id in values
+        }
 
         # Populate new values
         for value_id, value in values.items():
             if value_id not in self.values:
                 self.values[value_id] = value
 
-        # Remove stale values
-        for value_id in self.values:
-            if value_id not in values:
-                self.values.pop(value_id)
-
-    async def _async_send_command(
+    async def async_send_command(
         self,
         cmd: str,
         require_schema: Optional[int] = None,
@@ -97,8 +95,8 @@ class Endpoint(EventBase):
         """
         Send an endpoint command. For internal use only.
 
-        If wait_for_result is not None, it will take precedence, otherwise we will decide to wait
-        or not based on the node status.
+        If wait_for_result is not None, it will take precedence, otherwise we will decide
+        to wait or not based on the node status.
         """
         if self.client.driver is None:
             raise FailedCommand(
@@ -132,7 +130,7 @@ class Endpoint(EventBase):
         wait_for_result: bool = None,
     ) -> Any:
         """Call endpoint.invoke_cc_api command."""
-        result = await self._async_send_command(
+        result = await self.async_send_command(
             "invoke_cc_api",
             commandClass=command_class.value,
             methodName=method_name,
@@ -146,7 +144,7 @@ class Endpoint(EventBase):
 
     async def async_supports_cc_api(self, command_class: CommandClass) -> bool:
         """Call endpoint.supports_cc_api command."""
-        result = await self._async_send_command(
+        result = await self.async_send_command(
             "supports_cc_api",
             commandClass=command_class.value,
             require_schema=7,
