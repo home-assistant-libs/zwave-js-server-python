@@ -9,7 +9,7 @@ from ..const import (
     PowerLevel,
     SecurityClass,
 )
-from ..event import Event
+from ..event import Event, EventBase
 from ..exceptions import (
     FailedCommand,
     NotFoundError,
@@ -17,6 +17,7 @@ from ..exceptions import (
     UnwriteableValue,
 )
 from .command_class import CommandClassInfo, CommandClassInfoDataType
+from .device_class import DeviceClass, DeviceClassDataType
 from .device_config import DeviceConfig, DeviceConfigDataType
 from .endpoint import Endpoint, EndpointDataType
 from .firmware import (
@@ -290,9 +291,14 @@ class CheckHealthProgress:
     last_rating: int
 
 
-class NodeDataType(EndpointDataType):
+class NodeDataType(TypedDict, total=False):
     """Represent a node data dict type."""
 
+    nodeId: int  # required
+    index: int  # required
+    deviceClass: DeviceClassDataType  # required
+    installerIcon: int
+    userIcon: int
     name: str
     location: str
     status: int  # 0-4  # required
@@ -330,12 +336,13 @@ class NodeDataType(EndpointDataType):
     highestSecurityClass: int
 
 
-class Node(Endpoint):
+class Node(EventBase):
     """Represent a Z-Wave JS node."""
 
     def __init__(self, client: "Client", data: NodeDataType) -> None:
         """Initialize the node."""
-        super().__init__(client, data)
+        super().__init__()
+        self.client = client
         self.data: NodeDataType = data
         self._device_config = DeviceConfig(self.data.get("deviceConfig", {}))
         self._statistics = NodeStatistics(self.data.get("statistics"))
@@ -377,6 +384,31 @@ class Node(Endpoint):
         return (
             self.client.driver == other.client.driver and self.node_id == other.node_id
         )
+
+    @property
+    def node_id(self) -> int:
+        """Return node ID property."""
+        return self.data["nodeId"]
+
+    @property
+    def index(self) -> int:
+        """Return index property."""
+        return self.data["index"]
+
+    @property
+    def device_class(self) -> DeviceClass:
+        """Return the device_class."""
+        return DeviceClass(self.data["deviceClass"])
+
+    @property
+    def installer_icon(self) -> Optional[int]:
+        """Return installer icon property."""
+        return self.data.get("installerIcon")
+
+    @property
+    def user_icon(self) -> Optional[int]:
+        """Return user icon property."""
+        return self.data.get("userIcon")
 
     @property
     def status(self) -> NodeStatus:
@@ -585,8 +617,8 @@ class Node(Endpoint):
         """
         Send a node command. For internal use only.
 
-        If wait_for_result is not None, it will take precedence, otherwise we will decide to wait
-        or not based on the node status.
+        If wait_for_result is not None, it will take precedence, otherwise we will decide
+        to wait or not based on the node status.
         """
         kwargs = {}
         message = {"command": f"node.{cmd}", "nodeId": self.node_id, **cmd_kwargs}
@@ -712,6 +744,22 @@ class Node(Endpoint):
             or {}
         )
         return cast(bool, data.get("responded", False))
+
+    async def async_invoke_cc_api(
+        self,
+        command_class: CommandClass,
+        method_name: str,
+        *args: Any,
+        wait_for_result: Optional[bool] = None,
+    ) -> Any:
+        """Call endpoint.invoke_cc_api command."""
+        return await self.endpoints[0].async_invoke_cc_api(
+            command_class, method_name, *args, wait_for_result=wait_for_result
+        )
+
+    async def async_supports_cc_api(self, command_class: CommandClass) -> bool:
+        """Call endpoint.supports_cc_api command."""
+        return await self.endpoints[0].async_supports_cc_api(command_class)
 
     async def async_has_security_class(self, security_class: SecurityClass) -> bool:
         """Return whether node has the given security class."""
