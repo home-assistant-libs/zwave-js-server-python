@@ -34,7 +34,7 @@ class Endpoint(EventBase):
         self,
         client: "Client",
         data: EndpointDataType,
-        values: Dict[str, Union[ConfigurationValue, Value]] = None,
+        values: Dict[str, Union[ConfigurationValue, Value]],
     ) -> None:
         """Initialize."""
         super().__init__()
