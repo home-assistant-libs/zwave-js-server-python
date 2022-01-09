@@ -342,7 +342,7 @@ async def test_command_error_handling(client, mock_command):
 async def test_record_messages(wallmote_central_scene, mock_command, uuid4):
     """Test recording messages."""
     client = wallmote_central_scene.client
-    assert not client.messages_are_being_recorded
+    assert not client.recording_messages
     assert not client._recorded_commands
     assert not client._recorded_events
     client.begin_recording_messages()

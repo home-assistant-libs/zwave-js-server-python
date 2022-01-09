@@ -80,7 +80,7 @@ class Client:
         return self._client is not None and not self._client.closed
 
     @property
-    def messages_are_being_recorded(self) -> bool:
+    def recording_messages(self) -> bool:
         """Return True if messages are being recorded."""
         return self._record_messages
 
