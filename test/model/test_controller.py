@@ -13,6 +13,7 @@ from zwave_js_server.const import (
 from zwave_js_server.event import Event
 from zwave_js_server.model import association as association_pkg
 from zwave_js_server.model import controller as controller_pkg
+from zwave_js_server.model.controller_statistics import ControllerStatistics
 
 from .. import load_fixture
 
@@ -1132,7 +1133,7 @@ async def test_statistics_updated(controller):
     # Event should be modified with the ControllerStatistics object
     assert "statistics_updated" in event.data
     event_stats = event.data["statistics_updated"]
-    assert isinstance(event_stats, controller_pkg.ControllerStatistics)
+    assert isinstance(event_stats, ControllerStatistics)
     assert controller.statistics.nak == 1
     assert controller.statistics == event_stats
 
