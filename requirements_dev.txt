@@ -1,6 +1,7 @@
 -r requirements.txt
 -r requirements_lint.txt
 -r requirements_test.txt
-tox==3.24.4
+tox==3.24.5
+colorlog==6.6.0
 
 -e .
