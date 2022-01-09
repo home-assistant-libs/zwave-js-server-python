@@ -1,6 +1,17 @@
 """Represents the version from the server."""
 
 from dataclasses import dataclass
+from typing import TypedDict
+
+
+class VersionInfoDataType(TypedDict):
+    """Version info data dict type."""
+
+    driverVersion: str
+    serverVersion: str
+    homeId: int
+    minSchemaVersion: int
+    maxSchemaVersion: int
 
 
 @dataclass
@@ -14,7 +25,7 @@ class VersionInfo:
     max_schema_version: int
 
     @classmethod
-    def from_message(cls, msg: dict) -> "VersionInfo":
+    def from_message(cls, msg: VersionInfoDataType) -> "VersionInfo":
         """Create a version info from a version message."""
         return cls(
             driver_version=msg["driverVersion"],

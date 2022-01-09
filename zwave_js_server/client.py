@@ -22,7 +22,7 @@ from .exceptions import (
     NotConnected,
 )
 from .model.driver import Driver
-from .model.version import VersionInfo
+from .model.version import VersionInfo, VersionInfoDataType
 
 SIZE_PARSE_JSON_EXECUTOR = 8192
 
@@ -112,7 +112,7 @@ class Client:
             raise CannotConnect(err) from err
 
         self.version = version = VersionInfo.from_message(
-            await self._receive_json_or_raise()
+            cast(VersionInfoDataType, await self._receive_json_or_raise())
         )
 
         # basic check for server schema version compatability
