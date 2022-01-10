@@ -12,7 +12,8 @@ THERMOSTAT_SETPOINT_PROPERTY = "setpoint"
 THERMOSTAT_OPERATING_STATE_PROPERTY = "state"
 THERMOSTAT_CURRENT_TEMP_PROPERTY = "Air temperature"
 THERMOSTAT_HUMIDITY_PROPERTY = "Humidity"
-
+THERMOSTAT_FAN_MODE_PROPERTY = "mode"
+THERMOSTAT_FAN_OFF_PROPERTY = "off"
 
 class ThermostatMode(IntEnum):
     """Enum with all (known/used) Z-Wave ThermostatModes."""
