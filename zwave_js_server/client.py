@@ -344,7 +344,7 @@ class Client:
             if self._record_messages and msg["messageId"] not in LISTEN_MESSAGE_IDS:
                 self._recorded_commands[msg["messageId"]].update(
                     {
-                        "result_ts": _now().isoformat(),
+                        "result_ts": datetime.utcnow().isoformat(),
                         "result_msg": deepcopy(msg),
                     }
                 )
@@ -376,7 +376,7 @@ class Client:
             self._recorded_events.append(
                 {
                     "record_type": "event",
-                    "ts": _now().isoformat(),
+                    "ts": datetime.utcnow().isoformat(),
                     "type": msg["event"]["event"],
                     "event": deepcopy(msg),
                 }
@@ -400,10 +400,12 @@ class Client:
         assert "messageId" in message
 
         if self._record_messages and message["messageId"] not in LISTEN_MESSAGE_IDS:
+            # We don't need to deepcopy command_msg because it is always released by
+            # the caller after the command is sent.
             self._recorded_commands[message["messageId"]].update(
                 {
                     "record_type": "command",
-                    "ts": _now().isoformat(),
+                    "ts": datetime.utcnow().isoformat(),
                     "command": message["command"],
                     "command_msg": message,
                 }
@@ -421,7 +423,3 @@ class Client:
     ) -> None:
         """Disconnect from the websocket."""
         await self.disconnect()
-
-
-def _now() -> datetime:
-    return datetime.utcnow()

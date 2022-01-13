@@ -354,7 +354,9 @@ async def test_record_messages(wallmote_central_scene, mock_command, uuid4):
     with pytest.raises(InvalidState):
         client.begin_recording_messages()
 
-    with patch("zwave_js_server.client._now", return_value=datetime(2022, 1, 7, 1)):
+    with patch("zwave_js_server.client.datetime") as mock_dt:
+        mock_dt.utcnow.return_value = datetime(2022, 1, 7, 1)
+
         await client.async_send_command({"command": "some_command"})
 
     assert len(client._recorded_commands) == 1
@@ -375,7 +377,8 @@ async def test_record_messages(wallmote_central_scene, mock_command, uuid4):
     assert "ts" in client._recorded_commands[uuid4]
     assert "result_ts" in client._recorded_commands[uuid4]
 
-    with patch("zwave_js_server.client._now", return_value=datetime(2022, 1, 7, 0)):
+    with patch("zwave_js_server.client.datetime") as mock_dt:
+        mock_dt.utcnow.return_value = datetime(2022, 1, 7, 0)
         client._handle_incoming_message(
             {
                 "type": "event",
