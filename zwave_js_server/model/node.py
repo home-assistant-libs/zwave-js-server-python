@@ -418,8 +418,8 @@ class Node(EventBase):
         """
         Send a node command. For internal use only.
 
-        If wait_for_result is not None, it will take precedence, otherwise we will decide to wait
-        or not based on the node status.
+        If wait_for_result is not None, it will take precedence, otherwise we will decide
+        to wait or not based on the node status.
         """
         kwargs = {}
         message = {"command": f"node.{cmd}", "nodeId": self.node_id, **cmd_kwargs}
