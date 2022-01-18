@@ -39,6 +39,7 @@ class Endpoint(EventBase):
         """Initialize."""
         super().__init__()
         self.client = client
+        self.data: EndpointDataType = {}
         self.values: Dict[str, Union[ConfigurationValue, Value]] = {}
         self.update(data, values)
 

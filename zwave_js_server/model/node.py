@@ -106,8 +106,11 @@ class Node(EventBase):
         """Initialize the node."""
         super().__init__()
         self.client = client
-        self.values: Dict[str, Union[ConfigurationValue, Value]] = {}
+        self.data: NodeDataType = {}
+        self._device_config: DeviceConfig = DeviceConfig({})
+        self._statistics: NodeStatistics = NodeStatistics()
         self._firmware_update_progress: Optional[FirmwareUpdateProgress] = None
+        self.values: Dict[str, Union[ConfigurationValue, Value]] = {}
         self.endpoints: Dict[int, Endpoint] = {}
         self.update(data)
 
