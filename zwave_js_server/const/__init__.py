@@ -2,9 +2,9 @@
 from enum import Enum, IntEnum
 
 # minimal server schema version we can handle
-MIN_SERVER_SCHEMA_VERSION = 12
+MIN_SERVER_SCHEMA_VERSION = 14
 # max server schema version we can handle (and our code is compatible with)
-MAX_SERVER_SCHEMA_VERSION = 13
+MAX_SERVER_SCHEMA_VERSION = 14
 
 VALUE_UNKNOWN = "unknown"
 
@@ -264,3 +264,33 @@ class PowerLevel(IntEnum):
     DBM_MINUS_7 = 7
     DBM_MINUS_8 = 8
     DBM_MINUS_9 = 9
+
+
+class InclusionState(IntEnum):
+    """Enum for all known inclusion states."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/controller/Inclusion.ts#L154
+    IDLE = 0
+    INCLUDING = 1
+    EXCLUDING = 2
+    BUSY = 3
+    SMART_START = 4
+
+
+class RFRegion(IntEnum):
+    """Enum for all known RF regions."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/serialapi/misc/SerialAPISetupMessages.ts#L41
+    EUROPE = 0
+    USA = 1
+    AUSTRALIA_AND_NEW_ZEALAND = 2
+    HONG_KONG = 3
+    INDIA = 5
+    ISRAEL = 6
+    RUSSIA = 7
+    CHINA = 8
+    USA_LONG_RANGE = 9
+    JAPAN = 32
+    KOREA = 33
+    UNKNOWN = 254
+    DEFAULT_EU = 255

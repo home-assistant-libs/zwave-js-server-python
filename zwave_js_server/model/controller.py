@@ -14,9 +14,11 @@ from typing import (
 
 from ..const import (
     MINIMUM_QR_STRING_LENGTH,
+    InclusionState,
     InclusionStrategy,
     Protocols,
     QRCodeVersion,
+    RFRegion,
     SecurityClass,
     ZwaveFeature,
 )
@@ -24,6 +26,10 @@ from .controller_statistics import ControllerStatistics, ControllerStatisticsDat
 from ..event import Event, EventBase
 from .association import Association, AssociationGroup
 from .node import Node
+from ..util.helpers import (
+    convert_base64_to_bytes,
+    convert_bytes_to_base64,
+)
 
 if TYPE_CHECKING:
     from ..client import Client
@@ -90,6 +96,14 @@ class ProvisioningEntry:
                 k: v for k, v in data.items() if k not in {"dsk", "securityClasses"}
             },
         )
+
+
+@dataclass
+class NVMProgress:
+    """Class to represent an NVM backup/restore progress event."""
+
+    bytes_read_or_written: int
+    total_bytes: int
 
 
 @dataclass
@@ -205,6 +219,7 @@ class ControllerDataType(TypedDict, total=False):
     supportsTimers: bool
     isHealNetworkActive: bool
     statistics: ControllerStatisticsDataType
+    inclusionState: int
 
 
 class Controller(EventBase):
@@ -214,13 +229,12 @@ class Controller(EventBase):
         """Initialize controller."""
         super().__init__()
         self.client = client
-        self.data: ControllerDataType = state["controller"]
-        self._statistics = ControllerStatistics(self.data.get("statistics"))
         self.nodes: Dict[int, Node] = {}
         self._heal_network_progress: Optional[Dict[int, str]] = None
         for node_state in state["nodes"]:
             node = Node(client, node_state)
             self.nodes[node.node_id] = node
+        self.update(state["controller"])
 
     def __repr__(self) -> str:
         """Return the representation."""
@@ -335,6 +349,16 @@ class Controller(EventBase):
     def heal_network_progress(self) -> Optional[Dict[int, str]]:
         """Return heal network progress state."""
         return self._heal_network_progress
+
+    @property
+    def inclusion_state(self) -> InclusionState:
+        """Return inclusion state."""
+        return InclusionState(self.data["inclusionState"])
+
+    def update(self, data: ControllerDataType) -> None:
+        """Update controller data."""
+        self.data = data
+        self._statistics = ControllerStatistics(self.data.get("statistics"))
 
     async def async_begin_inclusion(
         self,
@@ -726,6 +750,72 @@ class Controller(EventBase):
         )
         return cast(Optional[bool], data.get("supported"))
 
+    async def async_get_state(self) -> None:
+        """Get controller state."""
+        data = await self.client.async_send_command(
+            {"command": "controller.get_state"}, require_schema=14
+        )
+        self.update(data["state"])
+
+    async def async_backup_nvm_raw(self) -> bytes:
+        """Send backupNVMRaw command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.backup_nvm_raw"}, require_schema=14
+        )
+        return convert_base64_to_bytes(data["nvmData"])
+
+    async def async_restore_nvm(self, file: bytes) -> None:
+        """Send restoreNVM command to Controller."""
+        await self.client.async_send_command(
+            {
+                "command": "controller.restore_nvm",
+                "nvmData": convert_bytes_to_base64(file),
+            },
+            require_schema=14,
+        )
+
+    async def async_get_power_level(self) -> Dict[str, int]:
+        """Send getPowerlevel command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.get_powerlevel"}, require_schema=14
+        )
+        return {
+            "power_level": data["powerlevel"],
+            "measured_0_dbm": data["measured0dBm"],
+        }
+
+    async def async_set_power_level(
+        self, power_level: int, measured_0_dbm: int
+    ) -> bool:
+        """Send setPowerlevel command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.set_powerlevel",
+                "powerlevel": power_level,
+                "measured0dBm": measured_0_dbm,
+            },
+            require_schema=14,
+        )
+        return cast(bool, data["success"])
+
+    async def async_get_rf_region(self) -> RFRegion:
+        """Send getRFRegion command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.get_rf_region"}, require_schema=14
+        )
+        return RFRegion(data["region"])
+
+    async def async_set_rf_region(self, rf_region: RFRegion) -> bool:
+        """Send setRFRegion command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.set_rf_region",
+                "region": rf_region.value,
+            },
+            require_schema=14,
+        )
+        return cast(bool, data["success"])
+
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
         if event.data["source"] == "node":
@@ -799,3 +889,21 @@ class Controller(EventBase):
 
     def handle_validate_dsk_and_enter_pin(self, event: Event) -> None:
         """Process a validate dsk and enter pin event."""
+
+    def handle_nvm_backup_progress(self, event: Event) -> None:
+        """Process a nvm backup progress event."""
+        event.data["nvm_backup_progress"] = NVMProgress(
+            event.data["bytesRead"], event.data["total"]
+        )
+
+    def handle_nvm_convert_progress(self, event: Event) -> None:
+        """Process a nvm convert progress event."""
+        event.data["nvm_convert_progress"] = NVMProgress(
+            event.data["bytesRead"], event.data["total"]
+        )
+
+    def handle_nvm_restore_progress(self, event: Event) -> None:
+        """Process a nvm restore progress event."""
+        event.data["nvm_restore_progress"] = NVMProgress(
+            event.data["bytesWritten"], event.data["total"]
+        )

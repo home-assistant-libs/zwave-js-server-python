@@ -39,8 +39,9 @@ class Endpoint(EventBase):
         """Initialize."""
         super().__init__()
         self.client = client
-        self.data = data
-        self.values = values
+        self.data: EndpointDataType = {}
+        self.values: Dict[str, Union[ConfigurationValue, Value]] = {}
+        self.update(data, values)
 
     @property
     def node_id(self) -> int:
@@ -67,6 +68,24 @@ class Endpoint(EventBase):
         """Return user icon property."""
         return self.data.get("userIcon")
 
+    def update(
+        self,
+        data: EndpointDataType,
+        values: Dict[str, Union[ConfigurationValue, Value]],
+    ) -> None:
+        """Update the endpoint data."""
+        self.data = data
+
+        # Remove stale values
+        self.values = {
+            value_id: val for value_id, val in self.values.items() if value_id in values
+        }
+
+        # Populate new values
+        for value_id, value in values.items():
+            if value_id not in self.values:
+                self.values[value_id] = value
+
     async def async_send_command(
         self,
         cmd: str,
@@ -77,8 +96,8 @@ class Endpoint(EventBase):
         """
         Send an endpoint command. For internal use only.
 
-        If wait_for_result is not None, it will take precedence, otherwise we will decide to wait
-        or not based on the node status.
+        If wait_for_result is not None, it will take precedence, otherwise we will decide
+        to wait or not based on the node status.
         """
         if self.client.driver is None:
             raise FailedCommand(

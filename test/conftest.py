@@ -2,6 +2,7 @@
 import asyncio
 import json
 from collections import deque
+from copy import deepcopy
 from typing import List, Tuple
 from unittest.mock import AsyncMock, Mock, patch
 
@@ -261,7 +262,7 @@ def version_data_fixture():
         "serverVersion": "test_server_version",
         "homeId": "test_home_id",
         "minSchemaVersion": 0,
-        "maxSchemaVersion": 13,
+        "maxSchemaVersion": 14,
     }
 
 
@@ -386,14 +387,14 @@ def mock_command_fixture(ws_client, client, uuid4):
 @pytest.fixture(name="driver")
 def driver_fixture(client, controller_state, log_config):
     """Return a driver instance with a supporting client."""
-    client.driver = Driver(client, controller_state, log_config)
+    client.driver = Driver(client, deepcopy(controller_state), log_config)
     return client.driver
 
 
 @pytest.fixture(name="multisensor_6")
 def multisensor_6_fixture(driver, multisensor_6_state):
     """Mock a multisensor 6 node."""
-    node = Node(driver.client, multisensor_6_state)
+    node = Node(driver.client, deepcopy(multisensor_6_state))
     driver.controller.nodes[node.node_id] = node
     return node
 
@@ -401,7 +402,7 @@ def multisensor_6_fixture(driver, multisensor_6_state):
 @pytest.fixture(name="lock_schlage_be469")
 def lock_schlage_be469_fixture(driver, lock_schlage_be469_state):
     """Mock a schlage lock node."""
-    node = Node(driver.client, lock_schlage_be469_state)
+    node = Node(driver.client, deepcopy(lock_schlage_be469_state))
     driver.controller.nodes[node.node_id] = node
     return node
 
@@ -411,7 +412,7 @@ def climate_radio_thermostat_ct100_plus_fixture(
     driver, climate_radio_thermostat_ct100_plus_state
 ):
     """Mock a radio thermostat node."""
-    node = Node(driver.client, climate_radio_thermostat_ct100_plus_state)
+    node = Node(driver.client, deepcopy(climate_radio_thermostat_ct100_plus_state))
     driver.controller.nodes[node.node_id] = node
     return node
 
@@ -419,7 +420,7 @@ def climate_radio_thermostat_ct100_plus_fixture(
 @pytest.fixture(name="cover_qubino_shutter")
 def cover_qubino_shutter_fixture(driver, cover_qubino_shutter_state):
     """Mock a qubino shutter cover node."""
-    node = Node(driver.client, cover_qubino_shutter_state)
+    node = Node(driver.client, deepcopy(cover_qubino_shutter_state))
     driver.controller.nodes[node.node_id] = node
     return node
 
@@ -427,7 +428,7 @@ def cover_qubino_shutter_fixture(driver, cover_qubino_shutter_state):
 @pytest.fixture(name="wallmote_central_scene")
 def wallmote_central_scene_fixture(driver, wallmote_central_scene_state):
     """Mock a wallmote central scene node."""
-    node = Node(driver.client, wallmote_central_scene_state)
+    node = Node(driver.client, deepcopy(wallmote_central_scene_state))
     driver.controller.nodes[node.node_id] = node
     return node
 
@@ -435,14 +436,14 @@ def wallmote_central_scene_fixture(driver, wallmote_central_scene_state):
 @pytest.fixture(name="controller")
 def controller_fixture(driver, controller_state):
     """Return a controller instance with a supporting client."""
-    controller = Controller(driver.client, controller_state)
+    controller = Controller(driver.client, deepcopy(controller_state))
     return controller
 
 
 @pytest.fixture(name="inovelli_switch")
 def inovelli_switch_fixture(driver, inovelli_switch_state):
     """Mock a inovelli switch node."""
-    node = Node(driver.client, inovelli_switch_state)
+    node = Node(driver.client, deepcopy(inovelli_switch_state))
     driver.controller.nodes[node.node_id] = node
     return node
 
@@ -450,7 +451,7 @@ def inovelli_switch_fixture(driver, inovelli_switch_state):
 @pytest.fixture(name="ring_keypad")
 def ring_keypad_fixture(driver, ring_keypad_state):
     """Mock a ring keypad node."""
-    node = Node(driver.client, ring_keypad_state)
+    node = Node(driver.client, deepcopy(ring_keypad_state))
     driver.controller.nodes[node.node_id] = node
     return node
 
@@ -458,7 +459,7 @@ def ring_keypad_fixture(driver, ring_keypad_state):
 @pytest.fixture(name="partial_and_full_parameter")
 def partial_and_full_parameter_fixture(driver, partial_and_full_parameter_state):
     """Mock a node that has both partial and full parameters."""
-    node = Node(driver.client, partial_and_full_parameter_state)
+    node = Node(driver.client, deepcopy(partial_and_full_parameter_state))
     driver.controller.nodes[node.node_id] = node
     return node
 
@@ -468,6 +469,6 @@ def invalid_multilevel_sensor_type_fixture(
     driver, invalid_multilevel_sensor_type_state
 ):
     """Mock a node that has invalid multilevel sensor type."""
-    node = Node(driver.client, invalid_multilevel_sensor_type_state)
+    node = Node(driver.client, deepcopy(invalid_multilevel_sensor_type_state))
     driver.controller.nodes[node.node_id] = node
     return node
