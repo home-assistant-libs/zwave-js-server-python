@@ -1,6 +1,8 @@
 """Test the client."""
 import asyncio
-from unittest.mock import Mock
+from datetime import datetime
+import logging
+from unittest.mock import Mock, patch
 
 import pytest
 from aiohttp.client_exceptions import ClientError, WSServerHandshakeError
@@ -335,3 +337,101 @@ async def test_command_error_handling(client, mock_command):
     assert raised.value.error_code == "zwave_error"
     assert raised.value.zwave_error_code == 3
     assert raised.value.zwave_error_message == "Node 5 is dead"
+
+
+async def test_record_messages(wallmote_central_scene, mock_command, uuid4):
+    """Test recording messages."""
+    client = wallmote_central_scene.client
+    assert not client.recording_messages
+    assert not client._recorded_commands
+    assert not client._recorded_events
+    client.begin_recording_messages()
+    mock_command(
+        {"command": "some_command"},
+        {},
+    )
+
+    with pytest.raises(InvalidState):
+        client.begin_recording_messages()
+
+    with patch("zwave_js_server.client.datetime") as mock_dt:
+        mock_dt.utcnow.return_value = datetime(2022, 1, 7, 1)
+
+        await client.async_send_command({"command": "some_command"})
+
+    assert len(client._recorded_commands) == 1
+    assert len(client._recorded_events) == 0
+    assert uuid4 in client._recorded_commands
+    assert client._recorded_commands[uuid4]["record_type"] == "command"
+    assert client._recorded_commands[uuid4]["command"] == "some_command"
+    assert client._recorded_commands[uuid4]["command_msg"] == {
+        "command": "some_command",
+        "messageId": uuid4,
+    }
+    assert client._recorded_commands[uuid4]["result_msg"] == {
+        "messageId": "1234",
+        "result": {},
+        "success": True,
+        "type": "result",
+    }
+    assert "ts" in client._recorded_commands[uuid4]
+    assert "result_ts" in client._recorded_commands[uuid4]
+
+    with patch("zwave_js_server.client.datetime") as mock_dt:
+        mock_dt.utcnow.return_value = datetime(2022, 1, 7, 0)
+        client._handle_incoming_message(
+            {
+                "type": "event",
+                "event": {
+                    "source": "node",
+                    "event": "value updated",
+                    "nodeId": wallmote_central_scene.node_id,
+                    "args": {
+                        "commandClassName": "Binary Switch",
+                        "commandClass": 37,
+                        "endpoint": 0,
+                        "property": "currentValue",
+                        "newValue": False,
+                        "prevValue": True,
+                        "propertyName": "currentValue",
+                    },
+                },
+            }
+        )
+    assert len(client._recorded_commands) == 1
+    assert len(client._recorded_events) == 1
+    logging.getLogger(__name__).error(client._recorded_events)
+    event = client._recorded_events[0]
+    assert event["record_type"] == "event"
+    assert event["type"] == "value updated"
+    assert event["event"] == {
+        "type": "event",
+        "event": {
+            "source": "node",
+            "event": "value updated",
+            "nodeId": wallmote_central_scene.node_id,
+            "args": {
+                "commandClassName": "Binary Switch",
+                "commandClass": 37,
+                "endpoint": 0,
+                "property": "currentValue",
+                "newValue": False,
+                "prevValue": True,
+                "propertyName": "currentValue",
+            },
+        },
+    }
+    assert "ts" in event
+
+    replay_dump = client.end_recording_messages()
+
+    assert len(replay_dump) == 2
+    assert len(client._recorded_commands) == 0
+    assert len(client._recorded_events) == 0
+
+    # Testing that events are properly sorted by timestamp. Even though the event
+    # comes after the command in the code, the patch should make the event appear first
+    assert replay_dump[0]["record_type"] == "event"
+
+    with pytest.raises(InvalidState):
+        client.end_recording_messages()

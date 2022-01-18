@@ -1,10 +1,14 @@
 """Client."""
 import asyncio
+from collections import defaultdict
+from copy import deepcopy
+from datetime import datetime
 import logging
+from operator import itemgetter
 import pprint
 import uuid
 from types import TracebackType
-from typing import Any, Dict, Optional, cast
+from typing import Any, DefaultDict, Dict, List, Optional, cast
 
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, client_exceptions
 
@@ -26,6 +30,17 @@ from .model.version import VersionInfo, VersionInfoDataType
 
 SIZE_PARSE_JSON_EXECUTOR = 8192
 
+# Message IDs
+SET_API_SCHEMA_MESSAGE_ID = "api-schema-id"
+GET_INITIAL_LOG_CONFIG_MESSAGE_ID = "get-initial-log-config"
+START_LISTENING_MESSAGE_ID = "listen-id"
+
+LISTEN_MESSAGE_IDS = (
+    GET_INITIAL_LOG_CONFIG_MESSAGE_ID,
+    SET_API_SCHEMA_MESSAGE_ID,
+    START_LISTENING_MESSAGE_ID,
+)
+
 
 class Client:
     """Class to manage the IoT connection."""
@@ -35,6 +50,7 @@ class Client:
         ws_server_url: str,
         aiohttp_session: ClientSession,
         schema_version: int = MAX_SERVER_SCHEMA_VERSION,
+        record_messages: bool = False,
     ):
         """Initialize the Client class."""
         self.ws_server_url = ws_server_url
@@ -49,6 +65,9 @@ class Client:
         self._loop = asyncio.get_running_loop()
         self._result_futures: Dict[str, asyncio.Future] = {}
         self._shutdown_complete_event: Optional[asyncio.Event] = None
+        self._record_messages = record_messages
+        self._recorded_commands: DefaultDict[str, dict] = defaultdict(dict)
+        self._recorded_events: List[dict] = []
 
     def __repr__(self) -> str:
         """Return the representation."""
@@ -59,6 +78,11 @@ class Client:
     def connected(self) -> bool:
         """Return if we're currently connected."""
         return self._client is not None and not self._client.closed
+
+    @property
+    def recording_messages(self) -> bool:
+        """Return True if messages are being recorded."""
+        return self._record_messages
 
     async def async_send_command(
         self,
@@ -150,7 +174,7 @@ class Client:
         await self._send_json_message(
             {
                 "command": "set_api_schema",
-                "messageId": "api-schema-id",
+                "messageId": SET_API_SCHEMA_MESSAGE_ID,
                 "schemaVersion": self.schema_version,
             }
         )
@@ -174,7 +198,7 @@ class Client:
             await self._send_json_message(
                 {
                     "command": "driver.get_log_config",
-                    "messageId": "get-initial-log-config",
+                    "messageId": GET_INITIAL_LOG_CONFIG_MESSAGE_ID,
                 }
             )
 
@@ -188,7 +212,7 @@ class Client:
             # send start_listening command to the server
             # we will receive a full state dump and from now on get events
             await self._send_json_message(
-                {"command": "start_listening", "messageId": "listen-id"}
+                {"command": "start_listening", "messageId": START_LISTENING_MESSAGE_ID}
             )
 
             state_msg = await self._receive_json_or_raise()
@@ -255,6 +279,29 @@ class Client:
         self._shutdown_complete_event = None
         self.driver = None
 
+    def begin_recording_messages(self) -> None:
+        """Begin recording messages for replay later."""
+        if self._record_messages:
+            raise InvalidState("Already recording messages")
+
+        self._record_messages = True
+
+    def end_recording_messages(self) -> List[dict]:
+        """End recording messages and return messages that were recorded."""
+        if not self._record_messages:
+            raise InvalidState("Not recording messages")
+
+        self._record_messages = False
+
+        data = sorted(
+            (*self._recorded_commands.values(), *self._recorded_events),
+            key=itemgetter("ts"),
+        )
+        self._recorded_commands.clear()
+        self._recorded_events.clear()
+
+        return list(data)
+
     async def _receive_json_or_raise(self) -> dict:
         """Receive json or raise."""
         assert self._client
@@ -294,6 +341,14 @@ class Client:
                 # no listener for this result
                 return
 
+            if self._record_messages and msg["messageId"] not in LISTEN_MESSAGE_IDS:
+                self._recorded_commands[msg["messageId"]].update(
+                    {
+                        "result_ts": datetime.utcnow().isoformat(),
+                        "result_msg": deepcopy(msg),
+                    }
+                )
+
             if msg["success"]:
                 future.set_result(msg["result"])
                 return
@@ -317,6 +372,16 @@ class Client:
             )
             return
 
+        if self._record_messages:
+            self._recorded_events.append(
+                {
+                    "record_type": "event",
+                    "ts": datetime.utcnow().isoformat(),
+                    "type": msg["event"]["event"],
+                    "event": deepcopy(msg),
+                }
+            )
+
         event = Event(type=msg["event"]["event"], data=msg["event"])
         self.driver.receive_event(event)  # type: ignore
 
@@ -333,6 +398,18 @@ class Client:
 
         assert self._client
         assert "messageId" in message
+
+        if self._record_messages and message["messageId"] not in LISTEN_MESSAGE_IDS:
+            # We don't need to deepcopy command_msg because it is always released by
+            # the caller after the command is sent.
+            self._recorded_commands[message["messageId"]].update(
+                {
+                    "record_type": "command",
+                    "ts": datetime.utcnow().isoformat(),
+                    "command": message["command"],
+                    "command_msg": message,
+                }
+            )
 
         await self._client.send_json(message)
 
