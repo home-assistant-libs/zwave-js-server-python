@@ -339,7 +339,7 @@ class Node(EventBase):
 
     def update(self, data: NodeDataType) -> None:
         """Update the internal state data."""
-        self.data: NodeDataType = data
+        self.data = data
         self._device_config = DeviceConfig(self.data.get("deviceConfig", {}))
         self._statistics = NodeStatistics(self.data.get("statistics"))
 

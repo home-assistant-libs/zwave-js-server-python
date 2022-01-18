@@ -74,7 +74,7 @@ class Endpoint(EventBase):
         values: Dict[str, Union[ConfigurationValue, Value]],
     ) -> None:
         """Update the endpoint data."""
-        self.data: EndpointDataType = data
+        self.data = data
 
         # Remove stale values
         self.values = {
