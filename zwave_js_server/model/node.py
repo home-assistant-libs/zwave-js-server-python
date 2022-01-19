@@ -15,7 +15,7 @@ from ..exceptions import (
     UnparseableValue,
     UnwriteableValue,
 )
-from .command_class import CommandClassInfo, CommandClassInfoDataType
+from .command_class import CommandClassInfo
 from .device_class import DeviceClass, DeviceClassDataType
 from .device_config import DeviceConfig, DeviceConfigDataType
 from .endpoint import Endpoint, EndpointDataType
@@ -92,7 +92,6 @@ class NodeDataType(TypedDict, total=False):
     aggregatedEndpointCount: int
     interviewAttempts: int
     interviewStage: Optional[Union[int, str]]
-    commandClasses: List[CommandClassInfoDataType]
     values: List[ValueDataType]
     statistics: NodeStatisticsDataType
     highestSecurityClass: int
@@ -308,7 +307,7 @@ class Node(EventBase):
     @property
     def command_classes(self) -> List[CommandClassInfo]:
         """Return all CommandClasses supported on this node."""
-        return [CommandClassInfo(cc) for cc in self.data["commandClasses"]]
+        return self.endpoints[0].command_classes
 
     @property
     def statistics(self) -> NodeStatistics:
