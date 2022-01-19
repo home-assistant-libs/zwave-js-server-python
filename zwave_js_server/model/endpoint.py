@@ -4,12 +4,12 @@ Model for a Zwave Node's endpoints.
 https://zwave-js.github.io/node-zwave-js/#/api/endpoint?id=endpoint-properties
 """
 
-from typing import TYPE_CHECKING, Any, Dict, Optional, TypedDict, Union, cast
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
 
 from ..const import NodeStatus
 from ..event import EventBase
 from ..exceptions import FailedCommand
-from .command_class import CommandClass
+from .command_class import CommandClass, CommandClassInfo, CommandClassInfoDataType
 from .device_class import DeviceClass, DeviceClassDataType
 from .value import ConfigurationValue, Value
 
@@ -25,6 +25,7 @@ class EndpointDataType(TypedDict, total=False):
     deviceClass: DeviceClassDataType  # required
     installerIcon: int
     userIcon: int
+    commandClasses: List[CommandClassInfoDataType]
 
 
 class Endpoint(EventBase):
@@ -67,6 +68,11 @@ class Endpoint(EventBase):
     def user_icon(self) -> Optional[int]:
         """Return user icon property."""
         return self.data.get("userIcon")
+
+    @property
+    def command_classes(self) -> List[CommandClassInfo]:
+        """Return all CommandClasses supported on this node."""
+        return [CommandClassInfo(cc) for cc in self.data["commandClasses"]]
 
     def update(
         self,
