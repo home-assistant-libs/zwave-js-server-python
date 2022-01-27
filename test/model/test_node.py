@@ -473,9 +473,10 @@ async def test_node_status_events(multisensor_6):
 async def test_value_added_events(multisensor_6):
     """Test Node value added events for new value."""
     node = multisensor_6
+    value_id = "52-112-0-6"
     # Validate that the value doesn't exist in the node state data
     with pytest.raises(StopIteration):
-        node.value_idx_from_val_data("52-112-0-6")
+        node.value_data_idx(value_id)
     event = Event(
         type="value added",
         data={
@@ -509,14 +510,15 @@ async def test_value_added_events(multisensor_6):
     )
     node.handle_value_added(event)
     assert isinstance(event.data["value"], ConfigurationValue)
-    assert isinstance(node.values["52-112-0-6"], ConfigurationValue)
+    assert isinstance(node.values[value_id], ConfigurationValue)
     # ensure that the value was added to the node's state data
-    assert node.value_idx_from_val_data("52-112-0-6")
+    assert node.value_data_idx(value_id)
 
 
 async def test_value_updated_events(multisensor_6):
     """Test Node value updated events."""
     node = multisensor_6
+    value_id = "52-112-0-2"
     event = Event(
         type="value updated",
         data={
@@ -536,9 +538,9 @@ async def test_value_updated_events(multisensor_6):
     )
     node.handle_value_updated(event)
     assert isinstance(event.data["value"], ConfigurationValue)
-    assert isinstance(node.values["52-112-0-2"], ConfigurationValue)
+    assert isinstance(node.values[value_id], ConfigurationValue)
     # ensure that the value was added to the node's state data
-    assert (value_idx := node.value_idx_from_val_data("52-112-0-2"))
+    assert (value_idx := node.value_data_idx(value_id))
     # ensure that the node's state data was updated and that old keys were removed
     assert (value_data := node.data["values"][value_idx]) is not None
     assert value_data["metadata"]
@@ -546,7 +548,7 @@ async def test_value_updated_events(multisensor_6):
     assert "newValue" not in value_data
     assert "prevValue" not in value_data
     # ensure that the value's state data was updated and that old keys were removed
-    val = node.values["52-112-0-2"]
+    val = node.values[value_id]
     assert val.data["value"] == 1
     assert "newValue" not in val.data
     assert "prevValue" not in val.data
@@ -555,6 +557,7 @@ async def test_value_updated_events(multisensor_6):
 async def test_value_removed_events(multisensor_6):
     """Test Node value removed events."""
     node = multisensor_6
+    value_id = "52-112-0-2"
     event = Event(
         type="value removed",
         data={
@@ -574,10 +577,10 @@ async def test_value_removed_events(multisensor_6):
     node.handle_value_removed(event)
     assert isinstance(event.data["value"], ConfigurationValue)
     # ensure that the value was removed form the nodes value's dict
-    assert node.values.get("52-112-0-2") is None
+    assert node.values.get(value_id) is None
     # ensure that the value was removed from the node's state data
     with pytest.raises(StopIteration):
-        node.value_idx_from_val_data("52-112-0-2")
+        node.value_data_idx(value_id)
 
 
 async def test_value_notification(wallmote_central_scene: node_pkg.Node):

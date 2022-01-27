@@ -752,8 +752,8 @@ class Node(EventBase):
         """Process a node value added event."""
         self.handle_value_updated(event)
 
-    def value_idx_from_val_data(self, value_id: str) -> int:
-        """Get the index of the value dict in the node's value data."""
+    def value_data_idx(self, value_id: str) -> int:
+        """Get the index for the given value ID in the node's value data."""
         values = self.data["values"]
         return next(
             idx
@@ -773,11 +773,11 @@ class Node(EventBase):
         else:
             value.receive_event(event)
             event.data["value"] = value
-            self.data["values"][self.value_idx_from_val_data(value_id)].update(
+            self.data["values"][self.value_data_idx(value_id)].update(
                 evt_val_data
             )
 
-        node_val_data = self.data["values"][self.value_idx_from_val_data(value_id)]
+        node_val_data = self.data["values"][self.value_data_idx(value_id)]
         if "newValue" in evt_val_data:
             node_val_data["value"] = evt_val_data["newValue"]
 
@@ -788,7 +788,7 @@ class Node(EventBase):
         """Process a node value removed event."""
         value_id = _get_value_id_from_dict(self, event.data["args"])
         event.data["value"] = self.values.pop(value_id)
-        self.data["values"].pop(self.value_idx_from_val_data(value_id))
+        self.data["values"].pop(self.value_data_idx(value_id))
 
     def handle_value_notification(self, event: Event) -> None:
         """Process a node value notification event."""
