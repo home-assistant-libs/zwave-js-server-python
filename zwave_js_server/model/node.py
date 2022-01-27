@@ -773,9 +773,7 @@ class Node(EventBase):
         else:
             value.receive_event(event)
             event.data["value"] = value
-            self.data["values"][self.value_data_idx(value_id)].update(
-                evt_val_data
-            )
+            self.data["values"][self.value_data_idx(value_id)].update(evt_val_data)
 
         node_val_data = self.data["values"][self.value_data_idx(value_id)]
         if "newValue" in evt_val_data:
