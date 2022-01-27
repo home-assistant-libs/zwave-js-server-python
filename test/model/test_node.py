@@ -552,6 +552,34 @@ async def test_value_updated_events(multisensor_6):
     assert "prevValue" not in val.data
 
 
+async def test_value_removed_events(multisensor_6):
+    """Test Node value removed events."""
+    node = multisensor_6
+    event = Event(
+        type="value removed",
+        data={
+            "source": "node",
+            "event": "value removed",
+            "nodeId": 52,
+            "args": {
+                "commandClassName": "Configuration",
+                "commandClass": 112,
+                "endpoint": 0,
+                "property": 2,
+                "propertyName": "Stay Awake in Battery Mode",
+                "prevValue": 0,
+            },
+        },
+    )
+    node.handle_value_removed(event)
+    assert isinstance(event.data["value"], ConfigurationValue)
+    # ensure that the value was removed form the nodes value's dict
+    assert node.values.get("52-112-0-2") is None
+    # ensure that the value was removed from the node's state data
+    with pytest.raises(StopIteration):
+        node.value_idx_from_val_data("52-112-0-2")
+
+
 async def test_value_notification(wallmote_central_scene: node_pkg.Node):
     """Test value notification events."""
     node = wallmote_central_scene
