@@ -471,8 +471,11 @@ async def test_node_status_events(multisensor_6):
 
 
 async def test_value_added_events(multisensor_6):
-    """Test Node value added events."""
+    """Test Node value added events for new value."""
     node = multisensor_6
+    # Validate that the value doesn't exist in the node state data
+    with pytest.raises(StopIteration):
+        node.value_idx_from_val_data("52-112-0-6")
     event = Event(
         type="value added",
         data={
@@ -483,7 +486,7 @@ async def test_value_added_events(multisensor_6):
                 "commandClassName": "Configuration",
                 "commandClass": 112,
                 "endpoint": 0,
-                "property": 2,
+                "property": 6,
                 "propertyName": "Stay Awake in Battery Mode",
                 "metadata": {
                     "type": "number",
@@ -506,7 +509,47 @@ async def test_value_added_events(multisensor_6):
     )
     node.handle_value_added(event)
     assert isinstance(event.data["value"], ConfigurationValue)
+    assert isinstance(node.values["52-112-0-6"], ConfigurationValue)
+    # ensure that the value was added to the node's state data
+    assert node.value_idx_from_val_data("52-112-0-6")
+
+
+async def test_value_updated_events(multisensor_6):
+    """Test Node value updated events."""
+    node = multisensor_6
+    event = Event(
+        type="value updated",
+        data={
+            "source": "node",
+            "event": "value updated",
+            "nodeId": 52,
+            "args": {
+                "commandClassName": "Configuration",
+                "commandClass": 112,
+                "endpoint": 0,
+                "property": 2,
+                "propertyName": "Stay Awake in Battery Mode",
+                "newValue": 1,
+                "prevValue": 0,
+            },
+        },
+    )
+    node.handle_value_updated(event)
+    assert isinstance(event.data["value"], ConfigurationValue)
     assert isinstance(node.values["52-112-0-2"], ConfigurationValue)
+    # ensure that the value was added to the node's state data
+    assert (value_idx := node.value_idx_from_val_data("52-112-0-2"))
+    # ensure that the node's state data was updated and that old keys were removed
+    assert (value_data := node.data["values"][value_idx]) is not None
+    assert value_data["metadata"]
+    assert value_data["value"] == 1
+    assert "newValue" not in value_data
+    assert "prevValue" not in value_data
+    # ensure that the value's state data was updated and that old keys were removed
+    val = node.values["52-112-0-2"]
+    assert val.data["value"] == 1
+    assert "newValue" not in val.data
+    assert "prevValue" not in val.data
 
 
 async def test_value_notification(wallmote_central_scene: node_pkg.Node):

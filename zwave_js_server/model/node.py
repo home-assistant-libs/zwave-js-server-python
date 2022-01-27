@@ -752,21 +752,43 @@ class Node(EventBase):
         """Process a node value added event."""
         self.handle_value_updated(event)
 
+    def value_idx_from_val_data(self, value_id: str) -> int:
+        """Get the index of the value dict in the node's value data."""
+        values = self.data["values"]
+        return next(
+            idx
+            for idx in range(len(values))
+            if _get_value_id_from_dict(self, values[idx]) == value_id
+        )
+
     def handle_value_updated(self, event: Event) -> None:
         """Process a node value updated event."""
-        value = self.values.get(_get_value_id_from_dict(self, event.data["args"]))
+        evt_val_data: ValueDataType = event.data["args"]
+        value_id = _get_value_id_from_dict(self, evt_val_data)
+        value = self.values.get(value_id)
         if value is None:
-            value = _init_value(self, event.data["args"])
+            value = _init_value(self, evt_val_data)
             self.values[value.value_id] = event.data["value"] = value
+            self.data["values"].append(evt_val_data)
         else:
             value.receive_event(event)
             event.data["value"] = value
+            self.data["values"][self.value_idx_from_val_data(value_id)].update(
+                evt_val_data
+            )
+
+        node_val_data = self.data["values"][self.value_idx_from_val_data(value_id)]
+        if "newValue" in evt_val_data:
+            node_val_data["value"] = evt_val_data["newValue"]
+
+        node_val_data.pop("newValue", None)
+        node_val_data.pop("prevValue", None)
 
     def handle_value_removed(self, event: Event) -> None:
         """Process a node value removed event."""
-        event.data["value"] = self.values.pop(
-            _get_value_id_from_dict(self, event.data["args"])
-        )
+        value_id = _get_value_id_from_dict(self, event.data["args"])
+        event.data["value"] = self.values.pop(value_id)
+        self.data["values"].pop(self.value_idx_from_val_data(value_id))
 
     def handle_value_notification(self, event: Event) -> None:
         """Process a node value notification event."""
