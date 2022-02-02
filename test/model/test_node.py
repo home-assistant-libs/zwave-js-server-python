@@ -576,7 +576,7 @@ async def test_value_removed_events(multisensor_6):
     )
     node.handle_value_removed(event)
     assert isinstance(event.data["value"], ConfigurationValue)
-    # ensure that the value was removed form the nodes value's dict
+    # ensure that the value was removed from the nodes value's dict
     assert node.values.get(value_id) is None
     # ensure that the value was removed from the node's state data
     with pytest.raises(StopIteration):
