@@ -254,11 +254,14 @@ class Value:
         """Update data."""
         self.data.update(data)
         if "newValue" in data:
-            self._value = data["newValue"]
+            self._value = self.data["value"] = data["newValue"]
         if "value" in data:
-            self._value = data["value"]
+            self._value = self.data["value"] = data["value"]
         if "metadata" in data:
             self._metadata.update(data["metadata"])
+
+        self.data.pop("newValue", None)
+        self.data.pop("prevValue", None)
 
         # Handle buffer dict and json string in value.
         if self.metadata.type == "buffer":
