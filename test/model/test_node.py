@@ -519,6 +519,11 @@ async def test_value_updated_events(multisensor_6):
     """Test Node value updated events."""
     node = multisensor_6
     value_id = "52-112-0-2"
+    # ensure that the value is in the node's state data
+    assert (value_idx := node.value_data_idx(value_id))
+    # assert the old value of the ZwaveValue
+    assert (value_data := node.data["values"][value_idx]) is not None
+    assert value_data["value"] == node.values[value_id].value == 0
     event = Event(
         type="value updated",
         data={
@@ -539,7 +544,7 @@ async def test_value_updated_events(multisensor_6):
     node.handle_value_updated(event)
     assert isinstance(event.data["value"], ConfigurationValue)
     assert isinstance(node.values[value_id], ConfigurationValue)
-    # ensure that the value was added to the node's state data
+    # ensure that the value is in to the node's state data
     assert (value_idx := node.value_data_idx(value_id))
     # ensure that the node's state data was updated and that old keys were removed
     assert (value_data := node.data["values"][value_idx]) is not None
