@@ -3,7 +3,6 @@ Model for a Zwave Node's device config.
 
 https://zwave-js.github.io/node-zwave-js/#/api/node?id=deviceconfig
 """
-from ctypes import cast
 from typing import Dict, List, Literal, Optional, TypedDict, Union
 
 
