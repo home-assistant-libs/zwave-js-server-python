@@ -102,7 +102,9 @@ async def test_highest_security_value(lock_schlage_be469, ring_keypad):
     assert ring_keypad.highest_security_class is None
 
 
-async def test_device_config(wallmote_central_scene):
+async def test_device_config(
+    wallmote_central_scene, climate_radio_thermostat_ct100_plus
+):
     """Test a device config."""
     node: node_pkg.Node = wallmote_central_scene
 
@@ -143,9 +145,12 @@ async def test_device_config(wallmote_central_scene):
         "https://products.z-wavealliance.org/ProductManual/File?folder=&filename=MarketCertificationFiles/2479/ZP3111-5_R2_20170316.pdf"
     )
     assert device_config.metadata.wakeup is None
+    assert device_config.metadata.comments == [{"level": "info", "text": "test"}]
     assert device_config.associations == {}
     assert device_config.param_information == {"_map": {}}
     assert device_config.supports_zwave_plus is None
+
+    assert climate_radio_thermostat_ct100_plus.device_config.metadata.comments == []
 
 
 async def test_unknown_values(cover_qubino_shutter):

@@ -3,7 +3,7 @@ Model for a Zwave Node's device config.
 
 https://zwave-js.github.io/node-zwave-js/#/api/node?id=deviceconfig
 """
-from typing import Dict, List, Optional, TypedDict
+from typing import Dict, List, Literal, Optional, TypedDict, Union
 
 
 class DeviceDeviceDataType(TypedDict, total=False):
@@ -56,6 +56,15 @@ class DeviceFirmwareVersionRange:
         return self.data.get("max")
 
 
+class CommentDataType(TypedDict):
+    """Represent a device config's comment data dict type."""
+
+    # See PR for suggested meanings of each level:
+    # https://github.com/zwave-js/node-zwave-js/pull/3947
+    level: Literal["info", "warning", "error"]
+    text: str
+
+
 class DeviceMetadataDataType(TypedDict, total=False):
     """Represent a device metadata data dict type."""
 
@@ -64,6 +73,7 @@ class DeviceMetadataDataType(TypedDict, total=False):
     exclusion: str
     reset: str
     manual: str
+    comments: Union[CommentDataType, List[CommentDataType]]
 
 
 class DeviceMetadata:
@@ -97,6 +107,14 @@ class DeviceMetadata:
     def manual(self) -> Optional[str]:
         """Return manual instructions."""
         return self.data.get("manual")
+
+    @property
+    def comments(self) -> List[CommentDataType]:
+        """Return list of comments about device."""
+        comments = self.data.get("comments", [])
+        if isinstance(comments, dict):
+            return [comments]
+        return comments
 
 
 class DeviceConfigDataType(TypedDict, total=False):
