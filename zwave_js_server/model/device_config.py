@@ -59,6 +59,8 @@ class DeviceFirmwareVersionRange:
 class CommentDataType(TypedDict):
     """Represent a device config's comment data dict type."""
 
+    # See PR for suggested meanings of each level:
+    # https://github.com/zwave-js/node-zwave-js/pull/3947
     level: Literal["info", "warning", "error"]
     text: str
 
