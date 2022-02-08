@@ -119,7 +119,6 @@ def messages_fixture():
 
 @pytest.fixture(name="ws_client")
 async def ws_client_fixture(
-    loop,
     version_data,
     ws_message,
     result,
@@ -181,7 +180,6 @@ async def ws_client_fixture(
 
 @pytest.fixture(name="no_get_log_config_ws_client")
 async def no_get_log_config_ws_client_fixture(
-    loop,
     version_data,
     ws_message,
     result,
@@ -236,7 +234,7 @@ async def no_get_log_config_ws_client_fixture(
 
 
 @pytest.fixture(name="await_other")
-async def await_other_fixture(loop):
+async def await_other_fixture():
     """Await all other task but the current task."""
 
     async def wait_for_tasks(current_task):
@@ -248,7 +246,7 @@ async def await_other_fixture(loop):
 
 
 @pytest.fixture(name="driver_ready")
-async def driver_ready_fixture(loop):
+async def driver_ready_fixture():
     """Return an asyncio.Event for driver ready."""
     return asyncio.Event()
 
@@ -333,7 +331,7 @@ def mock_uuid_fixture():
 
 
 @pytest.fixture(name="client")
-async def client_fixture(loop, client_session, ws_client, uuid4):
+async def client_fixture(client_session, ws_client, uuid4):
     """Return a client with a mock websocket transport.
 
     This fixture needs to be a coroutine function to get an event loop
