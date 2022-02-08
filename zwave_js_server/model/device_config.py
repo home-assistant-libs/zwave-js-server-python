@@ -3,6 +3,7 @@ Model for a Zwave Node's device config.
 
 https://zwave-js.github.io/node-zwave-js/#/api/node?id=deviceconfig
 """
+from ctypes import cast
 from typing import Dict, List, Literal, Optional, TypedDict, Union
 
 
@@ -113,8 +114,8 @@ class DeviceMetadata:
         """Return list of comments about device."""
         comments = self.data.get("comments", [])
         if isinstance(comments, dict):
-            return [CommentDataType(**comments)]
-        return [CommentDataType(**comment) for comment in comments]
+            return [comments]
+        return comments
 
 
 class DeviceConfigDataType(TypedDict, total=False):

@@ -102,7 +102,9 @@ async def test_highest_security_value(lock_schlage_be469, ring_keypad):
     assert ring_keypad.highest_security_class is None
 
 
-async def test_device_config(wallmote_central_scene, climate_radio_thermostat_ct100_plus):
+async def test_device_config(
+    wallmote_central_scene, climate_radio_thermostat_ct100_plus
+):
     """Test a device config."""
     node: node_pkg.Node = wallmote_central_scene
 
