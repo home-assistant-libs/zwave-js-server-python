@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from typing import Optional, cast
 
-from ..const import LogLevel, TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED
+from ..const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED, LogLevel
 
 if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
     from typing_extensions import TypedDict

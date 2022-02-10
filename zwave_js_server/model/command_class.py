@@ -3,7 +3,7 @@ Model for Zwave Command Class Info.
 
 https://zwave-js.github.io/node-zwave-js/#/api/endpoint?id=commandclasses
 """
-from ..const import CommandClass, TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED
+from ..const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED, CommandClass
 
 if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
     from typing_extensions import TypedDict

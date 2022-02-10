@@ -1,6 +1,6 @@
 """Constants for the Z-Wave JS python library."""
-from enum import Enum, IntEnum
 import sys
+from enum import Enum, IntEnum
 
 # minimal server schema version we can handle
 MIN_SERVER_SCHEMA_VERSION = 15

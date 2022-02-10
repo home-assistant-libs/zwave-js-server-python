@@ -6,7 +6,7 @@ https://zwave-js.github.io/node-zwave-js/#/api/endpoint?id=endpoint-properties
 
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, cast
 
-from ..const import NodeStatus, TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED
+from ..const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED, NodeStatus
 from ..event import EventBase
 from ..exceptions import FailedCommand
 from .command_class import CommandClass, CommandClassInfo, CommandClassInfoDataType

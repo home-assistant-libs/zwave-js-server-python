@@ -7,13 +7,13 @@ from zwave_js_server.const import CommandClass
 
 from ...event import BaseEventModel
 from ..firmware import FirmwareUpdateFinishedDataType, FirmwareUpdateProgressDataType
-from . import NodeDataType
 from ..notification import (
     EntryControlNotificationArgsDataType,
     NotificationNotificationArgsDataType,
 )
-from .statistics import NodeStatisticsDataType
 from ..value import ValueDataType
+from . import NodeDataType
+from .statistics import NodeStatisticsDataType
 
 
 class BaseNodeEventModel(BaseEventModel):

@@ -1,15 +1,6 @@
 """Provide a model for the Z-Wave JS controller."""
 from dataclasses import dataclass
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Dict,
-    List,
-    Literal,
-    Optional,
-    Union,
-    cast,
-)
+from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Union, cast
 
 from ...const import (
     MINIMUM_QR_STRING_LENGTH,
@@ -23,13 +14,10 @@ from ...const import (
     ZwaveFeature,
 )
 from ...event import Event, EventBase
+from ...util.helpers import convert_base64_to_bytes, convert_bytes_to_base64
 from ..association import Association, AssociationGroup
 from ..node import Node
 from .statistics import ControllerStatistics, ControllerStatisticsDataType
-from ...util.helpers import (
-    convert_base64_to_bytes,
-    convert_bytes_to_base64,
-)
 
 if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
     from typing_extensions import TypedDict

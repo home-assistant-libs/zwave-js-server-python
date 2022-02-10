@@ -1,11 +1,11 @@
 """Provide a model for the Z-Wave JS controller's events."""
 from typing import Dict, Literal
 
-from . import InclusionGrantDataType
 from ...const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED
-from .statistics import ControllerStatisticsDataType
 from ...event import BaseEventModel
 from ..node import NodeDataType
+from . import InclusionGrantDataType
+from .statistics import ControllerStatisticsDataType
 
 if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
     from typing_extensions import TypedDict
