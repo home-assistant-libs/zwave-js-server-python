@@ -126,7 +126,7 @@ class BulkSetConfigParameterFailed(BaseZwaveJSServerError):
     """
 
 
-class ValueHasInvalidCommandClass(BaseZwaveJSServerError):
+class InvalidCommandClass(BaseZwaveJSServerError):
     """Exception raised when Zwave Value has an invalid command class."""
 
     def __init__(self, value: "Value", command_class: CommandClass) -> None:

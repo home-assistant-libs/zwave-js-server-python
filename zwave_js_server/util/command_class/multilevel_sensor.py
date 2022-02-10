@@ -7,14 +7,14 @@ from ...const.command_class.multilevel_sensor import (
     MultilevelSensorType,
     MULTILEVEL_SENSOR_TYPE_TO_SCALE_MAP,
 )
-from ...exceptions import ValueHasInvalidCommandClass, UnknownValueData
+from ...exceptions import InvalidCommandClass, UnknownValueData
 from ...model.value import Value
 
 
 def get_multilevel_sensor_type(value: Value) -> MultilevelSensorType:
     """Get the MultilevelSensorType for a given value."""
     if value.command_class != CommandClass.SENSOR_MULTILEVEL:
-        raise ValueHasInvalidCommandClass(value, CommandClass.SENSOR_MULTILEVEL)
+        raise InvalidCommandClass(value, CommandClass.SENSOR_MULTILEVEL)
     try:
         return MultilevelSensorType(value.metadata.cc_specific[CC_SPECIFIC_SENSOR_TYPE])
     except ValueError:
