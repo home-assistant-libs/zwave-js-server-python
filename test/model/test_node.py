@@ -18,7 +18,12 @@ from zwave_js_server.const.command_class.entry_control import (
     EntryControlEventType,
 )
 from zwave_js_server.event import Event
-from zwave_js_server.exceptions import FailedCommand, NotFoundError, UnwriteableValue
+from zwave_js_server.exceptions import (
+    FailedCommand,
+    NotFoundError,
+    NotificationHasUnsupportedCommandClass,
+    UnwriteableValue,
+)
 from zwave_js_server.model import node as node_pkg
 from zwave_js_server.model.firmware import FirmwareUpdateStatus
 from zwave_js_server.model.node_health_check import (
@@ -738,6 +743,20 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
     assert event.data["notification"].label == "Access Control"
     assert event.data["notification"].event_label == "Keypad lock operation"
     assert event.data["notification"].parameters == {"userId": 1}
+
+    # Validate that an unrecognized CC notification event raises Exception
+    event = Event(
+        type="notification",
+        data={
+            "source": "node",
+            "event": "notification",
+            "nodeId": 23,
+            "ccId": 0,
+        },
+    )
+
+    with pytest.raises(NotificationHasUnsupportedCommandClass):
+        node.handle_notification(event)
 
 
 async def test_entry_control_notification(ring_keypad):

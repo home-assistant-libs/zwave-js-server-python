@@ -7,14 +7,14 @@ from ...const.command_class.meter import (
     MeterScaleType,
     MeterType,
 )
-from ...exceptions import InvalidCommandClass, UnknownValueData
+from ...exceptions import ValueHasInvalidCommandClass, UnknownValueData
 from ...model.value import Value
 
 
 def get_meter_type(value: Value) -> MeterType:
     """Get the MeterType for a given value."""
     if value.command_class != CommandClass.METER:
-        raise InvalidCommandClass(value, CommandClass.METER)
+        raise ValueHasInvalidCommandClass(value, CommandClass.METER)
     try:
         return MeterType(value.metadata.cc_specific[CC_SPECIFIC_METER_TYPE])
     except ValueError:
