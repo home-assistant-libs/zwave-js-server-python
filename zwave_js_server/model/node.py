@@ -38,6 +38,8 @@ from .notification import (
     EntryControlNotificationDataType,
     NotificationNotification,
     NotificationNotificationDataType,
+    PowerLevelNotification,
+    PowerLevelNotificationDataType,
 )
 from .value import (
     ConfigurationValue,
@@ -820,6 +822,10 @@ class Node(EventBase):
         elif command_class == CommandClass.ENTRY_CONTROL:
             event.data["notification"] = EntryControlNotification(
                 self, cast(EntryControlNotificationDataType, event.data)
+            )
+        elif command_class == CommandClass.POWERLEVEL:
+            event.data["notification"] = PowerLevelNotification(
+                self, cast(PowerLevelNotificationDataType, event.data)
             )
         else:
             raise NotificationHasUnsupportedCommandClass(event, command_class)

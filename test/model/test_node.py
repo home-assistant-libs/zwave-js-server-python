@@ -17,6 +17,7 @@ from zwave_js_server.const.command_class.entry_control import (
     EntryControlDataType,
     EntryControlEventType,
 )
+from zwave_js_server.const.command_class.power_level import PowerLevelTestStatus
 from zwave_js_server.event import Event
 from zwave_js_server.exceptions import (
     FailedCommand,
@@ -717,6 +718,29 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
     """Test notification CC notification events."""
     node = lock_schlage_be469
 
+    # Validate that Entry Control CC notification event is received as expected
+    event = Event(
+        type="notification",
+        data={
+            "source": "node",
+            "event": "notification",
+            "nodeId": 23,
+            "ccId": 111,
+            "args": {
+                "eventType": 0,
+                "dataType": 0,
+                "eventData": "test",
+            },
+        },
+    )
+
+    node.handle_notification(event)
+    assert event.data["notification"].command_class == CommandClass.ENTRY_CONTROL
+    assert event.data["notification"].node_id == 23
+    assert event.data["notification"].event_type == EntryControlEventType.CACHING
+    assert event.data["notification"].data_type == EntryControlDataType.NONE
+    assert event.data["notification"].event_data == "test"
+
     # Validate that Notification CC notification event is received as expected
     event = Event(
         type="notification",
@@ -743,6 +767,25 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
     assert event.data["notification"].label == "Access Control"
     assert event.data["notification"].event_label == "Keypad lock operation"
     assert event.data["notification"].parameters == {"userId": 1}
+
+    # Validate that Power Level CC notification event is received as expected
+    event = Event(
+        type="notification",
+        data={
+            "source": "node",
+            "event": "notification",
+            "nodeId": 23,
+            "ccId": CommandClass.POWERLEVEL.value,
+            "args": {"testNodeId": 1, "status": 0, "acknowledgedFrames": 2},
+        },
+    )
+
+    node.handle_notification(event)
+    assert event.data["notification"].command_class == CommandClass.POWERLEVEL
+    assert event.data["notification"].node_id == 23
+    assert event.data["notification"].test_node_id == 1
+    assert event.data["notification"].status == PowerLevelTestStatus.FAILED
+    assert event.data["notification"].acknowledged_frames == 2
 
     # Validate that an unrecognized CC notification event raises Exception
     event = Event(
