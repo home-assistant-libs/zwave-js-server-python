@@ -15,7 +15,7 @@ SOURCE_TO_EVENT_TO_MODEL_MAP = {
 
 
 def validate_event_data(
-    data: dict[str, Any],
+    data: Dict[str, Any],
     source: Literal["controller", "driver", "node"],
     event_name: str,
     keys_can_be_missing: bool = False,
