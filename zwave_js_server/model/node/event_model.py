@@ -94,6 +94,7 @@ class NotificationEventModel(BaseNodeEventModel):
 
 
 class ReadyEventModel(BaseNodeEventModel):
+    """Model for `ready` event data."""
 
     event: Literal["ready"]
     nodeState: NodeDataType
