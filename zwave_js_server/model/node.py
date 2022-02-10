@@ -12,6 +12,7 @@ from ..event import Event, EventBase
 from ..exceptions import (
     FailedCommand,
     NotFoundError,
+    NotificationHasUnsupportedCommandClass,
     UnparseableValue,
     UnwriteableValue,
 )
@@ -37,6 +38,8 @@ from .notification import (
     EntryControlNotificationDataType,
     NotificationNotification,
     NotificationNotificationDataType,
+    PowerLevelNotification,
+    PowerLevelNotificationDataType,
 )
 from .value import (
     ConfigurationValue,
@@ -811,14 +814,21 @@ class Node(EventBase):
 
     def handle_notification(self, event: Event) -> None:
         """Process a node notification event."""
-        if event.data["ccId"] == CommandClass.NOTIFICATION.value:
+        command_class = CommandClass(event.data["ccId"])
+        if command_class == CommandClass.NOTIFICATION:
             event.data["notification"] = NotificationNotification(
                 self, cast(NotificationNotificationDataType, event.data)
             )
-        else:
+        elif command_class == CommandClass.ENTRY_CONTROL:
             event.data["notification"] = EntryControlNotification(
                 self, cast(EntryControlNotificationDataType, event.data)
             )
+        elif command_class == CommandClass.POWERLEVEL:
+            event.data["notification"] = PowerLevelNotification(
+                self, cast(PowerLevelNotificationDataType, event.data)
+            )
+        else:
+            raise NotificationHasUnsupportedCommandClass(event, command_class)
 
     def handle_firmware_update_progress(self, event: Event) -> None:
         """Process a node firmware update progress event."""
