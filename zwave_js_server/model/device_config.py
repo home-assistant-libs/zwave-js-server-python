@@ -146,7 +146,7 @@ class DeviceConfig:
             DeviceDevice(device) for device in self.data.get("devices", [])
         ]
         self._firmware_version = DeviceFirmwareVersionRange(
-            self.data.get("firmwareVersion", {})  # type: ignore
+            self.data.get("firmwareVersion", {})
         )
         self._metadata = DeviceMetadata(self.data.get("metadata", {}))
 
