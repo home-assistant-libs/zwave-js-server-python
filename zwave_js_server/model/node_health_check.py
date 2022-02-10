@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from typing import List, Optional, TypedDict
 
-from zwave_js_server.const import PowerLevel
+from ..const import PowerLevel
 
 
 class LifelineHealthCheckResultDataType(TypedDict, total=False):

@@ -5,9 +5,9 @@ https://zwave-js.github.io/node-zwave-js/#/api/node?id=quotnotificationquot
 """
 
 from typing import TYPE_CHECKING, Any, Dict, Literal, Optional, TypedDict, Union
-from zwave_js_server.const.command_class.power_level import PowerLevelTestStatus
 
-from zwave_js_server.util.helpers import parse_buffer
+from ..const.command_class.power_level import PowerLevelTestStatus
+from ..util.helpers import parse_buffer
 
 if TYPE_CHECKING:
     from .node import Node

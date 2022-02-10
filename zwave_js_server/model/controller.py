@@ -22,14 +22,11 @@ from ..const import (
     SecurityClass,
     ZwaveFeature,
 )
-from .controller_statistics import ControllerStatistics, ControllerStatisticsDataType
 from ..event import Event, EventBase
+from ..util.helpers import convert_base64_to_bytes, convert_bytes_to_base64
 from .association import Association, AssociationGroup
+from .controller_statistics import ControllerStatistics, ControllerStatisticsDataType
 from .node import Node
-from ..util.helpers import (
-    convert_base64_to_bytes,
-    convert_bytes_to_base64,
-)
 
 if TYPE_CHECKING:
     from ..client import Client
