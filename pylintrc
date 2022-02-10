@@ -4,6 +4,7 @@ ignore=tests
 # any too bad. Override on command line as appropriate.
 jobs=2
 persistent=no
+extension-pkg-whitelist=pydantic
 
 [BASIC]
 good-names=id,i,j,k,ex,Run,_,fp

@@ -16,7 +16,7 @@ from zwave_js_server.const import (
 from zwave_js_server.event import Event
 from zwave_js_server.model import association as association_pkg
 from zwave_js_server.model import controller as controller_pkg
-from zwave_js_server.model.controller_statistics import ControllerStatistics
+from zwave_js_server.model.controller.statistics import ControllerStatistics
 
 from .. import load_fixture
 

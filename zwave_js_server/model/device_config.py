@@ -126,7 +126,7 @@ class DeviceConfigDataType(TypedDict, total=False):
     label: str
     description: str
     devices: List[DeviceDeviceDataType]
-    firmwareVersion: DeviceFirmwareVersionRange
+    firmwareVersion: DeviceFirmwareVersionRangeDataType
     associations: Dict[str, dict]
     paramInformation: Dict[str, dict]
     supportsZWavePlus: bool

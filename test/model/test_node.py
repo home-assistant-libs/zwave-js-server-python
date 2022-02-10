@@ -27,11 +27,11 @@ from zwave_js_server.exceptions import (
 )
 from zwave_js_server.model import node as node_pkg
 from zwave_js_server.model.firmware import FirmwareUpdateStatus
-from zwave_js_server.model.node_health_check import (
+from zwave_js_server.model.node.health_check import (
     LifelineHealthCheckResultDataType,
     RouteHealthCheckResultDataType,
 )
-from zwave_js_server.model.node_statistics import NodeStatistics
+from zwave_js_server.model.node.statistics import NodeStatistics
 from zwave_js_server.model.value import ConfigurationValue, get_value_id
 
 from .. import load_fixture
@@ -823,6 +823,25 @@ async def test_entry_control_notification(ring_keypad):
     assert event.data["notification"].event_type == EntryControlEventType.ARM_AWAY
     assert event.data["notification"].data_type == EntryControlDataType.ASCII
     assert event.data["notification"].event_data == "555"
+
+
+async def test_failure(multisensor_6):
+    node = multisensor_6
+
+    def callback(data: dict):
+        assert data is None
+
+    node.on("interview completed", callback)
+
+    event = Event(
+        type="interview completed",
+        data={
+            "source": "node",
+            "event": "interview completed",
+            "nodeId": 52,
+        },
+    )
+    node.receive_event(event)
 
 
 async def test_interview_events(multisensor_6):
