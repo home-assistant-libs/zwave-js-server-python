@@ -1,15 +1,11 @@
 """Provide a model for the Z-Wave JS node's events."""
 from typing import Literal, Optional, Union
 
-from pydantic import BaseModel
+from pydantic import BaseModel, create_model_from_typeddict
 
 from zwave_js_server.const import CommandClass
 
-from ...event import (
-    BaseEventModel,
-    _event_model_factory,
-    _event_model_from_typeddict_factory,
-)
+from ...event import BaseEventModel
 from ..firmware import FirmwareUpdateFinishedDataType, FirmwareUpdateProgressDataType
 from . import NodeDataType
 from ..notification import (
@@ -27,6 +23,12 @@ class BaseNodeEventModel(BaseEventModel):
     nodeId: int
 
 
+class AliveEventModel(BaseNodeEventModel):
+    """Model for `alive` event data."""
+
+    event: Literal["alive"]
+
+
 class CheckHealthProgressEventModel(BaseNodeEventModel):
     """
     Model for `check health progress` type events data.
@@ -38,6 +40,18 @@ class CheckHealthProgressEventModel(BaseNodeEventModel):
     rounds: int
     total_rounds: int
     last_rating: int
+
+
+class DeadEventModel(BaseNodeEventModel):
+    """Model for `dead` event data."""
+
+    event: Literal["dead"]
+
+
+class InterviewCompletedEventModel(BaseNodeEventModel):
+    """Model for `interview completed` event data."""
+
+    event: Literal["interview completed"]
 
 
 class InterviewFailedEventArgsModel(BaseModel):
@@ -63,6 +77,12 @@ class InterviewStageCompletedEventModel(BaseNodeEventModel):
     stageName: str
 
 
+class InterviewStartedEventModel(BaseNodeEventModel):
+    """Model for `interview started` event data."""
+
+    event: Literal["interview started"]
+
+
 class NotificationEventModel(BaseNodeEventModel):
     """Model for `notification` event data."""
 
@@ -77,6 +97,12 @@ class ReadyEventModel(BaseNodeEventModel):
 
     event: Literal["ready"]
     nodeState: NodeDataType
+
+
+class SleepEventModel(BaseNodeEventModel):
+    """Model for `sleep` event data."""
+
+    event: Literal["sleep"]
 
 
 class StatisticsUpdatedEventModel(BaseNodeEventModel):
@@ -105,41 +131,53 @@ class ValueEventModel(BaseNodeEventModel):
     value: ValueDataType
 
 
-AliveEventModel = _event_model_factory(BaseEventModel, "Alive", Literal["alive"])
-DeadEventModel = _event_model_factory(BaseEventModel, "Dead", Literal["dead"])
-InterviewCompletedEventModel = _event_model_factory(
-    BaseEventModel, "InterviewCompleted", Literal["interview completed"]
+class MetadataUpdatedEventModel(ValueEventModel):
+    """Model for `metadata updated` event data."""
+
+    event: Literal["metadata updated"]
+
+
+class ValueAddedEventModel(ValueEventModel):
+    """Model for `value added` event data."""
+
+    event: Literal["value added"]
+
+
+class ValueNotificationEventModel(ValueEventModel):
+    """Model for `value notification` event data."""
+
+    event: Literal["value notification"]
+
+
+class ValueRemovedEventModel(ValueEventModel):
+    """Model for `value removed` event data."""
+
+    event: Literal["value removed"]
+
+
+class ValueUpdatedEventModel(ValueEventModel):
+    """Model for `value updated` event data."""
+
+    event: Literal["value updated"]
+
+
+class WakeUpEventModel(BaseNodeEventModel):
+    """Model for `wake up` event data."""
+
+    event: Literal["wake up"]
+
+
+FirmwareUpdateFinishedEventModel = create_model_from_typeddict(
+    FirmwareUpdateFinishedDataType,
+    __base__=BaseNodeEventModel,
+    event=(Literal["firmware update finished"], ...),
+)
+FirmwareUpdateProgressEventModel = create_model_from_typeddict(
+    FirmwareUpdateProgressDataType,
+    __base__=BaseNodeEventModel,
+    event=(Literal["firmware update progress"], ...),
 )
 
-FirmwareUpdateFinishedEventModel = _event_model_from_typeddict_factory(
-    BaseEventModel, FirmwareUpdateFinishedDataType, Literal["firmware update finished"]
-)
-FirmwareUpdateProgressEventModel = _event_model_from_typeddict_factory(
-    BaseEventModel, FirmwareUpdateProgressDataType, Literal["firmware update progress"]
-)
-InterviewCompletedEventModel = _event_model_factory(
-    BaseEventModel, "InterviewCompleted", Literal["interview completed"]
-)
-InterviewStartedEventModel = _event_model_factory(
-    BaseEventModel, "InterviewStarted", Literal["interview started"]
-)
-MetadataUpdatedEventModel = _event_model_factory(
-    ValueEventModel, "MetadataUpdated", Literal["metadata updated"]
-)
-SleepEventModel = _event_model_factory(BaseEventModel, "Sleep", Literal["sleep"])
-ValueAddedEventModel = _event_model_factory(
-    ValueEventModel, "ValueAdded", Literal["value added"]
-)
-ValueNotificationEventModel = _event_model_factory(
-    ValueEventModel, "ValueNotification", Literal["value notification"]
-)
-ValueRemovedEventModel = _event_model_factory(
-    ValueEventModel, "ValueRemoved", Literal["value removed"]
-)
-ValueUpdatedEventModel = _event_model_factory(
-    ValueEventModel, "ValueUpdated", Literal["value updated"]
-)
-WakeUpEventModel = _event_model_factory(BaseEventModel, "WakeUp", Literal["wake up"])
 
 NODE_EVENT_MODEL_MAP = {
     "alive": AliveEventModel,

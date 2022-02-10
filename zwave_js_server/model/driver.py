@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any, Dict, Literal, Optional, Union, cast
 
 from pydantic import create_model_from_typeddict
 
-from ..event import BaseEventModel, Event, EventBase, _event_model_factory
+from ..event import BaseEventModel, Event, EventBase
 from .controller import Controller
 from .log_config import LogConfig, LogConfigDataType
 from .log_message import LogMessage, LogMessageDataType
@@ -25,9 +25,12 @@ class LogConfigUpdatedEventModel(BaseDriverEventModel):
     config: LogConfigDataType
 
 
-AllNodesReadyEventModel = _event_model_factory(
-    BaseDriverEventModel, "AllNodesReady", Literal["all nodes ready"]
-)
+class AllNodesReadyEventModel(BaseDriverEventModel):
+    """Model for `all nodes ready` event data."""
+
+    event: Literal["all nodes ready"]
+
+
 LoggingEventModel = create_model_from_typeddict(
     LogMessageDataType, __base__=BaseDriverEventModel
 )

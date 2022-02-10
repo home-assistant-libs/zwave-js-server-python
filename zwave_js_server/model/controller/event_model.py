@@ -3,14 +3,8 @@ from typing import Dict, Literal, TypedDict
 
 from . import InclusionGrantDataType
 from .statistics import ControllerStatisticsDataType
-from ...event import BaseEventModel, _event_model_factory
+from ...event import BaseEventModel
 from ..node import NodeDataType
-
-
-class BaseControllerEventModel(BaseEventModel):
-    """Base model for a controller event."""
-
-    source: Literal["controller"]
 
 
 class InclusionResultDataType(TypedDict, total=False):
@@ -19,11 +13,28 @@ class InclusionResultDataType(TypedDict, total=False):
     lowSecurity: bool
 
 
-class InclusionStartedEventModel(BaseControllerEventModel):
-    """Model for `inclusion started` event data."""
+class BaseControllerEventModel(BaseEventModel):
+    """Base model for a controller event."""
 
-    event: Literal["inclusion started"]
-    secure: bool
+    source: Literal["controller"]
+
+
+class ExclusionFailedEventModel(BaseControllerEventModel):
+    """Model for `exclusion failed` event data."""
+
+    event: Literal["exclusion failed"]
+
+
+class ExclusionStartedEventModel(BaseControllerEventModel):
+    """Model for `exclusion started` event data."""
+
+    event: Literal["exclusion started"]
+
+
+class ExclusionStoppedEventModel(BaseControllerEventModel):
+    """Model for `exclusion stopped` event data."""
+
+    event: Literal["exclusion stopped"]
 
 
 class GrantSecurityClassesEventModel(BaseControllerEventModel):
@@ -47,6 +58,25 @@ class HealNetworkProgressEventModel(BaseControllerEventModel):
     progress: Dict[int, str]
 
 
+class InclusionFailedEventModel(BaseControllerEventModel):
+    """Model for `inclusion failed` event data."""
+
+    event: Literal["inclusion failed"]
+
+
+class InclusionStartedEventModel(BaseControllerEventModel):
+    """Model for `inclusion started` event data."""
+
+    event: Literal["inclusion started"]
+    secure: bool
+
+
+class InclusionStoppedEventModel(BaseControllerEventModel):
+    """Model for `inclusion stopped` event data."""
+
+    event: Literal["inclusion stopped"]
+
+
 class NodeAddedEventModel(BaseControllerEventModel):
     """Model for `node added` event data."""
 
@@ -64,10 +94,22 @@ class NodeRemovedEventModel(BaseControllerEventModel):
 
 
 class NVMBackupAndConvertProgressEventModel(BaseControllerEventModel):
-    """Model for `nvm backup progress` and `nvm convert progress` event data."""
+    """Base model for `nvm backup progress` and `nvm convert progress` event data."""
 
     bytesRead: int
     total: int
+
+
+class NVMBackupProgressEventModel(NVMBackupAndConvertProgressEventModel):
+    """Model for `nvm backup progress` event data."""
+
+    event: Literal["nvm backup progress"]
+
+
+class NVMConvertProgressEventModel(NVMBackupAndConvertProgressEventModel):
+    """Model for `nvm convert progress` event data."""
+
+    event: Literal["nvm convert progress"]
 
 
 class NVMRestoreProgressEventModel(BaseControllerEventModel):
@@ -90,33 +132,6 @@ class ValidateDSKAndEnterPINEventModel(BaseControllerEventModel):
 
     event: Literal["validate dsk and enter pin"]
     dsk: str
-
-
-ExclusionFailedEventModel = _event_model_factory(
-    BaseControllerEventModel, "ExclusionFailed", Literal["exclusion failed"]
-)
-ExclusionStartedEventModel = _event_model_factory(
-    BaseControllerEventModel, "ExclusionStarted", Literal["exclusion started"]
-)
-ExclusionStoppedEventModel = _event_model_factory(
-    BaseControllerEventModel, "ExclusionStopped", Literal["exclusion stopped"]
-)
-InclusionFailedEventModel = _event_model_factory(
-    BaseControllerEventModel, "InclusionFailed", Literal["inclusion failed"]
-)
-InclusionStoppedEventModel = _event_model_factory(
-    BaseControllerEventModel, "InclusionStarted", Literal["inclusion started"]
-)
-NVMBackupProgressEventModel = _event_model_factory(
-    NVMBackupAndConvertProgressEventModel,
-    "NVMBackupProgressController",
-    Literal["nvm backup progress"],
-)
-NVMConvertProgressEventModel = _event_model_factory(
-    NVMBackupAndConvertProgressEventModel,
-    "NVMConvertProgressController",
-    Literal["nvm backup progress"],
-)
 
 
 CONTROLLER_EVENT_MODEL_MAP = {

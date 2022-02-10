@@ -1,9 +1,9 @@
 """Provide Event base classes for Z-Wave JS."""
 import logging
 from dataclasses import dataclass, field
-from typing import Callable, Dict, List, Literal, TypedDict, TypeVar
+from typing import Callable, Dict, List, Literal
 
-from pydantic import BaseModel, create_model, create_model_from_typeddict
+from pydantic import BaseModel
 
 LOGGER = logging.getLogger(__package__)
 
@@ -13,35 +13,6 @@ class BaseEventModel(BaseModel):
 
     source: Literal["controller", "driver", "node"]
     event: str
-
-
-EventNameType = TypeVar("EventNameType")
-
-
-def _event_model_factory(
-    base_model: BaseEventModel, model_name: str, event_name: EventNameType
-) -> BaseEventModel:
-    """
-    Factory for new event models from a BaseEventModel.
-
-    Adds the event_name Literal to the model.
-    """
-    return create_model(
-        f"{model_name}EventModel", __base__=base_model, event=(event_name, ...)
-    )
-
-
-def _event_model_from_typeddict_factory(
-    base_model: BaseEventModel, typed_dict: TypedDict, event_name: EventNameType
-) -> BaseEventModel:
-    """
-    Factory for event models created from a TypedDict.
-
-    Adds the event_name Literal to the model.
-    """
-    return create_model_from_typeddict(
-        typed_dict, __base__=base_model, event=(event_name, ...)
-    )
 
 
 @dataclass
