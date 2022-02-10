@@ -825,25 +825,6 @@ async def test_entry_control_notification(ring_keypad):
     assert event.data["notification"].event_data == "555"
 
 
-async def test_failure(multisensor_6):
-    node = multisensor_6
-
-    def callback(data: dict):
-        assert data is None
-
-    node.on("interview completed", callback)
-
-    event = Event(
-        type="interview completed",
-        data={
-            "source": "node",
-            "event": "interview completed",
-            "nodeId": 52,
-        },
-    )
-    node.receive_event(event)
-
-
 async def test_interview_events(multisensor_6):
     """Test Node interview events."""
     node = multisensor_6
