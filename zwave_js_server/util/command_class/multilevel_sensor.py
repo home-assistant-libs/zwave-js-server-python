@@ -3,9 +3,9 @@ from ...const import CommandClass
 from ...const.command_class.multilevel_sensor import (
     CC_SPECIFIC_SCALE,
     CC_SPECIFIC_SENSOR_TYPE,
+    MULTILEVEL_SENSOR_TYPE_TO_SCALE_MAP,
     MultilevelSensorScaleType,
     MultilevelSensorType,
-    MULTILEVEL_SENSOR_TYPE_TO_SCALE_MAP,
 )
 from ...exceptions import InvalidCommandClass, UnknownValueData
 from ...model.value import Value

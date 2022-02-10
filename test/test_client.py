@@ -1,7 +1,7 @@
 """Test the client."""
 import asyncio
-from datetime import datetime
 import logging
+from datetime import datetime
 from unittest.mock import Mock, patch
 
 import pytest

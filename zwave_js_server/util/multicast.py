@@ -1,11 +1,10 @@
 """Support for multicast commands."""
 from typing import Any, List, Optional, cast
 
-from zwave_js_server.model.node import Node
-
 from ..client import Client
 from ..const import CommandClass
 from ..exceptions import NotFoundError
+from ..model.node import Node
 from ..model.value import ValueDataType, _get_value_id_from_dict
 
 

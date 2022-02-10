@@ -1,6 +1,6 @@
 """Model for utils commands."""
-from zwave_js_server.const import MINIMUM_QR_STRING_LENGTH
 from ..client import Client
+from ..const import MINIMUM_QR_STRING_LENGTH
 from .controller import QRProvisioningInformation
 
 

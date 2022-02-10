@@ -1,11 +1,10 @@
 """Provide a model for the Z-Wave JS Driver."""
 from typing import TYPE_CHECKING, Any, Dict, Optional, Union, cast
 
-from zwave_js_server.model.log_config import LogConfig, LogConfigDataType
-from zwave_js_server.model.log_message import LogMessage, LogMessageDataType
-
 from ..event import Event, EventBase
 from .controller import Controller
+from .log_config import LogConfig, LogConfigDataType
+from .log_message import LogMessage, LogMessageDataType
 
 if TYPE_CHECKING:
     from ..client import Client
