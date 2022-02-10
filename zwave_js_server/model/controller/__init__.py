@@ -7,13 +7,13 @@ from typing import (
     List,
     Literal,
     Optional,
-    TypedDict,
     Union,
     cast,
 )
 
 from ...const import (
     MINIMUM_QR_STRING_LENGTH,
+    TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED,
     InclusionState,
     InclusionStrategy,
     Protocols,
@@ -30,6 +30,11 @@ from ...util.helpers import (
     convert_base64_to_bytes,
     convert_bytes_to_base64,
 )
+
+if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 if TYPE_CHECKING:
     from ...client import Client

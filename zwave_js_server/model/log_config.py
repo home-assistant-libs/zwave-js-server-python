@@ -1,8 +1,13 @@
 """Provide a model for the log config."""
 from dataclasses import dataclass
-from typing import Optional, TypedDict, cast
+from typing import Optional, cast
 
-from ..const import LogLevel
+from ..const import LogLevel, TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED
+
+if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 
 class LogConfigDataType(TypedDict, total=False):

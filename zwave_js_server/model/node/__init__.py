@@ -1,8 +1,9 @@
 """Provide a model for the Z-Wave JS node."""
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, cast
 
 from ...const import (
     INTERVIEW_FAILED,
+    TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED,
     CommandClass,
     NodeStatus,
     PowerLevel,
@@ -51,6 +52,11 @@ from ..value import (
     _get_value_id_from_dict,
     _init_value,
 )
+
+if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 if TYPE_CHECKING:
     from ...client import Client

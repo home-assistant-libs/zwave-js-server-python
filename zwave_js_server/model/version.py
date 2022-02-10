@@ -1,7 +1,13 @@
 """Represents the version from the server."""
 
 from dataclasses import dataclass
-from typing import TypedDict
+
+from ..const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED
+
+if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 
 class VersionInfoDataType(TypedDict):
