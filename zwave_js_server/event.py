@@ -1,7 +1,7 @@
 """Provide Event base classes for Z-Wave JS."""
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Literal, Type
+from typing import Any, Callable, Dict, List, Literal, Optional, Type
 
 from pydantic import BaseModel, ValidationError
 
@@ -14,13 +14,14 @@ def validate_event_data(
     event_name: str,
     event_name_to_model_map: Dict[str, Type["BaseEventModel"]],
     keys_can_be_missing: bool = False,
-) -> Type["BaseEventModel"]:
+) -> Optional[Type["BaseEventModel"]]:
     """
     Validate data with a pydantic model using event name and source.
 
     Raises an exception if data is invalid.
     keys_can_be_missing allows for required keys to be missing when True.
     """
+    return_model = True
     try:
         model = event_name_to_model_map[event_name](**data)
     except ValidationError as exc:
@@ -34,12 +35,17 @@ def validate_event_data(
         # If there are still errors after filtering, raise an exception
         if errors:
             raise ValueError(errors) from exc
+
+        # We can't return a model when keys are missing
+        return_model = False
     except KeyError as exc:
         raise TypeError(
             f"{event_name} is not a valid event name for the given source {source}"
         ) from exc
 
-    return model
+    if return_model:
+        return model
+    return None
 
 
 class BaseEventModel(BaseModel):
