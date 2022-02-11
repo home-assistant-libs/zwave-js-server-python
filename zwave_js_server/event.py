@@ -14,7 +14,7 @@ def validate_event_data(
     event_name: str,
     event_name_to_model_map: Dict[str, Type["BaseEventModel"]],
     keys_can_be_missing: bool = False,
-) -> None:
+) -> Type["BaseEventModel"]:
     """
     Validate data with a pydantic model using event name and source.
 
@@ -22,7 +22,7 @@ def validate_event_data(
     keys_can_be_missing allows for required keys to be missing when True.
     """
     try:
-        event_name_to_model_map[event_name](**data)
+        model = event_name_to_model_map[event_name](**data)
     except ValidationError as exc:
         errors: List[Dict[str, Any]] = []
         for error in exc.errors():
@@ -38,6 +38,8 @@ def validate_event_data(
         raise TypeError(
             f"{event_name} is not a valid event name for the given source {source}"
         ) from exc
+
+    return model
 
 
 class BaseEventModel(BaseModel):
