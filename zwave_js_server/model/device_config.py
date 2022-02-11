@@ -16,8 +16,8 @@ else:
 class DeviceDeviceDataType(TypedDict, total=False):
     """Represent a device device data dict type."""
 
-    productType: int
-    productId: int
+    productType: str
+    productId: str
 
 
 class DeviceDevice:
@@ -28,12 +28,12 @@ class DeviceDevice:
         self.data = data
 
     @property
-    def product_type(self) -> Optional[int]:
+    def product_type(self) -> Optional[str]:
         """Return product type."""
         return self.data.get("productType")
 
     @property
-    def product_id(self) -> Optional[int]:
+    def product_id(self) -> Optional[str]:
         """Return product id."""
         return self.data.get("productId")
 

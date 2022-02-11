@@ -1,10 +1,10 @@
 """Provide a model for the Z-Wave JS controller's events."""
-from typing import Dict, Literal
+from typing import Dict, Literal, Type
 
 from ...const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED
 from ...event import BaseEventModel
-from ..node import NodeDataType
-from . import InclusionGrantDataType
+from ..node.data_model import NodeDataType
+from .inclusion_and_provisioning import InclusionGrantDataType
 from .statistics import ControllerStatisticsDataType
 
 if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
@@ -140,7 +140,7 @@ class ValidateDSKAndEnterPINEventModel(BaseControllerEventModel):
     dsk: str
 
 
-CONTROLLER_EVENT_MODEL_MAP = {
+CONTROLLER_EVENT_MODEL_MAP: Dict[str, Type["BaseControllerEventModel"]] = {
     "exclusion failed": ExclusionFailedEventModel,
     "exclusion started": ExclusionStartedEventModel,
     "exclusion stopped": ExclusionStoppedEventModel,

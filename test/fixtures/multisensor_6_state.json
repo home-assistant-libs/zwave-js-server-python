@@ -10,7 +10,7 @@
     "generic": { "key": 2, "label": "Multilevel Sensor" },
     "specific": { "key": 3, "label": "Routing Multilevel Sensor" },
     "mandatorySupportedCCs": [],
-    "mandatoryControlCCs": []
+    "mandatoryControlledCCs": []
   },
   "isListening": true,
   "isFrequentListening": false,

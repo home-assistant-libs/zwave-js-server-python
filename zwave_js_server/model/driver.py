@@ -1,9 +1,9 @@
 """Provide a model for the Z-Wave JS Driver."""
-from typing import TYPE_CHECKING, Any, Dict, Literal, Optional, Union, cast
+from typing import TYPE_CHECKING, Any, Dict, Literal, Optional, Type, Union, cast
 
 from pydantic import create_model_from_typeddict
 
-from ..event import BaseEventModel, Event, EventBase
+from ..event import BaseEventModel, Event, EventBase, validate_event_data
 from .controller import Controller
 from .log_config import LogConfig, LogConfigDataType
 from .log_message import LogMessage, LogMessageDataType
@@ -36,7 +36,7 @@ LoggingEventModel = create_model_from_typeddict(
 )
 
 
-DRIVER_EVENT_MODEL_MAP = {
+DRIVER_EVENT_MODEL_MAP: Dict[str, Type["BaseDriverEventModel"]] = {
     "all nodes ready": AllNodesReadyEventModel,
     "log config updated": LogConfigUpdatedEventModel,
     "logging": LoggingEventModel,
@@ -79,6 +79,8 @@ class Driver(EventBase):
         if event.data["source"] != "driver":
             self.controller.receive_event(event)
             return
+
+        validate_event_data(event.data, "driver", event.type, DRIVER_EVENT_MODEL_MAP)
 
         self._handle_event_protocol(event)
 

@@ -4,91 +4,27 @@ from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Union, cas
 
 from ...const import (
     MINIMUM_QR_STRING_LENGTH,
-    TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED,
     InclusionState,
     InclusionStrategy,
-    Protocols,
     QRCodeVersion,
     RFRegion,
-    SecurityClass,
     ZwaveFeature,
 )
-from ...event import Event, EventBase
+from ...event import Event, EventBase, validate_event_data
 from ...util.helpers import convert_base64_to_bytes, convert_bytes_to_base64
 from ..association import Association, AssociationGroup
 from ..node import Node
-from .statistics import ControllerStatistics, ControllerStatisticsDataType
-
-if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
-    from typing_extensions import TypedDict
-else:
-    from typing import TypedDict
+from .data_model import ControllerDataType
+from .event_model import CONTROLLER_EVENT_MODEL_MAP
+from .inclusion_and_provisioning import (
+    InclusionGrant,
+    ProvisioningEntry,
+    QRProvisioningInformation,
+)
+from .statistics import ControllerStatistics
 
 if TYPE_CHECKING:
     from ...client import Client
-
-
-class InclusionGrantDataType(TypedDict):
-    """Representation of an inclusion grant data dict type."""
-
-    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/controller/Inclusion.ts#L48-L56
-    securityClasses: List[int]
-    clientSideAuth: bool
-
-
-@dataclass
-class InclusionGrant:
-    """Representation of an inclusion grant."""
-
-    security_classes: List[SecurityClass]
-    client_side_auth: bool
-
-    def to_dict(self) -> InclusionGrantDataType:
-        """Return InclusionGrantDataType dict from self."""
-        return {
-            "securityClasses": [sec_cls.value for sec_cls in self.security_classes],
-            "clientSideAuth": self.client_side_auth,
-        }
-
-    @classmethod
-    def from_dict(cls, data: InclusionGrantDataType) -> "InclusionGrant":
-        """Return InclusionGrant from InclusionGrantDataType dict."""
-        return cls(
-            security_classes=[
-                SecurityClass(sec_cls) for sec_cls in data["securityClasses"]
-            ],
-            client_side_auth=data["clientSideAuth"],
-        )
-
-
-@dataclass
-class ProvisioningEntry:
-    """Class to represent the base fields of a provisioning entry."""
-
-    dsk: str
-    security_classes: List[SecurityClass]
-    additional_properties: Optional[Dict[str, Any]] = None
-
-    def to_dict(self) -> Dict[str, Any]:
-        """Return PlannedProvisioning data dict from self."""
-        return {
-            "dsk": self.dsk,
-            "securityClasses": [sec_cls.value for sec_cls in self.security_classes],
-            **(self.additional_properties or {}),
-        }
-
-    @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "ProvisioningEntry":
-        """Return ProvisioningEntry from data dict."""
-        return cls(
-            dsk=data["dsk"],
-            security_classes=[
-                SecurityClass(sec_cls) for sec_cls in data["securityClasses"]
-            ],
-            additional_properties={
-                k: v for k, v in data.items() if k not in {"dsk", "securityClasses"}
-            },
-        )
 
 
 @dataclass
@@ -97,122 +33,6 @@ class NVMProgress:
 
     bytes_read_or_written: int
     total_bytes: int
-
-
-@dataclass
-class QRProvisioningInformationMixin:
-    """Mixin class to represent the base fields of a QR provisioning information."""
-
-    version: QRCodeVersion
-    generic_device_class: int
-    specific_device_class: int
-    installer_icon_type: int
-    manufacturer_id: int
-    product_type: int
-    product_id: int
-    application_version: str
-    max_inclusion_request_interval: Optional[int]
-    uuid: Optional[str]
-    supported_protocols: Optional[List[Protocols]]
-
-
-@dataclass
-class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixin):
-    """Representation of provisioning information retrieved from a QR code."""
-
-    def to_dict(self) -> Dict[str, Any]:
-        """Return QRProvisioningInformation data dict from self."""
-        data = {
-            "version": self.version.value,
-            "securityClasses": [sec_cls.value for sec_cls in self.security_classes],
-            "dsk": self.dsk,
-            "genericDeviceClass": self.generic_device_class,
-            "specificDeviceClass": self.specific_device_class,
-            "installerIconType": self.installer_icon_type,
-            "manufacturerId": self.manufacturer_id,
-            "productType": self.product_type,
-            "productId": self.product_id,
-            "applicationVersion": self.application_version,
-            **(self.additional_properties or {}),
-        }
-        if self.max_inclusion_request_interval is not None:
-            data["maxInclusionRequestInterval"] = self.max_inclusion_request_interval
-        if self.uuid is not None:
-            data["uuid"] = self.uuid
-        if self.supported_protocols is not None:
-            data["supportedProtocols"] = [
-                protocol.value for protocol in self.supported_protocols
-            ]
-        return data
-
-    @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "QRProvisioningInformation":
-        """Return QRProvisioningInformation from data dict."""
-        return cls(
-            version=QRCodeVersion(data["version"]),
-            security_classes=[
-                SecurityClass(sec_cls) for sec_cls in data["securityClasses"]
-            ],
-            dsk=data["dsk"],
-            generic_device_class=data["genericDeviceClass"],
-            specific_device_class=data["specificDeviceClass"],
-            installer_icon_type=data["installerIconType"],
-            manufacturer_id=data["manufacturerId"],
-            product_type=data["productType"],
-            product_id=data["productId"],
-            application_version=data["applicationVersion"],
-            max_inclusion_request_interval=data.get("maxInclusionRequestInterval"),
-            uuid=data.get("uuid"),
-            supported_protocols=[
-                Protocols(supported_protocol)
-                for supported_protocol in data.get("supportedProtocols", [])
-            ],
-            additional_properties={
-                k: v
-                for k, v in data.items()
-                if k
-                not in {
-                    "version",
-                    "securityClasses",
-                    "dsk",
-                    "genericDeviceClass",
-                    "specificDeviceClass",
-                    "installerIconType",
-                    "manufacturerId",
-                    "productType",
-                    "productId",
-                    "applicationVersion",
-                    "maxInclusionRequestInterval",
-                    "uuid",
-                    "supportedProtocols",
-                }
-            },
-        )
-
-
-class ControllerDataType(TypedDict, total=False):
-    """Represent a controller data dict type."""
-
-    libraryVersion: str
-    type: int
-    homeId: int
-    ownNodeId: int
-    isSecondary: bool  # TODO: The following items are missing in the docs.
-    isUsingHomeIdFromOtherNetwork: bool
-    isSISPresent: bool
-    wasRealPrimary: bool
-    isStaticUpdateController: bool
-    isSlave: bool
-    serialApiVersion: str
-    manufacturerId: int
-    productType: int
-    productId: int
-    supportedFunctionTypes: List[int]
-    sucNodeId: int
-    supportsTimers: bool
-    isHealNetworkActive: bool
-    statistics: ControllerStatisticsDataType
-    inclusionState: int
 
 
 class Controller(EventBase):
@@ -826,6 +646,10 @@ class Controller(EventBase):
                 f"Controller doesn't know how to handle/forward this event: {event.data}"
             )
 
+        validate_event_data(
+            event.data, "controller", event.type, CONTROLLER_EVENT_MODEL_MAP
+        )
+
         self._handle_event_protocol(event)
 
         event.data["controller"] = self
@@ -857,6 +681,8 @@ class Controller(EventBase):
     def handle_node_removed(self, event: Event) -> None:
         """Process a node removed event."""
         event.data["node"] = self.nodes.pop(event.data["node"]["nodeId"])
+        # Remove client from node since it's no longer connected to the controller
+        event.data["node"].client = None
 
     def handle_heal_network_progress(self, event: Event) -> None:
         """Process a heal network progress event."""

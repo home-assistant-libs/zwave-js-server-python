@@ -438,7 +438,7 @@ async def test_abort_firmware_update(multisensor_6, uuid4, mock_command):
     }
 
 
-def test_node_inclusion():
+def test_node_inclusion(multisensor_6_state):
     """Emulate a node being added."""
     # when a node node is added, it has minimal info first
     node = node_pkg.Node(
@@ -451,8 +451,16 @@ def test_node_inclusion():
     assert node.device_config.manufacturer is None
 
     # the ready event contains a full (and complete) dump of the node, including values
-    state = json.loads(load_fixture("multisensor_6_state.json"))
-    event = Event("ready", {"nodeState": state})
+    event = Event(
+        "ready",
+        {
+            "event": "ready",
+            "source": "node",
+            "nodeId": node.node_id,
+            "nodeState": multisensor_6_state,
+            "result": [],
+        },
+    )
     node.receive_event(event)
 
     assert node.device_config.manufacturer == "AEON Labs"
@@ -1102,6 +1110,7 @@ async def test_statistics_updated(wallmote_central_scene: node_pkg.Node):
         {
             "source": "node",
             "event": "statistics updated",
+            "nodeId": node.node_id,
             "statistics": {
                 "commandsTX": 1,
                 "commandsRX": 1,

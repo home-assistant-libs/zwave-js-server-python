@@ -1358,3 +1358,35 @@ async def test_nvm_events(controller):
     )
     controller.receive_event(event)
     assert event.data["nvm_restore_progress"] == controller_pkg.NVMProgress(5, 6)
+
+
+async def test_node_added(controller, multisensor_6_state):
+    """Test node added event."""
+    event = Event(
+        "node added",
+        {
+            "source": "controller",
+            "event": "node added",
+            "node": multisensor_6_state,
+            "result": "",
+        },
+    )
+    controller.receive_event(event)
+    assert event.data["node"].node_id == 52
+
+
+async def test_node_removed(client, multisensor_6, multisensor_6_state):
+    """Test node removed event."""
+    event = Event(
+        "node removed",
+        {
+            "source": "controller",
+            "event": "node removed",
+            "node": multisensor_6_state,
+            "replaced": False,
+        },
+    )
+    client.driver.controller.receive_event(event)
+    assert event.data["node"].node_id == 52
+    assert event.data["node"].client is None
+    assert 52 not in client.driver.controller.nodes

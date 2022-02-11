@@ -9,7 +9,7 @@ from ...const import (
     PowerLevel,
     SecurityClass,
 )
-from ...event import Event, EventBase
+from ...event import Event, EventBase, validate_event_data
 from ...exceptions import (
     FailedCommand,
     NotFoundError,
@@ -45,6 +45,7 @@ from ..value import (
     _get_value_id_from_dict,
     _init_value,
 )
+from .event_model import NODE_EVENT_MODEL_MAP
 from .health_check import (
     CheckHealthProgress,
     LifelineHealthCheckSummary,
@@ -414,6 +415,7 @@ class Node(EventBase):
 
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
+        validate_event_data(event.data, "node", event.type, NODE_EVENT_MODEL_MAP)
         self._handle_event_protocol(event)
         event.data["node"] = self
 

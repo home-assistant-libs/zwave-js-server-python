@@ -1,5 +1,5 @@
 """Provide a model for the Z-Wave JS node's events."""
-from typing import Literal, Optional, Union
+from typing import Dict, Literal, Optional, Type, Union
 
 from pydantic import BaseModel, create_model_from_typeddict
 
@@ -10,9 +10,10 @@ from ..firmware import FirmwareUpdateFinishedDataType, FirmwareUpdateProgressDat
 from ..notification import (
     EntryControlNotificationArgsDataType,
     NotificationNotificationArgsDataType,
+    PowerLevelNotificationArgsDataType,
 )
 from ..value import ValueDataType
-from . import NodeDataType
+from .data_model import NodeDataType
 from .statistics import NodeStatisticsDataType
 
 
@@ -36,10 +37,21 @@ class CheckHealthProgressEventModel(BaseNodeEventModel):
     Includes `check lifeline health progress` and `check route health progress` events.
     """
 
-    event: Literal["check health progress"]
     rounds: int
-    total_rounds: int
-    last_rating: int
+    totalRounds: int
+    lastRating: int
+
+
+class CheckLifelineHealthProgressEventModel(CheckHealthProgressEventModel):
+    """Model for `check lifeline health progress` event data."""
+
+    event: Literal["check lifeline health progress"]
+
+
+class CheckRouteHealthProgressEventModel(CheckHealthProgressEventModel):
+    """Model for `check route health progress` event data."""
+
+    event: Literal["check route health progress"]
 
 
 class DeadEventModel(BaseNodeEventModel):
@@ -89,7 +101,9 @@ class NotificationEventModel(BaseNodeEventModel):
     event: Literal["notification"]
     ccId: CommandClass
     args: Union[
-        NotificationNotificationArgsDataType, EntryControlNotificationArgsDataType
+        NotificationNotificationArgsDataType,
+        EntryControlNotificationArgsDataType,
+        PowerLevelNotificationArgsDataType,
     ]
 
 
@@ -129,7 +143,7 @@ class ValueEventModel(BaseNodeEventModel):
     `value notification`m `value removed`, and `value updated`.
     """
 
-    value: ValueDataType
+    args: ValueDataType
 
 
 class MetadataUpdatedEventModel(ValueEventModel):
@@ -180,10 +194,10 @@ FirmwareUpdateProgressEventModel = create_model_from_typeddict(
 )
 
 
-NODE_EVENT_MODEL_MAP = {
+NODE_EVENT_MODEL_MAP: Dict[str, Type["BaseNodeEventModel"]] = {
     "alive": AliveEventModel,
-    "check lifeline health progress": CheckHealthProgressEventModel,
-    "check route health progress": CheckHealthProgressEventModel,
+    "check lifeline health progress": CheckLifelineHealthProgressEventModel,
+    "check route health progress": CheckRouteHealthProgressEventModel,
     "dead": DeadEventModel,
     "firmware update finished": FirmwareUpdateFinishedEventModel,
     "firmware update progress": FirmwareUpdateProgressEventModel,

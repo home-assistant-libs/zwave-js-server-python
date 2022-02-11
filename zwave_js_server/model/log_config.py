@@ -14,7 +14,7 @@ class LogConfigDataType(TypedDict, total=False):
     """Represent a log config data dict type."""
 
     enabled: bool
-    level: int
+    level: str
     logToFile: bool
     filename: str
     forceConsole: bool
