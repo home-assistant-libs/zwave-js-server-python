@@ -77,7 +77,7 @@ def test_validator():
             NODE_EVENT_MODEL_MAP,
         )
 
-    # Invalid event type should fail validation
+    # Invalid event type should raise exception
     with pytest.raises(TypeError):
         assert event.validate_event_data(
             {},
