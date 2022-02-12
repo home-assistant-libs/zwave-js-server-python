@@ -1,11 +1,11 @@
 """Script to generate Multilevel Sensor CC constants."""
 from __future__ import annotations
 
-from collections import defaultdict
 import json
 import pathlib
 import re
 import subprocess
+from collections import defaultdict
 from typing import Callable, List
 
 import requests

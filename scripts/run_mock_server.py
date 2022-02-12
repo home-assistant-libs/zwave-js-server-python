@@ -1,10 +1,10 @@
 """Run a mock zwave-js-server instance off of a network state dump."""
 import argparse
 import asyncio
-from collections import defaultdict
-from collections.abc import Hashable
 import json
 import logging
+from collections import defaultdict
+from collections.abc import Hashable
 from typing import Any, DefaultDict, List, Optional, Union
 
 from aiohttp import WSMsgType, web, web_request
