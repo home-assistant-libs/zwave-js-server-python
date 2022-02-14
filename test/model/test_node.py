@@ -27,11 +27,11 @@ from zwave_js_server.exceptions import (
 )
 from zwave_js_server.model import node as node_pkg
 from zwave_js_server.model.firmware import FirmwareUpdateStatus
-from zwave_js_server.model.node_health_check import (
+from zwave_js_server.model.node.health_check import (
     LifelineHealthCheckResultDataType,
     RouteHealthCheckResultDataType,
 )
-from zwave_js_server.model.node_statistics import NodeStatistics
+from zwave_js_server.model.node.statistics import NodeStatistics
 from zwave_js_server.model.value import ConfigurationValue, get_value_id
 
 from .. import load_fixture
