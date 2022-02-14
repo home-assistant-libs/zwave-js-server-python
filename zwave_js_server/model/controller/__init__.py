@@ -24,7 +24,11 @@ from ...util.helpers import convert_base64_to_bytes, convert_bytes_to_base64
 from ..association import Association, AssociationGroup
 from .statistics import ControllerStatistics
 from ..node import Node
-from .inclusion_and_provisioning import InclusionGrant, ProvisioningEntry, QRProvisioningInformation
+from .inclusion_and_provisioning import (
+    InclusionGrant,
+    ProvisioningEntry,
+    QRProvisioningInformation,
+)
 from .data_model import ControllerDataType
 
 if TYPE_CHECKING:
