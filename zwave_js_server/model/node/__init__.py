@@ -1,39 +1,39 @@
 """Provide a model for the Z-Wave JS node."""
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
 
-from ..const import (
+from ...const import (
     INTERVIEW_FAILED,
     CommandClass,
     NodeStatus,
     PowerLevel,
     SecurityClass,
 )
-from ..event import Event, EventBase
-from ..exceptions import (
+from ...event import Event, EventBase
+from ...exceptions import (
     FailedCommand,
     NotFoundError,
     NotificationHasUnsupportedCommandClass,
     UnparseableValue,
     UnwriteableValue,
 )
-from .command_class import CommandClassInfo
-from .device_class import DeviceClass, DeviceClassDataType
-from .device_config import DeviceConfig, DeviceConfigDataType
-from .endpoint import Endpoint, EndpointDataType
-from .firmware import (
+from ..command_class import CommandClassInfo
+from ..device_class import DeviceClass, DeviceClassDataType
+from ..device_config import DeviceConfig, DeviceConfigDataType
+from ..endpoint import Endpoint, EndpointDataType
+from ..firmware import (
     FirmwareUpdateFinished,
     FirmwareUpdateFinishedDataType,
     FirmwareUpdateProgress,
     FirmwareUpdateProgressDataType,
 )
-from .node_health_check import (
+from .health_check import (
     CheckHealthProgress,
     LifelineHealthCheckSummary,
     RouteHealthCheckSummary,
     TestPowerLevelProgress,
 )
-from .node_statistics import NodeStatistics, NodeStatisticsDataType
-from .notification import (
+from .statistics import NodeStatistics, NodeStatisticsDataType
+from ..notification import (
     EntryControlNotification,
     EntryControlNotificationDataType,
     NotificationNotification,
@@ -41,7 +41,7 @@ from .notification import (
     PowerLevelNotification,
     PowerLevelNotificationDataType,
 )
-from .value import (
+from ..value import (
     ConfigurationValue,
     MetaDataType,
     Value,
@@ -53,7 +53,7 @@ from .value import (
 )
 
 if TYPE_CHECKING:
-    from ..client import Client
+    from ...client import Client
 
 
 class NodeDataType(TypedDict, total=False):
