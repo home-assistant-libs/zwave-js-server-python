@@ -1,4 +1,6 @@
 """Provide a model for the Z-Wave JS node."""
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, cast
+
 from ...const import (
     INTERVIEW_FAILED,
     TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED,
