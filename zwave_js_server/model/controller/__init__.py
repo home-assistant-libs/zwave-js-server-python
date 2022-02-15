@@ -1,6 +1,15 @@
 """Provide a model for the Z-Wave JS controller."""
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Union, cast
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    List,
+    Literal,
+    Optional,
+    Union,
+    cast,
+)
 
 from ...const import (
     MINIMUM_QR_STRING_LENGTH,

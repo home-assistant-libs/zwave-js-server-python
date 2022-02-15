@@ -1,6 +1,4 @@
 """Provide a model for the Z-Wave JS node."""
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, cast
-
 from ...const import (
     INTERVIEW_FAILED,
     TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED,
@@ -416,6 +414,7 @@ class Node(EventBase):
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
         validate_event_data(event.data, "node", event.type, NODE_EVENT_MODEL_MAP)
+
         self._handle_event_protocol(event)
         event.data["node"] = self
 

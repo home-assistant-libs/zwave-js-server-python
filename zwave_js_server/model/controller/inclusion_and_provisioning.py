@@ -78,7 +78,6 @@ class ProvisioningEntry:
         )
 
 
-@dataclass
 class QRProvisioningInformationMixin:
     """Mixin class to represent the base fields of a QR provisioning information."""
 
