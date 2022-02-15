@@ -140,7 +140,7 @@ class ValueEventModel(BaseNodeEventModel):
     Model for `value` events data.
 
     Subclass for event models for `metadata updated`, `value added`,
-    `value notification`m `value removed`, and `value updated`.
+    `value notification`, `value removed`, and `value updated`.
     """
 
     args: ValueDataType
