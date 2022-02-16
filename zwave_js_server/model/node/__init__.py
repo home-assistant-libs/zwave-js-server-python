@@ -5,7 +5,6 @@ from pydantic import ValidationError
 
 from ...const import (
     INTERVIEW_FAILED,
-    TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED,
     CommandClass,
     NodeStatus,
     PowerLevel,
@@ -56,11 +55,6 @@ from .health_check import (
     TestPowerLevelProgress,
 )
 from .statistics import NodeStatistics
-
-if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
-    from typing_extensions import TypedDict
-else:
-    from typing import TypedDict
 
 if TYPE_CHECKING:
     from ...client import Client

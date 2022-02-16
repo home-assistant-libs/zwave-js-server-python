@@ -1,5 +1,5 @@
 """Data model for a Z-Wave JS node."""
-from typing import List, Optional, TypedDict, Union
+from typing import List, Optional, Union
 
 from ...const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED
 from ..device_class import DeviceClassDataType
