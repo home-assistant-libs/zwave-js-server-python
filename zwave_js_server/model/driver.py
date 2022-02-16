@@ -1,13 +1,46 @@
 """Provide a model for the Z-Wave JS Driver."""
-from typing import TYPE_CHECKING, Any, Dict, Optional, Union, cast
+from typing import TYPE_CHECKING, Any, Dict, Literal, Optional, Type, Union, cast
 
-from ..event import Event, EventBase
+from pydantic import create_model_from_typeddict
+
+from ..event import BaseEventModel, Event, EventBase
 from .controller import Controller
 from .log_config import LogConfig, LogConfigDataType
 from .log_message import LogMessage, LogMessageDataType
 
 if TYPE_CHECKING:
     from ..client import Client
+
+
+class BaseDriverEventModel(BaseEventModel):
+    """Base model for a driver event."""
+
+    source: Literal["driver"]
+
+
+class LogConfigUpdatedEventModel(BaseDriverEventModel):
+    """Model for `log config updated` event data."""
+
+    event: Literal["log config updated"]
+    config: LogConfigDataType
+
+
+class AllNodesReadyEventModel(BaseDriverEventModel):
+    """Model for `all nodes ready` event data."""
+
+    event: Literal["all nodes ready"]
+
+
+LoggingEventModel = create_model_from_typeddict(
+    LogMessageDataType, __base__=BaseDriverEventModel
+)
+
+
+DRIVER_EVENT_MODEL_MAP: Dict[str, Type["BaseDriverEventModel"]] = {
+    "all nodes ready": AllNodesReadyEventModel,
+    "log config updated": LogConfigUpdatedEventModel,
+    "logging": LoggingEventModel,
+}
 
 
 class CheckConfigUpdates:
@@ -47,22 +80,11 @@ class Driver(EventBase):
             self.controller.receive_event(event)
             return
 
+        DRIVER_EVENT_MODEL_MAP[event.type](**event.data)
+
         self._handle_event_protocol(event)
 
         self.emit(event.type, event.data)
-
-    def handle_logging(self, event: Event) -> None:
-        """Process a driver logging event."""
-        event.data["log_message"] = LogMessage(cast(LogMessageDataType, event.data))
-
-    def handle_log_config_updated(self, event: Event) -> None:
-        """Process a driver log config updated event."""
-        event.data["log_config"] = self.log_config = LogConfig.from_dict(
-            event.data["config"]
-        )
-
-    def handle_all_nodes_ready(self, event: Event) -> None:
-        """Process a driver all nodes ready event."""
 
     async def _async_send_command(
         self, command: str, require_schema: int = None, **kwargs: Any
@@ -138,3 +160,16 @@ class Driver(EventBase):
         await self._async_send_command(
             "set_preferred_scales", scales=scales, require_schema=6
         )
+
+    def handle_logging(self, event: Event) -> None:
+        """Process a driver logging event."""
+        event.data["log_message"] = LogMessage(cast(LogMessageDataType, event.data))
+
+    def handle_log_config_updated(self, event: Event) -> None:
+        """Process a driver log config updated event."""
+        event.data["log_config"] = self.log_config = LogConfig.from_dict(
+            event.data["config"]
+        )
+
+    def handle_all_nodes_ready(self, event: Event) -> None:
+        """Process a driver all nodes ready event."""

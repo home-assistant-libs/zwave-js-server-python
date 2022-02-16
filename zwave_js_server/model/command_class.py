@@ -3,10 +3,12 @@ Model for Zwave Command Class Info.
 
 https://zwave-js.github.io/node-zwave-js/#/api/endpoint?id=commandclasses
 """
+from ..const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED, CommandClass
 
-from typing import TypedDict
-
-from ..const import CommandClass
+if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 
 class CommandClassInfoDataType(TypedDict):

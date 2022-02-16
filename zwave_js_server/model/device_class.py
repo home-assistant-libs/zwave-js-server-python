@@ -5,7 +5,14 @@ https://zwave-js.github.io/node-zwave-js/#/api/node?id=deviceclass
 """
 
 from dataclasses import dataclass
-from typing import List, TypedDict
+from typing import List
+
+from ..const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED
+
+if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 
 class DeviceClassItemDataType(TypedDict):

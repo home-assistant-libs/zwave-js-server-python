@@ -3,14 +3,21 @@ Model for a Zwave Node's device config.
 
 https://zwave-js.github.io/node-zwave-js/#/api/node?id=deviceconfig
 """
-from typing import Dict, List, Literal, Optional, TypedDict, Union
+from typing import Dict, List, Literal, Optional, Union
+
+from ..const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED
+
+if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 
 class DeviceDeviceDataType(TypedDict, total=False):
     """Represent a device device data dict type."""
 
-    productType: int
-    productId: int
+    productType: str
+    productId: str
 
 
 class DeviceDevice:
@@ -21,12 +28,12 @@ class DeviceDevice:
         self.data = data
 
     @property
-    def product_type(self) -> Optional[int]:
+    def product_type(self) -> Optional[str]:
         """Return product type."""
         return self.data.get("productType")
 
     @property
-    def product_id(self) -> Optional[int]:
+    def product_id(self) -> Optional[str]:
         """Return product id."""
         return self.data.get("productId")
 
@@ -126,7 +133,7 @@ class DeviceConfigDataType(TypedDict, total=False):
     label: str
     description: str
     devices: List[DeviceDeviceDataType]
-    firmwareVersion: DeviceFirmwareVersionRange
+    firmwareVersion: DeviceFirmwareVersionRangeDataType
     associations: Dict[str, dict]
     paramInformation: Dict[str, dict]
     supportsZWavePlus: bool
@@ -146,7 +153,7 @@ class DeviceConfig:
             DeviceDevice(device) for device in self.data.get("devices", [])
         ]
         self._firmware_version = DeviceFirmwareVersionRange(
-            self.data.get("firmwareVersion", {})  # type: ignore
+            self.data.get("firmwareVersion", {})
         )
         self._metadata = DeviceMetadata(self.data.get("metadata", {}))
 

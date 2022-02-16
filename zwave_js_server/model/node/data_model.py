@@ -1,11 +1,17 @@
-"""Provide a model for the Z-Wave JS controller."""
-from typing import List, Optional, TypedDict, Union
+"""Data model for a Z-Wave JS node."""
+from typing import List, Optional, Union
 
+from ...const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED
 from ..device_class import DeviceClassDataType
 from ..device_config import DeviceConfigDataType
 from ..endpoint import EndpointDataType
 from ..value import ValueDataType
 from .statistics import NodeStatisticsDataType
+
+if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 
 class NodeDataType(TypedDict, total=False):

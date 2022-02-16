@@ -1,5 +1,12 @@
 """Provide a model for the Z-Wave JS node's statistics."""
-from typing import Optional, TypedDict
+from typing import Optional
+
+from ...const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED
+
+if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 
 class NodeStatisticsDataType(TypedDict):

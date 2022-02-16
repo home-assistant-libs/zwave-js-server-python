@@ -1,9 +1,18 @@
 """Provide Event base classes for Z-Wave JS."""
 import logging
 from dataclasses import dataclass, field
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Literal
+
+from pydantic import BaseModel
 
 LOGGER = logging.getLogger(__package__)
+
+
+class BaseEventModel(BaseModel):
+    """Base model for an event."""
+
+    source: Literal["controller", "driver", "node"]
+    event: str
 
 
 @dataclass

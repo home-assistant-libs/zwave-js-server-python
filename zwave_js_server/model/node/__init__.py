@@ -45,6 +45,7 @@ from ..value import (
     _init_value,
 )
 from .data_model import NodeDataType
+from .event_model import NODE_EVENT_MODEL_MAP
 from .health_check import (
     CheckHealthProgress,
     LifelineHealthCheckSummary,
@@ -364,6 +365,8 @@ class Node(EventBase):
 
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
+        NODE_EVENT_MODEL_MAP[event.type](**event.data)
+
         self._handle_event_protocol(event)
         event.data["node"] = self
 

@@ -15,6 +15,7 @@ from ...util.helpers import convert_base64_to_bytes, convert_bytes_to_base64
 from ..association import Association, AssociationGroup
 from ..node import Node
 from .data_model import ControllerDataType
+from .event_model import CONTROLLER_EVENT_MODEL_MAP
 from .inclusion_and_provisioning import (
     InclusionGrant,
     ProvisioningEntry,
@@ -645,6 +646,8 @@ class Controller(EventBase):
                 f"Controller doesn't know how to handle/forward this event: {event.data}"
             )
 
+        CONTROLLER_EVENT_MODEL_MAP[event.type](**event.data)
+
         self._handle_event_protocol(event)
 
         event.data["controller"] = self
@@ -676,6 +679,8 @@ class Controller(EventBase):
     def handle_node_removed(self, event: Event) -> None:
         """Process a node removed event."""
         event.data["node"] = self.nodes.pop(event.data["node"]["nodeId"])
+        # Remove client from node since it's no longer connected to the controller
+        event.data["node"].client = None
 
     def handle_heal_network_progress(self, event: Event) -> None:
         """Process a heal network progress event."""

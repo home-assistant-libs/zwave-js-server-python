@@ -1,8 +1,18 @@
-"""Provide a model for the Z-Wave JS controller."""
+"""Provide a model for the Z-Wave JS controller's inclusion/provisioning data structures."""
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, TypedDict
+from typing import Any, Dict, List, Optional
 
-from ...const import Protocols, QRCodeVersion, SecurityClass
+from ...const import (
+    TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED,
+    Protocols,
+    QRCodeVersion,
+    SecurityClass,
+)
+
+if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 
 class InclusionGrantDataType(TypedDict):

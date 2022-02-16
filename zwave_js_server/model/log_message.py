@@ -1,7 +1,12 @@
 """Provide a model for a log message event."""
-from typing import List, Literal, Optional, TypedDict, Union
+from typing import List, Literal, Optional, Union
 
-from ..const import CommandClass
+from ..const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED, CommandClass
+
+if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 
 class LogMessageContextDataType(TypedDict, total=False):
