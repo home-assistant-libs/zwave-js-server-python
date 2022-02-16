@@ -321,5 +321,5 @@ async def test_set_preferred_scales(driver, uuid4, mock_command):
 
 async def test_unknown_event(driver):
     """Test that an unknown event type causes an exception."""
-    with pytest.raises(TypeError):
+    with pytest.raises(KeyError):
         assert driver.receive_event(Event("unknown_event", {"source": "driver"}))

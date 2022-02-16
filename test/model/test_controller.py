@@ -1394,7 +1394,7 @@ async def test_node_removed(client, multisensor_6, multisensor_6_state):
 
 async def test_unknown_event(controller):
     """Test that an unknown event type causes an exception."""
-    with pytest.raises(TypeError):
+    with pytest.raises(KeyError):
         assert controller.receive_event(
             Event("unknown_event", {"source": "controller"})
         )

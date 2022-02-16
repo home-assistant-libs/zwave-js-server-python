@@ -1,8 +1,6 @@
 """Provide a model for the Z-Wave JS node."""
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, cast
 
-from pydantic import ValidationError
-
 from ...const import (
     INTERVIEW_FAILED,
     CommandClass,
@@ -367,12 +365,7 @@ class Node(EventBase):
 
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
-        if event.type not in NODE_EVENT_MODEL_MAP:
-            raise TypeError(f"Unknown node event type: {event.type}")
-        try:
-            NODE_EVENT_MODEL_MAP[event.type](**event.data)
-        except ValidationError as exc:
-            raise ValueError(exc.errors()) from exc
+        NODE_EVENT_MODEL_MAP[event.type](**event.data)
 
         self._handle_event_protocol(event)
         event.data["node"] = self
