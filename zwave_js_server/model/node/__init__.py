@@ -1,5 +1,5 @@
 """Provide a model for the Z-Wave JS node."""
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, cast
 
 from ...const import (
     INTERVIEW_FAILED,
@@ -17,22 +17,15 @@ from ...exceptions import (
     UnwriteableValue,
 )
 from ..command_class import CommandClassInfo
-from ..device_class import DeviceClass, DeviceClassDataType
-from ..device_config import DeviceConfig, DeviceConfigDataType
-from ..endpoint import Endpoint, EndpointDataType
+from ..device_class import DeviceClass
+from ..device_config import DeviceConfig
+from ..endpoint import Endpoint
 from ..firmware import (
     FirmwareUpdateFinished,
     FirmwareUpdateFinishedDataType,
     FirmwareUpdateProgress,
     FirmwareUpdateProgressDataType,
 )
-from .health_check import (
-    CheckHealthProgress,
-    LifelineHealthCheckSummary,
-    RouteHealthCheckSummary,
-    TestPowerLevelProgress,
-)
-from .statistics import NodeStatistics, NodeStatisticsDataType
 from ..notification import (
     EntryControlNotification,
     EntryControlNotificationDataType,
@@ -51,54 +44,17 @@ from ..value import (
     _get_value_id_from_dict,
     _init_value,
 )
+from .data_model import NodeDataType
+from .health_check import (
+    CheckHealthProgress,
+    LifelineHealthCheckSummary,
+    RouteHealthCheckSummary,
+    TestPowerLevelProgress,
+)
+from .statistics import NodeStatistics
 
 if TYPE_CHECKING:
     from ...client import Client
-
-
-class NodeDataType(TypedDict, total=False):
-    """Represent a node data dict type."""
-
-    nodeId: int  # required
-    index: int  # required
-    deviceClass: DeviceClassDataType  # required
-    installerIcon: int
-    userIcon: int
-    name: str
-    location: str
-    status: int  # 0-4  # required
-    zwavePlusVersion: int
-    zwavePlusNodeType: int
-    zwavePlusRoleType: int
-    isListening: bool
-    isFrequentListening: Union[bool, str]
-    isRouting: bool
-    maxDataRate: int
-    supportedDataRates: List[int]
-    isSecure: bool
-    supportsBeaming: bool
-    supportsSecurity: bool
-    protocolVersion: int
-    firmwareVersion: str
-    manufacturerId: int
-    productId: int
-    productType: int
-    deviceConfig: DeviceConfigDataType
-    deviceDatabaseUrl: str
-    keepAwake: bool
-    ready: bool
-    label: str
-    endpoints: List[EndpointDataType]
-    endpointCountIsDynamic: bool
-    endpointsHaveIdenticalCapabilities: bool
-    individualEndpointCount: int
-    aggregatedEndpointCount: int
-    interviewAttempts: int
-    interviewStage: Optional[Union[int, str]]
-    values: List[ValueDataType]
-    statistics: NodeStatisticsDataType
-    highestSecurityClass: int
-    isControllerNode: bool
 
 
 class Node(EventBase):
