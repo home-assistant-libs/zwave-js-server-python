@@ -2,6 +2,8 @@
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Union, cast
 
+from pydantic import ValidationError
+
 from ...const import (
     MINIMUM_QR_STRING_LENGTH,
     InclusionState,
@@ -10,7 +12,7 @@ from ...const import (
     RFRegion,
     ZwaveFeature,
 )
-from ...event import Event, EventBase, validate_event_data
+from ...event import Event, EventBase
 from ...util.helpers import convert_base64_to_bytes, convert_bytes_to_base64
 from ..association import Association, AssociationGroup
 from ..node import Node
@@ -646,9 +648,12 @@ class Controller(EventBase):
                 f"Controller doesn't know how to handle/forward this event: {event.data}"
             )
 
-        validate_event_data(
-            event.data, "controller", event.type, CONTROLLER_EVENT_MODEL_MAP
-        )
+        if event.type not in CONTROLLER_EVENT_MODEL_MAP:
+            raise TypeError(f"Unknown controller event type: {event.type}")
+        try:
+            CONTROLLER_EVENT_MODEL_MAP[event.type](event.data)
+        except ValidationError as exc:
+            raise ValueError(exc.errors()) from exc
 
         self._handle_event_protocol(event)
 

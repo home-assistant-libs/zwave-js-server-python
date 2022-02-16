@@ -1,9 +1,9 @@
 """Provide a model for the Z-Wave JS Driver."""
 from typing import TYPE_CHECKING, Any, Dict, Literal, Optional, Type, Union, cast
 
-from pydantic import create_model_from_typeddict
+from pydantic import ValidationError, create_model_from_typeddict
 
-from ..event import BaseEventModel, Event, EventBase, validate_event_data
+from ..event import BaseEventModel, Event, EventBase
 from .controller import Controller
 from .log_config import LogConfig, LogConfigDataType
 from .log_message import LogMessage, LogMessageDataType
@@ -80,7 +80,12 @@ class Driver(EventBase):
             self.controller.receive_event(event)
             return
 
-        validate_event_data(event.data, "driver", event.type, DRIVER_EVENT_MODEL_MAP)
+        if event.type not in DRIVER_EVENT_MODEL_MAP:
+            raise TypeError(f"Unknown driver event type: {event.type}")
+        try:
+            DRIVER_EVENT_MODEL_MAP[event.type](event.data)
+        except ValidationError as exc:
+            raise ValueError(exc.errors()) from exc
 
         self._handle_event_protocol(event)
 
