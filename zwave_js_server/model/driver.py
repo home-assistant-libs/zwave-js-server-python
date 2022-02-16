@@ -83,7 +83,7 @@ class Driver(EventBase):
         if event.type not in DRIVER_EVENT_MODEL_MAP:
             raise TypeError(f"Unknown driver event type: {event.type}")
         try:
-            DRIVER_EVENT_MODEL_MAP[event.type](event.data)
+            DRIVER_EVENT_MODEL_MAP[event.type](**event.data)
         except ValidationError as exc:
             raise ValueError(exc.errors()) from exc
 

@@ -376,7 +376,7 @@ class Node(EventBase):
         if event.type not in NODE_EVENT_MODEL_MAP:
             raise TypeError(f"Unknown node event type: {event.type}")
         try:
-            NODE_EVENT_MODEL_MAP[event.type](event.data)
+            NODE_EVENT_MODEL_MAP[event.type](**event.data)
         except ValidationError as exc:
             raise ValueError(exc.errors()) from exc
 

@@ -651,7 +651,7 @@ class Controller(EventBase):
         if event.type not in CONTROLLER_EVENT_MODEL_MAP:
             raise TypeError(f"Unknown controller event type: {event.type}")
         try:
-            CONTROLLER_EVENT_MODEL_MAP[event.type](event.data)
+            CONTROLLER_EVENT_MODEL_MAP[event.type](**event.data)
         except ValidationError as exc:
             raise ValueError(exc.errors()) from exc
 
