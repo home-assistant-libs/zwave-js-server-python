@@ -69,14 +69,6 @@ class ProvisioningEntry:
 
 
 @dataclass
-class NVMProgress:
-    """Class to represent an NVM backup/restore progress event."""
-
-    bytes_read_or_written: int
-    total_bytes: int
-
-
-@dataclass
 class QRProvisioningInformationMixin:
     """Mixin class to represent the base fields of a QR provisioning information."""
 
