@@ -1390,3 +1390,11 @@ async def test_node_removed(client, multisensor_6, multisensor_6_state):
     assert event.data["node"].node_id == 52
     assert event.data["node"].client is None
     assert 52 not in client.driver.controller.nodes
+
+
+async def test_unknown_event(controller):
+    """Test that an unknown event type causes an exception."""
+    with pytest.raises(TypeError):
+        assert controller.receive_event(
+            Event("unknown_event", {"source": "controller"})
+        )

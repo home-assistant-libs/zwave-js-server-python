@@ -1450,3 +1450,9 @@ async def test_set_keep_awake(multisensor_6: node_pkg.Node, uuid4, mock_command)
         "keepAwake": False,
         "messageId": uuid4,
     }
+
+
+async def test_unknown_event(multisensor_6: node_pkg.Node):
+    """Test that an unknown event type causes an exception."""
+    with pytest.raises(TypeError):
+        assert multisensor_6.receive_event(Event("unknown_event", {"source": "node"}))

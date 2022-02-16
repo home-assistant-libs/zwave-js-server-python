@@ -1,6 +1,8 @@
 """Test the driver model."""
 import json
 
+import pytest
+
 from zwave_js_server.const import LogLevel
 from zwave_js_server.event import Event
 from zwave_js_server.model import driver as driver_pkg
@@ -315,3 +317,9 @@ async def test_set_preferred_scales(driver, uuid4, mock_command):
         "scales": {1: 1},
         "messageId": uuid4,
     }
+
+
+async def test_unknown_event(driver):
+    """Test that an unknown event type causes an exception."""
+    with pytest.raises(TypeError):
+        assert driver.receive_event(Event("unknown_event", {"source": "driver"}))
