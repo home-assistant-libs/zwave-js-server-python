@@ -935,13 +935,29 @@ async def test_get_associations(controller, uuid4, mock_command):
         {"command": "controller.get_associations"},
         {
             "associations": {
-                1: {
-                    "nodeId": 10,
-                },
-                2: {
-                    "nodeId": 30,
-                    "endpoint": 0,
-                },
+                "1": [
+                     {
+                       "nodeId": 10,
+                     }
+                ],
+                "2": [
+                     {
+                       "nodeId": 11,
+                     },
+                     {
+                       "nodeId": 20,
+                     }
+                ],
+                "3": [
+                     {
+                       "nodeId": 30,
+                       "endpoint": 0,
+                     },
+                     {
+                       "nodeId": 40,
+                       "endpoint": 1,
+                     },
+                ],
             }
         },
     )
@@ -949,11 +965,21 @@ async def test_get_associations(controller, uuid4, mock_command):
     node_id = 52
     result = await controller.async_get_associations(node_id)
 
-    assert result[1].node_id == 10
-    assert result[1].endpoint is None
+    assert result[1][0].node_id == 10
+    assert result[1][0].endpoint is None
 
-    assert result[2].node_id == 30
-    assert result[2].endpoint == 0
+    assert result[2][0].node_id == 11
+    assert result[2][0].endpoint is None
+
+    assert result[2][1].node_id == 20
+    assert result[2][1].endpoint is None
+
+    assert result[3][0].node_id == 30
+    assert result[3][0].endpoint == 0
+
+    assert result[3][1].node_id == 40
+    assert result[3][1].endpoint == 1
+
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {

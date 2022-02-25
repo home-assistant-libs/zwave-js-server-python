@@ -441,7 +441,7 @@ class Controller(EventBase):
             )
         return groups
 
-    async def async_get_associations(self, node_id: int) -> Dict[int, Association]:
+    async def async_get_associations(self, node_id: int) -> Dict[int, List[Association]]:
         """Send getAssociations command to Controller."""
         data = await self.client.async_send_command(
             {
@@ -450,10 +450,10 @@ class Controller(EventBase):
             }
         )
         associations = {}
-        for key, association in data["associations"].items():
-            associations[key] = Association(
-                node_id=association["nodeId"], endpoint=association.get("endpoint")
-            )
+        
+        for key, groupassociations in data["associations"].items():
+            associations[int(key)] = [Association(node_id=association["nodeId"], endpoint=association.get("endpoint")) for association in groupassociations]
+
         return associations
 
     async def async_is_association_allowed(
