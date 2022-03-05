@@ -27,7 +27,7 @@ def test_from_state():
 
     ctrl = controller_pkg.Controller(None, state)
 
-    assert ctrl.library_version == "Z-Wave 3.95"
+    assert ctrl.sdk_version == "Z-Wave 3.95"
     assert ctrl.controller_type == 1
     assert ctrl.home_id == 3601639587
     assert ctrl.own_node_id == 1
@@ -37,7 +37,7 @@ def test_from_state():
     assert ctrl.was_real_primary is True
     assert ctrl.is_static_update_controller is True
     assert ctrl.is_slave is False
-    assert ctrl.serial_api_version == "1.0"
+    assert ctrl.firmware_version == "1.0"
     assert ctrl.manufacturer_id == 134
     assert ctrl.product_type == 257
     assert ctrl.product_id == 90
