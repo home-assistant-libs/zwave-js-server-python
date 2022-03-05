@@ -21,7 +21,11 @@ from .inclusion_and_provisioning import (
     ProvisioningEntry,
     QRProvisioningInformation,
 )
-from .statistics import ControllerStatistics
+from .statistics import (
+    ControllerLifelineRoutes,
+    ControllerLifelineRoutesDataType,
+    ControllerStatistics,
+)
 
 if TYPE_CHECKING:
     from ...client import Client
@@ -64,9 +68,9 @@ class Controller(EventBase):
         return self.home_id == other.home_id
 
     @property
-    def library_version(self) -> Optional[str]:
-        """Return library_version."""
-        return self.data.get("libraryVersion")
+    def sdk_version(self) -> Optional[str]:
+        """Return sdk_version."""
+        return self.data.get("sdkVersion")
 
     @property
     def controller_type(self) -> Optional[int]:
@@ -114,9 +118,9 @@ class Controller(EventBase):
         return self.data.get("isSlave")
 
     @property
-    def serial_api_version(self) -> Optional[str]:
-        """Return serial_api_version."""
-        return self.data.get("serialApiVersion")
+    def firmware_version(self) -> Optional[str]:
+        """Return firmware_version."""
+        return self.data.get("firmwareVersion")
 
     @property
     def manufacturer_id(self) -> Optional[int]:
@@ -628,6 +632,21 @@ class Controller(EventBase):
             require_schema=14,
         )
         return cast(bool, data["success"])
+
+    async def async_get_known_lifeline_routes(
+        self,
+    ) -> Dict[Node, ControllerLifelineRoutes]:
+        """Send getKnownLifelineRoutes command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.get_known_lifeline_routes"}, require_schema=16
+        )
+
+        return {
+            self.nodes[node_id]: ControllerLifelineRoutes(self.client, lifeline_routes)
+            for node_id, lifeline_routes in cast(
+                Dict[int, ControllerLifelineRoutesDataType], data["routes"]
+            ).items()
+        }
 
     def receive_event(self, event: Event) -> None:
         """Receive an event."""

@@ -67,7 +67,7 @@ class Node(EventBase):
         self.client = client
         self.data: NodeDataType = {}
         self._device_config: DeviceConfig = DeviceConfig({})
-        self._statistics: NodeStatistics = NodeStatistics()
+        self._statistics: NodeStatistics = NodeStatistics(client)
         self._firmware_update_progress: Optional[FirmwareUpdateProgress] = None
         self.values: Dict[str, Union[ConfigurationValue, Value]] = {}
         self.endpoints: Dict[int, Endpoint] = {}
@@ -302,7 +302,7 @@ class Node(EventBase):
         """Update the internal state data."""
         self.data = data
         self._device_config = DeviceConfig(self.data.get("deviceConfig", {}))
-        self._statistics = NodeStatistics(self.data.get("statistics"))
+        self._statistics = NodeStatistics(self.client, self.data.get("statistics"))
 
         # Remove stale values
         value_ids = (_get_value_id_from_dict(self, val) for val in data["values"])
