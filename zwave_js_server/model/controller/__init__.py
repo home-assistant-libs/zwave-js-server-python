@@ -643,9 +643,7 @@ class Controller(EventBase):
 
         return {
             self.nodes[node_id]: ControllerLifelineRoutes(self.client, lifeline_routes)
-            for node_id, lifeline_routes in cast(
-                Dict[int, ControllerLifelineRoutesDataType], data["routes"]
-            ).items()
+            for node_id, lifeline_routes in data["routes"].items()
         }
 
     def receive_event(self, event: Event) -> None:
