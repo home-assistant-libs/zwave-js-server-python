@@ -33,6 +33,7 @@ class RouteStatistics:
     """Represent route statistics."""
 
     def __init__(self, client: "Client", data: RouteStatisticsDataType) -> None:
+        """Initialize route statistics."""
         self.data = data
         self.client = client
 
