@@ -420,13 +420,16 @@ class Controller(EventBase):
         return cast(bool, data["failed"])
 
     async def async_get_association_groups(
-        self, node_id: int
+        self, source: Association
     ) -> Dict[int, AssociationGroup]:
         """Send getAssociationGroups command to Controller."""
         data = await self.client.async_send_command(
             {
                 "command": "controller.get_association_groups",
-                "nodeId": node_id,
+                "nodeId": source.node_id,
+                **(
+                    {"endpoint": source.endpoint} if source.endpoint is not None else {}
+                ),
             }
         )
         groups = {}
@@ -441,84 +444,132 @@ class Controller(EventBase):
             )
         return groups
 
-    async def async_get_associations(self, node_id: int) -> Dict[int, List[Association]]:
+    async def async_get_associations(
+        self, source: Association
+    ) -> Dict[int, List[Association]]:
         """Send getAssociations command to Controller."""
         data = await self.client.async_send_command(
             {
                 "command": "controller.get_associations",
-                "nodeId": node_id,
+                "nodeId": source.node_id,
+                **(
+                    {"endpoint": source.endpoint} if source.endpoint is not None else {}
+                ),
             }
         )
         associations = {}
-        
+
         for key, groupassociations in data["associations"].items():
-            associations[int(key)] = [Association(node_id=association["nodeId"], endpoint=association.get("endpoint")) for association in groupassociations]
+            associations[int(key)] = [
+                Association(
+                    node_id=association["nodeId"], endpoint=association.get("endpoint")
+                )
+                for association in groupassociations
+            ]
 
         return associations
 
     async def async_is_association_allowed(
-        self, node_id: int, group: int, association: Association
+        self, source: Association, group: int, association: Association
     ) -> bool:
         """Send isAssociationAllowed command to Controller."""
         data = await self.client.async_send_command(
             {
                 "command": "controller.is_association_allowed",
-                "nodeId": node_id,
+                "nodeId": source.node_id,
+                **(
+                    {"endpoint": source.endpoint} if source.endpoint is not None else {}
+                ),
                 "group": group,
                 "association": {
                     "nodeId": association.node_id,
-                    "endpoint": association.endpoint,
+                    **(
+                        {"endpoint": association.endpoint}
+                        if association.endpoint is not None
+                        else {}
+                    ),
                 },
             }
         )
         return cast(bool, data["allowed"])
 
     async def async_add_associations(
-        self, node_id: int, group: int, associations: List[Association]
+        self,
+        source: Association,
+        group: int,
+        associations: List[Association],
+        wait_for_result: Optional[bool] = None,
     ) -> None:
         """Send addAssociations command to Controller."""
-        await self.client.async_send_command(
-            {
-                "command": "controller.add_associations",
-                "nodeId": node_id,
-                "group": group,
-                "associations": [
-                    {
-                        "nodeId": association.node_id,
-                        "endpoint": association.endpoint,
-                    }
-                    for association in associations
-                ],
-            }
-        )
+        cmd = {
+            "command": "controller.add_associations",
+            "nodeId": source.node_id,
+            **({"endpoint": source.endpoint} if source.endpoint is not None else {}),
+            "group": group,
+            "associations": [
+                {
+                    "nodeId": association.node_id,
+                    **(
+                        {"endpoint": association.endpoint}
+                        if association.endpoint is not None
+                        else {}
+                    ),
+                }
+                for association in associations
+            ],
+        }
+
+        if wait_for_result:
+            await self.client.async_send_command(cmd)
+        else:
+            await self.client.async_send_command_no_wait(cmd)
 
     async def async_remove_associations(
-        self, node_id: int, group: int, associations: List[Association]
+        self,
+        source: Association,
+        group: int,
+        associations: List[Association],
+        wait_for_result: Optional[bool] = None,
     ) -> None:
         """Send removeAssociations command to Controller."""
-        await self.client.async_send_command(
-            {
-                "command": "controller.remove_associations",
-                "nodeId": node_id,
-                "group": group,
-                "associations": [
-                    {
-                        "nodeId": association.node_id,
-                        "endpoint": association.endpoint,
-                    }
-                    for association in associations
-                ],
-            }
-        )
+        cmd = {
+            "command": "controller.remove_associations",
+            "nodeId": source.node_id,
+            **({"endpoint": source.endpoint} if source.endpoint is not None else {}),
+            "group": group,
+            "associations": [
+                {
+                    "nodeId": association.node_id,
+                    **(
+                        {"endpoint": association.endpoint}
+                        if association.endpoint is not None
+                        else {}
+                    ),
+                }
+                for association in associations
+            ],
+        }
 
-    async def async_remove_node_from_all_associations(self, node_id: int) -> None:
+        if wait_for_result:
+            await self.client.async_send_command(cmd)
+        else:
+            await self.client.async_send_command_no_wait(cmd)
+
+    async def async_remove_node_from_all_associations(
+        self,
+        node_id: int,
+        wait_for_result: Optional[bool] = None,
+    ) -> None:
         """Send removeNodeFromAllAssociations command to Controller."""
-        await self.client.async_send_command(
-            {
-                "command": "controller.remove_node_from_all_associations",
-                "nodeId": node_id,
-            }
-        )
+        cmd = {
+            "command": "controller.remove_node_from_all_associations",
+            "nodeId": node_id,
+        }
+
+        if wait_for_result:
+            await self.client.async_send_command(cmd)
+        else:
+            await self.client.async_send_command_no_wait(cmd)
 
     async def async_get_node_neighbors(self, node_id: int) -> List[int]:
         """Send getNodeNeighbors command to Controller to get node's neighbors."""
