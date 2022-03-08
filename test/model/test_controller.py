@@ -1345,10 +1345,6 @@ async def test_get_known_lifeline_routes(
                         "repeaters": [],
                         "rssi": 1,
                         "repeaterRSSI": [127],
-                        "routeFailedBetween": [
-                            multisensor_6.node_id,
-                            multisensor_6.node_id,
-                        ],
                     },
                 }
             }
@@ -1374,7 +1370,7 @@ async def test_get_known_lifeline_routes(
     assert lifeline_routes.nlwr.repeaters == []
     assert lifeline_routes.nlwr.rssi == 1
     assert lifeline_routes.nlwr.repeater_rssi == ["Not Available"]
-    assert lifeline_routes.nlwr.route_failed_between == [multisensor_6, multisensor_6]
+    assert not lifeline_routes.nlwr.route_failed_between
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
