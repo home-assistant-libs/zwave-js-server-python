@@ -1343,6 +1343,7 @@ async def test_get_known_lifeline_routes(
                     "nlwr": {
                         "protocolDataRate": 2,
                         "repeaters": [],
+                        "rssi": 1,
                         "repeaterRSSI": [127],
                         "routeFailedBetween": [
                             multisensor_6.node_id,
@@ -1362,6 +1363,7 @@ async def test_get_known_lifeline_routes(
     assert lifeline_routes.lwr
     assert lifeline_routes.lwr.protocol_data_rate == ProtocolDataRate.ZWAVE_9K6
     assert lifeline_routes.lwr.repeaters == [multisensor_6]
+    assert not lifeline_routes.lwr.rssi
     assert lifeline_routes.lwr.repeater_rssi == [1]
     assert lifeline_routes.lwr.route_failed_between == [
         ring_keypad,
@@ -1370,6 +1372,7 @@ async def test_get_known_lifeline_routes(
     assert lifeline_routes.nlwr
     assert lifeline_routes.nlwr.protocol_data_rate == ProtocolDataRate.ZWAVE_40K
     assert lifeline_routes.nlwr.repeaters == []
+    assert lifeline_routes.nlwr.rssi == 1
     assert lifeline_routes.nlwr.repeater_rssi == ["Not Available"]
     assert lifeline_routes.nlwr.route_failed_between == [multisensor_6, multisensor_6]
 

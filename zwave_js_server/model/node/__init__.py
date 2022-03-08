@@ -808,5 +808,6 @@ class Node(EventBase):
 
     def handle_statistics_updated(self, event: Event) -> None:
         """Process a statistics updated event."""
-        self._statistics.data.update(event.data["statistics"])
-        event.data["statistics_updated"] = self.statistics
+        event.data["statistics_updated"] = self._statistics = NodeStatistics(
+            self.client, event.data["statistics"]
+        )

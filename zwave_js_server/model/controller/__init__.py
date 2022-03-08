@@ -711,8 +711,9 @@ class Controller(EventBase):
 
     def handle_statistics_updated(self, event: Event) -> None:
         """Process a statistics updated event."""
-        self._statistics.data.update(event.data["statistics"])
-        event.data["statistics_updated"] = self.statistics
+        self._statistics = event.data["statistics_updated"] = ControllerStatistics(
+            event.data["statistics"]
+        )
 
     def handle_grant_security_classes(self, event: Event) -> None:
         """Process a grant security classes event."""

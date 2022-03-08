@@ -1161,6 +1161,37 @@ async def test_statistics_updated(
     assert event_stats.nlwr.protocol_data_rate == ProtocolDataRate.ZWAVE_40K
     assert node.statistics == event_stats
 
+    event = Event(
+        "statistics updated",
+        {
+            "source": "node",
+            "event": "statistics updated",
+            "nodeId": node.node_id,
+            "statistics": {
+                "commandsTX": 1,
+                "commandsRX": 2,
+                "commandsDroppedTX": 3,
+                "commandsDroppedRX": 4,
+                "timeoutResponse": 5,
+            },
+        },
+    )
+    node.receive_event(event)
+    # Event should be modified with the NodeStatistics object
+    assert "statistics_updated" in event.data
+    event_stats: NodeStatistics = event.data["statistics_updated"]
+    assert isinstance(event_stats, NodeStatistics)
+    assert event_stats.commands_tx == 1
+    assert event_stats.commands_rx == 2
+    assert event_stats.commands_dropped_tx == 3
+    assert event_stats.commands_dropped_rx == 4
+    assert event_stats.timeout_response == 5
+    assert not event_stats.rtt
+    assert not event_stats.rssi
+    assert not event_stats.lwr
+    assert not event_stats.nlwr
+    assert node.statistics == event_stats
+
 
 async def test_has_security_class(multisensor_6: node_pkg.Node, uuid4, mock_command):
     """Test node.has_security_class command."""
