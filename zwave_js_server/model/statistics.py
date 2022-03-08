@@ -61,10 +61,7 @@ class RouteStatistics:
     @property
     def repeater_rssi(self) -> Dict["Node", Union[str, int]]:
         """Return repeater RSSI."""
-        return {
-            self.repeaters[idx]: friendly_rssi(rssi_)
-            for idx, rssi_ in enumerate(self.data.get("repeaterRSSI", {}))
-        }
+        return [friendly_rssi(rssi_) for rssi_ in self.data.get("repeaterRSSI", [])]
 
     @property
     def route_failed_between(self) -> Optional[List["Node"]]:

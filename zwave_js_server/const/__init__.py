@@ -311,17 +311,6 @@ class ProtocolDataRate(IntEnum):
     LONG_RANGE_100K = 4
 
 
-class RouteProtocolDataRate(IntEnum):
-    """Enum for all known protocol data rates."""
-
-    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/capabilities/Protocols.ts#L14
-    UNSPECIFIED = 0
-    ZWAVE_9K6 = 1
-    ZWAVE_40K = 2
-    ZWAVE_100K = 3
-    LONG_RANGE_100K = 4
-
-
 class RssiError(IntEnum):
     """Enum for all known RSSI errors."""
 
@@ -337,6 +326,7 @@ def friendly_rssi(rssi: int) -> Union[str, int]:
 
     Returns error string if rssi is in RssiError, otherwise returns the rssi in dBm.
     """
-    if rssi in RssiError:
+    try:
         return RssiError(rssi).name.replace("_", " ").title()
-    return rssi
+    except ValueError:
+        return rssi

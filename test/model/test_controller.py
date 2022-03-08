@@ -7,9 +7,11 @@ import pytest
 from zwave_js_server.const import (
     InclusionState,
     InclusionStrategy,
+    ProtocolDataRate,
     Protocols,
     QRCodeVersion,
     RFRegion,
+    RssiError,
     SecurityClass,
     ZwaveFeature,
 )
@@ -1317,6 +1319,53 @@ async def test_get_rf_region(controller, uuid4, mock_command):
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.get_rf_region",
+        "messageId": uuid4,
+    }
+
+
+async def test_get_known_lifeline_routes(multisensor_6, uuid4, mock_command):
+    """Test get known lifeline routes."""
+    ack_commands = mock_command(
+        {"command": "controller.get_known_lifeline_routes"},
+        {
+            "routes": {
+                multisensor_6.node_id: {
+                    "lwr": {
+                        "protocolDataRate": 1,
+                        "repeaters": [multisensor_6.node_id],
+                        "repeaterRSSI": [1],
+                        "routeFailedBetween": [multisensor_6.node_id, multisensor_6.node_id],
+                    },
+                    "nlwr": {
+                        "protocolDataRate": 2,
+                        "repeaters": [],
+                        "repeaterRSSI": [127],
+                        "routeFailedBetween": [multisensor_6.node_id, multisensor_6.node_id],
+                    },
+                }
+            }
+        },
+    )
+    routes = (
+        await multisensor_6.client.driver.controller.async_get_known_lifeline_routes()
+    )
+    assert len(routes) == 1
+    assert multisensor_6 in routes
+    lifeline_routes = routes[multisensor_6]
+    assert lifeline_routes.lwr
+    assert lifeline_routes.lwr.protocol_data_rate == ProtocolDataRate.ZWAVE_9K6
+    assert lifeline_routes.lwr.repeaters == [multisensor_6]
+    assert lifeline_routes.lwr.repeater_rssi == [1]
+    assert lifeline_routes.lwr.route_failed_between == [multisensor_6, multisensor_6]
+    assert lifeline_routes.nlwr
+    assert lifeline_routes.nlwr.protocol_data_rate == ProtocolDataRate.ZWAVE_40K
+    assert lifeline_routes.nlwr.repeaters == []
+    assert lifeline_routes.nlwr.repeater_rssi == ["Not Available"]
+    assert lifeline_routes.nlwr.route_failed_between == [multisensor_6, multisensor_6]
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_known_lifeline_routes",
         "messageId": uuid4,
     }
 
