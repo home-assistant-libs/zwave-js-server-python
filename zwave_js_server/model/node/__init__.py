@@ -152,7 +152,9 @@ class Node(EventBase):
     @property
     def is_secure(self) -> Optional[bool]:
         """Return the is_secure."""
-        return self.data.get("isSecure")
+        if (is_secure := self.data.get("isSecure")) == "unknown":
+            return False
+        return is_secure
 
     @property
     def protocol_version(self) -> Optional[int]:

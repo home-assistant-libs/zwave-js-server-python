@@ -102,6 +102,12 @@ def ring_keypad_state_fixture():
     return json.loads(load_fixture("ring_keypad_state.json"))
 
 
+@pytest.fixture(name="is_secure_unknown_state", scope="session")
+def is_secure_unknown_state_fixture():
+    """Load the isSecure = `unknown` node state fixture data."""
+    return json.loads(load_fixture("is_secure_unknown_state.json"))
+
+
 def create_ws_message(result):
     """Return a mock WSMessage."""
     message = Mock(spec_set=WSMessage)
@@ -468,5 +474,13 @@ def invalid_multilevel_sensor_type_fixture(
 ):
     """Mock a node that has invalid multilevel sensor type."""
     node = Node(driver.client, deepcopy(invalid_multilevel_sensor_type_state))
+    driver.controller.nodes[node.node_id] = node
+    return node
+
+
+@pytest.fixture(name="is_secure_unknown")
+def is_secure_unknown_fixture(driver, is_secure_unknown_state):
+    """Mock a node that has inSecure = `unknown`."""
+    node = Node(driver.client, deepcopy(is_secure_unknown_state))
     driver.controller.nodes[node.node_id] = node
     return node

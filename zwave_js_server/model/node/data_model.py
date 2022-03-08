@@ -1,5 +1,5 @@
 """Data model for a Z-Wave JS node."""
-from typing import List, Optional, Union
+from typing import List, Literal, Optional, Union
 
 from ...const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED
 from ..device_class import DeviceClassDataType
@@ -56,4 +56,4 @@ class NodeDataType(TypedDict, total=False):
     values: List[ValueDataType]
     statistics: NodeStatisticsDataType
     highestSecurityClass: int
-    isControllerNode: bool
+    isControllerNode: Union[bool, Literal["unknown"]]
