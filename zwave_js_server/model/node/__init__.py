@@ -153,7 +153,7 @@ class Node(EventBase):
     def is_secure(self) -> Optional[bool]:
         """Return the is_secure."""
         if (is_secure := self.data.get("isSecure")) == "unknown":
-            return False
+            return None
         return is_secure
 
     @property
