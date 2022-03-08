@@ -1,5 +1,5 @@
 """Data model for a Z-Wave JS node."""
-from typing import List, Optional, Union
+from typing import List, Literal, Optional, Union
 
 from ...const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED
 from ..device_class import DeviceClassDataType
@@ -33,7 +33,7 @@ class NodeDataType(TypedDict, total=False):
     isRouting: bool
     maxDataRate: int
     supportedDataRates: List[int]
-    isSecure: bool
+    isSecure: Union[bool, Literal["unknown"]]
     supportsBeaming: bool
     supportsSecurity: bool
     protocolVersion: int
