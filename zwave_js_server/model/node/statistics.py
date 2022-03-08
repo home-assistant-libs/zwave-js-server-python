@@ -43,12 +43,6 @@ class NodeStatistics:
             timeoutResponse=0,
         )
         self.client = client
-        self._lwr = None
-        if lwr := self.data.get("lwr"):
-            self._lwr = RouteStatistics(client, lwr)
-        self._nlwr = None
-        if nlwr := self.data.get("nlwr"):
-            self._nlwr = RouteStatistics(client, nlwr)
 
     @property
     def commands_tx(self) -> int:
@@ -107,9 +101,13 @@ class NodeStatistics:
     @property
     def lwr(self) -> Optional[RouteStatistics]:
         """Return last working route from the controller to this node."""
-        return self._lwr
+        if (lwr := self.data.get("lwr")) is not None:
+            return RouteStatistics(self.client, lwr)
+        return None
 
     @property
     def nlwr(self) -> Optional[RouteStatistics]:
         """Return next to last working route from the controller to this node."""
-        return self._nlwr
+        if (nlwr := self.data.get("nlwr")) is not None:
+            return RouteStatistics(self.client, nlwr)
+        return None
