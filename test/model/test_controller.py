@@ -11,7 +11,6 @@ from zwave_js_server.const import (
     Protocols,
     QRCodeVersion,
     RFRegion,
-    RssiError,
     SecurityClass,
     ZwaveFeature,
 )

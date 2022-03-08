@@ -1,6 +1,6 @@
 """Common models for statistics."""
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, List, Optional, Union
 
 from ..const import (
     TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED,
@@ -59,7 +59,7 @@ class RouteStatistics:
         return friendly_rssi(rssi)
 
     @property
-    def repeater_rssi(self) -> Dict["Node", Union[str, int]]:
+    def repeater_rssi(self) -> List[Union[str, int]]:
         """Return repeater RSSI."""
         return [friendly_rssi(rssi_) for rssi_ in self.data.get("repeaterRSSI", [])]
 
