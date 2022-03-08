@@ -1323,7 +1323,9 @@ async def test_get_rf_region(controller, uuid4, mock_command):
     }
 
 
-async def test_get_known_lifeline_routes(multisensor_6, uuid4, mock_command):
+async def test_get_known_lifeline_routes(
+    multisensor_6, ring_keypad, wallmote_central_scene, uuid4, mock_command
+):
     """Test get known lifeline routes."""
     ack_commands = mock_command(
         {"command": "controller.get_known_lifeline_routes"},
@@ -1334,13 +1336,19 @@ async def test_get_known_lifeline_routes(multisensor_6, uuid4, mock_command):
                         "protocolDataRate": 1,
                         "repeaters": [multisensor_6.node_id],
                         "repeaterRSSI": [1],
-                        "routeFailedBetween": [multisensor_6.node_id, multisensor_6.node_id],
+                        "routeFailedBetween": [
+                            ring_keypad.node_id,
+                            wallmote_central_scene.node_id,
+                        ],
                     },
                     "nlwr": {
                         "protocolDataRate": 2,
                         "repeaters": [],
                         "repeaterRSSI": [127],
-                        "routeFailedBetween": [multisensor_6.node_id, multisensor_6.node_id],
+                        "routeFailedBetween": [
+                            multisensor_6.node_id,
+                            multisensor_6.node_id,
+                        ],
                     },
                 }
             }
@@ -1356,7 +1364,10 @@ async def test_get_known_lifeline_routes(multisensor_6, uuid4, mock_command):
     assert lifeline_routes.lwr.protocol_data_rate == ProtocolDataRate.ZWAVE_9K6
     assert lifeline_routes.lwr.repeaters == [multisensor_6]
     assert lifeline_routes.lwr.repeater_rssi == [1]
-    assert lifeline_routes.lwr.route_failed_between == [multisensor_6, multisensor_6]
+    assert lifeline_routes.lwr.route_failed_between == [
+        ring_keypad,
+        wallmote_central_scene,
+    ]
     assert lifeline_routes.nlwr
     assert lifeline_routes.nlwr.protocol_data_rate == ProtocolDataRate.ZWAVE_40K
     assert lifeline_routes.nlwr.repeaters == []
