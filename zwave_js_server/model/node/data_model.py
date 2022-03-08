@@ -33,7 +33,7 @@ class NodeDataType(TypedDict, total=False):
     isRouting: bool
     maxDataRate: int
     supportedDataRates: List[int]
-    isSecure: bool
+    isSecure: Union[bool, Literal["unknown"]]
     supportsBeaming: bool
     supportsSecurity: bool
     protocolVersion: int
@@ -56,4 +56,4 @@ class NodeDataType(TypedDict, total=False):
     values: List[ValueDataType]
     statistics: NodeStatisticsDataType
     highestSecurityClass: int
-    isControllerNode: Union[bool, Literal["unknown"]]
+    isControllerNode: bool
