@@ -23,7 +23,6 @@ from .inclusion_and_provisioning import (
 )
 from .statistics import (
     ControllerLifelineRoutes,
-    ControllerLifelineRoutesDataType,
     ControllerStatistics,
 )
 
