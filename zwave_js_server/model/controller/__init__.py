@@ -47,6 +47,7 @@ class Controller(EventBase):
         self.client = client
         self.nodes: Dict[int, Node] = {}
         self._heal_network_progress: Optional[Dict[int, str]] = None
+        self._statistics = ControllerStatistics()
         for node_state in state["nodes"]:
             node = Node(client, node_state)
             self.nodes[node.node_id] = node
