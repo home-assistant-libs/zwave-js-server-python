@@ -1026,8 +1026,32 @@ async def test_add_associations(controller, uuid4, mock_command):
         "nodeId": association_address.node_id,
         "group": group,
         "associations": [
-            {"nodeId": 5, "endpoint": 0},
-            {"nodeId": 10},
+            {"nodeId": associations[0].node_id, "endpoint": associations[0].endpoint},
+            {"nodeId": associations[1].node_id},
+        ],
+    }
+
+    association_address = association_pkg.Association(node_id=52, endpoint=111)
+    group = 1
+    associations = [
+        association_pkg.Association(node_id=11),
+        association_pkg.Association(node_id=6, endpoint=1),
+    ]
+
+    await controller.async_add_associations(
+        association_address, group, associations, True
+    )
+
+    assert len(ack_commands) == 2
+    assert ack_commands[1] == {
+        "command": "controller.add_associations",
+        "messageId": uuid4,
+        "nodeId": association_address.node_id,
+        "endpoint": association_address.endpoint,
+        "group": group,
+        "associations": [
+            {"nodeId": associations[0].node_id},
+            {"nodeId": associations[1].node_id, "endpoint": associations[1].endpoint},
         ],
     }
 
@@ -1056,8 +1080,32 @@ async def test_remove_associations(controller, uuid4, mock_command):
         "nodeId": association_address.node_id,
         "group": group,
         "associations": [
-            {"nodeId": 5, "endpoint": 0},
-            {"nodeId": 10},
+            {"nodeId": associations[0].node_id, "endpoint": associations[0].endpoint},
+            {"nodeId": associations[1].node_id},
+        ],
+    }
+
+    association_address = association_pkg.Association(node_id=53, endpoint=112)
+    group = 1
+    associations = [
+        association_pkg.Association(node_id=11),
+        association_pkg.Association(node_id=6, endpoint=1),
+    ]
+
+    await controller.async_remove_associations(
+        association_address, group, associations, True
+    )
+
+    assert len(ack_commands) == 2
+    assert ack_commands[1] == {
+        "command": "controller.remove_associations",
+        "messageId": uuid4,
+        "nodeId": association_address.node_id,
+        "endpoint": association_address.endpoint,
+        "group": group,
+        "associations": [
+            {"nodeId": associations[0].node_id},
+            {"nodeId": associations[1].node_id, "endpoint": associations[1].endpoint},
         ],
     }
 
@@ -1075,6 +1123,16 @@ async def test_remove_node_from_all_associations(controller, uuid4, mock_command
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
+        "command": "controller.remove_node_from_all_associations",
+        "messageId": uuid4,
+        "nodeId": node_id,
+    }
+
+    node_id = 53
+    await controller.async_remove_node_from_all_associations(node_id, True)
+
+    assert len(ack_commands) == 2
+    assert ack_commands[1] == {
         "command": "controller.remove_node_from_all_associations",
         "messageId": uuid4,
         "nodeId": node_id,
