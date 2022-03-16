@@ -13,7 +13,7 @@ class LogMessageContextDataType(TypedDict, total=False):
     """Represent a log message context data dict type."""
 
     source: Literal["config", "serial", "controller", "driver"]  # required
-    type: Literal["value", "node"]
+    type: Literal["controller", "value", "node"]
     nodeId: int
     header: str
     direction: Literal["inbound", "outbound", "none"]
@@ -38,7 +38,7 @@ class LogMessageContext:
         return self.data["source"]
 
     @property
-    def type(self) -> Optional[Literal["value", "node"]]:
+    def type(self) -> Optional[Literal["controller", "value", "node"]]:
         """Return the object type for the log message if applicable."""
         return self.data.get("type")
 
