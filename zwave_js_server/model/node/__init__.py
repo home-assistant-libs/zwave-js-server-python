@@ -33,6 +33,8 @@ from ..notification import (
     NotificationNotificationDataType,
     PowerLevelNotification,
     PowerLevelNotificationDataType,
+    MultilevelSwitchNotification,
+    MultilevelSwitchNotificationDataType,
 )
 from ..value import (
     ConfigurationValue,
@@ -779,6 +781,10 @@ class Node(EventBase):
         if command_class == CommandClass.NOTIFICATION:
             event.data["notification"] = NotificationNotification(
                 self, cast(NotificationNotificationDataType, event.data)
+            )
+        elif command_class == CommandClass.SWITCH_MULTILEVEL:
+            event.data["notification"] = MultilevelSwitchNotification(
+                self, cast(MultilevelSwitchNotificationDataType, event.data)
             )
         elif command_class == CommandClass.ENTRY_CONTROL:
             event.data["notification"] = EntryControlNotification(
