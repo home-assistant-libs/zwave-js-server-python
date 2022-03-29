@@ -184,3 +184,47 @@ class PowerLevelNotification:
     def acknowledged_frames(self) -> int:
         """Return acknowledged frames property."""
         return self.data["args"]["acknowledgedFrames"]
+
+class MultilevelSwitchNotificationArgsDataType(TypedDict):
+    """Represent args for a Multi Level Switch CC notification event data dict type."""
+
+    event_type: int
+    direction: str
+        
+        
+class MultilevelSwitchNotificationDataType(BaseNotificationDataType):
+    """Represent a Multi Level Switch CC notification event data dict type."""
+        
+    args: MultilevelSwitchNotificationArgsDataType  # required
+        
+        
+class MultilevelSwitchNotification:
+    """Model for a Zwave Node's Multi Level CC notification event."""
+        
+    def __init__(self, node: "Node", data: MultilevelSwitchNotificationDataType) -> None:
+        """Initialize."""
+        self.node = node
+        self.data = data
+        
+    @property
+    def node_id(self) -> int:
+        """Return node ID property."""
+        return self.data["nodeId"]
+        
+    @property
+    def command_class(self) -> int:
+        """Return command class."""
+        return self.data["ccId"]
+
+    @property
+    def event_type(self) -> int:
+        """Return event type property."""
+        return self.data["args"]["eventType"]
+
+    @property
+    def direction(self) -> Optional[str]:
+        """Return direction property."""
+        if direction := self.data["args"].get("direction"):
+            return direction
+        return None
+         
