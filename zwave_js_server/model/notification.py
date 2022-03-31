@@ -185,10 +185,10 @@ class PowerLevelNotification:
         """Return acknowledged frames property."""
         return self.data["args"]["acknowledgedFrames"]
 
-class MultilevelSwitchNotificationArgsDataType(TypedDict):
+class MultilevelSwitchNotificationArgsDataType(TypedDict, total=False):
     """Represent args for a Multi Level Switch CC notification event data dict type."""
 
-    event_type: int
+    event_type: int  # required
     direction: str
         
         
