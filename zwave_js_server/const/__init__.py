@@ -1,7 +1,8 @@
 """Constants for the Z-Wave JS python library."""
 import sys
 from enum import Enum, IntEnum
-from typing import Union
+
+from ..exceptions import RssiErrorReceived
 
 # minimal server schema version we can handle
 MIN_SERVER_SCHEMA_VERSION = 16
@@ -320,13 +321,13 @@ class RssiError(IntEnum):
     NO_SIGNAL_DETECTED = 125
 
 
-def friendly_rssi(rssi: int) -> Union[str, int]:
+def friendly_rssi(rssi: int) -> int:
     """
     Return friendly rssi value.
 
     Returns error string if rssi is in RssiError, otherwise returns the rssi in dBm.
     """
     try:
-        return RssiError(rssi).name.replace("_", " ").title()
+        raise RssiErrorReceived(RssiError(rssi))
     except ValueError:
         return rssi

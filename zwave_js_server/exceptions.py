@@ -1,9 +1,8 @@
 """Exceptions for zwave-js-server."""
 from typing import TYPE_CHECKING, Optional
 
-from .const import CommandClass
-
 if TYPE_CHECKING:
+    from .const import CommandClass, RssiError
     from .event import Event
     from .model.value import Value
 
@@ -129,7 +128,7 @@ class BulkSetConfigParameterFailed(BaseZwaveJSServerError):
 class InvalidCommandClass(BaseZwaveJSServerError):
     """Exception raised when Zwave Value has an invalid command class."""
 
-    def __init__(self, value: "Value", command_class: CommandClass) -> None:
+    def __init__(self, value: "Value", command_class: "CommandClass") -> None:
         """Initialize an invalid Command Class error."""
         self.value = value
         self.command_class = command_class
@@ -162,7 +161,7 @@ class UnknownValueData(BaseZwaveJSServerError):
 class NotificationHasUnsupportedCommandClass(BaseZwaveJSServerError):
     """Exception raised when notification is received for an unsupported CC."""
 
-    def __init__(self, event: "Event", command_class: CommandClass) -> None:
+    def __init__(self, event: "Event", command_class: "CommandClass") -> None:
         """Initialize an invalid Command Class error."""
         self.event_data = event.data
         self.command_class = command_class
@@ -170,3 +169,12 @@ class NotificationHasUnsupportedCommandClass(BaseZwaveJSServerError):
             "Notification received with unsupported command class "
             f"{command_class.name}: {event.data}"
         )
+
+
+class RssiErrorReceived(BaseZwaveJSServerError):
+    """Exception raised when an RSSI error is received."""
+
+    def __init__(self, error: "RssiError") -> None:
+        """Initialize an RSSI error."""
+        self.error = error
+        super().__init__(f"RSSI error: {error.name.replace('_', ' ').title()}")

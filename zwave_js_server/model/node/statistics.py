@@ -1,5 +1,5 @@
 """Provide a model for the Z-Wave JS node's statistics."""
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Optional
 
 from ...const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED, friendly_rssi
 from ..statistics import RouteStatistics, RouteStatisticsDataType
@@ -93,7 +93,7 @@ class NodeStatistics:
         return self.data.get("rtt")
 
     @property
-    def rssi(self) -> Optional[Union[str, int]]:
+    def rssi(self) -> Optional[int]:
         """
         Return average RSSI of frames received by this node.
 
