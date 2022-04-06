@@ -11,12 +11,11 @@ from zwave_js_server.const import (
     Protocols,
     QRCodeVersion,
     RFRegion,
-    RssiError,
     SecurityClass,
     ZwaveFeature,
 )
 from zwave_js_server.event import Event
-from zwave_js_server.exceptions import RssiErrorReceivedInList
+from zwave_js_server.exceptions import RssiErrorReceived, RssiErrorReceivedInList
 from zwave_js_server.model import association as association_pkg
 from zwave_js_server.model import controller as controller_pkg
 from zwave_js_server.model.controller.statistics import ControllerStatistics
@@ -1372,8 +1371,52 @@ async def test_get_known_lifeline_routes(
     assert lifeline_routes.nlwr.repeaters == []
     assert lifeline_routes.nlwr.rssi == 1
     with pytest.raises(RssiErrorReceivedInList):
-        assert lifeline_routes.nlwr.repeater_rssi == [RssiError.NOT_AVAILABLE]
+        lifeline_routes.nlwr.repeater_rssi
     assert not lifeline_routes.nlwr.route_failed_between
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_known_lifeline_routes",
+        "messageId": uuid4,
+    }
+
+
+async def test_get_known_lifeline_routes_rssi_error(
+    multisensor_6, ring_keypad, wallmote_central_scene, uuid4, mock_command
+):
+    """Test get known lifeline routes has an RSSI error."""
+    ack_commands = mock_command(
+        {"command": "controller.get_known_lifeline_routes"},
+        {
+            "routes": {
+                multisensor_6.node_id: {
+                    "lwr": {
+                        "protocolDataRate": 1,
+                        "repeaters": [multisensor_6.node_id],
+                        "repeaterRSSI": [1],
+                        "routeFailedBetween": [
+                            ring_keypad.node_id,
+                            wallmote_central_scene.node_id,
+                        ],
+                    },
+                    "nlwr": {
+                        "protocolDataRate": 2,
+                        "repeaters": [],
+                        "rssi": 127,
+                        "repeaterRSSI": [127],
+                    },
+                }
+            }
+        },
+    )
+    routes = (
+        await multisensor_6.client.driver.controller.async_get_known_lifeline_routes()
+    )
+    assert len(routes) == 1
+    assert multisensor_6 in routes
+    lifeline_routes = routes[multisensor_6]
+    with pytest.raises(RssiErrorReceived):
+        lifeline_routes.nlwr.rssi
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {

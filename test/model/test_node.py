@@ -24,6 +24,7 @@ from zwave_js_server.exceptions import (
     FailedCommand,
     NotFoundError,
     NotificationHasUnsupportedCommandClass,
+    RssiErrorReceived,
     UnwriteableValue,
 )
 from zwave_js_server.model import node as node_pkg
@@ -1191,6 +1192,56 @@ async def test_statistics_updated(
     assert not event_stats.lwr
     assert not event_stats.nlwr
     assert node.statistics == event_stats
+
+
+async def test_statistics_updated_rssi_error(
+    wallmote_central_scene: node_pkg.Node, multisensor_6, ring_keypad
+):
+    """Test that statistics get updated on events and rssi error is handled."""
+    node = wallmote_central_scene
+    assert node.statistics.commands_rx == 0
+    event = Event(
+        "statistics updated",
+        {
+            "source": "node",
+            "event": "statistics updated",
+            "nodeId": node.node_id,
+            "statistics": {
+                "commandsTX": 1,
+                "commandsRX": 2,
+                "commandsDroppedTX": 3,
+                "commandsDroppedRX": 4,
+                "timeoutResponse": 5,
+                "rtt": 6,
+                "rssi": 127,
+                "lwr": {
+                    "protocolDataRate": 1,
+                    "repeaters": [wallmote_central_scene.node_id],
+                    "repeaterRSSI": [1],
+                    "routeFailedBetween": [
+                        ring_keypad.node_id,
+                        multisensor_6.node_id,
+                    ],
+                },
+                "nlwr": {
+                    "protocolDataRate": 2,
+                    "repeaters": [],
+                    "repeaterRSSI": [127],
+                    "routeFailedBetween": [
+                        multisensor_6.node_id,
+                        ring_keypad.node_id,
+                    ],
+                },
+            },
+        },
+    )
+    node.receive_event(event)
+    # Event should be modified with the NodeStatistics object
+    assert "statistics_updated" in event.data
+    event_stats: NodeStatistics = event.data["statistics_updated"]
+    assert isinstance(event_stats, NodeStatistics)
+    with pytest.raises(RssiErrorReceived):
+        event_stats.rssi
 
 
 async def test_has_security_class(multisensor_6: node_pkg.Node, uuid4, mock_command):
