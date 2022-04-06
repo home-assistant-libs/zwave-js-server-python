@@ -21,10 +21,7 @@ from .inclusion_and_provisioning import (
     ProvisioningEntry,
     QRProvisioningInformation,
 )
-from .statistics import (
-    ControllerLifelineRoutes,
-    ControllerStatistics,
-)
+from .statistics import ControllerLifelineRoutes, ControllerStatistics
 
 if TYPE_CHECKING:
     from ...client import Client

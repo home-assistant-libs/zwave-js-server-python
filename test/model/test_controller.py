@@ -15,7 +15,7 @@ from zwave_js_server.const import (
     ZwaveFeature,
 )
 from zwave_js_server.event import Event
-from zwave_js_server.exceptions import RssiErrorReceived, RssiErrorReceivedInList
+from zwave_js_server.exceptions import RepeaterRssiErrorReceived, RssiErrorReceived
 from zwave_js_server.model import association as association_pkg
 from zwave_js_server.model import controller as controller_pkg
 from zwave_js_server.model.controller.statistics import ControllerStatistics
@@ -1370,7 +1370,7 @@ async def test_get_known_lifeline_routes(
     assert lifeline_routes.nlwr.protocol_data_rate == ProtocolDataRate.ZWAVE_40K
     assert lifeline_routes.nlwr.repeaters == []
     assert lifeline_routes.nlwr.rssi == 1
-    with pytest.raises(RssiErrorReceivedInList):
+    with pytest.raises(RepeaterRssiErrorReceived):
         lifeline_routes.nlwr.repeater_rssi
     assert not lifeline_routes.nlwr.route_failed_between
 

@@ -2,13 +2,9 @@
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, List, Optional
 
-from zwave_js_server.exceptions import RssiErrorReceived, RssiErrorReceivedInList
+from zwave_js_server.exceptions import RepeaterRssiErrorReceived, RssiErrorReceived
 
-from ..const import (
-    TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED,
-    ProtocolDataRate,
-    RssiError,
-)
+from ..const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED, ProtocolDataRate, RssiError
 
 if TYPE_CHECKING:
     from ..client import Client
@@ -68,7 +64,7 @@ class RouteStatistics:
         repeater_rssi = self.data.get("repeaterRSSI", [])
         rssi_errors = [item.value for item in RssiError]
         if any(rssi_ in rssi_errors for rssi_ in repeater_rssi):
-            raise RssiErrorReceivedInList(repeater_rssi)
+            raise RepeaterRssiErrorReceived(repeater_rssi)
 
         return repeater_rssi
 

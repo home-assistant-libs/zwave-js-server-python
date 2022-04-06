@@ -182,7 +182,7 @@ class RssiErrorReceived(BaseZwaveJSServerError):
         super().__init__()
 
 
-class RssiErrorReceivedInList(BaseZwaveJSServerError):
+class RepeaterRssiErrorReceived(BaseZwaveJSServerError):
     """Exception raised when an RSSI error is received in list of RSSIs."""
 
     def __init__(self, rssi_list: List[int]) -> None:
