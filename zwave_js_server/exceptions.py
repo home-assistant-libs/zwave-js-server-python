@@ -1,6 +1,5 @@
 """Exceptions for zwave-js-server."""
-from ctypes import Union
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, List, Optional, Union
 
 if TYPE_CHECKING:
     from .const import CommandClass, RssiError
@@ -175,9 +174,16 @@ class NotificationHasUnsupportedCommandClass(BaseZwaveJSServerError):
 class RssiErrorReceived(BaseZwaveJSServerError):
     """Exception raised when an RSSI error is received."""
 
-    def __init__(self, error: Union["RssiError", List[int]]) -> None:
+    def __init__(self, error: "RssiError") -> None:
         """Initialize an RSSI error."""
-        if isinstance(error, list):
-            self.error = []
         self.error = error
         super().__init__()
+
+
+class RssiErrorReceivedInList(RssiErrorReceived):
+    """Exception raised when an RSSI error is received in list of RSSIs."""
+
+    def __init__(self, error: List[Union[int, "RssiError"]]) -> None:
+        """Initialize an RSSI error."""
+        self.rssi_list = error
+        BaseZwaveJSServerError.__init__(self)

@@ -2,8 +2,6 @@
 import sys
 from enum import Enum, IntEnum
 
-from ..exceptions import RssiErrorReceived
-
 # minimal server schema version we can handle
 MIN_SERVER_SCHEMA_VERSION = 16
 # max server schema version we can handle (and our code is compatible with)

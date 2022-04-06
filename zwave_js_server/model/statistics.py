@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, List, Optional
 
-from zwave_js_server.exceptions import RssiErrorReceived
+from zwave_js_server.exceptions import RssiErrorReceived, RssiErrorReceivedInList
 
 from ..const import (
     TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED,
@@ -76,7 +76,7 @@ class RouteStatistics:
                 repeater_rssi.append(rssi_)
 
         if error:
-            raise RssiErrorReceived(repeater_rssi)
+            raise RssiErrorReceivedInList(repeater_rssi)
         return repeater_rssi
 
     @property
