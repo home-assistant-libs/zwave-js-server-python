@@ -11,10 +11,12 @@ from zwave_js_server.const import (
     Protocols,
     QRCodeVersion,
     RFRegion,
+    RssiError,
     SecurityClass,
     ZwaveFeature,
 )
 from zwave_js_server.event import Event
+from zwave_js_server.exceptions import RssiErrorReceivedInList
 from zwave_js_server.model import association as association_pkg
 from zwave_js_server.model import controller as controller_pkg
 from zwave_js_server.model.controller.statistics import ControllerStatistics
@@ -1369,7 +1371,8 @@ async def test_get_known_lifeline_routes(
     assert lifeline_routes.nlwr.protocol_data_rate == ProtocolDataRate.ZWAVE_40K
     assert lifeline_routes.nlwr.repeaters == []
     assert lifeline_routes.nlwr.rssi == 1
-    assert lifeline_routes.nlwr.repeater_rssi == ["Not Available"]
+    with pytest.raises(RssiErrorReceivedInList):
+        assert lifeline_routes.nlwr.repeater_rssi == [RssiError.NOT_AVAILABLE]
     assert not lifeline_routes.nlwr.route_failed_between
 
     assert len(ack_commands) == 1
