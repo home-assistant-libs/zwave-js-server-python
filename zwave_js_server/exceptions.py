@@ -187,8 +187,9 @@ class RssiErrorReceivedInList(BaseZwaveJSServerError):
 
     def __init__(self, rssi_list: List[int]) -> None:
         """Initialize an RSSI error."""
+        self.rssi_list = rssi_list
         rssi_errors = [item.value for item in RssiError]
-        self.rssi_list = [
-            RssiError(rssi_) if rssi_ in rssi_errors else rssi_ for rssi_ in rssi_list
+        self.error_list = [
+            RssiError(rssi_) if rssi_ in rssi_errors else None for rssi_ in rssi_list
         ]
         super().__init__()
