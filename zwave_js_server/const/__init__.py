@@ -319,15 +319,3 @@ class RssiError(IntEnum):
     NOT_AVAILABLE = 127
     RECEIVER_SATURATED = 126
     NO_SIGNAL_DETECTED = 125
-
-
-def friendly_rssi(rssi: int) -> int:
-    """
-    Return friendly rssi value.
-
-    Returns error string if rssi is in RssiError, otherwise returns the rssi in dBm.
-    """
-    try:
-        raise RssiErrorReceived(RssiError(rssi))
-    except ValueError:
-        return rssi

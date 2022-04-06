@@ -1,7 +1,9 @@
 """Provide a model for the Z-Wave JS node's statistics."""
 from typing import TYPE_CHECKING, Optional
 
-from ...const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED, friendly_rssi
+from zwave_js_server.exceptions import RssiErrorReceived
+
+from ...const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED, RssiError
 from ..statistics import RouteStatistics, RouteStatisticsDataType
 
 if TYPE_CHECKING:
@@ -100,9 +102,12 @@ class NodeStatistics:
         Consecutive non-error measurements are combined using an exponential moving
         average.
         """
-        if (rssi := self.data.get("rssi")) is None:
+        if (rssi_ := self.data.get("rssi")) is None:
             return None
-        return friendly_rssi(rssi)
+        try:
+            raise RssiErrorReceived(RssiError(rssi_))
+        except ValueError:
+            return rssi_
 
     @property
     def lwr(self) -> Optional[RouteStatistics]:

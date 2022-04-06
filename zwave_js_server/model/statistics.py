@@ -2,10 +2,12 @@
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, List, Optional
 
+from zwave_js_server.exceptions import RssiErrorReceived
+
 from ..const import (
     TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED,
     ProtocolDataRate,
-    friendly_rssi,
+    RssiError,
 )
 
 if TYPE_CHECKING:
@@ -56,12 +58,26 @@ class RouteStatistics:
         """Return RSSI."""
         if (rssi := self.data.get("rssi")) is None:
             return None
-        return friendly_rssi(rssi)
+        try:
+            raise RssiErrorReceived(RssiError(rssi))
+        except ValueError:
+            return rssi
 
     @property
     def repeater_rssi(self) -> List[int]:
         """Return repeater RSSI."""
-        return [friendly_rssi(rssi_) for rssi_ in self.data.get("repeaterRSSI", [])]
+        error = False
+        repeater_rssi = []
+        for rssi_ in self.data.get("repeaterRSSI", []):
+            try:
+                repeater_rssi.append(RssiError(rssi_))
+                error = True
+            except ValueError:
+                repeater_rssi.append(rssi_)
+
+        if error:
+            raise RssiErrorReceived(repeater_rssi)
+        return repeater_rssi
 
     @property
     def route_failed_between(self) -> Optional[List["Node"]]:
