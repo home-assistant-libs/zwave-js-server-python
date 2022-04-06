@@ -1,8 +1,10 @@
 """Exceptions for zwave-js-server."""
-from typing import TYPE_CHECKING, List, Optional, Union
+from typing import TYPE_CHECKING, List, Optional
+
+from .const import RssiError
 
 if TYPE_CHECKING:
-    from .const import CommandClass, RssiError
+    from .const import CommandClass
     from .event import Event
     from .model.value import Value
 
@@ -180,10 +182,13 @@ class RssiErrorReceived(BaseZwaveJSServerError):
         super().__init__()
 
 
-class RssiErrorReceivedInList(RssiErrorReceived):
+class RssiErrorReceivedInList(BaseZwaveJSServerError):
     """Exception raised when an RSSI error is received in list of RSSIs."""
 
-    def __init__(self, error: List[Union[int, "RssiError"]]) -> None:
+    def __init__(self, rssi_list: List[int]) -> None:
         """Initialize an RSSI error."""
-        self.rssi_list = error
-        BaseZwaveJSServerError.__init__(self)
+        self.rssi_list = [
+            RssiError(rssi_) if rssi_ in RssiError.__members__ else rssi_
+            for rssi_ in rssi_list
+        ]
+        super().__init__()

@@ -58,25 +58,17 @@ class RouteStatistics:
         """Return RSSI."""
         if (rssi := self.data.get("rssi")) is None:
             return None
-        try:
+        if rssi in RssiError.__members__:
             raise RssiErrorReceived(RssiError(rssi))
-        except ValueError:
-            return rssi
+        return rssi
 
     @property
     def repeater_rssi(self) -> List[int]:
         """Return repeater RSSI."""
-        error = False
-        repeater_rssi = []
-        for rssi_ in self.data.get("repeaterRSSI", []):
-            try:
-                repeater_rssi.append(RssiError(rssi_))
-                error = True
-            except ValueError:
-                repeater_rssi.append(rssi_)
-
-        if error:
+        repeater_rssi = self.data.get("repeaterRSSI", [])
+        if any(rssi_ in RssiError.__members__ for rssi_ in repeater_rssi):
             raise RssiErrorReceivedInList(repeater_rssi)
+
         return repeater_rssi
 
     @property

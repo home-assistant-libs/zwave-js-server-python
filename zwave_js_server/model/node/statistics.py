@@ -104,10 +104,9 @@ class NodeStatistics:
         """
         if (rssi_ := self.data.get("rssi")) is None:
             return None
-        try:
+        if rssi_ in RssiError.__members__:
             raise RssiErrorReceived(RssiError(rssi_))
-        except ValueError:
-            return rssi_
+        return rssi_
 
     @property
     def lwr(self) -> Optional[RouteStatistics]:
