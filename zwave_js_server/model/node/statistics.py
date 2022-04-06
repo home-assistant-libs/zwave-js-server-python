@@ -104,7 +104,7 @@ class NodeStatistics:
         """
         if (rssi_ := self.data.get("rssi")) is None:
             return None
-        if rssi_ in RssiError.__members__:
+        if rssi_ in [item.value for item in RssiError]:
             raise RssiErrorReceived(RssiError(rssi_))
         return rssi_
 

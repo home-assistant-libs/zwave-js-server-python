@@ -317,3 +317,12 @@ class RssiError(IntEnum):
     NOT_AVAILABLE = 127
     RECEIVER_SATURATED = 126
     NO_SIGNAL_DETECTED = 125
+
+    def __contains__(self, val: int) -> bool:
+        """Return True if the given object is a valid RSSI error."""
+        if not isinstance(val, int):
+            return False
+        try:
+            return bool(RssiError(val))
+        except ValueError:
+            return False
