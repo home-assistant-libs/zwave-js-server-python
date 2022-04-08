@@ -1,4 +1,5 @@
 """Constants for the Multilevel Switch CC."""
+from enum import IntEnum
 
 COVER_OPEN_PROPERTY = "Open"
 COVER_UP_PROPERTY = "Up"
