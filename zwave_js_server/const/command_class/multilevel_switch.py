@@ -10,7 +10,7 @@ COVER_OFF_PROPERTY = "Off"
 
 
 class MultilevelSwitchCommand(IntEnum):
-    """Enum for known multilevel switch notifications"""
+    """Enum for known multilevel switch notifications."""
 
     START_LEVEL_CHANGE = 4
     STOP_LEVEL_CHANGE = 5
