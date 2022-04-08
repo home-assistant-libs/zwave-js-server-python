@@ -190,7 +190,7 @@ class PowerLevelNotification:
 class MultilevelSwitchNotificationArgsDataType(TypedDict, total=False):
     """Represent args for a Multi Level Switch CC notification event data dict type."""
 
-    event_type: int  # required
+    eventType: int  # required
     direction: str
 
 
