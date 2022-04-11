@@ -457,15 +457,16 @@ class Controller(EventBase):
                 **source_data,
             }
         )
-        associations_map = {}
-        for key, associations in data["associations"].items():
-            associations_map[int(key)] = [
+        associations = {}
+        for key, association_addresses in data["associations"].items():
+            associations[int(key)] = [
                 AssociationAddress(
-                    node_id=association["nodeId"], endpoint=association.get("endpoint")
+                    node_id=association_address["nodeId"],
+                    endpoint=association_address.get("endpoint"),
                 )
-                for association in associations
+                for association_address in association_addresses
             ]
-        return associations_map
+        return associations
 
     async def async_is_association_allowed(
         self, source: AssociationAddress, group: int, association: AssociationAddress
