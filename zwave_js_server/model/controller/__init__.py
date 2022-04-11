@@ -434,7 +434,7 @@ class Controller(EventBase):
         )
         groups = {}
         for key, group in data["groups"].items():
-            groups[key] = AssociationGroup(
+            groups[int(key)] = AssociationGroup(
                 max_nodes=group["maxNodes"],
                 is_lifeline=group["isLifeline"],
                 multi_channel=group["multiChannel"],
@@ -459,7 +459,7 @@ class Controller(EventBase):
         )
         associations_map = {}
         for key, associations in data["associations"].items():
-            associations_map[key] = [
+            associations_map[int(key)] = [
                 Association(
                     node_id=association["nodeId"], endpoint=association.get("endpoint")
                 )
