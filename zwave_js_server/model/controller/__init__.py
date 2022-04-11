@@ -12,7 +12,7 @@ from ...const import (
 )
 from ...event import Event, EventBase
 from ...util.helpers import convert_base64_to_bytes, convert_bytes_to_base64
-from ..association import Association, AssociationGroup
+from ..association import AssociationAddress, AssociationGroup
 from ..node import Node
 from .data_model import ControllerDataType
 from .event_model import CONTROLLER_EVENT_MODEL_MAP
@@ -420,7 +420,7 @@ class Controller(EventBase):
         return cast(bool, data["failed"])
 
     async def async_get_association_groups(
-        self, source: Association
+        self, source: AssociationAddress
     ) -> Dict[int, AssociationGroup]:
         """Send getAssociationGroups command to Controller."""
         source_data = {"nodeId": source.node_id}
@@ -445,8 +445,8 @@ class Controller(EventBase):
         return groups
 
     async def async_get_associations(
-        self, source: Association
-    ) -> Dict[int, List[Association]]:
+        self, source: AssociationAddress
+    ) -> Dict[int, List[AssociationAddress]]:
         """Send getAssociations command to Controller."""
         source_data = {"nodeId": source.node_id}
         if source.endpoint is not None:
@@ -460,7 +460,7 @@ class Controller(EventBase):
         associations_map = {}
         for key, associations in data["associations"].items():
             associations_map[int(key)] = [
-                Association(
+                AssociationAddress(
                     node_id=association["nodeId"], endpoint=association.get("endpoint")
                 )
                 for association in associations
@@ -468,7 +468,7 @@ class Controller(EventBase):
         return associations_map
 
     async def async_is_association_allowed(
-        self, source: Association, group: int, association: Association
+        self, source: AssociationAddress, group: int, association: AssociationAddress
     ) -> bool:
         """Send isAssociationAllowed command to Controller."""
         source_data = {"nodeId": source.node_id}
@@ -490,9 +490,9 @@ class Controller(EventBase):
 
     async def async_add_associations(
         self,
-        source: Association,
+        source: AssociationAddress,
         group: int,
-        associations: List[Association],
+        associations: List[AssociationAddress],
         wait_for_result: bool = False,
     ) -> None:
         """Send addAssociations command to Controller."""
@@ -520,9 +520,9 @@ class Controller(EventBase):
 
     async def async_remove_associations(
         self,
-        source: Association,
+        source: AssociationAddress,
         group: int,
-        associations: List[Association],
+        associations: List[AssociationAddress],
         wait_for_result: bool = False,
     ) -> None:
         """Send removeAssociations command to Controller."""
