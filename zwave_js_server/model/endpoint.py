@@ -51,7 +51,7 @@ class Endpoint(EventBase):
 
     def __repr__(self) -> str:
         """Return the representation."""
-        return f"{type(self).__name__}(node_id={self.node_id}, endpoint={self.index})"
+        return f"{type(self).__name__}(node_id={self.node_id}, index={self.index})"
 
     def __hash__(self) -> int:
         """Return the hash."""
