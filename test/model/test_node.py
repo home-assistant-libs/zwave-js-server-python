@@ -25,7 +25,7 @@ from zwave_js_server.exceptions import (
     NotificationHasUnsupportedCommandClass,
     UnwriteableValue,
 )
-from zwave_js_server.model import node as node_pkg
+from zwave_js_server.model import endpoint as endpoint_pkg, node as node_pkg
 from zwave_js_server.model.firmware import FirmwareUpdateStatus
 from zwave_js_server.model.node.health_check import (
     LifelineHealthCheckResultDataType,
@@ -37,11 +37,11 @@ from zwave_js_server.model.value import ConfigurationValue, get_value_id
 from .. import load_fixture
 
 
-def test_from_state():
+def test_from_state(client):
     """Test from_state method."""
     state = json.loads(load_fixture("basic_dump.txt").split("\n")[0])["result"]["state"]
 
-    node = node_pkg.Node(None, state["nodes"][0])
+    node = node_pkg.Node(client, state["nodes"][0])
 
     assert node.node_id == 1
     assert node.index == 0
@@ -100,6 +100,14 @@ def test_from_state():
         == stats.timeout_response
         == 0
     )
+    assert node == node_pkg.Node(client, state["nodes"][0])
+    assert node != node.node_id
+    assert hash(node) == hash((client.driver, node.node_id))
+    assert node.endpoints[0] == endpoint_pkg.Endpoint(
+        client, state["nodes"][0]["endpoints"][0], {}
+    )
+    assert node.endpoints[0] != node.endpoints[0].index
+    assert hash(node.endpoints[0]) == hash((client.driver, node.node_id, 0))
 
 
 async def test_highest_security_value(lock_schlage_be469, ring_keypad):
