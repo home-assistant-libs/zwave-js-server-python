@@ -18,7 +18,9 @@ from zwave_js_server.const.command_class.entry_control import (
     EntryControlEventType,
 )
 from zwave_js_server.const.command_class.power_level import PowerLevelTestStatus
-from zwave_js_server.const.command_class.multilevel_switch import MultilevelSwitchCommand
+from zwave_js_server.const.command_class.multilevel_switch import (
+    MultilevelSwitchCommand,
+)
 from zwave_js_server.event import Event
 from zwave_js_server.exceptions import (
     FailedCommand,
@@ -812,7 +814,10 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
     assert event.data["notification"].command_class == CommandClass.SWITCH_MULTILEVEL
     assert event.data["notification"].node_id == 23
     assert event.data["notification"].direction == "up"
-    assert event.data["notification"].event_type == MultilevelSwitchCommand.START_LEVEL_CHANGE
+    assert (
+        event.data["notification"].event_type
+        == MultilevelSwitchCommand.START_LEVEL_CHANGE
+    )
 
     # Validate that an unrecognized CC notification event raises Exception
     event = Event(
