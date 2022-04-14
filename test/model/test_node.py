@@ -795,7 +795,7 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
     assert event.data["notification"].test_node_id == 1
     assert event.data["notification"].status == PowerLevelTestStatus.FAILED
     assert event.data["notification"].acknowledged_frames == 2
-    
+
     # Validate that Multilevel Switch CC notification event is received as expected
     event = Event(
         type="notification",
@@ -807,7 +807,7 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
             "args": {"direction": "up", "eventType": 4},
         },
     )
-    
+
     node.handle_notification(event)
     assert event.data["notification"].command_class == CommandClass.SWITCH_MULTILEVEL
     assert event.data["notification"].node_id == 23
