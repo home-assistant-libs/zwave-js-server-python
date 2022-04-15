@@ -819,6 +819,27 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
         == MultilevelSwitchCommand.START_LEVEL_CHANGE
     )
 
+    # Validate that Multilevel Switch CC notification event without a direction is valid
+    event = Event(
+        type="notification",
+        data={
+            "source": "node",
+            "event": "notification",
+            "nodeId": 23,
+            "ccId": CommandClass.SWITCH_MULTILEVEL.value,
+            "args": {"eventType": 4},
+        },
+    )
+
+    node.handle_notification(event)
+    assert event.data["notification"].command_class == CommandClass.SWITCH_MULTILEVEL
+    assert event.data["notification"].node_id == 23
+    assert event.data["notification"].direction is None
+    assert (
+        event.data["notification"].event_type
+        == MultilevelSwitchCommand.START_LEVEL_CHANGE
+    )
+
     # Validate that an unrecognized CC notification event raises Exception
     event = Event(
         type="notification",
