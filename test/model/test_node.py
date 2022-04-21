@@ -22,7 +22,6 @@ from zwave_js_server.event import Event
 from zwave_js_server.exceptions import (
     FailedCommand,
     NotFoundError,
-    NotificationHasUnsupportedCommandClass,
     UnwriteableValue,
 )
 from zwave_js_server.model import endpoint as endpoint_pkg, node as node_pkg
@@ -803,7 +802,11 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
     assert event.data["notification"].status == PowerLevelTestStatus.FAILED
     assert event.data["notification"].acknowledged_frames == 2
 
+
+async def test_notification_unknown(lock_schlage_be469: node_pkg.Node, caplog):
+    """Test unrecognized command class notification events."""
     # Validate that an unrecognized CC notification event raises Exception
+    node = lock_schlage_be469
     event = Event(
         type="notification",
         data={
@@ -814,8 +817,9 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
         },
     )
 
-    with pytest.raises(NotificationHasUnsupportedCommandClass):
-        node.handle_notification(event)
+    node.handle_notification(event)
+
+    assert "Unhandled notification command class" in caplog.text
 
 
 async def test_entry_control_notification(ring_keypad):

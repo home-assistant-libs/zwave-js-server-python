@@ -1,4 +1,5 @@
 """Provide a model for the Z-Wave JS node."""
+import logging
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, cast
 
 from ...const import (
@@ -12,7 +13,6 @@ from ...event import Event, EventBase
 from ...exceptions import (
     FailedCommand,
     NotFoundError,
-    NotificationHasUnsupportedCommandClass,
     UnparseableValue,
     UnwriteableValue,
 )
@@ -56,6 +56,9 @@ from .statistics import NodeStatistics
 
 if TYPE_CHECKING:
     from ...client import Client
+
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class Node(EventBase):
@@ -789,7 +792,7 @@ class Node(EventBase):
                 self, cast(PowerLevelNotificationDataType, event.data)
             )
         else:
-            raise NotificationHasUnsupportedCommandClass(event, command_class)
+            _LOGGER.warning("Unhandled notification command class: %s", command_class.name)
 
     def handle_firmware_update_progress(self, event: Event) -> None:
         """Process a node firmware update progress event."""
