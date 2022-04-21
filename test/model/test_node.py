@@ -1,6 +1,5 @@
 """Test the node model."""
 import json
-import logging
 from copy import deepcopy
 from unittest.mock import patch
 
