@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING, Optional
 from .const import CommandClass
 
 if TYPE_CHECKING:
-    from .event import Event
     from .model.value import Value
 
 
