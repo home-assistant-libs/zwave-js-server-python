@@ -792,9 +792,7 @@ class Node(EventBase):
                 self, cast(PowerLevelNotificationDataType, event.data)
             )
         else:
-            _LOGGER.info(
-                "Unhandled notification command class: %s", command_class.name
-            )
+            _LOGGER.info("Unhandled notification command class: %s", command_class.name)
 
     def handle_firmware_update_progress(self, event: Event) -> None:
         """Process a node firmware update progress event."""
