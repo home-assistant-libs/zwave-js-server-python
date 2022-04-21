@@ -1,5 +1,6 @@
 """Test the node model."""
 import json
+import logging
 from copy import deepcopy
 from unittest.mock import patch
 
@@ -819,7 +820,7 @@ async def test_notification_unknown(lock_schlage_be469: node_pkg.Node, caplog):
 
     node.handle_notification(event)
 
-    assert "Unhandled notification command class" in caplog.text
+    assert "notification" not in event.data
 
 
 async def test_entry_control_notification(ring_keypad):
