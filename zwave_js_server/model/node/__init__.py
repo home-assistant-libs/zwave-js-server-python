@@ -58,7 +58,7 @@ if TYPE_CHECKING:
     from ...client import Client
 
 
-_LOGGER = logging.getLogger(__name__)
+_LOGGER = logging.getLogger(__package__)
 
 
 class Node(EventBase):
