@@ -792,7 +792,7 @@ class Node(EventBase):
                 self, cast(PowerLevelNotificationDataType, event.data)
             )
         else:
-            _LOGGER.warning(
+            _LOGGER.info(
                 "Unhandled notification command class: %s", command_class.name
             )
 
