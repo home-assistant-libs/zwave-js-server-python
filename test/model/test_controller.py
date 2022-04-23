@@ -7,6 +7,7 @@ import pytest
 from zwave_js_server.const import (
     InclusionState,
     InclusionStrategy,
+    ProtocolDataRate,
     Protocols,
     QRCodeVersion,
     RFRegion,
@@ -14,6 +15,7 @@ from zwave_js_server.const import (
     ZwaveFeature,
 )
 from zwave_js_server.event import Event
+from zwave_js_server.exceptions import RepeaterRssiErrorReceived, RssiErrorReceived
 from zwave_js_server.model import association as association_pkg
 from zwave_js_server.model import controller as controller_pkg
 from zwave_js_server.model.controller.statistics import ControllerStatistics
@@ -27,7 +29,7 @@ def test_from_state():
 
     ctrl = controller_pkg.Controller(None, state)
 
-    assert ctrl.library_version == "Z-Wave 3.95"
+    assert ctrl.sdk_version == "Z-Wave 3.95"
     assert ctrl.controller_type == 1
     assert ctrl.home_id == 3601639587
     assert ctrl.own_node_id == 1
@@ -37,7 +39,7 @@ def test_from_state():
     assert ctrl.was_real_primary is True
     assert ctrl.is_static_update_controller is True
     assert ctrl.is_slave is False
-    assert ctrl.serial_api_version == "1.0"
+    assert ctrl.firmware_version == "1.0"
     assert ctrl.manufacturer_id == 134
     assert ctrl.product_type == 257
     assert ctrl.product_id == 90
@@ -1390,6 +1392,108 @@ async def test_get_rf_region(controller, uuid4, mock_command):
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.get_rf_region",
+        "messageId": uuid4,
+    }
+
+
+async def test_get_known_lifeline_routes(
+    multisensor_6, ring_keypad, wallmote_central_scene, uuid4, mock_command
+):
+    """Test get known lifeline routes."""
+    ack_commands = mock_command(
+        {"command": "controller.get_known_lifeline_routes"},
+        {
+            "routes": {
+                multisensor_6.node_id: {
+                    "lwr": {
+                        "protocolDataRate": 1,
+                        "repeaters": [multisensor_6.node_id],
+                        "repeaterRSSI": [1],
+                        "routeFailedBetween": [
+                            ring_keypad.node_id,
+                            wallmote_central_scene.node_id,
+                        ],
+                    },
+                    "nlwr": {
+                        "protocolDataRate": 2,
+                        "repeaters": [],
+                        "rssi": 1,
+                        "repeaterRSSI": [127],
+                    },
+                }
+            }
+        },
+    )
+    routes = (
+        await multisensor_6.client.driver.controller.async_get_known_lifeline_routes()
+    )
+    assert len(routes) == 1
+    assert multisensor_6 in routes
+    lifeline_routes = routes[multisensor_6]
+    assert lifeline_routes.lwr
+    assert lifeline_routes.lwr.protocol_data_rate == ProtocolDataRate.ZWAVE_9K6
+    assert lifeline_routes.lwr.repeaters == [multisensor_6]
+    assert not lifeline_routes.lwr.rssi
+    assert lifeline_routes.lwr.repeater_rssi == [1]
+    assert lifeline_routes.lwr.route_failed_between == [
+        ring_keypad,
+        wallmote_central_scene,
+    ]
+    assert lifeline_routes.nlwr
+    assert lifeline_routes.nlwr.protocol_data_rate == ProtocolDataRate.ZWAVE_40K
+    assert lifeline_routes.nlwr.repeaters == []
+    assert lifeline_routes.nlwr.rssi == 1
+    with pytest.raises(RepeaterRssiErrorReceived):
+        lifeline_routes.nlwr.repeater_rssi
+    assert not lifeline_routes.nlwr.route_failed_between
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_known_lifeline_routes",
+        "messageId": uuid4,
+    }
+
+
+async def test_get_known_lifeline_routes_rssi_error(
+    multisensor_6, ring_keypad, wallmote_central_scene, uuid4, mock_command
+):
+    """Test get known lifeline routes has an RSSI error."""
+    ack_commands = mock_command(
+        {"command": "controller.get_known_lifeline_routes"},
+        {
+            "routes": {
+                multisensor_6.node_id: {
+                    "lwr": {
+                        "protocolDataRate": 1,
+                        "repeaters": [multisensor_6.node_id],
+                        "repeaterRSSI": [1],
+                        "routeFailedBetween": [
+                            ring_keypad.node_id,
+                            wallmote_central_scene.node_id,
+                        ],
+                    },
+                    "nlwr": {
+                        "protocolDataRate": 2,
+                        "repeaters": [],
+                        "rssi": 127,
+                        "repeaterRSSI": [127],
+                    },
+                }
+            }
+        },
+    )
+    routes = (
+        await multisensor_6.client.driver.controller.async_get_known_lifeline_routes()
+    )
+    assert len(routes) == 1
+    assert multisensor_6 in routes
+    lifeline_routes = routes[multisensor_6]
+    with pytest.raises(RssiErrorReceived):
+        lifeline_routes.nlwr.rssi
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_known_lifeline_routes",
         "messageId": uuid4,
     }
 

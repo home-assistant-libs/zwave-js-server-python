@@ -21,7 +21,7 @@ from .inclusion_and_provisioning import (
     ProvisioningEntry,
     QRProvisioningInformation,
 )
-from .statistics import ControllerStatistics
+from .statistics import ControllerLifelineRoutes, ControllerStatistics
 
 if TYPE_CHECKING:
     from ...client import Client
@@ -44,6 +44,7 @@ class Controller(EventBase):
         self.client = client
         self.nodes: Dict[int, Node] = {}
         self._heal_network_progress: Optional[Dict[int, str]] = None
+        self._statistics = ControllerStatistics()
         for node_state in state["nodes"]:
             node = Node(client, node_state)
             self.nodes[node.node_id] = node
@@ -64,9 +65,9 @@ class Controller(EventBase):
         return self.home_id == other.home_id
 
     @property
-    def library_version(self) -> Optional[str]:
-        """Return library_version."""
-        return self.data.get("libraryVersion")
+    def sdk_version(self) -> Optional[str]:
+        """Return sdk_version."""
+        return self.data.get("sdkVersion")
 
     @property
     def controller_type(self) -> Optional[int]:
@@ -114,9 +115,9 @@ class Controller(EventBase):
         return self.data.get("isSlave")
 
     @property
-    def serial_api_version(self) -> Optional[str]:
-        """Return serial_api_version."""
-        return self.data.get("serialApiVersion")
+    def firmware_version(self) -> Optional[str]:
+        """Return firmware_version."""
+        return self.data.get("firmwareVersion")
 
     @property
     def manufacturer_id(self) -> Optional[int]:
@@ -673,6 +674,19 @@ class Controller(EventBase):
         )
         return cast(bool, data["success"])
 
+    async def async_get_known_lifeline_routes(
+        self,
+    ) -> Dict[Node, ControllerLifelineRoutes]:
+        """Send getKnownLifelineRoutes command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.get_known_lifeline_routes"}, require_schema=16
+        )
+
+        return {
+            self.nodes[node_id]: ControllerLifelineRoutes(self.client, lifeline_routes)
+            for node_id, lifeline_routes in data["routes"].items()
+        }
+
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
         if event.data["source"] == "node":
@@ -739,8 +753,9 @@ class Controller(EventBase):
 
     def handle_statistics_updated(self, event: Event) -> None:
         """Process a statistics updated event."""
-        self._statistics.data.update(event.data["statistics"])
-        event.data["statistics_updated"] = self.statistics
+        self._statistics = event.data["statistics_updated"] = ControllerStatistics(
+            event.data["statistics"]
+        )
 
     def handle_grant_security_classes(self, event: Event) -> None:
         """Process a grant security classes event."""

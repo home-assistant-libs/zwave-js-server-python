@@ -324,6 +324,19 @@ async def test_set_preferred_scales(driver, uuid4, mock_command):
     }
 
 
+async def test_enable_error_reporting(driver, uuid4, mock_command):
+    """Test driver.enable_error_reporting command."""
+    ack_commands = mock_command({"command": "driver.enable_error_reporting"}, {})
+
+    assert not await driver.async_enable_error_reporting()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.enable_error_reporting",
+        "messageId": uuid4,
+    }
+
+
 async def test_unknown_event(driver):
     """Test that an unknown event type causes an exception."""
     with pytest.raises(KeyError):

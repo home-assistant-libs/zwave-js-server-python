@@ -10,6 +10,7 @@ from zwave_js_server.const import (
     CommandClass,
     NodeStatus,
     PowerLevel,
+    ProtocolDataRate,
     ProtocolVersion,
     SecurityClass,
 )
@@ -22,6 +23,7 @@ from zwave_js_server.event import Event
 from zwave_js_server.exceptions import (
     FailedCommand,
     NotFoundError,
+    RssiErrorReceived,
     UnwriteableValue,
 )
 from zwave_js_server.model import endpoint as endpoint_pkg, node as node_pkg
@@ -1113,7 +1115,9 @@ async def test_supports_cc_api(multisensor_6, uuid4, mock_command):
         await node.async_supports_cc_api(CommandClass.USER_CODE)
 
 
-async def test_statistics_updated(wallmote_central_scene: node_pkg.Node):
+async def test_statistics_updated(
+    wallmote_central_scene: node_pkg.Node, multisensor_6, ring_keypad
+):
     """Test that statistics get updated on events."""
     node = wallmote_central_scene
     assert node.statistics.commands_rx == 0
@@ -1125,20 +1129,131 @@ async def test_statistics_updated(wallmote_central_scene: node_pkg.Node):
             "nodeId": node.node_id,
             "statistics": {
                 "commandsTX": 1,
-                "commandsRX": 1,
-                "commandsDroppedTX": 1,
-                "commandsDroppedRX": 1,
-                "timeoutResponse": 1,
+                "commandsRX": 2,
+                "commandsDroppedTX": 3,
+                "commandsDroppedRX": 4,
+                "timeoutResponse": 5,
+                "rtt": 6,
+                "rssi": 7,
+                "lwr": {
+                    "protocolDataRate": 1,
+                    "repeaters": [wallmote_central_scene.node_id],
+                    "repeaterRSSI": [1],
+                    "routeFailedBetween": [
+                        ring_keypad.node_id,
+                        multisensor_6.node_id,
+                    ],
+                },
+                "nlwr": {
+                    "protocolDataRate": 2,
+                    "repeaters": [],
+                    "repeaterRSSI": [127],
+                    "routeFailedBetween": [
+                        multisensor_6.node_id,
+                        ring_keypad.node_id,
+                    ],
+                },
             },
         },
     )
     node.receive_event(event)
     # Event should be modified with the NodeStatistics object
     assert "statistics_updated" in event.data
-    event_stats = event.data["statistics_updated"]
+    event_stats: NodeStatistics = event.data["statistics_updated"]
     assert isinstance(event_stats, NodeStatistics)
-    assert node.statistics.timeout_response == 1
+    assert event_stats.commands_tx == 1
+    assert event_stats.commands_rx == 2
+    assert event_stats.commands_dropped_tx == 3
+    assert event_stats.commands_dropped_rx == 4
+    assert event_stats.timeout_response == 5
+    assert event_stats.rtt == 6
+    assert event_stats.rssi == 7
+    assert event_stats.lwr
+    assert event_stats.lwr.protocol_data_rate == ProtocolDataRate.ZWAVE_9K6
+    assert event_stats.nlwr
+    assert event_stats.nlwr.protocol_data_rate == ProtocolDataRate.ZWAVE_40K
     assert node.statistics == event_stats
+
+    event = Event(
+        "statistics updated",
+        {
+            "source": "node",
+            "event": "statistics updated",
+            "nodeId": node.node_id,
+            "statistics": {
+                "commandsTX": 1,
+                "commandsRX": 2,
+                "commandsDroppedTX": 3,
+                "commandsDroppedRX": 4,
+                "timeoutResponse": 5,
+            },
+        },
+    )
+    node.receive_event(event)
+    # Event should be modified with the NodeStatistics object
+    assert "statistics_updated" in event.data
+    event_stats: NodeStatistics = event.data["statistics_updated"]
+    assert isinstance(event_stats, NodeStatistics)
+    assert event_stats.commands_tx == 1
+    assert event_stats.commands_rx == 2
+    assert event_stats.commands_dropped_tx == 3
+    assert event_stats.commands_dropped_rx == 4
+    assert event_stats.timeout_response == 5
+    assert not event_stats.rtt
+    assert not event_stats.rssi
+    assert not event_stats.lwr
+    assert not event_stats.nlwr
+    assert node.statistics == event_stats
+
+
+async def test_statistics_updated_rssi_error(
+    wallmote_central_scene: node_pkg.Node, multisensor_6, ring_keypad
+):
+    """Test that statistics get updated on events and rssi error is handled."""
+    node = wallmote_central_scene
+    assert node.statistics.commands_rx == 0
+    event = Event(
+        "statistics updated",
+        {
+            "source": "node",
+            "event": "statistics updated",
+            "nodeId": node.node_id,
+            "statistics": {
+                "commandsTX": 1,
+                "commandsRX": 2,
+                "commandsDroppedTX": 3,
+                "commandsDroppedRX": 4,
+                "timeoutResponse": 5,
+                "rtt": 6,
+                "rssi": 127,
+                "lwr": {
+                    "protocolDataRate": 1,
+                    "repeaters": [wallmote_central_scene.node_id],
+                    "repeaterRSSI": [1],
+                    "routeFailedBetween": [
+                        ring_keypad.node_id,
+                        multisensor_6.node_id,
+                    ],
+                },
+                "nlwr": {
+                    "protocolDataRate": 2,
+                    "repeaters": [],
+                    "repeaterRSSI": [127],
+                    "routeFailedBetween": [
+                        multisensor_6.node_id,
+                        ring_keypad.node_id,
+                    ],
+                },
+            },
+        },
+    )
+    node.receive_event(event)
+    # Event should be modified with the NodeStatistics object
+    assert "statistics_updated" in event.data
+    event_stats: NodeStatistics = event.data["statistics_updated"]
+    assert isinstance(event_stats, NodeStatistics)
+    with pytest.raises(RssiErrorReceived):
+        event_stats.rssi
 
 
 async def test_has_security_class(multisensor_6: node_pkg.Node, uuid4, mock_command):

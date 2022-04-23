@@ -161,6 +161,10 @@ class Driver(EventBase):
             "set_preferred_scales", scales=scales, require_schema=6
         )
 
+    async def async_enable_error_reporting(self) -> None:
+        """Send command to enable Sentry error reporting."""
+        await self._async_send_command("enable_error_reporting", require_schema=16)
+
     def handle_logging(self, event: Event) -> None:
         """Process a driver logging event."""
         event.data["log_message"] = LogMessage(cast(LogMessageDataType, event.data))
