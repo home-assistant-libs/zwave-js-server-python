@@ -5,7 +5,6 @@ from .const import RssiError
 
 if TYPE_CHECKING:
     from .const import CommandClass
-    from .event import Event
     from .model.value import Value
 
 
@@ -157,19 +156,6 @@ class UnknownValueData(BaseZwaveJSServerError):
             "doesn't, please report this issue as it may be caused by either an "
             "upstream issue with the driver or missing support for this data in the "
             "library"
-        )
-
-
-class NotificationHasUnsupportedCommandClass(BaseZwaveJSServerError):
-    """Exception raised when notification is received for an unsupported CC."""
-
-    def __init__(self, event: "Event", command_class: "CommandClass") -> None:
-        """Initialize an invalid Command Class error."""
-        self.event_data = event.data
-        self.command_class = command_class
-        super().__init__(
-            "Notification received with unsupported command class "
-            f"{command_class.name}: {event.data}"
         )
 
 
