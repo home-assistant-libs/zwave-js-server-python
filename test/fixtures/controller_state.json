@@ -1,6 +1,6 @@
 {
   "controller": {
-    "libraryVersion": "Z-Wave 3.95",
+    "sdkVersion": "Z-Wave 3.95",
     "type": 1,
     "homeId": 3245146787,
     "ownNodeId": 1,
@@ -10,7 +10,7 @@
     "wasRealPrimary": true,
     "isStaticUpdateController": true,
     "isSlave": false,
-    "serialApiVersion": "1.0",
+    "firmwareVersion": "1.0",
     "manufacturerId": 134,
     "productType": 257,
     "productId": 90,

@@ -16,7 +16,7 @@ class AssociationGroup:
 
 
 @dataclass
-class Association:
+class AssociationAddress:
     """Represent a association dict type."""
 
     node_id: int

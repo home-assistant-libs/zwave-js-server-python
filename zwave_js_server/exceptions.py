@@ -1,10 +1,10 @@
 """Exceptions for zwave-js-server."""
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, List, Optional
 
-from .const import CommandClass
+from .const import RssiError
 
 if TYPE_CHECKING:
-    from .event import Event
+    from .const import CommandClass
     from .model.value import Value
 
 
@@ -129,7 +129,7 @@ class BulkSetConfigParameterFailed(BaseZwaveJSServerError):
 class InvalidCommandClass(BaseZwaveJSServerError):
     """Exception raised when Zwave Value has an invalid command class."""
 
-    def __init__(self, value: "Value", command_class: CommandClass) -> None:
+    def __init__(self, value: "Value", command_class: "CommandClass") -> None:
         """Initialize an invalid Command Class error."""
         self.value = value
         self.command_class = command_class
@@ -159,14 +159,23 @@ class UnknownValueData(BaseZwaveJSServerError):
         )
 
 
-class NotificationHasUnsupportedCommandClass(BaseZwaveJSServerError):
-    """Exception raised when notification is received for an unsupported CC."""
+class RssiErrorReceived(BaseZwaveJSServerError):
+    """Exception raised when an RSSI error is received."""
 
-    def __init__(self, event: "Event", command_class: CommandClass) -> None:
-        """Initialize an invalid Command Class error."""
-        self.event_data = event.data
-        self.command_class = command_class
-        super().__init__(
-            "Notification received with unsupported command class "
-            f"{command_class.name}: {event.data}"
-        )
+    def __init__(self, error: "RssiError") -> None:
+        """Initialize an RSSI error."""
+        self.error = error
+        super().__init__()
+
+
+class RepeaterRssiErrorReceived(BaseZwaveJSServerError):
+    """Exception raised when an RSSI error is received in list of RSSIs."""
+
+    def __init__(self, rssi_list: List[int]) -> None:
+        """Initialize an RSSI error."""
+        self.rssi_list = rssi_list
+        rssi_errors = [item.value for item in RssiError]
+        self.error_list = [
+            RssiError(rssi_) if rssi_ in rssi_errors else None for rssi_ in rssi_list
+        ]
+        super().__init__()

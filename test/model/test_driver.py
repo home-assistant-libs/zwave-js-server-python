@@ -12,13 +12,18 @@ from zwave_js_server.model import log_message as log_message_pkg
 from .. import load_fixture
 
 
-def test_from_state(log_config):
+def test_from_state(client, log_config):
     """Test from_state method."""
     ws_msgs = load_fixture("basic_dump.txt").strip().split("\n")
 
     driver = driver_pkg.Driver(
-        None, json.loads(ws_msgs[0])["result"]["state"], log_config
+        client, json.loads(ws_msgs[0])["result"]["state"], log_config
     )
+    assert driver == driver_pkg.Driver(
+        client, json.loads(ws_msgs[0])["result"]["state"], log_config
+    )
+    assert driver != driver.controller.home_id
+    assert hash(driver) == hash(driver.controller.home_id)
 
     for msg in ws_msgs[1:]:
         msg = json.loads(msg)
@@ -315,6 +320,19 @@ async def test_set_preferred_scales(driver, uuid4, mock_command):
     assert ack_commands[0] == {
         "command": "driver.set_preferred_scales",
         "scales": {1: 1},
+        "messageId": uuid4,
+    }
+
+
+async def test_enable_error_reporting(driver, uuid4, mock_command):
+    """Test driver.enable_error_reporting command."""
+    ack_commands = mock_command({"command": "driver.enable_error_reporting"}, {})
+
+    assert not await driver.async_enable_error_reporting()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.enable_error_reporting",
         "messageId": uuid4,
     }
 

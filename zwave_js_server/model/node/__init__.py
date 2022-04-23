@@ -1,4 +1,5 @@
 """Provide a model for the Z-Wave JS node."""
+import logging
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, cast
 
 from ...const import (
@@ -12,7 +13,6 @@ from ...event import Event, EventBase
 from ...exceptions import (
     FailedCommand,
     NotFoundError,
-    NotificationHasUnsupportedCommandClass,
     UnparseableValue,
     UnwriteableValue,
 )
@@ -60,6 +60,9 @@ if TYPE_CHECKING:
     from ...client import Client
 
 
+_LOGGER = logging.getLogger(__package__)
+
+
 class Node(EventBase):
     """Represent a Z-Wave JS node."""
 
@@ -69,7 +72,7 @@ class Node(EventBase):
         self.client = client
         self.data: NodeDataType = {}
         self._device_config: DeviceConfig = DeviceConfig({})
-        self._statistics: NodeStatistics = NodeStatistics()
+        self._statistics: NodeStatistics = NodeStatistics(client)
         self._firmware_update_progress: Optional[FirmwareUpdateProgress] = None
         self.values: Dict[str, Union[ConfigurationValue, Value]] = {}
         self.endpoints: Dict[int, Endpoint] = {}
@@ -304,7 +307,7 @@ class Node(EventBase):
         """Update the internal state data."""
         self.data = data
         self._device_config = DeviceConfig(self.data.get("deviceConfig", {}))
-        self._statistics = NodeStatistics(self.data.get("statistics"))
+        self._statistics = NodeStatistics(self.client, self.data.get("statistics"))
 
         # Remove stale values
         value_ids = (_get_value_id_from_dict(self, val) for val in data["values"])
@@ -795,7 +798,7 @@ class Node(EventBase):
                 self, cast(PowerLevelNotificationDataType, event.data)
             )
         else:
-            raise NotificationHasUnsupportedCommandClass(event, command_class)
+            _LOGGER.info("Unhandled notification command class: %s", command_class.name)
 
     def handle_firmware_update_progress(self, event: Event) -> None:
         """Process a node firmware update progress event."""
@@ -814,5 +817,6 @@ class Node(EventBase):
 
     def handle_statistics_updated(self, event: Event) -> None:
         """Process a statistics updated event."""
-        self._statistics.data.update(event.data["statistics"])
-        event.data["statistics_updated"] = self.statistics
+        event.data["statistics_updated"] = self._statistics = NodeStatistics(
+            self.client, event.data["statistics"]
+        )

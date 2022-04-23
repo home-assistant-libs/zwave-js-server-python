@@ -1,12 +1,51 @@
 """Provide a model for the Z-Wave JS controller's statistics."""
-from typing import Optional
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Optional
 
 from ...const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED
+from ..statistics import RouteStatistics, RouteStatisticsDataType
 
 if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
     from typing_extensions import TypedDict
 else:
     from typing import TypedDict
+
+if TYPE_CHECKING:
+    from ...client import Client
+
+
+class ControllerLifelineRoutesDataType(TypedDict):
+    """Represent a controller lifeline routes data dict type."""
+
+    lwr: RouteStatisticsDataType
+    nlwr: RouteStatisticsDataType
+
+
+@dataclass
+class ControllerLifelineRoutes:
+    """Represent controller lifeline routes."""
+
+    def __init__(
+        self, client: "Client", data: ControllerLifelineRoutesDataType
+    ) -> None:
+        """Initialize controller lifeline routes."""
+        self.data = data
+        self._lwr = None
+        if lwr := self.data.get("lwr"):
+            self._lwr = RouteStatistics(client, lwr)
+        self._nlwr = None
+        if nlwr := self.data.get("nlwr"):
+            self._nlwr = RouteStatistics(client, nlwr)
+
+    @property
+    def lwr(self) -> Optional[RouteStatistics]:
+        """Return the last working route from the controller to this node."""
+        return self._lwr
+
+    @property
+    def nlwr(self) -> Optional[RouteStatistics]:
+        """Return the next to last working route from the controller to this node."""
+        return self._nlwr
 
 
 class ControllerStatisticsDataType(TypedDict):

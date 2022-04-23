@@ -7,6 +7,7 @@ import pytest
 from zwave_js_server.const import (
     InclusionState,
     InclusionStrategy,
+    ProtocolDataRate,
     Protocols,
     QRCodeVersion,
     RFRegion,
@@ -14,6 +15,7 @@ from zwave_js_server.const import (
     ZwaveFeature,
 )
 from zwave_js_server.event import Event
+from zwave_js_server.exceptions import RepeaterRssiErrorReceived, RssiErrorReceived
 from zwave_js_server.model import association as association_pkg
 from zwave_js_server.model import controller as controller_pkg
 from zwave_js_server.model.controller.statistics import ControllerStatistics
@@ -27,7 +29,7 @@ def test_from_state():
 
     ctrl = controller_pkg.Controller(None, state)
 
-    assert ctrl.library_version == "Z-Wave 3.95"
+    assert ctrl.sdk_version == "Z-Wave 3.95"
     assert ctrl.controller_type == 1
     assert ctrl.home_id == 3601639587
     assert ctrl.own_node_id == 1
@@ -37,7 +39,7 @@ def test_from_state():
     assert ctrl.was_real_primary is True
     assert ctrl.is_static_update_controller is True
     assert ctrl.is_slave is False
-    assert ctrl.serial_api_version == "1.0"
+    assert ctrl.firmware_version == "1.0"
     assert ctrl.manufacturer_id == 134
     assert ctrl.product_type == 257
     assert ctrl.product_id == 90
@@ -902,8 +904,8 @@ async def test_get_association_groups(controller, uuid4, mock_command):
         },
     )
 
-    node_id = 52
-    result = await controller.async_get_association_groups(node_id)
+    association_address = association_pkg.AssociationAddress(node_id=52)
+    result = await controller.async_get_association_groups(association_address)
 
     assert result[1].max_nodes == 10
     assert result[1].is_lifeline is True
@@ -924,7 +926,7 @@ async def test_get_association_groups(controller, uuid4, mock_command):
     assert ack_commands[0] == {
         "command": "controller.get_association_groups",
         "messageId": uuid4,
-        "nodeId": node_id,
+        "nodeId": association_address.node_id,
     }
 
 
@@ -935,31 +937,44 @@ async def test_get_associations(controller, uuid4, mock_command):
         {"command": "controller.get_associations"},
         {
             "associations": {
-                1: {
-                    "nodeId": 10,
-                },
-                2: {
-                    "nodeId": 30,
-                    "endpoint": 0,
-                },
+                "1": [
+                    {"nodeId": 10},
+                ],
+                "2": [
+                    {"nodeId": 11},
+                    {"nodeId": 20},
+                ],
+                "3": [
+                    {"nodeId": 30, "endpoint": 0},
+                    {"nodeId": 40, "endpoint": 1},
+                ],
             }
         },
     )
 
-    node_id = 52
-    result = await controller.async_get_associations(node_id)
+    association_address = association_pkg.AssociationAddress(node_id=52)
+    result = await controller.async_get_associations(association_address)
 
-    assert result[1].node_id == 10
-    assert result[1].endpoint is None
+    assert result[1][0].node_id == 10
+    assert result[1][0].endpoint is None
 
-    assert result[2].node_id == 30
-    assert result[2].endpoint == 0
+    assert result[2][0].node_id == 11
+    assert result[2][0].endpoint is None
+
+    assert result[2][1].node_id == 20
+    assert result[2][1].endpoint is None
+
+    assert result[3][0].node_id == 30
+    assert result[3][0].endpoint == 0
+
+    assert result[3][1].node_id == 40
+    assert result[3][1].endpoint == 1
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.get_associations",
         "messageId": uuid4,
-        "nodeId": node_id,
+        "nodeId": association_address.node_id,
     }
 
 
@@ -971,17 +986,19 @@ async def test_is_association_allowed(controller, uuid4, mock_command):
         {"allowed": True},
     )
 
-    node_id = 52
+    association_address = association_pkg.AssociationAddress(node_id=52)
     group = 0
-    association = association_pkg.Association(node_id=5, endpoint=0)
+    association = association_pkg.AssociationAddress(node_id=5, endpoint=0)
 
-    assert await controller.async_is_association_allowed(node_id, group, association)
+    assert await controller.async_is_association_allowed(
+        association_address, group, association
+    )
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.is_association_allowed",
         "messageId": uuid4,
-        "nodeId": node_id,
+        "nodeId": association_address.node_id,
         "group": group,
         "association": {"nodeId": 5, "endpoint": 0},
     }
@@ -995,24 +1012,48 @@ async def test_add_associations(controller, uuid4, mock_command):
         {},
     )
 
-    node_id = 52
+    association_address = association_pkg.AssociationAddress(node_id=52)
     group = 0
     associations = [
-        association_pkg.Association(node_id=5, endpoint=0),
-        association_pkg.Association(node_id=10),
+        association_pkg.AssociationAddress(node_id=5, endpoint=0),
+        association_pkg.AssociationAddress(node_id=10),
     ]
 
-    await controller.async_add_associations(node_id, group, associations)
+    await controller.async_add_associations(association_address, group, associations)
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.add_associations",
         "messageId": uuid4,
-        "nodeId": node_id,
+        "nodeId": association_address.node_id,
         "group": group,
         "associations": [
-            {"nodeId": 5, "endpoint": 0},
-            {"nodeId": 10, "endpoint": None},
+            {"nodeId": associations[0].node_id, "endpoint": associations[0].endpoint},
+            {"nodeId": associations[1].node_id},
+        ],
+    }
+
+    association_address = association_pkg.AssociationAddress(node_id=52, endpoint=111)
+    group = 1
+    associations = [
+        association_pkg.AssociationAddress(node_id=11),
+        association_pkg.AssociationAddress(node_id=6, endpoint=1),
+    ]
+
+    await controller.async_add_associations(
+        association_address, group, associations, True
+    )
+
+    assert len(ack_commands) == 2
+    assert ack_commands[1] == {
+        "command": "controller.add_associations",
+        "messageId": uuid4,
+        "nodeId": association_address.node_id,
+        "endpoint": association_address.endpoint,
+        "group": group,
+        "associations": [
+            {"nodeId": associations[0].node_id},
+            {"nodeId": associations[1].node_id, "endpoint": associations[1].endpoint},
         ],
     }
 
@@ -1025,24 +1066,48 @@ async def test_remove_associations(controller, uuid4, mock_command):
         {},
     )
 
-    node_id = 52
+    association_address = association_pkg.AssociationAddress(node_id=52)
     group = 0
     associations = [
-        association_pkg.Association(node_id=5, endpoint=0),
-        association_pkg.Association(node_id=10),
+        association_pkg.AssociationAddress(node_id=5, endpoint=0),
+        association_pkg.AssociationAddress(node_id=10),
     ]
 
-    await controller.async_remove_associations(node_id, group, associations)
+    await controller.async_remove_associations(association_address, group, associations)
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.remove_associations",
         "messageId": uuid4,
-        "nodeId": node_id,
+        "nodeId": association_address.node_id,
         "group": group,
         "associations": [
-            {"nodeId": 5, "endpoint": 0},
-            {"nodeId": 10, "endpoint": None},
+            {"nodeId": associations[0].node_id, "endpoint": associations[0].endpoint},
+            {"nodeId": associations[1].node_id},
+        ],
+    }
+
+    association_address = association_pkg.AssociationAddress(node_id=53, endpoint=112)
+    group = 1
+    associations = [
+        association_pkg.AssociationAddress(node_id=11),
+        association_pkg.AssociationAddress(node_id=6, endpoint=1),
+    ]
+
+    await controller.async_remove_associations(
+        association_address, group, associations, True
+    )
+
+    assert len(ack_commands) == 2
+    assert ack_commands[1] == {
+        "command": "controller.remove_associations",
+        "messageId": uuid4,
+        "nodeId": association_address.node_id,
+        "endpoint": association_address.endpoint,
+        "group": group,
+        "associations": [
+            {"nodeId": associations[0].node_id},
+            {"nodeId": associations[1].node_id, "endpoint": associations[1].endpoint},
         ],
     }
 
@@ -1060,6 +1125,16 @@ async def test_remove_node_from_all_associations(controller, uuid4, mock_command
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
+        "command": "controller.remove_node_from_all_associations",
+        "messageId": uuid4,
+        "nodeId": node_id,
+    }
+
+    node_id = 53
+    await controller.async_remove_node_from_all_associations(node_id, True)
+
+    assert len(ack_commands) == 2
+    assert ack_commands[1] == {
         "command": "controller.remove_node_from_all_associations",
         "messageId": uuid4,
         "nodeId": node_id,
@@ -1317,6 +1392,108 @@ async def test_get_rf_region(controller, uuid4, mock_command):
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.get_rf_region",
+        "messageId": uuid4,
+    }
+
+
+async def test_get_known_lifeline_routes(
+    multisensor_6, ring_keypad, wallmote_central_scene, uuid4, mock_command
+):
+    """Test get known lifeline routes."""
+    ack_commands = mock_command(
+        {"command": "controller.get_known_lifeline_routes"},
+        {
+            "routes": {
+                multisensor_6.node_id: {
+                    "lwr": {
+                        "protocolDataRate": 1,
+                        "repeaters": [multisensor_6.node_id],
+                        "repeaterRSSI": [1],
+                        "routeFailedBetween": [
+                            ring_keypad.node_id,
+                            wallmote_central_scene.node_id,
+                        ],
+                    },
+                    "nlwr": {
+                        "protocolDataRate": 2,
+                        "repeaters": [],
+                        "rssi": 1,
+                        "repeaterRSSI": [127],
+                    },
+                }
+            }
+        },
+    )
+    routes = (
+        await multisensor_6.client.driver.controller.async_get_known_lifeline_routes()
+    )
+    assert len(routes) == 1
+    assert multisensor_6 in routes
+    lifeline_routes = routes[multisensor_6]
+    assert lifeline_routes.lwr
+    assert lifeline_routes.lwr.protocol_data_rate == ProtocolDataRate.ZWAVE_9K6
+    assert lifeline_routes.lwr.repeaters == [multisensor_6]
+    assert not lifeline_routes.lwr.rssi
+    assert lifeline_routes.lwr.repeater_rssi == [1]
+    assert lifeline_routes.lwr.route_failed_between == [
+        ring_keypad,
+        wallmote_central_scene,
+    ]
+    assert lifeline_routes.nlwr
+    assert lifeline_routes.nlwr.protocol_data_rate == ProtocolDataRate.ZWAVE_40K
+    assert lifeline_routes.nlwr.repeaters == []
+    assert lifeline_routes.nlwr.rssi == 1
+    with pytest.raises(RepeaterRssiErrorReceived):
+        lifeline_routes.nlwr.repeater_rssi
+    assert not lifeline_routes.nlwr.route_failed_between
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_known_lifeline_routes",
+        "messageId": uuid4,
+    }
+
+
+async def test_get_known_lifeline_routes_rssi_error(
+    multisensor_6, ring_keypad, wallmote_central_scene, uuid4, mock_command
+):
+    """Test get known lifeline routes has an RSSI error."""
+    ack_commands = mock_command(
+        {"command": "controller.get_known_lifeline_routes"},
+        {
+            "routes": {
+                multisensor_6.node_id: {
+                    "lwr": {
+                        "protocolDataRate": 1,
+                        "repeaters": [multisensor_6.node_id],
+                        "repeaterRSSI": [1],
+                        "routeFailedBetween": [
+                            ring_keypad.node_id,
+                            wallmote_central_scene.node_id,
+                        ],
+                    },
+                    "nlwr": {
+                        "protocolDataRate": 2,
+                        "repeaters": [],
+                        "rssi": 127,
+                        "repeaterRSSI": [127],
+                    },
+                }
+            }
+        },
+    )
+    routes = (
+        await multisensor_6.client.driver.controller.async_get_known_lifeline_routes()
+    )
+    assert len(routes) == 1
+    assert multisensor_6 in routes
+    lifeline_routes = routes[multisensor_6]
+    with pytest.raises(RssiErrorReceived):
+        lifeline_routes.nlwr.rssi
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_known_lifeline_routes",
         "messageId": uuid4,
     }
 

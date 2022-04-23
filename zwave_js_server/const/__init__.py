@@ -3,9 +3,9 @@ import sys
 from enum import Enum, IntEnum
 
 # minimal server schema version we can handle
-MIN_SERVER_SCHEMA_VERSION = 15
+MIN_SERVER_SCHEMA_VERSION = 16
 # max server schema version we can handle (and our code is compatible with)
-MAX_SERVER_SCHEMA_VERSION = 15
+MAX_SERVER_SCHEMA_VERSION = 16
 
 TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED = sys.version_info < (3, 9, 2)
 
@@ -297,3 +297,23 @@ class RFRegion(IntEnum):
     KOREA = 33
     UNKNOWN = 254
     DEFAULT_EU = 255
+
+
+class ProtocolDataRate(IntEnum):
+    """Enum for all known protocol data rates."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/capabilities/Protocols.ts#L6
+
+    ZWAVE_9K6 = 1
+    ZWAVE_40K = 2
+    ZWAVE_100K = 3
+    LONG_RANGE_100K = 4
+
+
+class RssiError(IntEnum):
+    """Enum for all known RSSI errors."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/controller/SendDataShared.ts#L79
+    NOT_AVAILABLE = 127
+    RECEIVER_SATURATED = 126
+    NO_SIGNAL_DETECTED = 125

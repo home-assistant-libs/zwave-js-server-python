@@ -13,7 +13,7 @@ else:
 class ControllerDataType(TypedDict, total=False):
     """Represent a controller data dict type."""
 
-    libraryVersion: str
+    sdkVersion: str
     type: int
     homeId: int
     ownNodeId: int
@@ -23,7 +23,7 @@ class ControllerDataType(TypedDict, total=False):
     wasRealPrimary: bool
     isStaticUpdateController: bool
     isSlave: bool
-    serialApiVersion: str
+    firmwareVersion: str
     manufacturerId: int
     productType: int
     productId: int

@@ -12,7 +12,7 @@ from ...const import (
 )
 from ...event import Event, EventBase
 from ...util.helpers import convert_base64_to_bytes, convert_bytes_to_base64
-from ..association import Association, AssociationGroup
+from ..association import AssociationAddress, AssociationGroup
 from ..node import Node
 from .data_model import ControllerDataType
 from .event_model import CONTROLLER_EVENT_MODEL_MAP
@@ -21,7 +21,7 @@ from .inclusion_and_provisioning import (
     ProvisioningEntry,
     QRProvisioningInformation,
 )
-from .statistics import ControllerStatistics
+from .statistics import ControllerLifelineRoutes, ControllerStatistics
 
 if TYPE_CHECKING:
     from ...client import Client
@@ -44,6 +44,7 @@ class Controller(EventBase):
         self.client = client
         self.nodes: Dict[int, Node] = {}
         self._heal_network_progress: Optional[Dict[int, str]] = None
+        self._statistics = ControllerStatistics()
         for node_state in state["nodes"]:
             node = Node(client, node_state)
             self.nodes[node.node_id] = node
@@ -64,9 +65,9 @@ class Controller(EventBase):
         return self.home_id == other.home_id
 
     @property
-    def library_version(self) -> Optional[str]:
-        """Return library_version."""
-        return self.data.get("libraryVersion")
+    def sdk_version(self) -> Optional[str]:
+        """Return sdk_version."""
+        return self.data.get("sdkVersion")
 
     @property
     def controller_type(self) -> Optional[int]:
@@ -114,9 +115,9 @@ class Controller(EventBase):
         return self.data.get("isSlave")
 
     @property
-    def serial_api_version(self) -> Optional[str]:
-        """Return serial_api_version."""
-        return self.data.get("serialApiVersion")
+    def firmware_version(self) -> Optional[str]:
+        """Return firmware_version."""
+        return self.data.get("firmwareVersion")
 
     @property
     def manufacturer_id(self) -> Optional[int]:
@@ -420,18 +421,21 @@ class Controller(EventBase):
         return cast(bool, data["failed"])
 
     async def async_get_association_groups(
-        self, node_id: int
+        self, source: AssociationAddress
     ) -> Dict[int, AssociationGroup]:
         """Send getAssociationGroups command to Controller."""
+        source_data = {"nodeId": source.node_id}
+        if source.endpoint is not None:
+            source_data["endpoint"] = source.endpoint
         data = await self.client.async_send_command(
             {
                 "command": "controller.get_association_groups",
-                "nodeId": node_id,
+                **source_data,
             }
         )
         groups = {}
         for key, group in data["groups"].items():
-            groups[key] = AssociationGroup(
+            groups[int(key)] = AssociationGroup(
                 max_nodes=group["maxNodes"],
                 is_lifeline=group["isLifeline"],
                 multi_channel=group["multiChannel"],
@@ -441,84 +445,125 @@ class Controller(EventBase):
             )
         return groups
 
-    async def async_get_associations(self, node_id: int) -> Dict[int, Association]:
+    async def async_get_associations(
+        self, source: AssociationAddress
+    ) -> Dict[int, List[AssociationAddress]]:
         """Send getAssociations command to Controller."""
+        source_data = {"nodeId": source.node_id}
+        if source.endpoint is not None:
+            source_data["endpoint"] = source.endpoint
         data = await self.client.async_send_command(
             {
                 "command": "controller.get_associations",
-                "nodeId": node_id,
+                **source_data,
             }
         )
         associations = {}
-        for key, association in data["associations"].items():
-            associations[key] = Association(
-                node_id=association["nodeId"], endpoint=association.get("endpoint")
-            )
+        for key, association_addresses in data["associations"].items():
+            associations[int(key)] = [
+                AssociationAddress(
+                    node_id=association_address["nodeId"],
+                    endpoint=association_address.get("endpoint"),
+                )
+                for association_address in association_addresses
+            ]
         return associations
 
     async def async_is_association_allowed(
-        self, node_id: int, group: int, association: Association
+        self, source: AssociationAddress, group: int, association: AssociationAddress
     ) -> bool:
         """Send isAssociationAllowed command to Controller."""
+        source_data = {"nodeId": source.node_id}
+        if source.endpoint is not None:
+            source_data["endpoint"] = source.endpoint
+
+        association_data = {"nodeId": association.node_id}
+        if association.endpoint is not None:
+            association_data["endpoint"] = association.endpoint
         data = await self.client.async_send_command(
             {
                 "command": "controller.is_association_allowed",
-                "nodeId": node_id,
+                **source_data,
                 "group": group,
-                "association": {
-                    "nodeId": association.node_id,
-                    "endpoint": association.endpoint,
-                },
+                "association": association_data,
             }
         )
         return cast(bool, data["allowed"])
 
     async def async_add_associations(
-        self, node_id: int, group: int, associations: List[Association]
+        self,
+        source: AssociationAddress,
+        group: int,
+        associations: List[AssociationAddress],
+        wait_for_result: bool = False,
     ) -> None:
         """Send addAssociations command to Controller."""
-        await self.client.async_send_command(
-            {
-                "command": "controller.add_associations",
-                "nodeId": node_id,
-                "group": group,
-                "associations": [
-                    {
-                        "nodeId": association.node_id,
-                        "endpoint": association.endpoint,
-                    }
-                    for association in associations
-                ],
-            }
-        )
+        source_data = {"nodeId": source.node_id}
+        if source.endpoint is not None:
+            source_data["endpoint"] = source.endpoint
+
+        associations_data = []
+        for association in associations:
+            association_data = {"nodeId": association.node_id}
+            if association.endpoint is not None:
+                association_data["endpoint"] = association.endpoint
+            associations_data.append(association_data)
+
+        cmd = {
+            "command": "controller.add_associations",
+            **source_data,
+            "group": group,
+            "associations": associations_data,
+        }
+        if wait_for_result:
+            await self.client.async_send_command(cmd)
+        else:
+            await self.client.async_send_command_no_wait(cmd)
 
     async def async_remove_associations(
-        self, node_id: int, group: int, associations: List[Association]
+        self,
+        source: AssociationAddress,
+        group: int,
+        associations: List[AssociationAddress],
+        wait_for_result: bool = False,
     ) -> None:
         """Send removeAssociations command to Controller."""
-        await self.client.async_send_command(
-            {
-                "command": "controller.remove_associations",
-                "nodeId": node_id,
-                "group": group,
-                "associations": [
-                    {
-                        "nodeId": association.node_id,
-                        "endpoint": association.endpoint,
-                    }
-                    for association in associations
-                ],
-            }
-        )
+        source_data = {"nodeId": source.node_id}
+        if source.endpoint is not None:
+            source_data["endpoint"] = source.endpoint
 
-    async def async_remove_node_from_all_associations(self, node_id: int) -> None:
+        associations_data = []
+        for association in associations:
+            association_data = {"nodeId": association.node_id}
+            if association.endpoint is not None:
+                association_data["endpoint"] = association.endpoint
+            associations_data.append(association_data)
+
+        cmd = {
+            "command": "controller.remove_associations",
+            **source_data,
+            "group": group,
+            "associations": associations_data,
+        }
+        if wait_for_result:
+            await self.client.async_send_command(cmd)
+        else:
+            await self.client.async_send_command_no_wait(cmd)
+
+    async def async_remove_node_from_all_associations(
+        self,
+        node_id: int,
+        wait_for_result: bool = False,
+    ) -> None:
         """Send removeNodeFromAllAssociations command to Controller."""
-        await self.client.async_send_command(
-            {
-                "command": "controller.remove_node_from_all_associations",
-                "nodeId": node_id,
-            }
-        )
+        cmd = {
+            "command": "controller.remove_node_from_all_associations",
+            "nodeId": node_id,
+        }
+        if wait_for_result:
+            await self.client.async_send_command(cmd)
+        else:
+            await self.client.async_send_command_no_wait(cmd)
 
     async def async_get_node_neighbors(self, node_id: int) -> List[int]:
         """Send getNodeNeighbors command to Controller to get node's neighbors."""
@@ -629,6 +674,19 @@ class Controller(EventBase):
         )
         return cast(bool, data["success"])
 
+    async def async_get_known_lifeline_routes(
+        self,
+    ) -> Dict[Node, ControllerLifelineRoutes]:
+        """Send getKnownLifelineRoutes command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.get_known_lifeline_routes"}, require_schema=16
+        )
+
+        return {
+            self.nodes[node_id]: ControllerLifelineRoutes(self.client, lifeline_routes)
+            for node_id, lifeline_routes in data["routes"].items()
+        }
+
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
         if event.data["source"] == "node":
@@ -695,8 +753,9 @@ class Controller(EventBase):
 
     def handle_statistics_updated(self, event: Event) -> None:
         """Process a statistics updated event."""
-        self._statistics.data.update(event.data["statistics"])
-        event.data["statistics_updated"] = self.statistics
+        self._statistics = event.data["statistics_updated"] = ControllerStatistics(
+            event.data["statistics"]
+        )
 
     def handle_grant_security_classes(self, event: Event) -> None:
         """Process a grant security classes event."""

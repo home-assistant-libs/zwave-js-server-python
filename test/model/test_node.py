@@ -10,6 +10,7 @@ from zwave_js_server.const import (
     CommandClass,
     NodeStatus,
     PowerLevel,
+    ProtocolDataRate,
     ProtocolVersion,
     SecurityClass,
 )
@@ -25,10 +26,10 @@ from zwave_js_server.event import Event
 from zwave_js_server.exceptions import (
     FailedCommand,
     NotFoundError,
-    NotificationHasUnsupportedCommandClass,
+    RssiErrorReceived,
     UnwriteableValue,
 )
-from zwave_js_server.model import node as node_pkg
+from zwave_js_server.model import endpoint as endpoint_pkg, node as node_pkg
 from zwave_js_server.model.firmware import FirmwareUpdateStatus
 from zwave_js_server.model.node.health_check import (
     LifelineHealthCheckResultDataType,
@@ -40,11 +41,11 @@ from zwave_js_server.model.value import ConfigurationValue, get_value_id
 from .. import load_fixture
 
 
-def test_from_state():
+def test_from_state(client):
     """Test from_state method."""
     state = json.loads(load_fixture("basic_dump.txt").split("\n")[0])["result"]["state"]
 
-    node = node_pkg.Node(None, state["nodes"][0])
+    node = node_pkg.Node(client, state["nodes"][0])
 
     assert node.node_id == 1
     assert node.index == 0
@@ -103,6 +104,14 @@ def test_from_state():
         == stats.timeout_response
         == 0
     )
+    assert node == node_pkg.Node(client, state["nodes"][0])
+    assert node != node.node_id
+    assert hash(node) == hash((client.driver, node.node_id))
+    assert node.endpoints[0] == endpoint_pkg.Endpoint(
+        client, state["nodes"][0]["endpoints"][0], {}
+    )
+    assert node.endpoints[0] != node.endpoints[0].index
+    assert hash(node.endpoints[0]) == hash((client.driver, node.node_id, 0))
 
 
 async def test_highest_security_value(lock_schlage_be469, ring_keypad):
@@ -840,7 +849,11 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
         == MultilevelSwitchCommand.START_LEVEL_CHANGE
     )
 
+
+async def test_notification_unknown(lock_schlage_be469: node_pkg.Node, caplog):
+    """Test unrecognized command class notification events."""
     # Validate that an unrecognized CC notification event raises Exception
+    node = lock_schlage_be469
     event = Event(
         type="notification",
         data={
@@ -851,8 +864,9 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
         },
     )
 
-    with pytest.raises(NotificationHasUnsupportedCommandClass):
-        node.handle_notification(event)
+    node.handle_notification(event)
+
+    assert "notification" not in event.data
 
 
 async def test_entry_control_notification(ring_keypad):
@@ -1146,7 +1160,9 @@ async def test_supports_cc_api(multisensor_6, uuid4, mock_command):
         await node.async_supports_cc_api(CommandClass.USER_CODE)
 
 
-async def test_statistics_updated(wallmote_central_scene: node_pkg.Node):
+async def test_statistics_updated(
+    wallmote_central_scene: node_pkg.Node, multisensor_6, ring_keypad
+):
     """Test that statistics get updated on events."""
     node = wallmote_central_scene
     assert node.statistics.commands_rx == 0
@@ -1158,20 +1174,131 @@ async def test_statistics_updated(wallmote_central_scene: node_pkg.Node):
             "nodeId": node.node_id,
             "statistics": {
                 "commandsTX": 1,
-                "commandsRX": 1,
-                "commandsDroppedTX": 1,
-                "commandsDroppedRX": 1,
-                "timeoutResponse": 1,
+                "commandsRX": 2,
+                "commandsDroppedTX": 3,
+                "commandsDroppedRX": 4,
+                "timeoutResponse": 5,
+                "rtt": 6,
+                "rssi": 7,
+                "lwr": {
+                    "protocolDataRate": 1,
+                    "repeaters": [wallmote_central_scene.node_id],
+                    "repeaterRSSI": [1],
+                    "routeFailedBetween": [
+                        ring_keypad.node_id,
+                        multisensor_6.node_id,
+                    ],
+                },
+                "nlwr": {
+                    "protocolDataRate": 2,
+                    "repeaters": [],
+                    "repeaterRSSI": [127],
+                    "routeFailedBetween": [
+                        multisensor_6.node_id,
+                        ring_keypad.node_id,
+                    ],
+                },
             },
         },
     )
     node.receive_event(event)
     # Event should be modified with the NodeStatistics object
     assert "statistics_updated" in event.data
-    event_stats = event.data["statistics_updated"]
+    event_stats: NodeStatistics = event.data["statistics_updated"]
     assert isinstance(event_stats, NodeStatistics)
-    assert node.statistics.timeout_response == 1
+    assert event_stats.commands_tx == 1
+    assert event_stats.commands_rx == 2
+    assert event_stats.commands_dropped_tx == 3
+    assert event_stats.commands_dropped_rx == 4
+    assert event_stats.timeout_response == 5
+    assert event_stats.rtt == 6
+    assert event_stats.rssi == 7
+    assert event_stats.lwr
+    assert event_stats.lwr.protocol_data_rate == ProtocolDataRate.ZWAVE_9K6
+    assert event_stats.nlwr
+    assert event_stats.nlwr.protocol_data_rate == ProtocolDataRate.ZWAVE_40K
     assert node.statistics == event_stats
+
+    event = Event(
+        "statistics updated",
+        {
+            "source": "node",
+            "event": "statistics updated",
+            "nodeId": node.node_id,
+            "statistics": {
+                "commandsTX": 1,
+                "commandsRX": 2,
+                "commandsDroppedTX": 3,
+                "commandsDroppedRX": 4,
+                "timeoutResponse": 5,
+            },
+        },
+    )
+    node.receive_event(event)
+    # Event should be modified with the NodeStatistics object
+    assert "statistics_updated" in event.data
+    event_stats: NodeStatistics = event.data["statistics_updated"]
+    assert isinstance(event_stats, NodeStatistics)
+    assert event_stats.commands_tx == 1
+    assert event_stats.commands_rx == 2
+    assert event_stats.commands_dropped_tx == 3
+    assert event_stats.commands_dropped_rx == 4
+    assert event_stats.timeout_response == 5
+    assert not event_stats.rtt
+    assert not event_stats.rssi
+    assert not event_stats.lwr
+    assert not event_stats.nlwr
+    assert node.statistics == event_stats
+
+
+async def test_statistics_updated_rssi_error(
+    wallmote_central_scene: node_pkg.Node, multisensor_6, ring_keypad
+):
+    """Test that statistics get updated on events and rssi error is handled."""
+    node = wallmote_central_scene
+    assert node.statistics.commands_rx == 0
+    event = Event(
+        "statistics updated",
+        {
+            "source": "node",
+            "event": "statistics updated",
+            "nodeId": node.node_id,
+            "statistics": {
+                "commandsTX": 1,
+                "commandsRX": 2,
+                "commandsDroppedTX": 3,
+                "commandsDroppedRX": 4,
+                "timeoutResponse": 5,
+                "rtt": 6,
+                "rssi": 127,
+                "lwr": {
+                    "protocolDataRate": 1,
+                    "repeaters": [wallmote_central_scene.node_id],
+                    "repeaterRSSI": [1],
+                    "routeFailedBetween": [
+                        ring_keypad.node_id,
+                        multisensor_6.node_id,
+                    ],
+                },
+                "nlwr": {
+                    "protocolDataRate": 2,
+                    "repeaters": [],
+                    "repeaterRSSI": [127],
+                    "routeFailedBetween": [
+                        multisensor_6.node_id,
+                        ring_keypad.node_id,
+                    ],
+                },
+            },
+        },
+    )
+    node.receive_event(event)
+    # Event should be modified with the NodeStatistics object
+    assert "statistics_updated" in event.data
+    event_stats: NodeStatistics = event.data["statistics_updated"]
+    assert isinstance(event_stats, NodeStatistics)
+    with pytest.raises(RssiErrorReceived):
+        event_stats.rssi
 
 
 async def test_has_security_class(multisensor_6: node_pkg.Node, uuid4, mock_command):
