@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any, Dict, Literal, Optional, Union
 
 from ..const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED
 from ..const.command_class.power_level import PowerLevelTestStatus
+from ..const.command_class.multilevel_switch import MultilevelSwitchCommand
 from ..util.helpers import parse_buffer
 
 if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
@@ -184,3 +185,49 @@ class PowerLevelNotification:
     def acknowledged_frames(self) -> int:
         """Return acknowledged frames property."""
         return self.data["args"]["acknowledgedFrames"]
+
+
+class MultilevelSwitchNotificationArgsDataType(TypedDict, total=False):
+    """Represent args for a Multi Level Switch CC notification event data dict type."""
+
+    eventType: int  # required
+    direction: str
+
+
+class MultilevelSwitchNotificationDataType(BaseNotificationDataType):
+    """Represent a Multi Level Switch CC notification event data dict type."""
+
+    args: MultilevelSwitchNotificationArgsDataType  # required
+
+
+class MultilevelSwitchNotification:
+    """Model for a Zwave Node's Multi Level CC notification event."""
+
+    def __init__(
+        self, node: "Node", data: MultilevelSwitchNotificationDataType
+    ) -> None:
+        """Initialize."""
+        self.node = node
+        self.data = data
+
+    @property
+    def node_id(self) -> int:
+        """Return node ID property."""
+        return self.data["nodeId"]
+
+    @property
+    def command_class(self) -> int:
+        """Return command class."""
+        return self.data["ccId"]
+
+    @property
+    def event_type(self) -> MultilevelSwitchCommand:
+        """Return event type property."""
+        return MultilevelSwitchCommand(self.data["args"]["eventType"])
+
+    @property
+    def direction(self) -> Optional[str]:
+        """Return direction property."""
+        if direction := self.data["args"].get("direction"):
+            return direction
+        return None
