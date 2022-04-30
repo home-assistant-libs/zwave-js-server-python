@@ -168,7 +168,7 @@ class Endpoint(EventBase):
             require_schema=7,
             wait_for_result=wait_for_result,
         )
-        if result is None:
+        if not result:
             return None
         return result["response"]
 
