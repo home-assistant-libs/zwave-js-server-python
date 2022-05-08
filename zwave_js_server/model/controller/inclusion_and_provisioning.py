@@ -1,5 +1,5 @@
 """Provide a model for the Z-Wave JS controller's inclusion/provisioning data structures."""
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 from ...const import (
@@ -55,21 +55,23 @@ class ProvisioningEntry:
 
     dsk: str
     security_classes: List[SecurityClass]
-    requested_security_classes: List[SecurityClass] = field(default_factory=list)
+    requested_security_classes: Optional[List[SecurityClass]] = None
     status: ProvisioningEntryStatus = ProvisioningEntryStatus.ACTIVE
     additional_properties: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         """Return PlannedProvisioning data dict from self."""
-        return {
+        data = {
             "dsk": self.dsk,
             "securityClasses": [sec_cls.value for sec_cls in self.security_classes],
-            "requestedSecurityClasses": [
-                sec_cls.value for sec_cls in self.requested_security_classes
-            ],
             "status": self.status.value,
             **(self.additional_properties or {}),
         }
+        if self.requested_security_classes:
+            data["requestedSecurityClasses"] = [
+                sec_cls.value for sec_cls in self.requested_security_classes
+            ]
+        return data
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "ProvisioningEntry":
@@ -79,18 +81,18 @@ class ProvisioningEntry:
             security_classes=[
                 SecurityClass(sec_cls) for sec_cls in data["securityClasses"]
             ],
-            requested_security_classes=[
-                SecurityClass(sec_cls)
-                for sec_cls in data.get("requestedSecurityClasses", [])
-            ],
+            status=ProvisioningEntryStatus(data["status"]),
             additional_properties={
                 k: v
                 for k, v in data.items()
-                if k not in {"dsk", "securityClasses", "requestedSecurityClasses"}
+                if k
+                not in {"dsk", "securityClasses", "requestedSecurityClasses", "status"}
             },
         )
-        if "status" in data:
-            cls_instance.status = ProvisioningEntryStatus(data["status"])
+        if "requestedSecurityClasses" in data:
+            cls_instance.requested_security_classes = [
+                SecurityClass(sec_cls) for sec_cls in data["requestedSecurityClasses"]
+            ]
         return cls_instance
 
 
@@ -120,9 +122,6 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
         data = {
             "version": self.version.value,
             "securityClasses": [sec_cls.value for sec_cls in self.security_classes],
-            "requestedSecurityClasses": [
-                sec_cls.value for sec_cls in self.requested_security_classes
-            ],
             "dsk": self.dsk,
             "genericDeviceClass": self.generic_device_class,
             "specificDeviceClass": self.specific_device_class,
@@ -133,6 +132,10 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
             "applicationVersion": self.application_version,
             **(self.additional_properties or {}),
         }
+        if self.requested_security_classes:
+            data["requestedSecurityClasses"] = [
+                sec_cls.value for sec_cls in self.requested_security_classes
+            ]
         if self.max_inclusion_request_interval is not None:
             data["maxInclusionRequestInterval"] = self.max_inclusion_request_interval
         if self.uuid is not None:
@@ -146,14 +149,10 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "QRProvisioningInformation":
         """Return QRProvisioningInformation from data dict."""
-        return cls(
+        cls_instance = cls(
             version=QRCodeVersion(data["version"]),
             security_classes=[
                 SecurityClass(sec_cls) for sec_cls in data["securityClasses"]
-            ],
-            requested_security_classes=[
-                SecurityClass(sec_cls)
-                for sec_cls in data.get("requestedSecurityClasses", [])
             ],
             dsk=data["dsk"],
             generic_device_class=data["genericDeviceClass"],
@@ -191,3 +190,8 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
                 }
             },
         )
+        if "requestedSecurityClasses" in data:
+            cls_instance.requested_security_classes = [
+                SecurityClass(sec_cls) for sec_cls in data["requestedSecurityClasses"]
+            ]
+        return cls_instance

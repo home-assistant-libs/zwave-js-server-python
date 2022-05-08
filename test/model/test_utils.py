@@ -13,6 +13,7 @@ async def test_parse_qr_code_string(client, mock_command, uuid4):
             "qrProvisioningInformation": {
                 "version": 0,
                 "securityClasses": [0, 1, 2],
+                "requestedSecurityClasses": [0],
                 "dsk": "test",
                 "genericDeviceClass": 1,
                 "specificDeviceClass": 1,

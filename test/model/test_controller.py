@@ -9,6 +9,7 @@ from zwave_js_server.const import (
     InclusionStrategy,
     ProtocolDataRate,
     Protocols,
+    ProvisioningEntryStatus,
     QRCodeVersion,
     RFRegion,
     SecurityClass,
@@ -506,6 +507,7 @@ async def test_get_provisioning_entry(controller, uuid4, mock_command):
                 "securityClasses": [0],
                 "requestedSecurityClasses": [0],
                 "test": "test",
+                "status": 0,
             }
         },
     )
@@ -514,13 +516,30 @@ async def test_get_provisioning_entry(controller, uuid4, mock_command):
         "test",
         [SecurityClass.S2_UNAUTHENTICATED],
         requested_security_classes=[SecurityClass.S2_UNAUTHENTICATED],
+        status=ProvisioningEntryStatus.ACTIVE,
         additional_properties={"test": "test"},
     )
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.get_provisioning_entry",
-        "dsk": "test",
+        "dskOrNodeId": "test",
+        "messageId": uuid4,
+    }
+
+
+async def test_get_provisioning_entry_undefined(controller, uuid4, mock_command):
+    """Test get_provisioning_entry when entry is undefined."""
+    ack_commands = mock_command(
+        {"command": "controller.get_provisioning_entry"},
+        {},
+    )
+    assert await controller.async_get_provisioning_entry("test") is None
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_provisioning_entry",
+        "dskOrNodeId": "test",
         "messageId": uuid4,
     }
 
@@ -536,6 +555,7 @@ async def test_get_provisioning_entries(controller, uuid4, mock_command):
                     "securityClasses": [0],
                     "requestedSecurityClasses": [0],
                     "test": "test",
+                    "status": 0,
                 }
             ]
         },
@@ -545,6 +565,7 @@ async def test_get_provisioning_entries(controller, uuid4, mock_command):
         controller_pkg.ProvisioningEntry(
             "test",
             [SecurityClass.S2_UNAUTHENTICATED],
+            status=ProvisioningEntryStatus.ACTIVE,
             requested_security_classes=[SecurityClass.S2_UNAUTHENTICATED],
             additional_properties={"test": "test"},
         )
