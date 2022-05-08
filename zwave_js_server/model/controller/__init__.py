@@ -307,7 +307,9 @@ class Controller(EventBase):
         )
         return cast(bool, data["success"])
 
-    async def async_begin_exclusion(self, unprovision: Optional[bool] = None) -> bool:
+    async def async_begin_exclusion(
+        self, unprovision: Optional[Union[bool, Literal["inactive"]]] = None
+    ) -> bool:
         """Send beginExclusion command to Controller."""
         payload: Dict[str, Union[str, bool]] = {"command": "controller.begin_exclusion"}
         if unprovision is not None:

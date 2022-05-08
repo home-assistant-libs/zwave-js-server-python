@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional
 from ...const import (
     TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED,
     Protocols,
+    ProvisioningEntryStatus,
     QRCodeVersion,
     SecurityClass,
 )
@@ -54,6 +55,8 @@ class ProvisioningEntry:
 
     dsk: str
     security_classes: List[SecurityClass]
+    requested_security_classes: List[SecurityClass]
+    status: ProvisioningEntryStatus = ProvisioningEntryStatus.ACTIVE
     additional_properties: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
@@ -61,6 +64,10 @@ class ProvisioningEntry:
         return {
             "dsk": self.dsk,
             "securityClasses": [sec_cls.value for sec_cls in self.security_classes],
+            "requestedSecurityClasses": [
+                sec_cls.value for sec_cls in self.requested_security_classes
+            ],
+            "status": self.status.value,
             **(self.additional_properties or {}),
         }
 
@@ -72,6 +79,10 @@ class ProvisioningEntry:
             security_classes=[
                 SecurityClass(sec_cls) for sec_cls in data["securityClasses"]
             ],
+            requested_security_classes=[
+                SecurityClass(sec_cls) for sec_cls in data["requestedSecurityClasses"]
+            ],
+            status=ProvisioningEntryStatus(data["status"]),
             additional_properties={
                 k: v for k, v in data.items() if k not in {"dsk", "securityClasses"}
             },
@@ -104,6 +115,9 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
         data = {
             "version": self.version.value,
             "securityClasses": [sec_cls.value for sec_cls in self.security_classes],
+            "requestedSecurityClasses": [
+                sec_cls.value for sec_cls in self.requested_security_classes
+            ],
             "dsk": self.dsk,
             "genericDeviceClass": self.generic_device_class,
             "specificDeviceClass": self.specific_device_class,
@@ -132,6 +146,9 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
             security_classes=[
                 SecurityClass(sec_cls) for sec_cls in data["securityClasses"]
             ],
+            requested_security_classes=[
+                SecurityClass(sec_cls) for sec_cls in data["requestedSecurityClasses"]
+            ],
             dsk=data["dsk"],
             generic_device_class=data["genericDeviceClass"],
             specific_device_class=data["specificDeviceClass"],
@@ -153,6 +170,7 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
                 not in {
                     "version",
                     "securityClasses",
+                    "requestedSecurityClasses",
                     "dsk",
                     "genericDeviceClass",
                     "specificDeviceClass",
