@@ -245,7 +245,10 @@ async def test_begin_inclusion_s2_provisioning_entry(controller, uuid4, mock_com
         {"success": True},
     )
     provisioning_entry = controller_pkg.ProvisioningEntry(
-        "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
+        "test",
+        [SecurityClass.S2_UNAUTHENTICATED],
+        requested_security_classes=[SecurityClass.S2_UNAUTHENTICATED],
+        additional_properties={"test": "test"},
     )
     assert await controller.async_begin_inclusion(
         InclusionStrategy.SECURITY_S2, provisioning=provisioning_entry
@@ -256,7 +259,13 @@ async def test_begin_inclusion_s2_provisioning_entry(controller, uuid4, mock_com
         "command": "controller.begin_inclusion",
         "options": {
             "strategy": InclusionStrategy.SECURITY_S2,
-            "provisioning": {"dsk": "test", "securityClasses": [0], "test": "test"},
+            "provisioning": {
+                "dsk": "test",
+                "securityClasses": [0],
+                "requestedSecurityClasses": [0],
+                "status": 0,
+                "test": "test",
+            },
         },
         "messageId": uuid4,
     }
@@ -271,6 +280,7 @@ async def test_begin_inclusion_s2_qr_info(controller, uuid4, mock_command):
     provisioning_entry = controller_pkg.QRProvisioningInformation(
         dsk="test1",
         security_classes=[SecurityClass.S2_UNAUTHENTICATED],
+        requested_security_classes=[SecurityClass.S2_UNAUTHENTICATED],
         version=QRCodeVersion.S2,
         generic_device_class=1,
         specific_device_class=2,
@@ -295,6 +305,7 @@ async def test_begin_inclusion_s2_qr_info(controller, uuid4, mock_command):
             "provisioning": {
                 "version": 0,
                 "securityClasses": [0],
+                "requestedSecurityClasses": [0],
                 "dsk": "test1",
                 "genericDeviceClass": 1,
                 "specificDeviceClass": 2,
@@ -314,7 +325,10 @@ async def test_begin_inclusion_s2_qr_info(controller, uuid4, mock_command):
 async def test_begin_inclusion_errors(controller, uuid4, mock_command):
     """Test begin inclusion error scenarios."""
     provisioning_entry = controller_pkg.ProvisioningEntry(
-        "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
+        "test",
+        [SecurityClass.S2_UNAUTHENTICATED],
+        requested_security_classes=[SecurityClass.S2_UNAUTHENTICATED],
+        additional_properties={"test": "test"},
     )
     # Test that Security S0 Inclusion Strategy doesn't support providing a provisioning
     # entry
@@ -332,6 +346,7 @@ async def test_begin_inclusion_errors(controller, uuid4, mock_command):
     provisioning_entry = controller_pkg.QRProvisioningInformation(
         dsk="test1",
         security_classes=[SecurityClass.S2_UNAUTHENTICATED],
+        requested_security_classes=[SecurityClass.S2_UNAUTHENTICATED],
         version=QRCodeVersion.SMART_START,
         generic_device_class=1,
         specific_device_class=2,
@@ -377,14 +392,23 @@ async def test_provision_smart_start_node_provisioning_entry(
         {"success": True},
     )
     provisioning_entry = controller_pkg.ProvisioningEntry(
-        "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
+        "test",
+        [SecurityClass.S2_UNAUTHENTICATED],
+        requested_security_classes=[SecurityClass.S2_UNAUTHENTICATED],
+        additional_properties={"test": "test"},
     )
     await controller.async_provision_smart_start_node(provisioning_entry)
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.provision_smart_start_node",
-        "entry": {"dsk": "test", "securityClasses": [0], "test": "test"},
+        "entry": {
+            "dsk": "test",
+            "securityClasses": [0],
+            "requestedSecurityClasses": [0],
+            "status": 0,
+            "test": "test",
+        },
         "messageId": uuid4,
     }
 
@@ -398,6 +422,7 @@ async def test_provision_smart_start_node_qr_info(controller, uuid4, mock_comman
     provisioning_entry = controller_pkg.QRProvisioningInformation(
         dsk="test1",
         security_classes=[SecurityClass.S2_UNAUTHENTICATED],
+        requested_security_classes=[SecurityClass.S2_UNAUTHENTICATED],
         version=QRCodeVersion.SMART_START,
         generic_device_class=1,
         specific_device_class=2,
@@ -418,6 +443,7 @@ async def test_provision_smart_start_node_qr_info(controller, uuid4, mock_comman
         "entry": {
             "version": 1,
             "securityClasses": [0],
+            "requestedSecurityClasses": [0],
             "dsk": "test1",
             "genericDeviceClass": 1,
             "specificDeviceClass": 2,
@@ -437,6 +463,7 @@ async def test_provision_smart_start_node_qr_info(controller, uuid4, mock_comman
     provisioning_entry = controller_pkg.QRProvisioningInformation(
         dsk="test1",
         security_classes=[SecurityClass.S2_UNAUTHENTICATED],
+        requested_security_classes=[SecurityClass.S2_UNAUTHENTICATED],
         version=QRCodeVersion.S2,
         generic_device_class=1,
         specific_device_class=2,
@@ -473,11 +500,21 @@ async def test_get_provisioning_entry(controller, uuid4, mock_command):
     """Test get_provisioning_entry."""
     ack_commands = mock_command(
         {"command": "controller.get_provisioning_entry"},
-        {"entry": {"dsk": "test", "securityClasses": [0], "test": "test"}},
+        {
+            "entry": {
+                "dsk": "test",
+                "securityClasses": [0],
+                "requestedSecurityClasses": [0],
+                "test": "test",
+            }
+        },
     )
     provisioning_entry = await controller.async_get_provisioning_entry("test")
     assert provisioning_entry == controller_pkg.ProvisioningEntry(
-        "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
+        "test",
+        [SecurityClass.S2_UNAUTHENTICATED],
+        requested_security_classes=[SecurityClass.S2_UNAUTHENTICATED],
+        additional_properties={"test": "test"},
     )
 
     assert len(ack_commands) == 1
@@ -492,12 +529,24 @@ async def test_get_provisioning_entries(controller, uuid4, mock_command):
     """Test get_provisioning_entries."""
     ack_commands = mock_command(
         {"command": "controller.get_provisioning_entries"},
-        {"entries": [{"dsk": "test", "securityClasses": [0], "test": "test"}]},
+        {
+            "entries": [
+                {
+                    "dsk": "test",
+                    "securityClasses": [0],
+                    "requestedSecurityClasses": [0],
+                    "test": "test",
+                }
+            ]
+        },
     )
     provisioning_entry = await controller.async_get_provisioning_entries()
     assert provisioning_entry == [
         controller_pkg.ProvisioningEntry(
-            "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
+            "test",
+            [SecurityClass.S2_UNAUTHENTICATED],
+            requested_security_classes=[SecurityClass.S2_UNAUTHENTICATED],
+            additional_properties={"test": "test"},
         )
     ]
 
@@ -710,7 +759,10 @@ async def test_replace_failed_node_s2_provisioning_entry(
         {"success": True},
     )
     provisioning_entry = controller_pkg.ProvisioningEntry(
-        "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
+        "test",
+        [SecurityClass.S2_UNAUTHENTICATED],
+        requested_security_classes=[SecurityClass.S2_UNAUTHENTICATED],
+        additional_properties={"test": "test"},
     )
     assert await controller.async_replace_failed_node(
         1, InclusionStrategy.SECURITY_S2, provisioning=provisioning_entry
@@ -722,7 +774,13 @@ async def test_replace_failed_node_s2_provisioning_entry(
         "nodeId": 1,
         "options": {
             "strategy": InclusionStrategy.SECURITY_S2,
-            "provisioning": {"dsk": "test", "securityClasses": [0], "test": "test"},
+            "provisioning": {
+                "dsk": "test",
+                "securityClasses": [0],
+                "requestedSecurityClasses": [0],
+                "status": 0,
+                "test": "test",
+            },
         },
         "messageId": uuid4,
     }
@@ -737,6 +795,7 @@ async def test_replace_failed_node_s2_qr_info(controller, uuid4, mock_command):
     provisioning_entry = controller_pkg.QRProvisioningInformation(
         dsk="test1",
         security_classes=[SecurityClass.S2_UNAUTHENTICATED],
+        requested_security_classes=[SecurityClass.S2_UNAUTHENTICATED],
         version=QRCodeVersion.S2,
         generic_device_class=1,
         specific_device_class=2,
@@ -762,6 +821,7 @@ async def test_replace_failed_node_s2_qr_info(controller, uuid4, mock_command):
             "provisioning": {
                 "version": 0,
                 "securityClasses": [0],
+                "requestedSecurityClasses": [0],
                 "dsk": "test1",
                 "genericDeviceClass": 1,
                 "specificDeviceClass": 2,
@@ -781,7 +841,10 @@ async def test_replace_failed_node_s2_qr_info(controller, uuid4, mock_command):
 async def test_replace_failed_node_errors(controller):
     """Test replace_failed_node error scenarios."""
     provisioning_entry = controller_pkg.ProvisioningEntry(
-        "test", [SecurityClass.S2_UNAUTHENTICATED], {"test": "test"}
+        "test",
+        [SecurityClass.S2_UNAUTHENTICATED],
+        requested_security_classes=[SecurityClass.S2_UNAUTHENTICATED],
+        additional_properties={"test": "test"},
     )
     # Test that Security S0 Inclusion strategy can't be combined with a provisioning
     # entry

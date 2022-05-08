@@ -1,5 +1,5 @@
 """Provide a model for the Z-Wave JS controller's inclusion/provisioning data structures."""
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
 from ...const import (
@@ -55,7 +55,7 @@ class ProvisioningEntry:
 
     dsk: str
     security_classes: List[SecurityClass]
-    requested_security_classes: List[SecurityClass]
+    requested_security_classes: List[SecurityClass] = field(default_factory=list)
     status: ProvisioningEntryStatus = ProvisioningEntryStatus.ACTIVE
     additional_properties: Optional[Dict[str, Any]] = None
 
@@ -74,19 +74,24 @@ class ProvisioningEntry:
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "ProvisioningEntry":
         """Return ProvisioningEntry from data dict."""
-        return cls(
+        cls_instance = cls(
             dsk=data["dsk"],
             security_classes=[
                 SecurityClass(sec_cls) for sec_cls in data["securityClasses"]
             ],
             requested_security_classes=[
-                SecurityClass(sec_cls) for sec_cls in data["requestedSecurityClasses"]
+                SecurityClass(sec_cls)
+                for sec_cls in data.get("requestedSecurityClasses", [])
             ],
-            status=ProvisioningEntryStatus(data["status"]),
             additional_properties={
-                k: v for k, v in data.items() if k not in {"dsk", "securityClasses"}
+                k: v
+                for k, v in data.items()
+                if k not in {"dsk", "securityClasses", "requestedSecurityClasses"}
             },
         )
+        if "status" in data:
+            cls_instance.status = ProvisioningEntryStatus(data["status"])
+        return cls_instance
 
 
 @dataclass
@@ -147,7 +152,8 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
                 SecurityClass(sec_cls) for sec_cls in data["securityClasses"]
             ],
             requested_security_classes=[
-                SecurityClass(sec_cls) for sec_cls in data["requestedSecurityClasses"]
+                SecurityClass(sec_cls)
+                for sec_cls in data.get("requestedSecurityClasses", [])
             ],
             dsk=data["dsk"],
             generic_device_class=data["genericDeviceClass"],
