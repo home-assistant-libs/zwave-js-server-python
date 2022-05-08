@@ -286,7 +286,7 @@ class Controller(EventBase):
                 "command": "controller.get_provisioning_entry",
                 "dskOrNodeId": dsk_or_node_id,
             },
-            require_schema=11,
+            require_schema=17,
         )
         if "entry" in data:
             return ProvisioningEntry.from_dict(data["entry"])
