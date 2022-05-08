@@ -81,7 +81,6 @@ class ProvisioningEntry:
             security_classes=[
                 SecurityClass(sec_cls) for sec_cls in data["securityClasses"]
             ],
-            status=ProvisioningEntryStatus(data["status"]),
             additional_properties={
                 k: v
                 for k, v in data.items()
@@ -93,6 +92,8 @@ class ProvisioningEntry:
             cls_instance.requested_security_classes = [
                 SecurityClass(sec_cls) for sec_cls in data["requestedSecurityClasses"]
             ]
+        if "status" in data:
+            cls_instance.status = ProvisioningEntryStatus(data["status"])
         return cls_instance
 
 
@@ -123,6 +124,7 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
             "version": self.version.value,
             "securityClasses": [sec_cls.value for sec_cls in self.security_classes],
             "dsk": self.dsk,
+            "status": self.status.value,
             "genericDeviceClass": self.generic_device_class,
             "specificDeviceClass": self.specific_device_class,
             "installerIconType": self.installer_icon_type,
@@ -187,6 +189,7 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
                     "maxInclusionRequestInterval",
                     "uuid",
                     "supportedProtocols",
+                    "status",
                 }
             },
         )
@@ -194,4 +197,6 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
             cls_instance.requested_security_classes = [
                 SecurityClass(sec_cls) for sec_cls in data["requestedSecurityClasses"]
             ]
+        if "status" in data:
+            cls_instance.status = ProvisioningEntryStatus(data["status"])
         return cls_instance
