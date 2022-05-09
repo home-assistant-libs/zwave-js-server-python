@@ -19,6 +19,7 @@ setup(
     long_description=README_FILE.read_text(encoding="utf-8"),
     long_description_content_type="text/markdown",
     packages=find_packages(exclude=["test.*", "test"]),
+    package_data={"zwave_js_server": ["py.typed"]},
     python_requires=">=3.8",
     install_requires=["aiohttp>3", "pydantic>=1.9.0"],
     entry_points={
