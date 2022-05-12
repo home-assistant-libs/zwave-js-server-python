@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, cast
 
 from ..const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED, NodeStatus
 from ..event import EventBase
-from ..exceptions import FailedCommand
+from ..exceptions import FailedCommand, NotFoundError
 from .command_class import CommandClass, CommandClassInfo, CommandClassInfoDataType
 from .device_class import DeviceClass, DeviceClassDataType
 from .value import ConfigurationValue, Value
@@ -160,6 +160,10 @@ class Endpoint(EventBase):
         wait_for_result: bool = None,
     ) -> Any:
         """Call endpoint.invoke_cc_api command."""
+        if not any(cc for cc in self.command_classes if cc.id == command_class.value):
+            raise NotFoundError(
+                f"Command class {command_class} not found on endpoint {self}"
+            )
         result = await self.async_send_command(
             "invoke_cc_api",
             commandClass=command_class.value,

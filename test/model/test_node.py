@@ -1090,9 +1090,9 @@ async def test_value_added_new_value(climate_radio_thermostat_ct100_plus):
     assert f"{node.node_id}-128-1-isMedium" in node.values
 
 
-async def test_invoke_cc_api(multisensor_6, uuid4, mock_command):
-    """Test endpoint. commands."""
-    node = multisensor_6
+async def test_invoke_cc_api(client, lock_schlage_be469, uuid4, mock_command):
+    """Test endpoint.invoke_cc_api commands."""
+    node = lock_schlage_be469
     ack_commands = mock_command(
         {"command": "endpoint.invoke_cc_api", "nodeId": node.node_id, "endpoint": 0},
         {"response": "ok"},
@@ -1100,7 +1100,7 @@ async def test_invoke_cc_api(multisensor_6, uuid4, mock_command):
 
     assert (
         await node.async_invoke_cc_api(CommandClass.USER_CODE, "set", 1, 1, "1234")
-        is None
+        == "ok"
     )
 
     assert len(ack_commands) == 1
@@ -1131,6 +1131,9 @@ async def test_invoke_cc_api(multisensor_6, uuid4, mock_command):
         "args": [2, 2, "1234"],
         "messageId": uuid4,
     }
+
+    with pytest.raises(NotFoundError):
+        await node.async_invoke_cc_api(CommandClass.ANTITHEFT, "test", 1)
 
 
 async def test_supports_cc_api(multisensor_6, uuid4, mock_command):
