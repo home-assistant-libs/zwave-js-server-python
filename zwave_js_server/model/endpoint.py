@@ -160,7 +160,7 @@ class Endpoint(EventBase):
         wait_for_result: bool = None,
     ) -> Any:
         """Call endpoint.invoke_cc_api command."""
-        if not any(cc for cc in self.command_classes if cc.id == command_class.value):
+        if not any(cc.id == command_class.value for cc in self.command_classes):
             raise NotFoundError(
                 f"Command class {command_class} not found on endpoint {self}"
             )
