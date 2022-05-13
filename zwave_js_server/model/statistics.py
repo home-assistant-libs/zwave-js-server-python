@@ -26,7 +26,7 @@ class RouteStatisticsDataType(TypedDict, total=False):
     routeFailedBetween: List[int]
 
 
-class RouteStatisticsDict(TypedDict, total=False):
+class RouteStatisticsDict(TypedDict):
     """Represent a route statistics data dict type."""
 
     protocol_data_rate: int
