@@ -1221,6 +1221,16 @@ async def test_statistics_updated(
     assert event_stats.nlwr
     assert event_stats.nlwr.protocol_data_rate == ProtocolDataRate.ZWAVE_40K
     assert node.statistics == event_stats
+    assert event_stats.lwr.as_dict() == {
+        "protocol_data_rate": 1,
+        "repeaters": [wallmote_central_scene.node_id],
+        "repeater_rssi": [1],
+        "rssi": None,
+        "route_failed_between": [
+            ring_keypad.node_id,
+            multisensor_6.node_id,
+        ],
+    }
 
     event = Event(
         "statistics updated",

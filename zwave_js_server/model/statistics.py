@@ -1,6 +1,6 @@
 """Common models for statistics."""
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional, Union
 
 from zwave_js_server.exceptions import RepeaterRssiErrorReceived, RssiErrorReceived
 
@@ -75,3 +75,15 @@ class RouteStatistics:
             return None
         assert self.client.driver
         return [self.client.driver.controller.nodes[node_id] for node_id in node_ids]
+
+    def as_dict(self) -> Dict[str, Optional[Union[List[int], int]]]:
+        """Return route statistics as dict."""
+        return {
+            "protocol_data_rate": self.protocol_data_rate.value,
+            "repeaters": [node.node_id for node in self.repeaters],
+            "rssi": self.rssi,
+            "repeater_rssi": self.repeater_rssi,
+            "route_failed_between": [
+                node.node_id for node in self.route_failed_between
+            ],
+        }
