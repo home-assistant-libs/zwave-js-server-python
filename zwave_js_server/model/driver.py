@@ -48,6 +48,7 @@ class CheckConfigUpdates:
 
     def __init__(self, data: dict) -> None:
         """Initialize class."""
+        self.installed_version: str = data["installedVersion"]
         self.update_available: bool = data["updateAvailable"]
         self.new_version: Optional[str] = data.get("newVersion")
 

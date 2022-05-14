@@ -280,10 +280,11 @@ async def test_check_for_config_updates(driver, uuid4, mock_command):
     """Test driver.check_for_config_updates command."""
     ack_commands = mock_command(
         {"command": "driver.check_for_config_updates"},
-        {"updateAvailable": False},
+        {"updateAvailable": False, "installedVersion": "1.0.0"},
     )
 
     check_config_updates = await driver.async_check_for_config_updates()
+    assert check_config_updates.installed_version == "1.0.0"
     assert check_config_updates.update_available is False
     assert check_config_updates.new_version is None
 
