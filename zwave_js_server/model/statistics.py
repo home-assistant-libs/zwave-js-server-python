@@ -26,6 +26,16 @@ class RouteStatisticsDataType(TypedDict, total=False):
     routeFailedBetween: List[int]
 
 
+class RouteStatisticsDict(TypedDict):
+    """Represent a route statistics data dict type."""
+
+    protocol_data_rate: int
+    repeaters: List[int]
+    rssi: Optional[int]
+    repeater_rssi: List[int]
+    route_failed_between: Optional[List[int]]
+
+
 @dataclass
 class RouteStatistics:
     """Represent route statistics."""
@@ -75,3 +85,15 @@ class RouteStatistics:
             return None
         assert self.client.driver
         return [self.client.driver.controller.nodes[node_id] for node_id in node_ids]
+
+    def as_dict(self) -> RouteStatisticsDict:
+        """Return route statistics as dict."""
+        return {
+            "protocol_data_rate": self.protocol_data_rate.value,
+            "repeaters": [node.node_id for node in self.repeaters],
+            "rssi": self.rssi,
+            "repeater_rssi": self.repeater_rssi,
+            "route_failed_between": [node.node_id for node in self.route_failed_between]
+            if self.route_failed_between
+            else None,
+        }
