@@ -31,7 +31,7 @@ class RouteStatisticsDict(TypedDict):
 
     protocol_data_rate: int
     repeaters: List[int]
-    rssi: int
+    rssi: Optional[int]
     repeater_rssi: List[int]
     route_failed_between: Optional[List[int]]
 
