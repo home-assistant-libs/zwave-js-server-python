@@ -1226,10 +1226,10 @@ async def test_statistics_updated(
         "repeaters": [wallmote_central_scene.node_id],
         "repeater_rssi": [1],
         "rssi": None,
-        "route_failed_between": [
+        "route_failed_between": (
             ring_keypad.node_id,
             multisensor_6.node_id,
-        ],
+        ),
     }
 
     event = Event(

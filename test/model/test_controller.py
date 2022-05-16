@@ -1435,10 +1435,10 @@ async def test_get_known_lifeline_routes(
     assert lifeline_routes.lwr.repeaters == [multisensor_6]
     assert not lifeline_routes.lwr.rssi
     assert lifeline_routes.lwr.repeater_rssi == [1]
-    assert lifeline_routes.lwr.route_failed_between == [
+    assert lifeline_routes.lwr.route_failed_between == (
         ring_keypad,
         wallmote_central_scene,
-    ]
+    )
     assert lifeline_routes.nlwr
     assert lifeline_routes.nlwr.protocol_data_rate == ProtocolDataRate.ZWAVE_40K
     assert lifeline_routes.nlwr.repeaters == []
