@@ -33,7 +33,7 @@ class RouteStatisticsDict(TypedDict):
     repeaters: List[int]
     rssi: Optional[int]
     repeater_rssi: List[int]
-    route_failed_between: Optional[Tuple[int, int]]
+    route_failed_between: Optional[Tuple[int, ...]]
 
 
 @dataclass
@@ -79,7 +79,7 @@ class RouteStatistics:
         return repeater_rssi
 
     @property
-    def route_failed_between(self) -> Optional[Tuple["Node", "Node"]]:
+    def route_failed_between(self) -> Optional[Tuple["Node", ...]]:
         """Return route failed between."""
         if (node_ids := self.data.get("routeFailedBetween")) is None:
             return None
