@@ -85,7 +85,9 @@ class RouteStatistics:
             return None
         assert self.client.driver
         assert len(node_ids) == 2
-        return (self.client.driver.controller.nodes[node_id] for node_id in node_ids)
+        return tuple(
+            self.client.driver.controller.nodes[node_id] for node_id in node_ids
+        )
 
     def as_dict(self) -> RouteStatisticsDict:
         """Return route statistics as dict."""
@@ -94,7 +96,9 @@ class RouteStatistics:
             "repeaters": [node.node_id for node in self.repeaters],
             "rssi": self.rssi,
             "repeater_rssi": self.repeater_rssi,
-            "route_failed_between": (node.node_id for node in self.route_failed_between)
+            "route_failed_between": tuple(
+                node.node_id for node in self.route_failed_between
+            )
             if self.route_failed_between
             else None,
         }
