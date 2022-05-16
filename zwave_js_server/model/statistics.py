@@ -98,7 +98,8 @@ class RouteStatistics:
             "rssi": self.rssi,
             "repeater_rssi": self.repeater_rssi,
             "route_failed_between": (
-                self.route_failed_between[0].node_id, self.route_failed_between[1].node_id
+                self.route_failed_between[0].node_id,
+                self.route_failed_between[1].node_id,
             )
             if self.route_failed_between
             else None,
