@@ -72,7 +72,9 @@ class Node(EventBase):
         self.client = client
         self.data: NodeDataType = {}
         self._device_config: DeviceConfig = DeviceConfig({})
-        self._statistics: NodeStatistics = NodeStatistics(client, data.get("statistics"))
+        self._statistics: NodeStatistics = NodeStatistics(
+            client, data.get("statistics")
+        )
         self._firmware_update_progress: Optional[FirmwareUpdateProgress] = None
         self.values: Dict[str, Union[ConfigurationValue, Value]] = {}
         self.endpoints: Dict[int, Endpoint] = {}
