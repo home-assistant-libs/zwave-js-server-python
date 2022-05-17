@@ -34,7 +34,7 @@ class NodeStatistics:
     """Represent a node statistics update."""
 
     def __init__(
-        self, client: "Client", data: Optional[NodeStatisticsDataType] = None
+        self, client: "Client", data: Optional[NodeStatisticsDataType]
     ) -> None:
         """Initialize node statistics."""
         self.data = data or NodeStatisticsDataType(
