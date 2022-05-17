@@ -94,7 +94,7 @@ class RouteStatistics:
         """Return route statistics as dict."""
         return {
             "protocol_data_rate": self.protocol_data_rate.value,
-            "repeaters": [node.node_id for node in self.repeaters],
+            "repeaters": [node for node in self.repeaters],
             "rssi": self.data.get("rssi"),
             "repeater_rssi": self.data.get("repeaterRSSI", []),
             "route_failed_between": (

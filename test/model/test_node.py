@@ -1223,7 +1223,7 @@ async def test_statistics_updated(
     assert node.statistics == event_stats
     assert event_stats.lwr.as_dict() == {
         "protocol_data_rate": 1,
-        "repeaters": [wallmote_central_scene.node_id],
+        "repeaters": [wallmote_central_scene],
         "repeater_rssi": [1],
         "rssi": None,
         "route_failed_between": (
