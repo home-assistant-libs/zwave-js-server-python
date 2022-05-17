@@ -30,10 +30,10 @@ class RouteStatisticsDict(TypedDict):
     """Represent a route statistics data dict type."""
 
     protocol_data_rate: int
-    repeaters: List[int]
+    repeaters: List["Node"]
     rssi: Optional[int]
     repeater_rssi: List[int]
-    route_failed_between: Optional[Tuple[int, int]]
+    route_failed_between: Optional[Tuple["Node", "Node"]]
 
 
 @dataclass
@@ -94,12 +94,12 @@ class RouteStatistics:
         """Return route statistics as dict."""
         return {
             "protocol_data_rate": self.protocol_data_rate.value,
-            "repeaters": [node.node_id for node in self.repeaters],
-            "rssi": self.rssi,
-            "repeater_rssi": self.repeater_rssi,
+            "repeaters": self.repeaters,
+            "rssi": self.data.get("rssi"),
+            "repeater_rssi": self.data.get("repeaterRSSI", []),
             "route_failed_between": (
-                self.route_failed_between[0].node_id,
-                self.route_failed_between[1].node_id,
+                self.route_failed_between[0],
+                self.route_failed_between[1],
             )
             if self.route_failed_between
             else None,
