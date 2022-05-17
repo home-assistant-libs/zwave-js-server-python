@@ -1227,8 +1227,8 @@ async def test_statistics_updated(
         "repeater_rssi": [1],
         "rssi": None,
         "route_failed_between": (
-            ring_keypad.node_id,
-            multisensor_6.node_id,
+            ring_keypad,
+            multisensor_6,
         ),
     }
 
