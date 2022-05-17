@@ -30,7 +30,7 @@ class RouteStatisticsDict(TypedDict):
     """Represent a route statistics data dict type."""
 
     protocol_data_rate: int
-    repeaters: List[int]
+    repeaters: List["Node"]
     rssi: Optional[int]
     repeater_rssi: List[int]
     route_failed_between: Optional[Tuple["Node", "Node"]]
