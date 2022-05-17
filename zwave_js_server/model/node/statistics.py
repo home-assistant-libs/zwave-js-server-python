@@ -37,15 +37,13 @@ class NodeStatistics:
         self, client: "Client", data: Optional[NodeStatisticsDataType]
     ) -> None:
         """Initialize node statistics."""
-        self.data = NodeStatisticsDataType(
+        self.data = data or NodeStatisticsDataType(
             commandsDroppedRX=0,
             commandsDroppedTX=0,
             commandsRX=0,
             commandsTX=0,
             timeoutResponse=0,
         )
-        if data:
-            self.data = data
         self.client = client
         self._lwr = None
         if lwr := self.data.get("lwr"):
