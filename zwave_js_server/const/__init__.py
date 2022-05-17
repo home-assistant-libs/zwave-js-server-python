@@ -3,9 +3,9 @@ import sys
 from enum import Enum, IntEnum
 
 # minimal server schema version we can handle
-MIN_SERVER_SCHEMA_VERSION = 16
+MIN_SERVER_SCHEMA_VERSION = 17
 # max server schema version we can handle (and our code is compatible with)
-MAX_SERVER_SCHEMA_VERSION = 16
+MAX_SERVER_SCHEMA_VERSION = 17
 
 TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED = sys.version_info < (3, 9, 2)
 
@@ -317,3 +317,11 @@ class RssiError(IntEnum):
     NOT_AVAILABLE = 127
     RECEIVER_SATURATED = 126
     NO_SIGNAL_DETECTED = 125
+
+
+class ProvisioningEntryStatus(IntEnum):
+    """Enum for all known provisioning entry statuses."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/controller/Inclusion.ts#L136
+    ACTIVE = 0
+    INACTIVE = 1

@@ -1,7 +1,12 @@
 """Test general utility functions."""
 import pytest
 
-from zwave_js_server.const import Protocols, QRCodeVersion, SecurityClass
+from zwave_js_server.const import (
+    Protocols,
+    ProvisioningEntryStatus,
+    QRCodeVersion,
+    SecurityClass,
+)
 from zwave_js_server.model.utils import async_parse_qr_code_string
 
 
@@ -13,6 +18,8 @@ async def test_parse_qr_code_string(client, mock_command, uuid4):
             "qrProvisioningInformation": {
                 "version": 0,
                 "securityClasses": [0, 1, 2],
+                "requestedSecurityClasses": [0],
+                "status": 1,
                 "dsk": "test",
                 "genericDeviceClass": 1,
                 "specificDeviceClass": 1,
@@ -41,6 +48,10 @@ async def test_parse_qr_code_string(client, mock_command, uuid4):
         SecurityClass.S2_AUTHENTICATED,
         SecurityClass.S2_UNAUTHENTICATED,
     }
+    assert qr_provisioning_info.requested_security_classes == [
+        SecurityClass.S2_UNAUTHENTICATED
+    ]
+    assert qr_provisioning_info.status == ProvisioningEntryStatus.INACTIVE
     assert (
         qr_provisioning_info.dsk
         == qr_provisioning_info.application_version

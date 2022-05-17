@@ -278,17 +278,19 @@ class Controller(EventBase):
         )
 
     async def async_get_provisioning_entry(
-        self, dsk: str
+        self, dsk_or_node_id: Union[str, int]
     ) -> Optional[ProvisioningEntry]:
         """Send getProvisioningEntry command to Controller."""
         data = await self.client.async_send_command(
             {
                 "command": "controller.get_provisioning_entry",
-                "dsk": dsk,
+                "dskOrNodeId": dsk_or_node_id,
             },
-            require_schema=11,
+            require_schema=17,
         )
-        return ProvisioningEntry.from_dict(data["entry"])
+        if "entry" in data:
+            return ProvisioningEntry.from_dict(data["entry"])
+        return None
 
     async def async_get_provisioning_entries(self) -> List[ProvisioningEntry]:
         """Send getProvisioningEntries command to Controller."""
@@ -307,7 +309,9 @@ class Controller(EventBase):
         )
         return cast(bool, data["success"])
 
-    async def async_begin_exclusion(self, unprovision: Optional[bool] = None) -> bool:
+    async def async_begin_exclusion(
+        self, unprovision: Optional[Union[bool, Literal["inactive"]]] = None
+    ) -> bool:
         """Send beginExclusion command to Controller."""
         payload: Dict[str, Union[str, bool]] = {"command": "controller.begin_exclusion"}
         if unprovision is not None:
