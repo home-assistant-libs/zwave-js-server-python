@@ -64,6 +64,12 @@ class HealNetworkProgressEventModel(BaseControllerEventModel):
     progress: Dict[int, str]
 
 
+class InclusionAbortedEventModel(BaseControllerEventModel):
+    """Model for `inclusion aborted` event data."""
+
+    event: Literal["inclusion aborted"]
+
+
 class InclusionFailedEventModel(BaseControllerEventModel):
     """Model for `inclusion failed` event data."""
 
@@ -147,6 +153,7 @@ CONTROLLER_EVENT_MODEL_MAP: Dict[str, Type["BaseControllerEventModel"]] = {
     "grant security classes": GrantSecurityClassesEventModel,
     "heal network done": HealNetworkDoneEventModel,
     "heal network progress": HealNetworkProgressEventModel,
+    "inclusion aborted": InclusionAbortedEventModel,
     "inclusion failed": InclusionFailedEventModel,
     "inclusion started": InclusionStartedEventModel,
     "inclusion stopped": InclusionStoppedEventModel,

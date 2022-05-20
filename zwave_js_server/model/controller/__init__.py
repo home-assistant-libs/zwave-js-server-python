@@ -770,6 +770,9 @@ class Controller(EventBase):
     def handle_validate_dsk_and_enter_pin(self, event: Event) -> None:
         """Process a validate dsk and enter pin event."""
 
+    def handle_inclusion_aborted(self, event: Event) -> None:
+        """Process an inclusion aborted event."""
+
     def handle_nvm_backup_progress(self, event: Event) -> None:
         """Process a nvm backup progress event."""
         event.data["nvm_backup_progress"] = NVMProgress(

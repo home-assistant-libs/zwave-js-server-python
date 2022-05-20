@@ -1,6 +1,7 @@
 """Test the controller model."""
 import json
 from copy import deepcopy
+from unittest.mock import patch
 
 import pytest
 
@@ -1657,6 +1658,23 @@ async def test_node_removed(client, multisensor_6, multisensor_6_state):
     assert event.data["node"].node_id == 52
     assert event.data["node"].client is None
     assert 52 not in client.driver.controller.nodes
+
+
+async def test_inclusion_aborted(controller):
+    """Test inclusion aborted event."""
+    event_data = {
+        "source": "controller",
+        "event": "inclusion aborted",
+    }
+    event = Event("inclusion aborted", event_data.copy())
+    with patch(
+        "zwave_js_server.model.controller.Controller.handle_inclusion_aborted"
+    ) as mock:
+        controller.receive_event(event)
+        assert mock.called
+
+    # Ensure that the handler doesn't modify the event
+    assert {k: v for k, v in event.data.items() if k != "controller"} == event_data
 
 
 async def test_unknown_event(controller):
