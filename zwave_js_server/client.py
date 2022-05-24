@@ -139,7 +139,7 @@ class Client:
             cast(VersionInfoDataType, await self._receive_json_or_raise())
         )
 
-        # basic check for server schema version compatability
+        # basic check for server schema version compatibility
         if (
             self.version.min_schema_version > MIN_SERVER_SCHEMA_VERSION
             or self.version.max_schema_version < MIN_SERVER_SCHEMA_VERSION
