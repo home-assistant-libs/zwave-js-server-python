@@ -28,7 +28,7 @@ class ThermostatMode(IntEnum):
     AUXILIARY = 4
     RESUME_ON = 5
     FAN = 6
-    FURNANCE = 7
+    FURNACE = 7
     DRY = 8
     MOIST = 9
     AUTO_CHANGE_OVER = 10
@@ -80,7 +80,7 @@ class ThermostatSetpointType(IntEnum):
 
 
 # In Z-Wave the modes and presets are both in ThermostatMode.
-# This list contains thermostatmodes we should consider a mode only
+# This list contains thermostat modes we should consider a mode only
 THERMOSTAT_MODES = [
     ThermostatMode.OFF,
     ThermostatMode.HEAT,
@@ -98,7 +98,7 @@ THERMOSTAT_MODE_SETPOINT_MAP: Dict[int, List[ThermostatSetpointType]] = {
         ThermostatSetpointType.COOLING,
     ],
     ThermostatMode.AUXILIARY: [ThermostatSetpointType.HEATING],
-    ThermostatMode.FURNANCE: [ThermostatSetpointType.FURNACE],
+    ThermostatMode.FURNACE: [ThermostatSetpointType.FURNACE],
     ThermostatMode.DRY: [ThermostatSetpointType.DRY_AIR],
     ThermostatMode.MOIST: [ThermostatSetpointType.MOIST_AIR],
     ThermostatMode.AUTO_CHANGE_OVER: [ThermostatSetpointType.AUTO_CHANGEOVER],
