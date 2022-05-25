@@ -1281,22 +1281,24 @@ async def test_heal_network_active(client, controller):
 async def test_statistics_updated(controller):
     """Test that statistics get updated on events."""
     assert controller.statistics.nak == 0
+    statistics_data = {
+        "messagesTX": 1,
+        "messagesRX": 1,
+        "messagesDroppedRX": 1,
+        "NAK": 1,
+        "CAN": 1,
+        "timeoutACK": 1,
+        "timeoutResponse": 1,
+        "timeoutCallback": 1,
+        "messagesDroppedTX": 1,
+    }
+    assert controller.data["statistics"] != statistics_data
     event = Event(
         "statistics updated",
         {
             "source": "controller",
             "event": "statistics updated",
-            "statistics": {
-                "messagesTX": 1,
-                "messagesRX": 1,
-                "messagesDroppedRX": 1,
-                "NAK": 1,
-                "CAN": 1,
-                "timeoutACK": 1,
-                "timeoutResponse": 1,
-                "timeoutCallback": 1,
-                "messagesDroppedTX": 1,
-            },
+            "statistics": statistics_data,
         },
     )
     controller.receive_event(event)
@@ -1306,6 +1308,7 @@ async def test_statistics_updated(controller):
     assert isinstance(event_stats, ControllerStatistics)
     assert controller.statistics.nak == 1
     assert controller.statistics == event_stats
+    assert controller.data["statistics"] == statistics_data
 
 
 async def test_grant_security_classes(controller, uuid4, mock_command) -> None:
