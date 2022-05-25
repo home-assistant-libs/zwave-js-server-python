@@ -1292,7 +1292,7 @@ async def test_statistics_updated(controller):
         "timeoutCallback": 1,
         "messagesDroppedTX": 1,
     }
-    assert controller.data["statistics"] != statistics_data
+    assert controller.data.get("statistics") != statistics_data
     event = Event(
         "statistics updated",
         {
