@@ -1239,7 +1239,7 @@ async def test_statistics_updated(
         "commandsDroppedRX": 4,
         "timeoutResponse": 5,
     }
-    assert node.data["statistics"] != statistics_data
+    assert node.data.get("statistics") != statistics_data
     event = Event(
         "statistics updated",
         {
