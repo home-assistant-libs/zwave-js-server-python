@@ -1232,19 +1232,21 @@ async def test_statistics_updated(
         ),
     }
 
+    statistics_data = {
+        "commandsTX": 1,
+        "commandsRX": 2,
+        "commandsDroppedTX": 3,
+        "commandsDroppedRX": 4,
+        "timeoutResponse": 5,
+    }
+    assert node.data.get("statistics") != statistics_data
     event = Event(
         "statistics updated",
         {
             "source": "node",
             "event": "statistics updated",
             "nodeId": node.node_id,
-            "statistics": {
-                "commandsTX": 1,
-                "commandsRX": 2,
-                "commandsDroppedTX": 3,
-                "commandsDroppedRX": 4,
-                "timeoutResponse": 5,
-            },
+            "statistics": statistics_data,
         },
     )
     node.receive_event(event)
@@ -1262,6 +1264,7 @@ async def test_statistics_updated(
     assert not event_stats.lwr
     assert not event_stats.nlwr
     assert node.statistics == event_stats
+    assert node.data["statistics"] == statistics_data
 
 
 async def test_statistics_updated_rssi_error(

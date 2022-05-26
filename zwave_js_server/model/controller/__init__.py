@@ -757,8 +757,9 @@ class Controller(EventBase):
 
     def handle_statistics_updated(self, event: Event) -> None:
         """Process a statistics updated event."""
+        self.data["statistics"] = statistics = event.data["statistics"]
         self._statistics = event.data["statistics_updated"] = ControllerStatistics(
-            event.data["statistics"]
+            statistics
         )
 
     def handle_grant_security_classes(self, event: Event) -> None:
