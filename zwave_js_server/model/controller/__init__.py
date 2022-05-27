@@ -326,15 +326,15 @@ class Controller(EventBase):
         )
         return cast(bool, data["success"])
 
-    async def async_remove_failed_node(self, node_id: int) -> None:
+    async def async_remove_failed_node(self, node: Node) -> None:
         """Send removeFailedNode command to Controller."""
         await self.client.async_send_command(
-            {"command": "controller.remove_failed_node", "nodeId": node_id}
+            {"command": "controller.remove_failed_node", "nodeId": node.node_id}
         )
 
     async def async_replace_failed_node(
         self,
-        node_id: int,
+        node: Node,
         inclusion_strategy: Literal[
             InclusionStrategy.DEFAULT,
             InclusionStrategy.SECURITY_S0,
@@ -385,17 +385,17 @@ class Controller(EventBase):
         data = await self.client.async_send_command(
             {
                 "command": "controller.replace_failed_node",
-                "nodeId": node_id,
+                "nodeId": node.node_id,
                 "options": options,
             },
             require_schema=require_schema,
         )
         return cast(bool, data["success"])
 
-    async def async_heal_node(self, node_id: int) -> bool:
+    async def async_heal_node(self, node: Node) -> bool:
         """Send healNode command to Controller."""
         data = await self.client.async_send_command(
-            {"command": "controller.heal_node", "nodeId": node_id}
+            {"command": "controller.heal_node", "nodeId": node.node_id}
         )
         return cast(bool, data["success"])
 
@@ -417,10 +417,10 @@ class Controller(EventBase):
             self.data["isHealNetworkActive"] = False
         return success
 
-    async def async_is_failed_node(self, node_id: int) -> bool:
+    async def async_is_failed_node(self, node: Node) -> bool:
         """Send isFailedNode command to Controller."""
         data = await self.client.async_send_command(
-            {"command": "controller.is_failed_node", "nodeId": node_id}
+            {"command": "controller.is_failed_node", "nodeId": node.node_id}
         )
         return cast(bool, data["failed"])
 
@@ -556,25 +556,25 @@ class Controller(EventBase):
 
     async def async_remove_node_from_all_associations(
         self,
-        node_id: int,
+        node: Node,
         wait_for_result: bool = False,
     ) -> None:
         """Send removeNodeFromAllAssociations command to Controller."""
         cmd = {
             "command": "controller.remove_node_from_all_associations",
-            "nodeId": node_id,
+            "nodeId": node.node_id,
         }
         if wait_for_result:
             await self.client.async_send_command(cmd)
         else:
             await self.client.async_send_command_no_wait(cmd)
 
-    async def async_get_node_neighbors(self, node_id: int) -> List[int]:
+    async def async_get_node_neighbors(self, node: Node) -> List[int]:
         """Send getNodeNeighbors command to Controller to get node's neighbors."""
         data = await self.client.async_send_command(
             {
                 "command": "controller.get_node_neighbors",
-                "nodeId": node_id,
+                "nodeId": node.node_id,
             }
         )
         return cast(List[int], data["neighbors"])

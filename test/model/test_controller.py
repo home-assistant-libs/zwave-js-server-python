@@ -649,53 +649,52 @@ async def test_hash(controller):
     assert hash(controller) == hash(controller.home_id)
 
 
-async def test_remove_failed_node(controller, uuid4, mock_command):
+async def test_remove_failed_node(controller, multisensor_6, uuid4, mock_command):
     """Test remove failed node."""
     ack_commands = mock_command(
         {"command": "controller.remove_failed_node"},
         {},
     )
 
-    node_id = 52
-    assert await controller.async_remove_failed_node(node_id) is None
+    assert await controller.async_remove_failed_node(multisensor_6) is None
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.remove_failed_node",
         "messageId": uuid4,
-        "nodeId": node_id,
+        "nodeId": multisensor_6.node_id,
     }
 
 
-async def test_replace_failed_node(controller, uuid4, mock_command):
+async def test_replace_failed_node(controller, multisensor_6, uuid4, mock_command):
     """Test replace_failed_node."""
     ack_commands = mock_command(
         {"command": "controller.replace_failed_node"},
         {"success": True},
     )
-    assert await controller.async_replace_failed_node(1, InclusionStrategy.SECURITY_S0)
+    assert await controller.async_replace_failed_node(multisensor_6, InclusionStrategy.SECURITY_S0)
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.replace_failed_node",
-        "nodeId": 1,
+        "nodeId": multisensor_6.node_id,
         "options": {"strategy": InclusionStrategy.SECURITY_S0},
         "messageId": uuid4,
     }
 
 
-async def test_replace_failed_node_default(controller, uuid4, mock_command):
+async def test_replace_failed_node_default(controller, multisensor_6, uuid4, mock_command):
     """Test replace_failed_node."""
     ack_commands = mock_command(
         {"command": "controller.replace_failed_node"},
         {"success": True},
     )
-    assert await controller.async_replace_failed_node(1, InclusionStrategy.DEFAULT)
+    assert await controller.async_replace_failed_node(multisensor_6, InclusionStrategy.DEFAULT)
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.replace_failed_node",
-        "nodeId": 1,
+        "nodeId": multisensor_6.node_id,
         "options": {
             "strategy": InclusionStrategy.DEFAULT,
         },
@@ -704,7 +703,7 @@ async def test_replace_failed_node_default(controller, uuid4, mock_command):
 
 
 async def test_replace_failed_node_default_force_security(
-    controller, uuid4, mock_command
+    controller, multisensor_6, uuid4, mock_command
 ):
     """Test replace_failed_node with force_security provided."""
     ack_commands = mock_command(
@@ -712,13 +711,13 @@ async def test_replace_failed_node_default_force_security(
         {"success": True},
     )
     assert await controller.async_replace_failed_node(
-        1, InclusionStrategy.DEFAULT, force_security=False
+        multisensor_6, InclusionStrategy.DEFAULT, force_security=False
     )
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.replace_failed_node",
-        "nodeId": 1,
+        "nodeId": multisensor_6.node_id,
         "options": {
             "strategy": InclusionStrategy.DEFAULT,
             "forceSecurity": False,
@@ -727,31 +726,31 @@ async def test_replace_failed_node_default_force_security(
     }
 
 
-async def test_replace_failed_node_s2_no_input(controller, uuid4, mock_command):
+async def test_replace_failed_node_s2_no_input(controller, multisensor_6, uuid4, mock_command):
     """Test replace_failed_node S2 Mode."""
     ack_commands = mock_command(
         {"command": "controller.replace_failed_node"},
         {"success": True},
     )
-    assert await controller.async_replace_failed_node(1, InclusionStrategy.SECURITY_S2)
+    assert await controller.async_replace_failed_node(multisensor_6, InclusionStrategy.SECURITY_S2)
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.replace_failed_node",
-        "nodeId": 1,
+        "nodeId": multisensor_6.node_id,
         "options": {"strategy": InclusionStrategy.SECURITY_S2},
         "messageId": uuid4,
     }
 
 
-async def test_replace_failed_node_s2_qr_code_string(controller, uuid4, mock_command):
+async def test_replace_failed_node_s2_qr_code_string(controller, multisensor_6, uuid4, mock_command):
     """Test replace_failed_node S2 Mode with a QR code string."""
     ack_commands = mock_command(
         {"command": "controller.replace_failed_node"},
         {"success": True},
     )
     assert await controller.async_replace_failed_node(
-        1,
+        multisensor_6,
         InclusionStrategy.SECURITY_S2,
         provisioning="90testtesttesttesttesttesttesttesttesttesttesttesttest",
     )
@@ -759,7 +758,7 @@ async def test_replace_failed_node_s2_qr_code_string(controller, uuid4, mock_com
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.replace_failed_node",
-        "nodeId": 1,
+        "nodeId": multisensor_6.node_id,
         "options": {
             "strategy": InclusionStrategy.SECURITY_S2,
             "provisioning": "90testtesttesttesttesttesttesttesttesttesttesttesttest",
@@ -770,14 +769,14 @@ async def test_replace_failed_node_s2_qr_code_string(controller, uuid4, mock_com
     # Test invalid QR code length fails
     with pytest.raises(ValueError):
         await controller.async_replace_failed_node(
-            1,
+            multisensor_6,
             InclusionStrategy.SECURITY_S2,
             provisioning="test",
         )
 
 
 async def test_replace_failed_node_s2_provisioning_entry(
-    controller, uuid4, mock_command
+    controller, multisensor_6, uuid4, mock_command
 ):
     """Test replace_failed_node S2 Mode with a provisioning entry."""
     ack_commands = mock_command(
@@ -791,13 +790,13 @@ async def test_replace_failed_node_s2_provisioning_entry(
         additional_properties={"test": "test"},
     )
     assert await controller.async_replace_failed_node(
-        1, InclusionStrategy.SECURITY_S2, provisioning=provisioning_entry
+        multisensor_6, InclusionStrategy.SECURITY_S2, provisioning=provisioning_entry
     )
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.replace_failed_node",
-        "nodeId": 1,
+        "nodeId": multisensor_6.node_id,
         "options": {
             "strategy": InclusionStrategy.SECURITY_S2,
             "provisioning": {
@@ -812,7 +811,7 @@ async def test_replace_failed_node_s2_provisioning_entry(
     }
 
 
-async def test_replace_failed_node_s2_qr_info(controller, uuid4, mock_command):
+async def test_replace_failed_node_s2_qr_info(controller, multisensor_6, uuid4, mock_command):
     """Test replace_failed_node S2 Mode with QR info."""
     ack_commands = mock_command(
         {"command": "controller.replace_failed_node"},
@@ -836,13 +835,13 @@ async def test_replace_failed_node_s2_qr_info(controller, uuid4, mock_command):
         supported_protocols=None,
     )
     assert await controller.async_replace_failed_node(
-        1, InclusionStrategy.SECURITY_S2, provisioning=provisioning_entry
+        multisensor_6, InclusionStrategy.SECURITY_S2, provisioning=provisioning_entry
     )
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.replace_failed_node",
-        "nodeId": 1,
+        "nodeId": multisensor_6.node_id,
         "options": {
             "strategy": InclusionStrategy.SECURITY_S2,
             "provisioning": {
@@ -866,7 +865,7 @@ async def test_replace_failed_node_s2_qr_info(controller, uuid4, mock_command):
     }
 
 
-async def test_replace_failed_node_errors(controller):
+async def test_replace_failed_node_errors(controller, multisensor_6):
     """Test replace_failed_node error scenarios."""
     provisioning_entry = controller_pkg.ProvisioningEntry(
         "test",
@@ -878,30 +877,29 @@ async def test_replace_failed_node_errors(controller):
     # entry
     with pytest.raises(ValueError):
         await controller.async_replace_failed_node(
-            1, InclusionStrategy.SECURITY_S0, provisioning=provisioning_entry
+            multisensor_6, InclusionStrategy.SECURITY_S0, provisioning=provisioning_entry
         )
     # Test that Security S2 inclusion strategy can't use force_security
     with pytest.raises(ValueError):
         await controller.async_replace_failed_node(
-            1, InclusionStrategy.SECURITY_S2, force_security=True
+            multisensor_6, InclusionStrategy.SECURITY_S2, force_security=True
         )
 
 
-async def test_heal_node(controller, uuid4, mock_command):
+async def test_heal_node(controller, multisensor_6, uuid4, mock_command):
     """Test heal node."""
     ack_commands = mock_command(
         {"command": "controller.heal_node"},
         {"success": True},
     )
 
-    node_id = 52
-    assert await controller.async_heal_node(node_id)
+    assert await controller.async_heal_node(multisensor_6)
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.heal_node",
         "messageId": uuid4,
-        "nodeId": node_id,
+        "nodeId": multisensor_6.node_id,
     }
 
 
@@ -950,21 +948,20 @@ async def test_stop_healing_network(controller, uuid4, mock_command):
     assert controller.heal_network_progress is None
 
 
-async def test_is_failed_node(controller, uuid4, mock_command):
+async def test_is_failed_node(controller, multisensor_6, uuid4, mock_command):
     """Test is failed node."""
     ack_commands = mock_command(
         {"command": "controller.is_failed_node"},
         {"failed": False},
     )
 
-    node_id = 52
-    assert await controller.async_is_failed_node(node_id) is False
+    assert await controller.async_is_failed_node(multisensor_6) is False
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.is_failed_node",
         "messageId": uuid4,
-        "nodeId": node_id,
+        "nodeId": multisensor_6.node_id,
     }
 
 
@@ -1203,7 +1200,7 @@ async def test_remove_associations(controller, uuid4, mock_command):
     }
 
 
-async def test_remove_node_from_all_associations(controller, uuid4, mock_command):
+async def test_remove_node_from_all_associations(controller, multisensor_6, uuid4, mock_command):
     """Test remove associations."""
 
     ack_commands = mock_command(
@@ -1211,42 +1208,39 @@ async def test_remove_node_from_all_associations(controller, uuid4, mock_command
         {},
     )
 
-    node_id = 52
-    await controller.async_remove_node_from_all_associations(node_id)
+    await controller.async_remove_node_from_all_associations(multisensor_6)
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.remove_node_from_all_associations",
         "messageId": uuid4,
-        "nodeId": node_id,
+        "nodeId": multisensor_6.node_id,
     }
 
-    node_id = 53
-    await controller.async_remove_node_from_all_associations(node_id, True)
+    await controller.async_remove_node_from_all_associations(multisensor_6, True)
 
     assert len(ack_commands) == 2
     assert ack_commands[1] == {
         "command": "controller.remove_node_from_all_associations",
         "messageId": uuid4,
-        "nodeId": node_id,
+        "nodeId": multisensor_6.node_id,
     }
 
 
-async def test_get_node_neighbors(controller, uuid4, mock_command):
+async def test_get_node_neighbors(controller, multisensor_6, uuid4, mock_command):
     """Test get node neighbors."""
 
     ack_commands = mock_command(
         {"command": "controller.get_node_neighbors"}, {"neighbors": [1, 2]}
     )
 
-    node_id = 52
-    assert await controller.async_get_node_neighbors(node_id) == [1, 2]
+    assert await controller.async_get_node_neighbors(multisensor_6) == [1, 2]
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.get_node_neighbors",
         "messageId": uuid4,
-        "nodeId": node_id,
+        "nodeId": multisensor_6.node_id,
     }
 
 
