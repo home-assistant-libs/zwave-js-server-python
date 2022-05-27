@@ -553,12 +553,12 @@ class Node(EventBase):
         return SecurityClass(data["highestSecurityClass"])
 
     async def async_test_power_level(
-        self, test_node_id: int, power_level: PowerLevel, test_frame_count: int
+        self, test_node: "Node", power_level: PowerLevel, test_frame_count: int
     ) -> int:
         """Send testPowerLevel command to Node."""
         data = await self.async_send_command(
             "test_powerlevel",
-            testNodeId=test_node_id,
+            testNodeId=test_node.node_id,
             powerlevel=power_level,
             testFrameCount=test_frame_count,
             require_schema=13,
@@ -584,10 +584,10 @@ class Node(EventBase):
         return LifelineHealthCheckSummary(data["summary"])
 
     async def async_check_route_health(
-        self, target_node_id: int, rounds: Optional[int] = None
+        self, target_node: "Node", rounds: Optional[int] = None
     ) -> RouteHealthCheckSummary:
         """Send checkRouteHealth command to Node."""
-        kwargs = {"targetNodeId": target_node_id}
+        kwargs = {"targetNodeId": target_node.node_id}
         if rounds is not None:
             kwargs["rounds"] = rounds
         data = await self.async_send_command(

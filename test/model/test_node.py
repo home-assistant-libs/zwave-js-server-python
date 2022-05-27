@@ -1356,20 +1356,30 @@ async def test_get_highest_security_class(
     }
 
 
-async def test_test_power_level(multisensor_6: node_pkg.Node, uuid4, mock_command):
+async def test_test_power_level(
+    multisensor_6: node_pkg.Node,
+    wallmote_central_scene: node_pkg.Node,
+    uuid4,
+    mock_command,
+):
     """Test node.test_powerlevel command."""
     node = multisensor_6
     ack_commands = mock_command(
         {"command": "node.test_powerlevel", "nodeId": node.node_id},
         {"framesAcked": 1},
     )
-    assert await node.async_test_power_level(2, PowerLevel.DBM_MINUS_1, 3) == 1
+    assert (
+        await node.async_test_power_level(
+            wallmote_central_scene, PowerLevel.DBM_MINUS_1, 3
+        )
+        == 1
+    )
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "node.test_powerlevel",
         "nodeId": node.node_id,
-        "testNodeId": 2,
+        "testNodeId": wallmote_central_scene.node_id,
         "powerlevel": PowerLevel.DBM_MINUS_1.value,
         "testFrameCount": 3,
         "messageId": uuid4,
@@ -1460,7 +1470,12 @@ async def test_check_lifeline_health_progress_event(
     assert event.data["check_lifeline_health_progress"].last_rating == 10
 
 
-async def test_check_route_health(multisensor_6: node_pkg.Node, uuid4, mock_command):
+async def test_check_route_health(
+    multisensor_6: node_pkg.Node,
+    wallmote_central_scene: node_pkg.Node,
+    uuid4,
+    mock_command,
+):
     """Test node.check_route_health command."""
     node = multisensor_6
     ack_commands = mock_command(
@@ -1481,7 +1496,7 @@ async def test_check_route_health(multisensor_6: node_pkg.Node, uuid4, mock_comm
             }
         },
     )
-    summary = await node.async_check_route_health(15, 1)
+    summary = await node.async_check_route_health(wallmote_central_scene, 1)
 
     assert summary.rating == 10
     assert summary.results[0].num_neighbors == 1
@@ -1495,7 +1510,7 @@ async def test_check_route_health(multisensor_6: node_pkg.Node, uuid4, mock_comm
     assert ack_commands[0] == {
         "command": "node.check_route_health",
         "nodeId": node.node_id,
-        "targetNodeId": 15,
+        "targetNodeId": wallmote_central_scene.node_id,
         "rounds": 1,
         "messageId": uuid4,
     }
