@@ -134,9 +134,9 @@ def generate_int_enum_class_definition(
     return class_def
 
 
-def generate_int_enum_base_class(class_name: str, docstring: str):
+def generate_int_enum_base_class(class_name: str, docstring: str) -> List[str]:
     """Generate an IntEnum base class definition."""
-    class_def: list[str] = []
+    class_def: List[str] = []
     class_def.append(f"class {class_name}(IntEnum):")
     class_def.append(f"\t{docstring}")
     return class_def
