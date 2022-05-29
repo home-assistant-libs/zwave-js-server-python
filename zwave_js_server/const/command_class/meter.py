@@ -1,6 +1,6 @@
 """Constants for Meter CC."""
 from enum import IntEnum
-from typing import Dict, Set, Type, Union
+from typing import Dict, Set, Type
 
 VALUE_PROPERTY = "value"
 
@@ -27,7 +27,11 @@ class MeterType(IntEnum):
     COOLING = 5
 
 
-class ElectricScale(IntEnum):
+class MeterScaleType(IntEnum):
+    """Common base class for meter scale enums."""
+
+
+class ElectricScale(MeterScaleType):
     """Enum with all known electric meter scale values."""
 
     KILOWATT_HOUR = 0
@@ -41,7 +45,7 @@ class ElectricScale(IntEnum):
     KILOVOLT_AMPERE_REACTIVE_HOUR = 8
 
 
-class GasScale(IntEnum):
+class GasScale(MeterScaleType):
     """Enum with all known gas meter scale values."""
 
     CUBIC_METER = 0
@@ -49,7 +53,7 @@ class GasScale(IntEnum):
     PULSE_COUNT = 3
 
 
-class WaterScale(IntEnum):
+class WaterScale(MeterScaleType):
     """Enum with all known water meter scale values."""
 
     CUBIC_METER = 0
@@ -58,15 +62,13 @@ class WaterScale(IntEnum):
     PULSE_COUNT = 3
 
 
-class HeatingScale(IntEnum):
+class HeatingScale(MeterScaleType):
     """Enum with all known heating meter scale values."""
 
     KILOWATT_HOUR = 0
 
 
 CoolingScale = HeatingScale
-
-MeterScaleType = Union[CoolingScale, ElectricScale, GasScale, HeatingScale, WaterScale]
 
 METER_TYPE_TO_SCALE_ENUM_MAP: Dict[MeterType, Type[MeterScaleType]] = {
     MeterType.ELECTRIC: ElectricScale,
