@@ -6,7 +6,7 @@
 # ----------------------------------------------------------------------------------- #
 
 from enum import IntEnum
-from typing import Dict, Set, Type, Union
+from typing import Dict, Set, Type
 
 CC_SPECIFIC_SCALE = "scale"
 CC_SPECIFIC_SENSOR_TYPE = "sensorType"
@@ -106,7 +106,11 @@ class MultilevelSensorType(IntEnum):
     WEIGHT = 14
 
 
-class AirFlowScale(IntEnum):
+class MultilevelSensorScaleType(IntEnum):
+    """Common base class for multilevel sensor scale enums."""
+
+
+class AirFlowScale(MultilevelSensorScaleType):
     """Enum for known scales for AIR_FLOW multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -114,7 +118,7 @@ class AirFlowScale(IntEnum):
     CUBIC_METER_PER_HOUR = 0
 
 
-class AnglePositionScale(IntEnum):
+class AnglePositionScale(MultilevelSensorScaleType):
     """Enum for known scales for ANGLE_POSITION multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -123,28 +127,28 @@ class AnglePositionScale(IntEnum):
     PERCENTAGE_VALUE = 0
 
 
-class AppliedForceOnTheSensorScale(IntEnum):
+class AppliedForceOnTheSensorScale(MultilevelSensorScaleType):
     """Enum for known scales for APPLIED_FORCE_ON_THE_SENSOR multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     NEWTON = 0
 
 
-class AccelerationScale(IntEnum):
+class AccelerationScale(MultilevelSensorScaleType):
     """Enum for known scales for Acceleration multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     METER_PER_SQUARE_SECOND = 0
 
 
-class AcidityScale(IntEnum):
+class AcidityScale(MultilevelSensorScaleType):
     """Enum for known scales for Acidity multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     ACIDITY = 0
 
 
-class AirPressureScale(IntEnum):
+class AirPressureScale(MultilevelSensorScaleType):
     """Enum for known scales for Air Pressure multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -152,14 +156,14 @@ class AirPressureScale(IntEnum):
     KILOPASCAL = 0
 
 
-class BasisMetabolicRateScale(IntEnum):
+class BasisMetabolicRateScale(MultilevelSensorScaleType):
     """Enum for known scales for BASIS_METABOLIC_RATE multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     JOULE = 0
 
 
-class BloodPressureScale(IntEnum):
+class BloodPressureScale(MultilevelSensorScaleType):
     """Enum for known scales for BLOOD_PRESSURE multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -167,21 +171,21 @@ class BloodPressureScale(IntEnum):
     SYSTOLIC = 0
 
 
-class BodyMassIndexScale(IntEnum):
+class BodyMassIndexScale(MultilevelSensorScaleType):
     """Enum for known scales for BODY_MASS_INDEX multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     BODY_MASS_INDEX = 0
 
 
-class CarbonDioxideLevelScale(IntEnum):
+class CarbonDioxideLevelScale(MultilevelSensorScaleType):
     """Enum for known scales for CARBON_DIOXIDE_LEVEL multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     PARTS_MILLION = 0
 
 
-class CarbonMonoxideLevelScale(IntEnum):
+class CarbonMonoxideLevelScale(MultilevelSensorScaleType):
     """Enum for known scales for CARBON_MONOXIDE_LEVEL multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -189,7 +193,7 @@ class CarbonMonoxideLevelScale(IntEnum):
     PARTS_MILLION = 1
 
 
-class CurrentScale(IntEnum):
+class CurrentScale(MultilevelSensorScaleType):
     """Enum for known scales for CURRENT multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -197,7 +201,7 @@ class CurrentScale(IntEnum):
     MILLIAMPERE = 1
 
 
-class DistanceScale(IntEnum):
+class DistanceScale(MultilevelSensorScaleType):
     """Enum for known scales for DISTANCE multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -206,42 +210,42 @@ class DistanceScale(IntEnum):
     METER = 0
 
 
-class DensityScale(IntEnum):
+class DensityScale(MultilevelSensorScaleType):
     """Enum for known scales for Density multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     DENSITY = 0
 
 
-class DirectionScale(IntEnum):
+class DirectionScale(MultilevelSensorScaleType):
     """Enum for known scales for Direction multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     DEGREES = 0
 
 
-class ElectricalConductivityScale(IntEnum):
+class ElectricalConductivityScale(MultilevelSensorScaleType):
     """Enum for known scales for ELECTRICAL_CONDUCTIVITY multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     SIEMENS_PER_METER = 0
 
 
-class ElectricalResistivityScale(IntEnum):
+class ElectricalResistivityScale(MultilevelSensorScaleType):
     """Enum for known scales for ELECTRICAL_RESISTIVITY multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     OHM_METER = 0
 
 
-class FormaldehydeLevelScale(IntEnum):
+class FormaldehydeLevelScale(MultilevelSensorScaleType):
     """Enum for known scales for FORMALDEHYDE_LEVEL multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     MOLE_PER_CUBIC_METER = 0
 
 
-class FrequencyScale(IntEnum):
+class FrequencyScale(MultilevelSensorScaleType):
     """Enum for known scales for FREQUENCY multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -249,7 +253,7 @@ class FrequencyScale(IntEnum):
     KILOHERTZ = 1
 
 
-class GeneralPurposeScale(IntEnum):
+class GeneralPurposeScale(MultilevelSensorScaleType):
     """Enum for known scales for GENERAL_PURPOSE multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -257,22 +261,22 @@ class GeneralPurposeScale(IntEnum):
     PERCENTAGE_VALUE = 0
 
 
-class HeartRateScale(IntEnum):
+class HeartRateScale(MultilevelSensorScaleType):
     """Enum for known scales for HEART_RATE multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     BEATS_PER_MINUTE = 0
 
 
-class HumidityScale(IntEnum):
-    """Enum for known scales for HUMIDITY multilevel sensor types."""
+class HumidityScale(MultilevelSensorScaleType):
+    """Enum for known scales for Humidity multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     ABSOLUTE_HUMIDITY = 1
     PERCENTAGE_VALUE = 0
 
 
-class IlluminanceScale(IntEnum):
+class IlluminanceScale(MultilevelSensorScaleType):
     """Enum for known scales for ILLUMINANCE multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -280,7 +284,7 @@ class IlluminanceScale(IntEnum):
     PERCENTAGE_VALUE = 0
 
 
-class LoudnessScale(IntEnum):
+class LoudnessScale(MultilevelSensorScaleType):
     """Enum for known scales for LOUDNESS multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -288,14 +292,14 @@ class LoudnessScale(IntEnum):
     DECIBEL = 0
 
 
-class MethaneDensityScale(IntEnum):
+class MethaneDensityScale(MultilevelSensorScaleType):
     """Enum for known scales for METHANE_DENSITY multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     MOLE_PER_CUBIC_METER = 0
 
 
-class MoistureScale(IntEnum):
+class MoistureScale(MultilevelSensorScaleType):
     """Enum for known scales for MOISTURE multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -305,14 +309,14 @@ class MoistureScale(IntEnum):
     WATER_ACTIVITY = 3
 
 
-class MassScale(IntEnum):
+class MassScale(MultilevelSensorScaleType):
     """Enum for known scales for Mass multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     KILOGRAM = 0
 
 
-class ParticulateMatter10Scale(IntEnum):
+class ParticulateMatter10Scale(MultilevelSensorScaleType):
     """Enum for known scales for PARTICULATE_MATTER_10 multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -320,7 +324,7 @@ class ParticulateMatter10Scale(IntEnum):
     MOLE_PER_CUBIC_METER = 0
 
 
-class ParticulateMatter25Scale(IntEnum):
+class ParticulateMatter25Scale(MultilevelSensorScaleType):
     """Enum for known scales for PARTICULATE_MATTER_2_5 multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -328,7 +332,7 @@ class ParticulateMatter25Scale(IntEnum):
     MOLE_PER_CUBIC_METER = 0
 
 
-class PowerScale(IntEnum):
+class PowerScale(MultilevelSensorScaleType):
     """Enum for known scales for POWER multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -336,14 +340,14 @@ class PowerScale(IntEnum):
     WATT = 0
 
 
-class PercentageScale(IntEnum):
+class PercentageScale(MultilevelSensorScaleType):
     """Enum for known scales for Percentage multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     PERCENTAGE_VALUE = 0
 
 
-class PressureScale(IntEnum):
+class PressureScale(MultilevelSensorScaleType):
     """Enum for known scales for Pressure multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -351,7 +355,7 @@ class PressureScale(IntEnum):
     POUND_PER_SQUARE_INCH = 1
 
 
-class RadonConcentrationScale(IntEnum):
+class RadonConcentrationScale(MultilevelSensorScaleType):
     """Enum for known scales for RADON_CONCENTRATION multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -359,7 +363,7 @@ class RadonConcentrationScale(IntEnum):
     PICOCURIES_PER_LITER = 1
 
 
-class RainRateScale(IntEnum):
+class RainRateScale(MultilevelSensorScaleType):
     """Enum for known scales for RAIN_RATE multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -367,14 +371,14 @@ class RainRateScale(IntEnum):
     MILLIMETER_HOUR = 0
 
 
-class RespiratoryRateScale(IntEnum):
+class RespiratoryRateScale(MultilevelSensorScaleType):
     """Enum for known scales for RESPIRATORY_RATE multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     BREATHS_PER_MINUTE = 0
 
 
-class RfSignalStrengthScale(IntEnum):
+class RfSignalStrengthScale(MultilevelSensorScaleType):
     """Enum for known scales for RF_SIGNAL_STRENGTH multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -382,7 +386,7 @@ class RfSignalStrengthScale(IntEnum):
     RSSI = 0
 
 
-class RotationScale(IntEnum):
+class RotationScale(MultilevelSensorScaleType):
     """Enum for known scales for ROTATION multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -390,7 +394,7 @@ class RotationScale(IntEnum):
     REVOLUTIONS_PER_MINUTE = 0
 
 
-class SeismicIntensityScale(IntEnum):
+class SeismicIntensityScale(MultilevelSensorScaleType):
     """Enum for known scales for SEISMIC_INTENSITY multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -400,7 +404,7 @@ class SeismicIntensityScale(IntEnum):
     SHINDO = 3
 
 
-class SeismicMagnitudeScale(IntEnum):
+class SeismicMagnitudeScale(MultilevelSensorScaleType):
     """Enum for known scales for SEISMIC_MAGNITUDE multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -410,21 +414,21 @@ class SeismicMagnitudeScale(IntEnum):
     SURFACE_WAVE = 2
 
 
-class SoilSalinityScale(IntEnum):
+class SoilSalinityScale(MultilevelSensorScaleType):
     """Enum for known scales for SOIL_SALINITY multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     MOLE_PER_CUBIC_METER = 0
 
 
-class SolarRadiationScale(IntEnum):
+class SolarRadiationScale(MultilevelSensorScaleType):
     """Enum for known scales for SOLAR_RADIATION multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     WATT_PER_SQUARE_METER = 0
 
 
-class TankCapacityScale(IntEnum):
+class TankCapacityScale(MultilevelSensorScaleType):
     """Enum for known scales for TANK_CAPACITY multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -433,7 +437,7 @@ class TankCapacityScale(IntEnum):
     LITER = 0
 
 
-class TideLevelScale(IntEnum):
+class TideLevelScale(MultilevelSensorScaleType):
     """Enum for known scales for TIDE_LEVEL multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -441,14 +445,14 @@ class TideLevelScale(IntEnum):
     METER = 0
 
 
-class TimeScale(IntEnum):
+class TimeScale(MultilevelSensorScaleType):
     """Enum for known scales for TIME multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     SECOND = 0
 
 
-class TemperatureScale(IntEnum):
+class TemperatureScale(MultilevelSensorScaleType):
     """Enum for known scales for Temperature multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -456,21 +460,21 @@ class TemperatureScale(IntEnum):
     FAHRENHEIT = 1
 
 
-class UltravioletScale(IntEnum):
+class UltravioletScale(MultilevelSensorScaleType):
     """Enum for known scales for ULTRAVIOLET multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     UV_INDEX = 0
 
 
-class UnitlessScale(IntEnum):
+class UnitlessScale(MultilevelSensorScaleType):
     """Enum for known scales for Unitless multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     UNITLESS = 0
 
 
-class VelocityScale(IntEnum):
+class VelocityScale(MultilevelSensorScaleType):
     """Enum for known scales for VELOCITY multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -478,7 +482,7 @@ class VelocityScale(IntEnum):
     M_S = 0
 
 
-class VolatileOrganicCompoundLevelScale(IntEnum):
+class VolatileOrganicCompoundLevelScale(MultilevelSensorScaleType):
     """Enum for known scales for VOLATILE_ORGANIC_COMPOUND_LEVEL multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -486,7 +490,7 @@ class VolatileOrganicCompoundLevelScale(IntEnum):
     PARTS_MILLION = 1
 
 
-class VoltageScale(IntEnum):
+class VoltageScale(MultilevelSensorScaleType):
     """Enum for known scales for VOLTAGE multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
@@ -494,99 +498,41 @@ class VoltageScale(IntEnum):
     VOLT = 0
 
 
-class WaterChlorineLevelScale(IntEnum):
+class WaterChlorineLevelScale(MultilevelSensorScaleType):
     """Enum for known scales for WATER_CHLORINE_LEVEL multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     MILLIGRAM_PER_LITER = 0
 
 
-class WaterFlowScale(IntEnum):
+class WaterFlowScale(MultilevelSensorScaleType):
     """Enum for known scales for WATER_FLOW multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     LITER_PER_HOUR = 0
 
 
-class WaterOxidationReductionPotentialScale(IntEnum):
+class WaterOxidationReductionPotentialScale(MultilevelSensorScaleType):
     """Enum for known scales for WATER_OXIDATION_REDUCTION_POTENTIAL multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     MILLIVOLT = 0
 
 
-class WaterPressureScale(IntEnum):
+class WaterPressureScale(MultilevelSensorScaleType):
     """Enum for known scales for WATER_PRESSURE multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     KILOPASCAL = 0
 
 
-class WeightScale(IntEnum):
+class WeightScale(MultilevelSensorScaleType):
     """Enum for known scales for WEIGHT multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
     KILOGRAM = 0
     POUNDS = 1
 
-
-MultilevelSensorScaleType = Union[
-    AccelerationScale,
-    AcidityScale,
-    AirFlowScale,
-    AirPressureScale,
-    AnglePositionScale,
-    AppliedForceOnTheSensorScale,
-    BasisMetabolicRateScale,
-    BloodPressureScale,
-    BodyMassIndexScale,
-    CarbonDioxideLevelScale,
-    CarbonMonoxideLevelScale,
-    CurrentScale,
-    DensityScale,
-    DirectionScale,
-    DistanceScale,
-    ElectricalConductivityScale,
-    ElectricalResistivityScale,
-    FormaldehydeLevelScale,
-    FrequencyScale,
-    GeneralPurposeScale,
-    HeartRateScale,
-    HumidityScale,
-    IlluminanceScale,
-    LoudnessScale,
-    MassScale,
-    MethaneDensityScale,
-    MoistureScale,
-    ParticulateMatter10Scale,
-    ParticulateMatter25Scale,
-    PercentageScale,
-    PowerScale,
-    PressureScale,
-    RadonConcentrationScale,
-    RainRateScale,
-    RespiratoryRateScale,
-    RfSignalStrengthScale,
-    RotationScale,
-    SeismicIntensityScale,
-    SeismicMagnitudeScale,
-    SoilSalinityScale,
-    SolarRadiationScale,
-    TankCapacityScale,
-    TemperatureScale,
-    TideLevelScale,
-    TimeScale,
-    UltravioletScale,
-    UnitlessScale,
-    VelocityScale,
-    VolatileOrganicCompoundLevelScale,
-    VoltageScale,
-    WaterChlorineLevelScale,
-    WaterFlowScale,
-    WaterOxidationReductionPotentialScale,
-    WaterPressureScale,
-    WeightScale,
-]
 
 MULTILEVEL_SENSOR_TYPE_TO_SCALE_MAP: Dict[
     MultilevelSensorType, Type[MultilevelSensorScaleType]

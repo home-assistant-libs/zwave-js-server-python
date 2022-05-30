@@ -114,10 +114,11 @@ def generate_int_enum_class_definition(
     enum_ref_url: str | None = None,
     get_id_func: Callable | None = None,
     docstring_info: str = "",
+    base_class: str = "IntEnum",
 ) -> List[str]:
     """Generate an IntEnum class definition as an array of lines of string."""
     class_def = []
-    class_def.append(f"class {class_name}(IntEnum):")
+    class_def.append(f"class {class_name}({base_class}):")
     docstring = (
         f'"""Enum for known {docstring_info} multilevel sensor types."""'.replace(
             "  ", " "
@@ -130,6 +131,14 @@ def generate_int_enum_class_definition(
         if get_id_func:
             enum_id = get_id_func(enum_id)
         class_def.append(f"    {enum_name} = {enum_id}")
+    return class_def
+
+
+def generate_int_enum_base_class(class_name: str, docstring: str) -> List[str]:
+    """Generate an IntEnum base class definition."""
+    class_def: List[str] = []
+    class_def.append(f"class {class_name}(IntEnum):")
+    class_def.append(f"\t{docstring}")
     return class_def
 
 
@@ -146,7 +155,7 @@ lines = [
     "# ----------------------------------------------------------------------------------- #",
     "",
     "from enum import IntEnum",
-    "from typing import Dict, Set, Type, Union",
+    "from typing import Dict, Set, Type",
     'CC_SPECIFIC_SCALE = "scale"',
     'CC_SPECIFIC_SENSOR_TYPE = "sensorType"',
 ]
@@ -160,6 +169,13 @@ lines.extend(
     )
 )
 
+lines.extend(
+    generate_int_enum_base_class(
+        "MultilevelSensorScaleType",
+        docstring='"""Common base class for multilevel sensor scale enums."""',
+    )
+)
+
 unit_name_to_enum_map = defaultdict(list)
 for scale_name, scale_dict in scales.items():
     lines.extend(
@@ -168,6 +184,7 @@ for scale_name, scale_dict in scales.items():
             scale_dict,
             SENSOR_TYPE_URL,
             docstring_info=f"scales for {scale_name}",
+            base_class="MultilevelSensorScaleType",
         )
     )
     for unit_name in scale_dict.keys():
@@ -180,10 +197,6 @@ unit_name_to_enum_map = dict(
 for unit_name, enum_list in unit_name_to_enum_map.items():
     unit_name_to_enum_map[unit_name] = sorted(enum_list)
 
-scale_class_names = [format_for_class_name(scale_name) for scale_name in scales]
-lines.extend(
-    [f"MultilevelSensorScaleType = Union[{', '.join(sorted(scale_class_names))}]", ""]
-)
 
 multilevel_sensor_type_to_scale_map_line = (
     "MULTILEVEL_SENSOR_TYPE_TO_SCALE_MAP: Dict[MultilevelSensorType, "
