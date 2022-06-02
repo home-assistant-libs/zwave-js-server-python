@@ -342,3 +342,9 @@ async def test_unknown_event(driver):
     """Test that an unknown event type causes an exception."""
     with pytest.raises(KeyError):
         assert driver.receive_event(Event("unknown_event", {"source": "driver"}))
+
+
+async def test_all_nodes_ready_event(driver):
+    """Test that the all nodes ready event is succesfully validated by pydantic."""
+    event = Event("all nodes ready", {"source": "driver", "event": "all nodes ready"})
+    driver.receive_event(event)
