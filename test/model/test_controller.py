@@ -1698,3 +1698,37 @@ async def test_unknown_event(controller):
         assert controller.receive_event(
             Event("unknown_event", {"source": "controller"})
         )
+
+
+async def test_additional_events(controller):
+    """Test that remaining events pass pydantic validation."""
+    event = Event(
+        "exclusion failed", {"source": "controller", "event": "exclusion failed"}
+    )
+    controller.receive_event(event)
+    event = Event(
+        "exclusion started", {"source": "controller", "event": "exclusion started"}
+    )
+    controller.receive_event(event)
+    event = Event(
+        "exclusion stopped", {"source": "controller", "event": "exclusion stopped"}
+    )
+    controller.receive_event(event)
+    event = Event(
+        "inclusion failed", {"source": "controller", "event": "inclusion failed"}
+    )
+    controller.receive_event(event)
+    event = Event(
+        "inclusion started",
+        {"source": "controller", "event": "inclusion started", "secure": True},
+    )
+    controller.receive_event(event)
+    event = Event(
+        "inclusion stopped", {"source": "controller", "event": "inclusion stopped"}
+    )
+    controller.receive_event(event)
+    event = Event(
+        "validate dsk and enter pin",
+        {"source": "controller", "event": "validate dsk and enter pin", "dsk": "1234"},
+    )
+    controller.receive_event(event)
