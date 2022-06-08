@@ -239,6 +239,16 @@ async def no_get_log_config_ws_client_fixture(
     return no_get_log_config_ws_client
 
 
+@pytest.fixture(name="no_get_log_config_client_session")
+def no_get_log_config_client_session_fixture(no_get_log_config_ws_client):
+    """Mock an aiohttp client session without calling get_log_config."""
+    no_get_log_config_client_session = AsyncMock(spec_set=ClientSession)
+    no_get_log_config_client_session.ws_connect.side_effect = AsyncMock(
+        return_value=no_get_log_config_ws_client
+    )
+    return no_get_log_config_client_session
+
+
 @pytest.fixture(name="await_other")
 async def await_other_fixture():
     """Await all other task but the current task."""

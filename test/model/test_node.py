@@ -18,10 +18,10 @@ from zwave_js_server.const.command_class.entry_control import (
     EntryControlDataType,
     EntryControlEventType,
 )
-from zwave_js_server.const.command_class.power_level import PowerLevelTestStatus
 from zwave_js_server.const.command_class.multilevel_switch import (
     MultilevelSwitchCommand,
 )
+from zwave_js_server.const.command_class.power_level import PowerLevelTestStatus
 from zwave_js_server.event import Event
 from zwave_js_server.exceptions import (
     FailedCommand,
@@ -29,7 +29,7 @@ from zwave_js_server.exceptions import (
     RssiErrorReceived,
     UnwriteableValue,
 )
-from zwave_js_server.model import endpoint as endpoint_pkg, node as node_pkg
+from zwave_js_server.model import node as node_pkg, endpoint as endpoint_pkg
 from zwave_js_server.model.firmware import FirmwareUpdateStatus
 from zwave_js_server.model.node.health_check import (
     LifelineHealthCheckResultDataType,

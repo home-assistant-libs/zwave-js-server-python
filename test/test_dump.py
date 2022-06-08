@@ -3,7 +3,6 @@ import asyncio
 from unittest.mock import AsyncMock, call
 
 import pytest
-from aiohttp.client import ClientSession
 
 from zwave_js_server.dump import dump_msgs
 
@@ -30,16 +29,6 @@ def event_fixture():
             },
         },
     }
-
-
-@pytest.fixture(name="no_get_log_config_client_session")
-def no_get_log_config_client_session_fixture(no_get_log_config_ws_client):
-    """Mock an aiohttp client session without calling get_log_config."""
-    no_get_log_config_client_session = AsyncMock(spec_set=ClientSession)
-    no_get_log_config_client_session.ws_connect.side_effect = AsyncMock(
-        return_value=no_get_log_config_ws_client
-    )
-    return no_get_log_config_client_session
 
 
 async def test_dump(

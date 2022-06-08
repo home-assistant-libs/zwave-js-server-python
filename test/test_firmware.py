@@ -1,59 +1,134 @@
 """Test the firmware update helper."""
-from unittest.mock import patch
+import asyncio
+from unittest.mock import AsyncMock
 
+import pytest
+
+from zwave_js_server.exceptions import FailedCommand, FailedZWaveCommand, InvalidMessage
 from zwave_js_server.firmware import begin_firmware_update
 
+from .const import FAILED_COMMAND_MSG, FAILED_ZWAVE_COMMAND_MSG, INVALID_MESSAGE_MSG
 
-async def test_begin_firmware_update_guess_format(url, client_session, multisensor_6):
+
+async def test_begin_firmware_update_guess_format(
+    no_get_log_config_client_session,
+    multisensor_6,
+    url,
+    version_data,
+    set_api_schema_data,
+    no_get_log_config_ws_client,
+):
     """Test begin_firmware_update with guessed format."""
-    with patch("zwave_js_server.firmware.Client.connect") as connect_mock, patch(
-        "zwave_js_server.firmware.Client.set_api_schema"
-    ) as set_api_schema_mock, patch(
-        "zwave_js_server.firmware.Client.async_send_command"
-    ) as cmd_mock, patch(
-        "zwave_js_server.firmware.Client.disconnect"
-    ) as disconnect_mock:
-        node = multisensor_6
-        await begin_firmware_update(url, node, "test", bytes(10), client_session)
+    to_receive = asyncio.Queue()
+    for message in (
+        version_data,
+        set_api_schema_data,
+        {"type": "result", "success": True},
+    ):
+        to_receive.put_nowait(message)
 
-        connect_mock.assert_called_once()
-        set_api_schema_mock.assert_called_once()
-        cmd_mock.assert_called_once_with(
-            {
-                "command": "node.begin_firmware_update",
-                "nodeId": node.node_id,
-                "firmwareFilename": "test",
-                "firmwareFile": "AAAAAAAAAAAAAA==",
-            },
-            require_schema=5,
-        )
-        disconnect_mock.assert_called_once()
+    async def receive_json():
+        return await to_receive.get()
+
+    no_get_log_config_ws_client.receive_json = AsyncMock(side_effect=receive_json)
+    await begin_firmware_update(
+        url, multisensor_6, "test", bytes(10), no_get_log_config_client_session
+    )
+
+    assert no_get_log_config_ws_client.receive_json.call_count == 3
+    assert no_get_log_config_ws_client.send_json.call_count == 2
+    command = no_get_log_config_ws_client.send_json.call_args[0][0]
+    command.pop("messageId")
+    assert command == {
+        "command": "node.begin_firmware_update",
+        "nodeId": multisensor_6.node_id,
+        "firmwareFilename": "test",
+        "firmwareFile": "AAAAAAAAAAAAAA==",
+    }
+    assert no_get_log_config_ws_client.close.call_count == 1
 
 
-async def test_begin_firmware_update_known_format(url, client_session, multisensor_6):
+async def test_begin_firmware_update_known_format(
+    no_get_log_config_client_session,
+    multisensor_6,
+    url,
+    version_data,
+    set_api_schema_data,
+    no_get_log_config_ws_client,
+):
     """Test begin_firmware_update with known format."""
-    with patch("zwave_js_server.firmware.Client.connect") as connect_mock, patch(
-        "zwave_js_server.firmware.Client.set_api_schema"
-    ) as set_api_schema_mock, patch(
-        "zwave_js_server.firmware.Client.async_send_command"
-    ) as cmd_mock, patch(
-        "zwave_js_server.firmware.Client.disconnect"
-    ) as disconnect_mock:
-        node = multisensor_6
-        await begin_firmware_update(
-            url, node, "test", bytes(10), client_session, "test"
-        )
+    to_receive = asyncio.Queue()
+    for message in (
+        version_data,
+        set_api_schema_data,
+        {"type": "result", "success": True},
+    ):
+        to_receive.put_nowait(message)
 
-        connect_mock.assert_called_once()
-        set_api_schema_mock.assert_called_once()
-        cmd_mock.assert_called_once_with(
-            {
-                "command": "node.begin_firmware_update",
-                "nodeId": node.node_id,
-                "firmwareFilename": "test",
-                "firmwareFile": "AAAAAAAAAAAAAA==",
-                "firmwareFileFormat": "test",
-            },
-            require_schema=5,
+    async def receive_json():
+        return await to_receive.get()
+
+    no_get_log_config_ws_client.receive_json = AsyncMock(side_effect=receive_json)
+    await begin_firmware_update(
+        url,
+        multisensor_6,
+        "test",
+        bytes(10),
+        no_get_log_config_client_session,
+        "format",
+    )
+
+    assert no_get_log_config_ws_client.receive_json.call_count == 3
+    assert no_get_log_config_ws_client.send_json.call_count == 2
+    command = no_get_log_config_ws_client.send_json.call_args[0][0]
+    command.pop("messageId")
+    assert command == {
+        "command": "node.begin_firmware_update",
+        "nodeId": multisensor_6.node_id,
+        "firmwareFilename": "test",
+        "firmwareFile": "AAAAAAAAAAAAAA==",
+        "firmwareFileFormat": "format",
+    }
+    assert no_get_log_config_ws_client.close.call_count == 1
+
+
+@pytest.mark.parametrize(
+    "error_message, exception",
+    [
+        (INVALID_MESSAGE_MSG, InvalidMessage),
+        (FAILED_COMMAND_MSG, FailedCommand),
+        (FAILED_ZWAVE_COMMAND_MSG, FailedZWaveCommand),
+    ],
+)
+async def test_begin_firmware_update_failures(
+    no_get_log_config_client_session,
+    multisensor_6,
+    url,
+    version_data,
+    set_api_schema_data,
+    no_get_log_config_ws_client,
+    error_message,
+    exception,
+):
+    """Test begin_firmware_update failures."""
+    to_receive = asyncio.Queue()
+    for message in (
+        version_data,
+        set_api_schema_data,
+        error_message,
+    ):
+        to_receive.put_nowait(message)
+
+    async def receive_json():
+        return await to_receive.get()
+
+    no_get_log_config_ws_client.receive_json = AsyncMock(side_effect=receive_json)
+    with pytest.raises(exception):
+        await begin_firmware_update(
+            url,
+            multisensor_6,
+            "test",
+            bytes(10),
+            no_get_log_config_client_session,
+            "format",
         )
-        disconnect_mock.assert_called_once()
