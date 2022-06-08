@@ -56,9 +56,9 @@ async def begin_firmware_update(
     if msg["success"]:
         return
 
-    if msg["errorCode"] != "zwave_error":
-        raise FailedCommand(msg["messageId"], msg["errorCode"])
+    if msg["errorCode"] == "zwave_error":
+        raise FailedZWaveCommand(
+            msg["messageId"], msg["zwaveErrorCode"], msg["zwaveErrorMessage"]
+        )
 
-    raise FailedZWaveCommand(
-        msg["messageId"], msg["zwaveErrorCode"], msg["zwaveErrorMessage"]
-    )
+    raise FailedCommand(msg["messageId"], msg["errorCode"])
