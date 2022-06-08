@@ -1,4 +1,5 @@
 """Firmware update helper."""
+import asyncio
 from typing import Optional
 
 import aiohttp
@@ -20,6 +21,8 @@ async def begin_firmware_update(
     client = Client(url, session)
     await client.connect()
     await client.set_api_schema()
+
+    asyncio.get_running_loop().create_task(client.receive_until_closed())
 
     cmd = {
         "command": "node.begin_firmware_update",

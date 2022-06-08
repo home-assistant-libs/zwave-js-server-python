@@ -238,10 +238,7 @@ class Client:
                 "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
             )
 
-            while not self._client.closed:
-                data = await self._receive_json_or_raise()
-
-                self._handle_incoming_message(data)
+            await self.receive_until_closed()
         except ConnectionClosed:
             pass
 
@@ -301,6 +298,13 @@ class Client:
         self._recorded_events.clear()
 
         return list(data)
+
+    async def receive_until_closed(self) -> None:
+        """Receive messages until client is closed."""
+        while not self._client.closed:
+            data = await self._receive_json_or_raise()
+
+            self._handle_incoming_message(data)
 
     async def _receive_json_or_raise(self) -> dict:
         """Receive json or raise."""
