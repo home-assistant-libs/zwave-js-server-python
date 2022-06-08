@@ -1,11 +1,12 @@
 """Test the CLI in main."""
 import sys
-from test.common import update_ws_client_fixture
 from unittest.mock import AsyncMock, patch
 
 import pytest
 
 from zwave_js_server.__main__ import main
+
+from .common import update_ws_client_msg_queue
 
 # pylint: disable=unused-argument
 
@@ -43,7 +44,7 @@ def test_dump_state(
     client_session, url, ws_client, result, version_data, set_api_schema_data, capsys
 ):
     """Test dump state."""
-    update_ws_client_fixture(ws_client, (version_data, set_api_schema_data, result))
+    update_ws_client_msg_queue(ws_client, (version_data, set_api_schema_data, result))
     with patch.object(
         sys, "argv", ["zwave_js_server", url, "--dump-state"]
     ), pytest.raises(SystemExit) as sys_exit:

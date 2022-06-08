@@ -3,8 +3,8 @@ import asyncio
 from unittest.mock import AsyncMock
 
 
-def update_ws_client_fixture(fixture, new_messages):
-    """Update a fixture with a message."""
+def update_ws_client_msg_queue(fixture, new_messages):
+    """Update a ws client fixture with a new message queue."""
     to_receive = asyncio.Queue()
     for message in new_messages:
         to_receive.put_nowait(message)

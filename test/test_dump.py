@@ -5,7 +5,7 @@ import pytest
 
 from zwave_js_server.dump import dump_msgs
 
-from .common import update_ws_client_fixture
+from .common import update_ws_client_msg_queue
 
 # pylint: disable=too-many-arguments
 
@@ -41,7 +41,7 @@ async def test_dump(
     ws_client,
 ):
     """Test the dump function."""
-    update_ws_client_fixture(ws_client, (version_data, set_api_schema_data, result))
+    update_ws_client_msg_queue(ws_client, (version_data, set_api_schema_data, result))
     messages = await dump_msgs(url, client_session)
 
     assert ws_client.receive_json.call_count == 3
@@ -67,7 +67,7 @@ async def test_dump_timeout(
     ws_client,
 ):
     """Test the dump function with timeout."""
-    update_ws_client_fixture(
+    update_ws_client_msg_queue(
         ws_client, (version_data, set_api_schema_data, result, event)
     )
     messages = await dump_msgs(url, client_session, 0.05)

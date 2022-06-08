@@ -4,7 +4,7 @@ import pytest
 from zwave_js_server.exceptions import FailedCommand, FailedZWaveCommand, InvalidMessage
 from zwave_js_server.firmware import begin_firmware_update
 
-from .common import update_ws_client_fixture
+from .common import update_ws_client_msg_queue
 from .const import (
     FAILED_COMMAND_MSG,
     FAILED_ZWAVE_COMMAND_MSG,
@@ -22,7 +22,7 @@ async def test_begin_firmware_update_guess_format(
     ws_client,
 ):
     """Test begin_firmware_update with guessed format."""
-    update_ws_client_fixture(
+    update_ws_client_msg_queue(
         ws_client, (version_data, set_api_schema_data, SUCCESS_MSG)
     )
 
@@ -50,7 +50,7 @@ async def test_begin_firmware_update_known_format(
     ws_client,
 ):
     """Test begin_firmware_update with known format."""
-    update_ws_client_fixture(
+    update_ws_client_msg_queue(
         ws_client, (version_data, set_api_schema_data, SUCCESS_MSG)
     )
 
@@ -96,7 +96,7 @@ async def test_begin_firmware_update_failures(
     exception,
 ):
     """Test begin_firmware_update failures."""
-    update_ws_client_fixture(
+    update_ws_client_msg_queue(
         ws_client, (version_data, set_api_schema_data, error_message)
     )
 
