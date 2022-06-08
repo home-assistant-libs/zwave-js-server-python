@@ -102,10 +102,5 @@ async def test_begin_firmware_update_failures(
 
     with pytest.raises(exception):
         await begin_firmware_update(
-            url,
-            multisensor_6,
-            "test",
-            bytes(10),
-            client_session,
-            "format",
+            url, multisensor_6, "test", bytes(10), client_session, "format"
         )
