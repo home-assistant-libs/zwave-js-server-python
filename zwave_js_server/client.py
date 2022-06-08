@@ -301,6 +301,8 @@ class Client:
 
     async def receive_until_closed(self) -> None:
         """Receive messages until client is closed."""
+        assert self._client
+
         while not self._client.closed:
             data = await self._receive_json_or_raise()
 
