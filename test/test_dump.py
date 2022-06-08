@@ -1,6 +1,5 @@
 """Test the dump helper."""
-import asyncio
-from unittest.mock import AsyncMock, call
+from unittest.mock import call
 
 import pytest
 
@@ -71,14 +70,6 @@ async def test_dump_timeout(
     update_ws_client_fixture(
         ws_client, (version_data, set_api_schema_data, result, event)
     )
-    to_receive = asyncio.Queue()
-    for message in (version_data, set_api_schema_data, result, event):
-        to_receive.put_nowait(message)
-
-    async def receive_json():
-        return await to_receive.get()
-
-    ws_client.receive_json = AsyncMock(side_effect=receive_json)
     messages = await dump_msgs(url, client_session, 0.05)
 
     assert ws_client.receive_json.call_count == 5
