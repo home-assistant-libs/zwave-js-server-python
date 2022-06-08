@@ -28,6 +28,10 @@ async def test_begin_firmware_update_guess_format(url, client_session, multisens
             require_schema=5,
         )
         disconnect_mock.assert_called_once()
+        assert multisensor_6.firmware_update_progress.data == {
+            "sentFragments": 0,
+            "totalFragments": 0,
+        }
 
 
 async def test_begin_firmware_update_known_format(url, client_session, multisensor_6):
@@ -57,3 +61,7 @@ async def test_begin_firmware_update_known_format(url, client_session, multisens
             require_schema=5,
         )
         disconnect_mock.assert_called_once()
+        assert multisensor_6.firmware_update_progress.data == {
+            "sentFragments": 0,
+            "totalFragments": 0,
+        }

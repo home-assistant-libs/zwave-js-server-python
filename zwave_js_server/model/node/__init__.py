@@ -286,6 +286,11 @@ class Node(EventBase):
         """Return firmware update progress."""
         return self._firmware_update_progress
 
+    @firmware_update_progress.setter
+    def firmware_update_progress(self, value: FirmwareUpdateProgress) -> None:
+        """Set firmware update progress."""
+        self._firmware_update_progress = value
+
     @property
     def highest_security_class(self) -> Optional[SecurityClass]:
         """Return highest security class configured on the node."""
@@ -802,7 +807,7 @@ class Node(EventBase):
 
     def handle_firmware_update_progress(self, event: Event) -> None:
         """Process a node firmware update progress event."""
-        self._firmware_update_progress = event.data[
+        self.firmware_update_progress = event.data[
             "firmware_update_progress"
         ] = FirmwareUpdateProgress(
             self, cast(FirmwareUpdateProgressDataType, event.data)
@@ -810,7 +815,7 @@ class Node(EventBase):
 
     def handle_firmware_update_finished(self, event: Event) -> None:
         """Process a node firmware update finished event."""
-        self._firmware_update_progress = None
+        self.firmware_update_progress = None
         event.data["firmware_update_finished"] = FirmwareUpdateFinished(
             self, cast(FirmwareUpdateFinishedDataType, event.data)
         )

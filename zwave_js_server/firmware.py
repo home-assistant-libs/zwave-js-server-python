@@ -3,6 +3,11 @@ from typing import Optional
 
 import aiohttp
 
+from zwave_js_server.model.firmware import (
+    FirmwareUpdateProgress,
+    FirmwareUpdateProgressDataType,
+)
+
 from .client import Client
 from .model.node import Node
 from .util.helpers import convert_bytes_to_base64
@@ -31,4 +36,7 @@ async def begin_firmware_update(
         cmd["firmwareFileFormat"] = file_format
 
     await client.async_send_command(cmd, require_schema=5)
+    node.firmware_update_progress = FirmwareUpdateProgress(
+        node, FirmwareUpdateProgressDataType(sentFragments=0, totalFragments=0)
+    )
     await client.disconnect()
