@@ -22,7 +22,7 @@ async def begin_firmware_update(
     await client.connect()
     await client.set_api_schema()
 
-    listen_task = asyncio.get_running_loop().create_task(client.receive_until_closed())
+    receive_task = asyncio.get_running_loop().create_task(client.receive_until_closed())
 
     cmd = {
         "command": "node.begin_firmware_update",
@@ -35,5 +35,5 @@ async def begin_firmware_update(
 
     await client.async_send_command(cmd, require_schema=5)
     await client.disconnect()
-    if not listen_task.done():
-        listen_task.cancel()
+    if not receive_task.done():
+        receive_task.cancel()
