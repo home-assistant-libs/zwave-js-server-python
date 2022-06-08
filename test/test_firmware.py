@@ -1,43 +1,36 @@
 """Test the firmware update helper."""
-import asyncio
-from unittest.mock import AsyncMock
-
 import pytest
 
 from zwave_js_server.exceptions import FailedCommand, FailedZWaveCommand, InvalidMessage
 from zwave_js_server.firmware import begin_firmware_update
 
-from .const import FAILED_COMMAND_MSG, FAILED_ZWAVE_COMMAND_MSG, INVALID_MESSAGE_MSG
+from .common import update_ws_client_fixture
+from .const import (
+    FAILED_COMMAND_MSG,
+    FAILED_ZWAVE_COMMAND_MSG,
+    INVALID_MESSAGE_MSG,
+    SUCCESS_MSG,
+)
 
 
 async def test_begin_firmware_update_guess_format(
-    no_get_log_config_client_session,
+    client_session,
     multisensor_6,
     url,
     version_data,
     set_api_schema_data,
-    no_get_log_config_ws_client,
+    ws_client,
 ):
     """Test begin_firmware_update with guessed format."""
-    to_receive = asyncio.Queue()
-    for message in (
-        version_data,
-        set_api_schema_data,
-        {"type": "result", "success": True},
-    ):
-        to_receive.put_nowait(message)
-
-    async def receive_json():
-        return await to_receive.get()
-
-    no_get_log_config_ws_client.receive_json = AsyncMock(side_effect=receive_json)
-    await begin_firmware_update(
-        url, multisensor_6, "test", bytes(10), no_get_log_config_client_session
+    update_ws_client_fixture(
+        ws_client, (version_data, set_api_schema_data, SUCCESS_MSG)
     )
 
-    assert no_get_log_config_ws_client.receive_json.call_count == 3
-    assert no_get_log_config_ws_client.send_json.call_count == 2
-    command = no_get_log_config_ws_client.send_json.call_args[0][0]
+    await begin_firmware_update(url, multisensor_6, "test", bytes(10), client_session)
+
+    assert ws_client.receive_json.call_count == 3
+    assert ws_client.send_json.call_count == 2
+    command = ws_client.send_json.call_args[0][0]
     command.pop("messageId")
     assert command == {
         "command": "node.begin_firmware_update",
@@ -45,42 +38,34 @@ async def test_begin_firmware_update_guess_format(
         "firmwareFilename": "test",
         "firmwareFile": "AAAAAAAAAAAAAA==",
     }
-    assert no_get_log_config_ws_client.close.call_count == 1
+    assert ws_client.close.call_count == 1
 
 
 async def test_begin_firmware_update_known_format(
-    no_get_log_config_client_session,
+    client_session,
     multisensor_6,
     url,
     version_data,
     set_api_schema_data,
-    no_get_log_config_ws_client,
+    ws_client,
 ):
     """Test begin_firmware_update with known format."""
-    to_receive = asyncio.Queue()
-    for message in (
-        version_data,
-        set_api_schema_data,
-        {"type": "result", "success": True},
-    ):
-        to_receive.put_nowait(message)
+    update_ws_client_fixture(
+        ws_client, (version_data, set_api_schema_data, SUCCESS_MSG)
+    )
 
-    async def receive_json():
-        return await to_receive.get()
-
-    no_get_log_config_ws_client.receive_json = AsyncMock(side_effect=receive_json)
     await begin_firmware_update(
         url,
         multisensor_6,
         "test",
         bytes(10),
-        no_get_log_config_client_session,
+        client_session,
         "format",
     )
 
-    assert no_get_log_config_ws_client.receive_json.call_count == 3
-    assert no_get_log_config_ws_client.send_json.call_count == 2
-    command = no_get_log_config_ws_client.send_json.call_args[0][0]
+    assert ws_client.receive_json.call_count == 3
+    assert ws_client.send_json.call_count == 2
+    command = ws_client.send_json.call_args[0][0]
     command.pop("messageId")
     assert command == {
         "command": "node.begin_firmware_update",
@@ -89,7 +74,7 @@ async def test_begin_firmware_update_known_format(
         "firmwareFile": "AAAAAAAAAAAAAA==",
         "firmwareFileFormat": "format",
     }
-    assert no_get_log_config_ws_client.close.call_count == 1
+    assert ws_client.close.call_count == 1
 
 
 @pytest.mark.parametrize(
@@ -101,34 +86,26 @@ async def test_begin_firmware_update_known_format(
     ],
 )
 async def test_begin_firmware_update_failures(
-    no_get_log_config_client_session,
+    client_session,
     multisensor_6,
     url,
     version_data,
     set_api_schema_data,
-    no_get_log_config_ws_client,
+    ws_client,
     error_message,
     exception,
 ):
     """Test begin_firmware_update failures."""
-    to_receive = asyncio.Queue()
-    for message in (
-        version_data,
-        set_api_schema_data,
-        error_message,
-    ):
-        to_receive.put_nowait(message)
+    update_ws_client_fixture(
+        ws_client, (version_data, set_api_schema_data, error_message)
+    )
 
-    async def receive_json():
-        return await to_receive.get()
-
-    no_get_log_config_ws_client.receive_json = AsyncMock(side_effect=receive_json)
     with pytest.raises(exception):
         await begin_firmware_update(
             url,
             multisensor_6,
             "test",
             bytes(10),
-            no_get_log_config_client_session,
+            client_session,
             "format",
         )

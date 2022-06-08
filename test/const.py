@@ -14,3 +14,7 @@ FAILED_ZWAVE_COMMAND_MSG = {
     "zwaveErrorCode": 1,
     "zwaveErrorMessage": "test",
 }
+SUCCESS_MSG = {
+    "type": "result",
+    "success": True,
+}

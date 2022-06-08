@@ -29,7 +29,8 @@ from zwave_js_server.exceptions import (
     RssiErrorReceived,
     UnwriteableValue,
 )
-from zwave_js_server.model import node as node_pkg, endpoint as endpoint_pkg
+from zwave_js_server.model import endpoint as endpoint_pkg
+from zwave_js_server.model import node as node_pkg
 from zwave_js_server.model.firmware import FirmwareUpdateStatus
 from zwave_js_server.model.node.health_check import (
     LifelineHealthCheckResultDataType,

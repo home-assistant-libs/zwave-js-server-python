@@ -6,6 +6,8 @@ import pytest
 
 from zwave_js_server.dump import dump_msgs
 
+from .common import update_ws_client_fixture
+
 # pylint: disable=too-many-arguments
 
 
@@ -32,22 +34,23 @@ def event_fixture():
 
 
 async def test_dump(
-    no_get_log_config_client_session,
+    client_session,
     result,
     url,
     version_data,
     set_api_schema_data,
-    no_get_log_config_ws_client,
+    ws_client,
 ):
     """Test the dump function."""
-    messages = await dump_msgs(url, no_get_log_config_client_session)
+    update_ws_client_fixture(ws_client, (version_data, set_api_schema_data, result))
+    messages = await dump_msgs(url, client_session)
 
-    assert no_get_log_config_ws_client.receive_json.call_count == 3
-    assert no_get_log_config_ws_client.send_json.call_count == 2
-    assert no_get_log_config_ws_client.send_json.call_args == call(
+    assert ws_client.receive_json.call_count == 3
+    assert ws_client.send_json.call_count == 2
+    assert ws_client.send_json.call_args == call(
         {"command": "start_listening", "messageId": "listen-id"}
     )
-    assert no_get_log_config_ws_client.close.call_count == 1
+    assert ws_client.close.call_count == 1
     assert messages
     assert len(messages) == 3
     assert messages[0] == version_data
@@ -56,15 +59,18 @@ async def test_dump(
 
 
 async def test_dump_timeout(
-    no_get_log_config_client_session,
+    client_session,
     result,
     url,
     event,
     version_data,
     set_api_schema_data,
-    no_get_log_config_ws_client,
+    ws_client,
 ):
     """Test the dump function with timeout."""
+    update_ws_client_fixture(
+        ws_client, (version_data, set_api_schema_data, result, event)
+    )
     to_receive = asyncio.Queue()
     for message in (version_data, set_api_schema_data, result, event):
         to_receive.put_nowait(message)
@@ -72,15 +78,15 @@ async def test_dump_timeout(
     async def receive_json():
         return await to_receive.get()
 
-    no_get_log_config_ws_client.receive_json = AsyncMock(side_effect=receive_json)
-    messages = await dump_msgs(url, no_get_log_config_client_session, 0.05)
+    ws_client.receive_json = AsyncMock(side_effect=receive_json)
+    messages = await dump_msgs(url, client_session, 0.05)
 
-    assert no_get_log_config_ws_client.receive_json.call_count == 5
-    assert no_get_log_config_ws_client.send_json.call_count == 2
-    assert no_get_log_config_ws_client.send_json.call_args == call(
+    assert ws_client.receive_json.call_count == 5
+    assert ws_client.send_json.call_count == 2
+    assert ws_client.send_json.call_args == call(
         {"command": "start_listening", "messageId": "listen-id"}
     )
-    assert no_get_log_config_ws_client.close.call_count == 1
+    assert ws_client.close.call_count == 1
     assert messages
     assert len(messages) == 4
     assert messages[0] == version_data
