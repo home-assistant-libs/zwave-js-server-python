@@ -10,7 +10,6 @@ from ...const import (
     RFRegion,
     ZwaveFeature,
 )
-from ...exceptions import InvalidCommand
 from ...event import Event, EventBase
 from ...util.helpers import convert_base64_to_bytes, convert_bytes_to_base64
 from ..association import AssociationAddress, AssociationGroup
@@ -691,17 +690,6 @@ class Controller(EventBase):
             self.nodes[node_id]: ControllerLifelineRoutes(self.client, lifeline_routes)
             for node_id, lifeline_routes in data["routes"].items()
         }
-
-    async def async_interview_node(self, node: Node) -> None:
-        """Send interviewNode command to Controller."""
-        if not node.awaiting_manual_interview:
-            raise InvalidCommand(
-                "controller.interview_node", "Node is not awaiting an interview"
-            )
-        await self.client.async_send_command(
-            {"command": "controller.interview_node", "nodeId": node.node_id},
-            require_schema=18,
-        )
 
     def receive_event(self, event: Event) -> None:
         """Receive an event."""

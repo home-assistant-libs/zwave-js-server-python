@@ -3,10 +3,12 @@ from typing import TYPE_CHECKING, Any, Dict, Literal, Optional, Type, Union, cas
 
 from pydantic import create_model_from_typeddict
 
+from ..exceptions import InvalidCommand
 from ..event import BaseEventModel, Event, EventBase
 from .controller import Controller
 from .log_config import LogConfig, LogConfigDataType
 from .log_message import LogMessage, LogMessageDataType
+from .node import Node
 
 if TYPE_CHECKING:
     from ..client import Client
@@ -165,6 +167,16 @@ class Driver(EventBase):
     async def async_enable_error_reporting(self) -> None:
         """Send command to enable Sentry error reporting."""
         await self._async_send_command("enable_error_reporting", require_schema=16)
+
+    async def async_interview_node(self, node: Node) -> None:
+        """Send interviewNode command to Controller."""
+        if not node.awaiting_manual_interview:
+            raise InvalidCommand(
+                "driver.interview_node", "Node is not awaiting an interview"
+            )
+        await self._async_send_command(
+            "interview_node", nodeId=node.node_id, require_schema=18
+        )
 
     def handle_logging(self, event: Event) -> None:
         """Process a driver logging event."""

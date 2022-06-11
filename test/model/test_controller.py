@@ -17,11 +17,7 @@ from zwave_js_server.const import (
     ZwaveFeature,
 )
 from zwave_js_server.event import Event
-from zwave_js_server.exceptions import (
-    InvalidCommand,
-    RepeaterRssiErrorReceived,
-    RssiErrorReceived,
-)
+from zwave_js_server.exceptions import RepeaterRssiErrorReceived, RssiErrorReceived
 from zwave_js_server.model import association as association_pkg
 from zwave_js_server.model import controller as controller_pkg
 from zwave_js_server.model.controller.statistics import ControllerStatistics
@@ -1606,27 +1602,6 @@ async def test_get_known_lifeline_routes_rssi_error(
         "command": "controller.get_known_lifeline_routes",
         "messageId": uuid4,
     }
-
-
-async def test_interview_node(multisensor_6, uuid4, mock_command):
-    """Test interview node command."""
-    ack_commands = mock_command({"command": "controller.interview_node"}, {})
-    await multisensor_6.client.driver.controller.async_interview_node(multisensor_6)
-
-    assert len(ack_commands) == 1
-    assert ack_commands[0] == {
-        "command": "controller.interview_node",
-        "nodeId": multisensor_6.node_id,
-        "messageId": uuid4,
-    }
-
-
-async def test_interview_node_failed(inovelli_switch):
-    """Test interview_node failure."""
-    with pytest.raises(InvalidCommand):
-        await inovelli_switch.client.driver.controller.async_interview_node(
-            inovelli_switch
-        )
 
 
 async def test_nvm_events(controller):
