@@ -355,9 +355,7 @@ async def test_interview_node(multisensor_6, uuid4, mock_command):
 async def test_interview_node_failed(inovelli_switch):
     """Test interview_node failure."""
     with pytest.raises(InvalidCommand):
-        await inovelli_switch.client.driver.async_interview_node(
-            inovelli_switch
-        )
+        await inovelli_switch.client.driver.async_interview_node(inovelli_switch)
 
 
 async def test_unknown_event(driver):
