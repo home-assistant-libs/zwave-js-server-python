@@ -169,7 +169,7 @@ class Driver(EventBase):
         await self._async_send_command("enable_error_reporting", require_schema=16)
 
     async def async_interview_node(self, node: Node) -> None:
-        """Send interviewNode command to Driver."""
+        """Send command to interview node."""
         if not node.awaiting_manual_interview:
             raise InvalidCommand(
                 "driver.interview_node", "Node is not awaiting an interview"
