@@ -910,7 +910,8 @@ async def test_interview_events(multisensor_6):
     node.handle_interview_started(event)
     assert node.interview_stage is None
     assert not node.ready
-    assert node.in_interview
+    assert not node.in_interview
+    assert node.awaiting_manual_interview
 
     event = Event(
         type="interview stage completed",

@@ -3,14 +3,15 @@ import sys
 from enum import Enum, IntEnum
 
 # minimal server schema version we can handle
-MIN_SERVER_SCHEMA_VERSION = 17
+MIN_SERVER_SCHEMA_VERSION = 18
 # max server schema version we can handle (and our code is compatible with)
-MAX_SERVER_SCHEMA_VERSION = 17
+MAX_SERVER_SCHEMA_VERSION = 18
 
 TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED = sys.version_info < (3, 9, 2)
 
 VALUE_UNKNOWN = "unknown"
 
+NOT_INTERVIEWED = "None"
 INTERVIEW_FAILED = "Failed"
 
 CURRENT_STATE_PROPERTY = "currentState"
