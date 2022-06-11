@@ -498,7 +498,7 @@ class Node(EventBase):
 
     async def async_abort_firmware_update(self) -> None:
         """Send abortFirmwareUpdate command to Node."""
-        await self.async_send_command("abort_firmware_update", wait_for_result=False)
+        await self.async_send_command("abort_firmware_update", wait_for_result=True)
 
     async def async_poll_value(self, val: Union[Value, str]) -> None:
         """Send pollValue command to Node for given value (or value_id)."""
