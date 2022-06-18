@@ -1656,6 +1656,60 @@ async def test_set_keep_awake(multisensor_6: node_pkg.Node, uuid4, mock_command)
     }
 
 
+async def test_get_firmware_update_capabilities(
+    multisensor_6: node_pkg.Node, uuid4, mock_command
+):
+    """Test node.get_firmware_update_capabilities command."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.get_firmware_update_capabilities", "nodeId": node.node_id},
+        {
+            "firmwareUpgradable": True,
+            "firmwareTargets": [0],
+            "continuesToFunction": True,
+            "supportsActivation": True,
+        },
+    )
+    capabilities = await node.async_get_firmware_update_capabilities()
+    assert capabilities.firmware_upgradable
+    assert capabilities.firmware_targets == [0]
+    assert capabilities.continues_to_function
+    assert capabilities.supports_activation
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.get_firmware_update_capabilities",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_firmware_update_capabilities_false(
+    multisensor_6: node_pkg.Node, uuid4, mock_command
+):
+    """Test node.get_firmware_update_capabilities cmd without firmware support."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.get_firmware_update_capabilities", "nodeId": node.node_id},
+        {"firmwareUpgradable": False},
+    )
+    capabilities = await node.async_get_firmware_update_capabilities()
+    assert not capabilities.firmware_upgradable
+    with pytest.raises(TypeError):
+        assert capabilities.firmware_targets
+    with pytest.raises(TypeError):
+        assert capabilities.continues_to_function
+    with pytest.raises(TypeError):
+        assert capabilities.supports_activation
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.get_firmware_update_capabilities",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }
+
+
 async def test_unknown_event(multisensor_6: node_pkg.Node):
     """Test that an unknown event type causes an exception."""
     with pytest.raises(KeyError):

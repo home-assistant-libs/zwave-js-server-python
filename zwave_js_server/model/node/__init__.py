@@ -21,6 +21,8 @@ from ..device_class import DeviceClass
 from ..device_config import DeviceConfig
 from ..endpoint import Endpoint
 from ..firmware import (
+    FirmwareUpdateCapabilities,
+    FirmwareUpdateCapabilitiesDataType,
     FirmwareUpdateFinished,
     FirmwareUpdateFinishedDataType,
     FirmwareUpdateProgress,
@@ -495,6 +497,19 @@ class Node(EventBase):
             "get_value_metadata", valueId=val.data, wait_for_result=True
         )
         return ValueMetadata(cast(MetaDataType, data))
+
+    async def async_get_firmware_update_capabilities(
+        self,
+    ) -> FirmwareUpdateCapabilities:
+        """Send getFirmwareUpdateCapabilities command to Node."""
+        data = await self.async_send_command(
+            "get_firmware_update_capabilities",
+            require_schema=7,
+            wait_for_result=True,
+        )
+        return FirmwareUpdateCapabilities(
+            self, cast(FirmwareUpdateCapabilitiesDataType, data)
+        )
 
     async def async_abort_firmware_update(self) -> None:
         """Send abortFirmwareUpdate command to Node."""
