@@ -49,6 +49,7 @@ class FirmwareUpdateCapabilities:
             raise TypeError("Firmware is not upgradeable.")
         if (val := self.data["continuesToFunction"]) == VALUE_UNKNOWN:
             return None
+        assert isinstance(val, bool)
         return val
 
     @property
@@ -58,6 +59,7 @@ class FirmwareUpdateCapabilities:
             raise TypeError("Firmware is not upgradeable.")
         if (val := self.data["supportsActivation"]) == VALUE_UNKNOWN:
             return None
+        assert isinstance(val, bool)
         return val
 
     def to_dict(self) -> Dict[str, Optional[Union[bool, List[int]]]]:
