@@ -5,7 +5,6 @@ import pytest
 
 from zwave_js_server.const import LogLevel
 from zwave_js_server.event import Event
-from zwave_js_server.exceptions import InvalidCommand
 from zwave_js_server.model import driver as driver_pkg
 from zwave_js_server.model import log_config as log_config_pkg
 from zwave_js_server.model import log_message as log_message_pkg
@@ -337,25 +336,6 @@ async def test_enable_error_reporting(driver, uuid4, mock_command):
         "command": "driver.enable_error_reporting",
         "messageId": uuid4,
     }
-
-
-async def test_interview_node(multisensor_6, uuid4, mock_command):
-    """Test interview node command."""
-    ack_commands = mock_command({"command": "driver.interview_node"}, {})
-    await multisensor_6.client.driver.async_interview_node(multisensor_6)
-
-    assert len(ack_commands) == 1
-    assert ack_commands[0] == {
-        "command": "driver.interview_node",
-        "nodeId": multisensor_6.node_id,
-        "messageId": uuid4,
-    }
-
-
-async def test_interview_node_failed(inovelli_switch):
-    """Test interview_node failure."""
-    with pytest.raises(InvalidCommand):
-        await inovelli_switch.client.driver.async_interview_node(inovelli_switch)
 
 
 async def test_unknown_event(driver):
