@@ -64,19 +64,6 @@ class InvalidServerVersion(BaseZwaveJSServerError):
     """Exception raised when connected to server with incompatible version."""
 
 
-class InvalidCommand(BaseZwaveJSServerError):
-    """Exception raised when an invalid command is received."""
-
-    def __init__(self, command_name: str, reason: Optional[str] = None):
-        """Initialize an invalid command exception."""
-        self.command_name = command_name
-        self.reason = reason
-        error_msg = f"Invalid command '{command_name}'"
-        if reason:
-            error_msg += f": {reason}"
-        super().__init__(error_msg)
-
-
 class FailedCommand(BaseZwaveJSServerError):
     """When a command has failed."""
 
