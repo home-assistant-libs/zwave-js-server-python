@@ -36,7 +36,7 @@ class FirmwareUpdateCapabilities:
         return self.data["firmwareUpgradable"]
 
     @property
-    def firmware_targets(self) -> Optional[List[int]]:
+    def firmware_targets(self) -> List[int]:
         """Return firmware targets."""
         if not self.firmware_upgradable:
             raise TypeError("Firmware is not upgradeable.")
@@ -64,16 +64,14 @@ class FirmwareUpdateCapabilities:
 
     def to_dict(self) -> Dict[str, Optional[Union[bool, List[int]]]]:
         """Return dict representation of the object."""
-        data = {"firmware_upgradable": self.firmware_upgradable}
-        if self.firmware_upgradable:
-            data.update(
-                {
-                    "firmware_targets": self.firmware_targets,
-                    "continues_to_function": self.continues_to_function,
-                    "supports_activation": self.supports_activation,
-                }
-            )
-        return data
+        if not self.firmware_upgradable:
+            return {"firmware_upgradable": self.firmware_upgradable}
+        return {
+            "firmware_upgradable": self.firmware_upgradable,
+            "firmware_targets": self.firmware_targets,
+            "continues_to_function": self.continues_to_function,
+            "supports_activation": self.supports_activation,
+        }
 
 
 class FirmwareUpdateStatus(IntEnum):
