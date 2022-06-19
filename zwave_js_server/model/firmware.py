@@ -22,12 +22,20 @@ class FirmwareUpdateCapabilitiesDataType(TypedDict, total=False):
     supportsActivation: Union[bool, str]
 
 
+class FirmwareUpdateCapabilitiesDict(TypedDict, total=False):
+    """Represent a dict from FirmwareUpdateCapabilities."""
+
+    firmware_upgradable: bool  # required
+    firmware_targets: List[int]
+    continues_to_function: Optional[bool]
+    supports_activation: Optional[bool]
+
+
 class FirmwareUpdateCapabilities:
     """Model for firmware update capabilities."""
 
-    def __init__(self, node: "Node", data: FirmwareUpdateCapabilitiesDataType) -> None:
+    def __init__(self, data: FirmwareUpdateCapabilitiesDataType) -> None:
         """Initialize class."""
-        self.node = node
         self.data = data
 
     @property
@@ -62,7 +70,7 @@ class FirmwareUpdateCapabilities:
         assert isinstance(val, bool)
         return val
 
-    def to_dict(self) -> Dict[str, Optional[Union[bool, List[int]]]]:
+    def to_dict(self) -> FirmwareUpdateCapabilitiesDict:
         """Return dict representation of the object."""
         if not self.firmware_upgradable:
             return {"firmware_upgradable": self.firmware_upgradable}

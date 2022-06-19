@@ -509,7 +509,7 @@ class Node(EventBase):
         )
         assert data
         return FirmwareUpdateCapabilities(
-            self, cast(FirmwareUpdateCapabilitiesDataType, data["capabilities"])
+            cast(FirmwareUpdateCapabilitiesDataType, data["capabilities"])
         )
 
     async def async_abort_firmware_update(self) -> None:
