@@ -64,12 +64,16 @@ class FirmwareUpdateCapabilities:
 
     def to_dict(self) -> Dict[str, Optional[Union[bool, List[int]]]]:
         """Return dict representation of the object."""
-        return {
-            "firmware_upgradable": self.firmware_upgradable,
-            "firmware_targets": self.firmware_targets,
-            "continues_to_function": self.continues_to_function,
-            "supports_activation": self.supports_activation,
-        }
+        data = {"firmware_upgradable": self.firmware_upgradable}
+        if self.firmware_upgradable:
+            data.update(
+                {
+                    "firmware_targets": self.firmware_targets,
+                    "continues_to_function": self.continues_to_function,
+                    "supports_activation": self.supports_activation,
+                }
+            )
+        return data
 
 
 class FirmwareUpdateStatus(IntEnum):
