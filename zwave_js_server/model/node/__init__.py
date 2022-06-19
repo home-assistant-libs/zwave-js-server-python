@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, cast
 
 from ...const import (
     INTERVIEW_FAILED,
+    NOT_INTERVIEWED,
     CommandClass,
     NodeStatus,
     PowerLevel,
@@ -269,7 +270,16 @@ class Node(EventBase):
     @property
     def in_interview(self) -> bool:
         """Return whether node is currently being interviewed."""
-        return not self.ready and self.interview_stage != INTERVIEW_FAILED
+        return (
+            not self.ready
+            and not self.awaiting_manual_interview
+            and self.interview_stage != INTERVIEW_FAILED
+        )
+
+    @property
+    def awaiting_manual_interview(self) -> bool:
+        """Return whether node requires a manual interview."""
+        return self.interview_stage in (None, NOT_INTERVIEWED)
 
     @property
     def command_classes(self) -> List[CommandClassInfo]:

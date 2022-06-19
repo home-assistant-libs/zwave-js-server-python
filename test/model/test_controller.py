@@ -1643,6 +1643,20 @@ async def test_nvm_events(controller):
     assert event.data["nvm_restore_progress"] == controller_pkg.NVMProgress(5, 6)
 
 
+async def test_node_found(controller, multisensor_6_state):
+    """Test node found event."""
+    event = Event(
+        "node found",
+        {
+            "source": "controller",
+            "event": "node found",
+            "node": multisensor_6_state,
+        },
+    )
+    controller.receive_event(event)
+    assert event.data["node"] == multisensor_6_state
+
+
 async def test_node_added(controller, multisensor_6_state):
     """Test node added event."""
     event = Event(

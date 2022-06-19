@@ -11,6 +11,7 @@ TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED = sys.version_info < (3, 9, 2)
 
 VALUE_UNKNOWN = "unknown"
 
+NOT_INTERVIEWED = "None"
 INTERVIEW_FAILED = "Failed"
 
 CURRENT_STATE_PROPERTY = "currentState"
