@@ -507,6 +507,7 @@ class Node(EventBase):
             require_schema=7,
             wait_for_result=True,
         )
+        assert data
         return FirmwareUpdateCapabilities(
             self, cast(FirmwareUpdateCapabilitiesDataType, data["capabilities"])
         )
