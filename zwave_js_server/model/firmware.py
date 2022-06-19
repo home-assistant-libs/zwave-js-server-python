@@ -1,6 +1,6 @@
 """Provide a model for Z-Wave firmware."""
 from enum import IntEnum
-from typing import TYPE_CHECKING, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, List, Optional, Union
 
 from ..const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED, VALUE_UNKNOWN
 
