@@ -25,12 +25,14 @@ async def test_begin_firmware_update_guess_format(url, client_session, multisens
                 "firmwareFilename": "test",
                 "firmwareFile": "AAAAAAAAAAAAAA==",
             },
-            require_schema=5,
+            require_schema=18,
         )
         disconnect_mock.assert_called_once()
 
 
-async def test_begin_firmware_update_known_format(url, client_session, multisensor_6):
+async def test_begin_firmware_update_known_format_and_target(
+    url, client_session, multisensor_6
+):
     """Test begin_firmware_update with known format."""
     with patch("zwave_js_server.firmware.Client.connect") as connect_mock, patch(
         "zwave_js_server.firmware.Client.set_api_schema"
@@ -41,7 +43,13 @@ async def test_begin_firmware_update_known_format(url, client_session, multisens
     ) as disconnect_mock:
         node = multisensor_6
         await begin_firmware_update(
-            url, node, "test", bytes(10), client_session, "test"
+            url=url,
+            node=node,
+            filename="test",
+            file=bytes(10),
+            session=client_session,
+            file_format="test",
+            target=0,
         )
 
         connect_mock.assert_called_once()
@@ -53,7 +61,8 @@ async def test_begin_firmware_update_known_format(url, client_session, multisens
                 "firmwareFilename": "test",
                 "firmwareFile": "AAAAAAAAAAAAAA==",
                 "firmwareFileFormat": "test",
+                "target": 0,
             },
-            require_schema=5,
+            require_schema=18,
         )
         disconnect_mock.assert_called_once()

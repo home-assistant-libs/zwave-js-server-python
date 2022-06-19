@@ -16,6 +16,7 @@ async def begin_firmware_update(
     file: bytes,
     session: aiohttp.ClientSession,
     file_format: Optional[str] = None,
+    target: Optional[int] = None,
 ) -> None:
     """Send beginFirmwareUpdate command to Node."""
     client = Client(url, session)
@@ -33,7 +34,10 @@ async def begin_firmware_update(
     if file_format is not None:
         cmd["firmwareFileFormat"] = file_format
 
-    await client.async_send_command(cmd, require_schema=5)
+    if target is not None:
+        cmd["target"] = target
+
+    await client.async_send_command(cmd, require_schema=18)
     await client.disconnect()
     if not receive_task.done():
         receive_task.cancel()
