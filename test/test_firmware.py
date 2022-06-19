@@ -43,7 +43,13 @@ async def test_begin_firmware_update_known_format_and_target(
     ) as disconnect_mock:
         node = multisensor_6
         await begin_firmware_update(
-            url, node, "test", bytes(10), client_session, "test", 0
+            url=url,
+            node=node,
+            filename="test",
+            file=bytes(10),
+            session=client_session,
+            file_format="test",
+            target=0,
         )
 
         connect_mock.assert_called_once()
