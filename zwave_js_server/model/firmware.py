@@ -1,8 +1,8 @@
 """Provide a model for Z-Wave firmware."""
 from enum import IntEnum
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, List, Optional, Union
 
-from ..const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED
+from ..const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED, VALUE_UNKNOWN
 
 if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
     from typing_extensions import TypedDict
@@ -11,6 +11,75 @@ else:
 
 if TYPE_CHECKING:
     from .node import Node
+
+
+class FirmwareUpdateCapabilitiesDataType(TypedDict, total=False):
+    """Represent a firmware update capabilities dict type."""
+
+    firmwareUpgradable: bool  # required
+    firmwareTargets: List[int]
+    continuesToFunction: Union[bool, str]
+    supportsActivation: Union[bool, str]
+
+
+class FirmwareUpdateCapabilitiesDict(TypedDict, total=False):
+    """Represent a dict from FirmwareUpdateCapabilities."""
+
+    firmware_upgradable: bool  # required
+    firmware_targets: List[int]
+    continues_to_function: Optional[bool]
+    supports_activation: Optional[bool]
+
+
+class FirmwareUpdateCapabilities:
+    """Model for firmware update capabilities."""
+
+    def __init__(self, data: FirmwareUpdateCapabilitiesDataType) -> None:
+        """Initialize class."""
+        self.data = data
+
+    @property
+    def firmware_upgradable(self) -> bool:
+        """Return whether firmware is upgradable."""
+        return self.data["firmwareUpgradable"]
+
+    @property
+    def firmware_targets(self) -> List[int]:
+        """Return firmware targets."""
+        if not self.firmware_upgradable:
+            raise TypeError("Firmware is not upgradeable.")
+        return self.data["firmwareTargets"]
+
+    @property
+    def continues_to_function(self) -> Optional[bool]:
+        """Return whether node continues to function during update."""
+        if not self.firmware_upgradable:
+            raise TypeError("Firmware is not upgradeable.")
+        if (val := self.data["continuesToFunction"]) == VALUE_UNKNOWN:
+            return None
+        assert isinstance(val, bool)
+        return val
+
+    @property
+    def supports_activation(self) -> Optional[bool]:
+        """Return whether node supports delayed activation of the new firmware."""
+        if not self.firmware_upgradable:
+            raise TypeError("Firmware is not upgradeable.")
+        if (val := self.data["supportsActivation"]) == VALUE_UNKNOWN:
+            return None
+        assert isinstance(val, bool)
+        return val
+
+    def to_dict(self) -> FirmwareUpdateCapabilitiesDict:
+        """Return dict representation of the object."""
+        if not self.firmware_upgradable:
+            return {"firmware_upgradable": self.firmware_upgradable}
+        return {
+            "firmware_upgradable": self.firmware_upgradable,
+            "firmware_targets": self.firmware_targets,
+            "continues_to_function": self.continues_to_function,
+            "supports_activation": self.supports_activation,
+        }
 
 
 class FirmwareUpdateStatus(IntEnum):
