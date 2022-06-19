@@ -733,6 +733,9 @@ class Controller(EventBase):
     def handle_exclusion_stopped(self, event: Event) -> None:
         """Process an exclusion stopped event."""
 
+    def handle_node_found(self, event: Event) -> None:
+        """Process a node found event."""
+
     def handle_node_added(self, event: Event) -> None:
         """Process a node added event."""
         node = event.data["node"] = Node(self.client, event.data["node"])

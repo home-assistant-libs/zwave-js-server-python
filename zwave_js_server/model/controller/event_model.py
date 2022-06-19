@@ -97,6 +97,13 @@ class NodeAddedEventModel(BaseControllerEventModel):
     result: InclusionResultDataType
 
 
+class NodeFoundEventModel(BaseControllerEventModel):
+    """Model for `node found` event data."""
+
+    event: Literal["node found"]
+    node: NodeDataType
+
+
 class NodeRemovedEventModel(BaseControllerEventModel):
     """Model for `node removed` event data."""
 
@@ -158,6 +165,7 @@ CONTROLLER_EVENT_MODEL_MAP: Dict[str, Type["BaseControllerEventModel"]] = {
     "inclusion started": InclusionStartedEventModel,
     "inclusion stopped": InclusionStoppedEventModel,
     "node added": NodeAddedEventModel,
+    "node found": NodeFoundEventModel,
     "node removed": NodeRemovedEventModel,
     "nvm backup progress": NVMBackupProgressEventModel,
     "nvm convert progress": NVMConvertProgressEventModel,

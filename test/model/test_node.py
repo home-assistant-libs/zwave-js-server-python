@@ -911,7 +911,8 @@ async def test_interview_events(multisensor_6):
     node.handle_interview_started(event)
     assert node.interview_stage is None
     assert not node.ready
-    assert node.in_interview
+    assert not node.in_interview
+    assert node.awaiting_manual_interview
 
     event = Event(
         type="interview stage completed",
@@ -1746,6 +1747,26 @@ async def test_get_firmware_update_capabilities_string(
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "node.get_firmware_update_capabilities",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_firmware_update_progress(
+    multisensor_6: node_pkg.Node, uuid4, mock_command
+):
+    """Test node.get_firmware_update_progress command."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.get_firmware_update_progress", "nodeId": node.node_id},
+        {"progress": True},
+    )
+
+    assert await node.async_get_firmware_update_progress()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.get_firmware_update_progress",
         "nodeId": node.node_id,
         "messageId": uuid4,
     }

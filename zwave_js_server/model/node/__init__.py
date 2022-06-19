@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, cast
 
 from ...const import (
     INTERVIEW_FAILED,
+    NOT_INTERVIEWED,
     CommandClass,
     NodeStatus,
     PowerLevel,
@@ -271,7 +272,16 @@ class Node(EventBase):
     @property
     def in_interview(self) -> bool:
         """Return whether node is currently being interviewed."""
-        return not self.ready and self.interview_stage != INTERVIEW_FAILED
+        return (
+            not self.ready
+            and not self.awaiting_manual_interview
+            and self.interview_stage != INTERVIEW_FAILED
+        )
+
+    @property
+    def awaiting_manual_interview(self) -> bool:
+        """Return whether node requires a manual interview."""
+        return self.interview_stage in (None, NOT_INTERVIEWED)
 
     @property
     def command_classes(self) -> List[CommandClassInfo]:
@@ -514,7 +524,7 @@ class Node(EventBase):
 
     async def async_abort_firmware_update(self) -> None:
         """Send abortFirmwareUpdate command to Node."""
-        await self.async_send_command("abort_firmware_update", wait_for_result=False)
+        await self.async_send_command("abort_firmware_update", wait_for_result=True)
 
     async def async_poll_value(self, val: Union[Value, str]) -> None:
         """Send pollValue command to Node for given value (or value_id)."""
@@ -659,6 +669,18 @@ class Node(EventBase):
             require_schema=14,
         )
         self.data["location"] = location
+
+    async def async_get_firmware_update_progress(self) -> bool:
+        """
+        Send getFirmwareUpdateProgress command to Node.
+
+        If `True`, a firmware update for this node is in progress.
+        """
+        data = await self.async_send_command(
+            "get_firmware_update_progress", require_schema=18, wait_for_result=True
+        )
+        assert data
+        return cast(bool, data["progress"])
 
     async def async_set_keep_awake(self, keep_awake: bool) -> None:
         """Set node keep awake state."""
