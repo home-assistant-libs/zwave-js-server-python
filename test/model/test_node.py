@@ -1656,6 +1656,26 @@ async def test_set_keep_awake(multisensor_6: node_pkg.Node, uuid4, mock_command)
     }
 
 
+async def test_get_firmware_update_progress(
+    multisensor_6: node_pkg.Node, uuid4, mock_command
+):
+    """Test node.get_firmware_update_progress command."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.get_firmware_update_progress", "nodeId": node.node_id},
+        {"progress": True},
+    )
+
+    assert await node.async_get_firmware_update_progress()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.get_firmware_update_progress",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }
+
+
 async def test_unknown_event(multisensor_6: node_pkg.Node):
     """Test that an unknown event type causes an exception."""
     with pytest.raises(KeyError):
