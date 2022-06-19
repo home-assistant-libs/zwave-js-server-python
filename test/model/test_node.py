@@ -1663,12 +1663,12 @@ async def test_get_firmware_update_capabilities(
     node = multisensor_6
     ack_commands = mock_command(
         {"command": "node.get_firmware_update_capabilities", "nodeId": node.node_id},
-        {
+        {"capabilities": {
             "firmwareUpgradable": True,
             "firmwareTargets": [0],
             "continuesToFunction": True,
             "supportsActivation": True,
-        },
+        }},
     )
     capabilities = await node.async_get_firmware_update_capabilities()
     assert capabilities.firmware_upgradable
@@ -1698,7 +1698,7 @@ async def test_get_firmware_update_capabilities_false(
     node = multisensor_6
     ack_commands = mock_command(
         {"command": "node.get_firmware_update_capabilities", "nodeId": node.node_id},
-        {"firmwareUpgradable": False},
+        {"capabilities": {"firmwareUpgradable": False}},
     )
     capabilities = await node.async_get_firmware_update_capabilities()
     assert not capabilities.firmware_upgradable
@@ -1726,12 +1726,12 @@ async def test_get_firmware_update_capabilities_string(
     node = multisensor_6
     ack_commands = mock_command(
         {"command": "node.get_firmware_update_capabilities", "nodeId": node.node_id},
-        {
+        {"capabilities": {
             "firmwareUpgradable": True,
             "firmwareTargets": [0],
             "continuesToFunction": "unknown",
             "supportsActivation": "unknown",
-        },
+        }},
     )
     capabilities = await node.async_get_firmware_update_capabilities()
     assert capabilities.firmware_upgradable
