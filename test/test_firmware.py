@@ -30,7 +30,9 @@ async def test_begin_firmware_update_guess_format(url, client_session, multisens
         disconnect_mock.assert_called_once()
 
 
-async def test_begin_firmware_update_known_format_and_target(url, client_session, multisensor_6):
+async def test_begin_firmware_update_known_format_and_target(
+    url, client_session, multisensor_6
+):
     """Test begin_firmware_update with known format."""
     with patch("zwave_js_server.firmware.Client.connect") as connect_mock, patch(
         "zwave_js_server.firmware.Client.set_api_schema"
