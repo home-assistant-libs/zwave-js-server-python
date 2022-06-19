@@ -508,7 +508,7 @@ class Node(EventBase):
             wait_for_result=True,
         )
         return FirmwareUpdateCapabilities(
-            self, cast(FirmwareUpdateCapabilitiesDataType, data)
+            self, cast(FirmwareUpdateCapabilitiesDataType, data["capabilities"])
         )
 
     async def async_abort_firmware_update(self) -> None:
