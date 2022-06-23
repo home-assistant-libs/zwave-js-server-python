@@ -670,7 +670,7 @@ class Node(EventBase):
         )
         self.data["location"] = location
 
-    async def async_get_firmware_update_progress(self, any_node: bool = False) -> bool:
+    async def async_get_firmware_update_progress(self) -> bool:
         """
         Send getFirmwareUpdateProgress command to Node.
 
@@ -681,8 +681,6 @@ class Node(EventBase):
             "get_firmware_update_progress", require_schema=18, wait_for_result=True
         )
         assert data
-        if any_node:
-            return cast(bool, data["anyProgress"])
         return cast(bool, data["progress"])
 
     async def async_set_keep_awake(self, keep_awake: bool) -> None:

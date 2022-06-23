@@ -691,6 +691,19 @@ class Controller(EventBase):
             for node_id, lifeline_routes in data["routes"].items()
         }
 
+    async def async_get_any_firmware_update_progress(self) -> bool:
+        """
+        Send getAnyFirmwareUpdateProgress command to Node.
+
+        If `True`, a firmware update is in progress on at least one node.
+        """
+        data = await self.client.async_send_command(
+            {"command": "controller.get_any_firmware_update_progress"},
+            require_schema=20,
+        )
+        assert data
+        return cast(bool, data["progress"])
+
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
         if event.data["source"] == "node":

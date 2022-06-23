@@ -1759,30 +1759,10 @@ async def test_get_firmware_update_progress(
     node = multisensor_6
     ack_commands = mock_command(
         {"command": "node.get_firmware_update_progress", "nodeId": node.node_id},
-        {"progress": True, "anyProgress": True},
+        {"progress": True},
     )
 
     assert await node.async_get_firmware_update_progress()
-
-    assert len(ack_commands) == 1
-    assert ack_commands[0] == {
-        "command": "node.get_firmware_update_progress",
-        "nodeId": node.node_id,
-        "messageId": uuid4,
-    }
-
-
-async def test_get_firmware_update_any_progress(
-    multisensor_6: node_pkg.Node, uuid4, mock_command
-):
-    """Test node.get_firmware_update_progress command."""
-    node = multisensor_6
-    ack_commands = mock_command(
-        {"command": "node.get_firmware_update_progress", "nodeId": node.node_id},
-        {"progress": False, "anyProgress": True},
-    )
-
-    assert await node.async_get_firmware_update_progress(any_node=True)
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
