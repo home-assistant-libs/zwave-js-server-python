@@ -1560,6 +1560,23 @@ async def test_get_known_lifeline_routes(
     }
 
 
+async def test_get_any_firmware_update_progress(multisensor_6, uuid4, mock_command):
+    """Test get any firmware update progress."""
+    ack_commands = mock_command(
+        {"command": "controller.get_any_firmware_update_progress"},
+        {"progress": False},
+    )
+    assert (
+        not await multisensor_6.client.driver.controller.async_get_any_firmware_update_progress()
+    )
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_any_firmware_update_progress",
+        "messageId": uuid4,
+    }
+
+
 async def test_get_known_lifeline_routes_rssi_error(
     multisensor_6, ring_keypad, wallmote_central_scene, uuid4, mock_command
 ):

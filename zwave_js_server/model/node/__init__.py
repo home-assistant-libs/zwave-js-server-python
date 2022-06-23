@@ -674,7 +674,8 @@ class Node(EventBase):
         """
         Send getFirmwareUpdateProgress command to Node.
 
-        If `True`, a firmware update for this node is in progress.
+        By default, if `True`, a firmware update for this node is in progress. If
+        `any_node` is `True`, a firmware update for any node is in progress.
         """
         data = await self.async_send_command(
             "get_firmware_update_progress", require_schema=18, wait_for_result=True
