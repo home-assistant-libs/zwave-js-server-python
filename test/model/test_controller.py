@@ -1625,7 +1625,10 @@ async def test_begin_ota_firmware_update(multisensor_6, uuid4, mock_command):
         {},
     )
     await multisensor_6.client.driver.controller.async_begin_ota_firmware_update(
-        multisensor_6, FirmwareUpdateFileInfo({"target": 0, "url": "http://example.com", "integrity": "test"})
+        multisensor_6,
+        FirmwareUpdateFileInfo(
+            {"target": 0, "url": "http://example.com", "integrity": "test"}
+        ),
     )
 
     assert len(ack_commands) == 1
