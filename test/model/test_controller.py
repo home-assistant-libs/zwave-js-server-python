@@ -21,6 +21,7 @@ from zwave_js_server.exceptions import RepeaterRssiErrorReceived, RssiErrorRecei
 from zwave_js_server.model import association as association_pkg
 from zwave_js_server.model import controller as controller_pkg
 from zwave_js_server.model.controller.statistics import ControllerStatistics
+from zwave_js_server.model.firmware import FirmwareUpdateFileInfo
 
 from .. import load_fixture
 
@@ -1560,19 +1561,78 @@ async def test_get_known_lifeline_routes(
     }
 
 
-async def test_get_any_firmware_update_progress(multisensor_6, uuid4, mock_command):
+async def test_is_any_ota_firmware_update_in_progress(
+    multisensor_6, uuid4, mock_command
+):
     """Test get any firmware update progress."""
     ack_commands = mock_command(
-        {"command": "controller.get_any_firmware_update_progress"},
+        {"command": "controller.is_any_ota_firmware_update_in_progress"},
         {"progress": False},
     )
     assert (
-        not await multisensor_6.client.driver.controller.async_get_any_firmware_update_progress()
+        not await multisensor_6.client.driver.controller.async_is_any_ota_firmware_update_in_progress()
     )
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
-        "command": "controller.get_any_firmware_update_progress",
+        "command": "controller.is_any_ota_firmware_update_in_progress",
+        "messageId": uuid4,
+    }
+
+
+async def test_get_available_firmware_updates(multisensor_6, uuid4, mock_command):
+    """Test get available firmware updates."""
+    ack_commands = mock_command(
+        {"command": "controller.get_available_firmware_updates"},
+        {
+            "updates": [
+                {
+                    "version": "1.0.0",
+                    "changelog": "changelog",
+                    "files": [
+                        {"target": 0, "url": "http://example.com", "integrity": "test"}
+                    ],
+                }
+            ]
+        },
+    )
+    updates = await multisensor_6.client.driver.controller.async_get_available_firmware_updates(
+        multisensor_6
+    )
+
+    assert len(updates) == 1
+    update = updates[0]
+    assert update.version == "1.0.0"
+    assert update.changelog == "changelog"
+    assert len(update.files) == 1
+    file = update.files[0]
+    assert file.target == 0
+    assert file.url == "http://example.com"
+    assert file.integrity == "test"
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_available_firmware_updates",
+        "nodeId": multisensor_6.node_id,
+        "messageId": uuid4,
+    }
+
+
+async def test_begin_ota_firmware_update(multisensor_6, uuid4, mock_command):
+    """Test get available firmware updates."""
+    ack_commands = mock_command(
+        {"command": "controller.begin_ota_firmware_update"},
+        {},
+    )
+    await multisensor_6.client.driver.controller.async_begin_ota_firmware_update(
+        multisensor_6, FirmwareUpdateFileInfo({"target": 0, "url": "http://example.com", "integrity": "test"})
+    )
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.begin_ota_firmware_update",
+        "nodeId": multisensor_6.node_id,
+        "update": {"target": 0, "url": "http://example.com", "integrity": "test"},
         "messageId": uuid4,
     }
 

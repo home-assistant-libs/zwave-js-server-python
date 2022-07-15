@@ -670,14 +670,14 @@ class Node(EventBase):
         )
         self.data["location"] = location
 
-    async def async_get_firmware_update_progress(self) -> bool:
+    async def async_is_firmware_update_in_progress(self) -> bool:
         """
-        Send getFirmwareUpdateProgress command to Node.
+        Send isFirmwareUpdateInProgress command to Node.
 
         If `True`, a firmware update for this node is in progress.
         """
         data = await self.async_send_command(
-            "get_firmware_update_progress", require_schema=18, wait_for_result=True
+            "is_firmware_update_in_progress", require_schema=21, wait_for_result=True
         )
         assert data
         return cast(bool, data["progress"])

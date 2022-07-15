@@ -153,3 +153,65 @@ class FirmwareUpdateFinished:
     def wait_time(self) -> Optional[int]:
         """Return the wait time in seconds before the device is functional again."""
         return self.data.get("waitTime")
+
+
+class FirmwareUpdateFileInfoDataType(TypedDict):
+    """Represent a firmware update file info data dict type."""
+
+    target: int
+    url: str
+    integrity: str  # sha256
+
+
+class FirmwareUpdateFileInfo:
+    """Represent a firmware update file info."""
+
+    def __init__(self, data: FirmwareUpdateFileInfoDataType) -> None:
+        """Initialize."""
+        self.data = data
+
+    @property
+    def target(self) -> int:
+        """Return the firmware target."""
+        return self.data["target"]
+
+    @property
+    def url(self) -> str:
+        """Return the firmware url."""
+        return self.data["url"]
+
+    @property
+    def integrity(self) -> str:
+        """Return the firmware file integrity hash."""
+        return self.data["integrity"]
+
+
+class FirmwareUpdateInfoDataType(TypedDict):
+    """Represent a firmware update info data dict type."""
+
+    version: str
+    changelog: str
+    files: List[FirmwareUpdateFileInfoDataType]
+
+
+class FirmwareUpdateInfo:
+    """Represent a firmware update info."""
+
+    def __init__(self, data: FirmwareUpdateInfoDataType) -> None:
+        """Initialize."""
+        self.data = data
+
+    @property
+    def version(self) -> str:
+        """Return the firmware version."""
+        return self.data["version"]
+
+    @property
+    def changelog(self) -> str:
+        """Return the firmware changelog."""
+        return self.data["changelog"]
+
+    @property
+    def files(self) -> List[FirmwareUpdateFileInfo]:
+        """Return the firmware files."""
+        return [FirmwareUpdateFileInfo(file) for file in self.data["files"]]
