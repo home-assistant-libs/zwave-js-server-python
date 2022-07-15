@@ -1757,6 +1757,46 @@ async def test_get_firmware_update_capabilities_string(
     }
 
 
+async def test_get_firmware_update_capabilities_cached(
+    multisensor_6: node_pkg.Node, uuid4, mock_command
+):
+    """Test node.get_firmware_update_capabilities_cached command."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {
+            "command": "node.get_firmware_update_capabilities_cached",
+            "nodeId": node.node_id,
+        },
+        {
+            "capabilities": {
+                "firmwareUpgradable": True,
+                "firmwareTargets": [0],
+                "continuesToFunction": True,
+                "supportsActivation": True,
+            }
+        },
+    )
+    capabilities = await node.async_get_firmware_update_capabilities_cached()
+    assert capabilities.firmware_upgradable
+    assert capabilities.firmware_targets == [0]
+    assert capabilities.continues_to_function
+    assert capabilities.supports_activation
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.get_firmware_update_capabilities_cached",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }
+
+    assert capabilities.to_dict() == {
+        "firmware_upgradable": True,
+        "firmware_targets": [0],
+        "continues_to_function": True,
+        "supports_activation": True,
+    }
+
+
 async def test_is_firmware_update_in_progress(
     multisensor_6: node_pkg.Node, uuid4, mock_command
 ):

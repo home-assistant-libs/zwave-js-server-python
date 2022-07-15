@@ -522,6 +522,20 @@ class Node(EventBase):
             cast(FirmwareUpdateCapabilitiesDataType, data["capabilities"])
         )
 
+    async def async_get_firmware_update_capabilities_cached(
+        self,
+    ) -> FirmwareUpdateCapabilities:
+        """Send getFirmwareUpdateCapabilitiesCached command to Node."""
+        data = await self.async_send_command(
+            "get_firmware_update_capabilities_cached",
+            require_schema=21,
+            wait_for_result=True,
+        )
+        assert data
+        return FirmwareUpdateCapabilities(
+            cast(FirmwareUpdateCapabilitiesDataType, data["capabilities"])
+        )
+
     async def async_abort_firmware_update(self) -> None:
         """Send abortFirmwareUpdate command to Node."""
         await self.async_send_command("abort_firmware_update", wait_for_result=True)
