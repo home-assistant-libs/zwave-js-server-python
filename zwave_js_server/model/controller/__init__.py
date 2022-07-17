@@ -1,5 +1,5 @@
 """Provide a model for the Z-Wave JS controller."""
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Union, cast
 
 from zwave_js_server.model.firmware import FirmwareUpdateFileInfo, FirmwareUpdateInfo
@@ -718,7 +718,7 @@ class Controller(EventBase):
             require_schema=21,
         )
         assert data
-        return [FirmwareUpdateInfo(update) for update in data["updates"]]
+        return [FirmwareUpdateInfo(**update) for update in data["updates"]]
 
     async def async_begin_ota_firmware_update(
         self, node: Node, update: FirmwareUpdateFileInfo
@@ -728,7 +728,7 @@ class Controller(EventBase):
             {
                 "command": "controller.begin_ota_firmware_update",
                 "nodeId": node.node_id,
-                "update": update.data,
+                "update": asdict(update),
             },
             require_schema=21,
         )

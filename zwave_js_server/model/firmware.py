@@ -1,4 +1,5 @@
 """Provide a model for Z-Wave firmware."""
+from dataclasses import dataclass
 from enum import IntEnum
 from typing import TYPE_CHECKING, List, Optional, Union
 
@@ -163,27 +164,13 @@ class FirmwareUpdateFileInfoDataType(TypedDict):
     integrity: str  # sha256
 
 
+@dataclass
 class FirmwareUpdateFileInfo:
     """Represent a firmware update file info."""
 
-    def __init__(self, data: FirmwareUpdateFileInfoDataType) -> None:
-        """Initialize."""
-        self.data = data
-
-    @property
-    def target(self) -> int:
-        """Return the firmware target."""
-        return self.data["target"]
-
-    @property
-    def url(self) -> str:
-        """Return the firmware url."""
-        return self.data["url"]
-
-    @property
-    def integrity(self) -> str:
-        """Return the firmware file integrity hash."""
-        return self.data["integrity"]
+    target: int
+    url: str
+    integrity: str
 
 
 class FirmwareUpdateInfoDataType(TypedDict):
@@ -194,24 +181,14 @@ class FirmwareUpdateInfoDataType(TypedDict):
     files: List[FirmwareUpdateFileInfoDataType]
 
 
+@dataclass
 class FirmwareUpdateInfo:
     """Represent a firmware update info."""
 
-    def __init__(self, data: FirmwareUpdateInfoDataType) -> None:
-        """Initialize."""
-        self.data = data
+    version: str
+    changelog: str
+    files: Union[List[FirmwareUpdateFileInfo], List[FirmwareUpdateFileInfoDataType]]
 
-    @property
-    def version(self) -> str:
-        """Return the firmware version."""
-        return self.data["version"]
-
-    @property
-    def changelog(self) -> str:
-        """Return the firmware changelog."""
-        return self.data["changelog"]
-
-    @property
-    def files(self) -> List[FirmwareUpdateFileInfo]:
-        """Return the firmware files."""
-        return [FirmwareUpdateFileInfo(file) for file in self.data["files"]]
+    def __post_init__(self) -> None:
+        """Post initialization."""
+        self.files = [FirmwareUpdateFileInfo(**file) for file in self.files]
