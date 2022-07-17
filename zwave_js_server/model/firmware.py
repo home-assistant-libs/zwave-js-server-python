@@ -192,7 +192,7 @@ class FirmwareUpdateInfo:
     @classmethod
     def from_dict(cls, data: FirmwareUpdateInfoDataType) -> "FirmwareUpdateInfo":
         """Initialize from dict."""
-        return FirmwareUpdateInfo(
+        return cls(
             version=data["version"],
             changelog=data["changelog"],
             files=[FirmwareUpdateFileInfo(**file) for file in data["files"]],
