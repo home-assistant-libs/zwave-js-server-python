@@ -204,6 +204,31 @@ async def test_set_value_multicast(
         )
 
 
+async def test_set_value_multicast_basic(
+    climate_radio_thermostat_ct100_plus, inovelli_switch, client, uuid4, mock_command
+):
+    """Test multicast_group.set_value command with Basic CC."""
+    node1 = climate_radio_thermostat_ct100_plus
+    node2 = inovelli_switch
+    ack_commands = mock_command(
+        {"command": "multicast_group.set_value"},
+        {"success": True},
+    )
+
+    assert await async_multicast_set_value(
+        client, 1, {"commandClass": 32, "property": "targetValue"}, [node1, node2]
+    )
+
+    assert ack_commands[0] == {
+        "command": "multicast_group.set_value",
+        "nodeIDs": [node1.node_id, node2.node_id],
+        "value": 1,
+        "valueId": {"commandClass": 32, "property": "targetValue"},
+        "options": None,
+        "messageId": uuid4,
+    }
+
+
 async def test_invoke_cc_api_broadcast(client, uuid4, mock_command):
     """Test broadcast_node.invoke_cc_api command."""
     ack_commands = mock_command(

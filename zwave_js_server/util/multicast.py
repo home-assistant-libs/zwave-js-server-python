@@ -2,7 +2,7 @@
 from typing import Any, List, Optional, cast
 
 from ..client import Client
-from ..const import CommandClass
+from ..const import TARGET_VALUE_PROPERTY, CommandClass
 from ..exceptions import NotFoundError
 from ..model.node import Node
 from ..model.value import ValueDataType, _get_value_id_from_dict
@@ -39,6 +39,12 @@ async def async_multicast_set_value(
     assert client.driver
     # Iterate through nodes specified or all nodes if not specified
     for node in nodes or client.driver.controller.nodes.values():
+        # If the value to set is for Basic CC and targetValue property, skip validation
+        if (
+            value_data["commandClass"] == CommandClass.BASIC
+            and value_data["property"] == TARGET_VALUE_PROPERTY
+        ):
+            break
         value_id = _get_value_id_from_dict(node, value_data)
         # Check that the value exists on the node
         if value_id not in node.values:
