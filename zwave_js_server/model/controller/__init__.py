@@ -718,7 +718,7 @@ class Controller(EventBase):
             require_schema=21,
         )
         assert data
-        return [FirmwareUpdateInfo(**update) for update in data["updates"]]
+        return [FirmwareUpdateInfo.from_dict(update) for update in data["updates"]]
 
     async def async_begin_ota_firmware_update(
         self, node: Node, update: FirmwareUpdateFileInfo

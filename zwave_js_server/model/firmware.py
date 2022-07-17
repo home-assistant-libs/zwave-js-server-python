@@ -187,8 +187,13 @@ class FirmwareUpdateInfo:
 
     version: str
     changelog: str
-    files: Union[List[FirmwareUpdateFileInfo], List[FirmwareUpdateFileInfoDataType]]
+    files: List[FirmwareUpdateFileInfo]
 
-    def __post_init__(self) -> None:
-        """Post initialization."""
-        self.files = [FirmwareUpdateFileInfo(**file) for file in self.files]
+    @classmethod
+    def from_dict(cls, data: FirmwareUpdateInfoDataType) -> "FirmwareUpdateInfo":
+        """Initialize from dict."""
+        return FirmwareUpdateInfo(
+            version=data["version"],
+            changelog=data["changelog"],
+            files=[FirmwareUpdateFileInfo(**file) for file in data["files"]],
+        )
