@@ -522,6 +522,20 @@ class Node(EventBase):
             cast(FirmwareUpdateCapabilitiesDataType, data["capabilities"])
         )
 
+    async def async_get_firmware_update_capabilities_cached(
+        self,
+    ) -> FirmwareUpdateCapabilities:
+        """Send getFirmwareUpdateCapabilitiesCached command to Node."""
+        data = await self.async_send_command(
+            "get_firmware_update_capabilities_cached",
+            require_schema=21,
+            wait_for_result=True,
+        )
+        assert data
+        return FirmwareUpdateCapabilities(
+            cast(FirmwareUpdateCapabilitiesDataType, data["capabilities"])
+        )
+
     async def async_abort_firmware_update(self) -> None:
         """Send abortFirmwareUpdate command to Node."""
         await self.async_send_command("abort_firmware_update", wait_for_result=True)
@@ -670,14 +684,14 @@ class Node(EventBase):
         )
         self.data["location"] = location
 
-    async def async_get_firmware_update_progress(self) -> bool:
+    async def async_is_firmware_update_in_progress(self) -> bool:
         """
-        Send getFirmwareUpdateProgress command to Node.
+        Send isFirmwareUpdateInProgress command to Node.
 
         If `True`, a firmware update for this node is in progress.
         """
         data = await self.async_send_command(
-            "get_firmware_update_progress", require_schema=18, wait_for_result=True
+            "is_firmware_update_in_progress", require_schema=21, wait_for_result=True
         )
         assert data
         return cast(bool, data["progress"])

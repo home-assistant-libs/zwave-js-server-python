@@ -1,6 +1,8 @@
 """Provide a model for the Z-Wave JS controller."""
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Union, cast
+
+from zwave_js_server.model.firmware import FirmwareUpdateFileInfo, FirmwareUpdateInfo
 
 from ...const import (
     MINIMUM_QR_STRING_LENGTH,
@@ -691,18 +693,45 @@ class Controller(EventBase):
             for node_id, lifeline_routes in data["routes"].items()
         }
 
-    async def async_get_any_firmware_update_progress(self) -> bool:
+    async def async_is_any_ota_firmware_update_in_progress(self) -> bool:
         """
-        Send getAnyFirmwareUpdateProgress command to Node.
+        Send isAnyOTAFirmwareUpdateInProgress command to Controller.
 
         If `True`, a firmware update is in progress on at least one node.
         """
         data = await self.client.async_send_command(
-            {"command": "controller.get_any_firmware_update_progress"},
-            require_schema=20,
+            {"command": "controller.is_any_ota_firmware_update_in_progress"},
+            require_schema=21,
         )
         assert data
         return cast(bool, data["progress"])
+
+    async def async_get_available_firmware_updates(
+        self, node: Node
+    ) -> List[FirmwareUpdateInfo]:
+        """Send getAvailableFirmwareUpdates command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.get_available_firmware_updates",
+                "nodeId": node.node_id,
+            },
+            require_schema=21,
+        )
+        assert data
+        return [FirmwareUpdateInfo.from_dict(update) for update in data["updates"]]
+
+    async def async_begin_ota_firmware_update(
+        self, node: Node, update: FirmwareUpdateFileInfo
+    ) -> None:
+        """Send beginOTAFirmwareUpdate command to Controller."""
+        await self.client.async_send_command(
+            {
+                "command": "controller.begin_ota_firmware_update",
+                "nodeId": node.node_id,
+                "update": asdict(update),
+            },
+            require_schema=21,
+        )
 
     def receive_event(self, event: Event) -> None:
         """Receive an event."""

@@ -749,7 +749,9 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
             "ccId": 111,
             "args": {
                 "eventType": 0,
+                "eventTypeLabel": "a",
                 "dataType": 0,
+                "dataTypeLabel": "b",
                 "eventData": "test",
             },
         },
@@ -759,7 +761,9 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
     assert event.data["notification"].command_class == CommandClass.ENTRY_CONTROL
     assert event.data["notification"].node_id == 23
     assert event.data["notification"].event_type == EntryControlEventType.CACHING
+    assert event.data["notification"].event_type_label == "a"
     assert event.data["notification"].data_type == EntryControlDataType.NONE
+    assert event.data["notification"].data_type_label == "b"
     assert event.data["notification"].event_data == "test"
 
     # Validate that Notification CC notification event is received as expected
@@ -816,7 +820,7 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
             "event": "notification",
             "nodeId": 23,
             "ccId": CommandClass.SWITCH_MULTILEVEL.value,
-            "args": {"direction": "up", "eventType": 4},
+            "args": {"direction": "up", "eventType": 4, "eventTypeLabel": "c"},
         },
     )
 
@@ -828,6 +832,7 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
         event.data["notification"].event_type
         == MultilevelSwitchCommand.START_LEVEL_CHANGE
     )
+    assert event.data["notification"].event_type_label == "c"
 
     # Validate that Multilevel Switch CC notification event without a direction is valid
     event = Event(
@@ -1752,21 +1757,61 @@ async def test_get_firmware_update_capabilities_string(
     }
 
 
-async def test_get_firmware_update_progress(
+async def test_get_firmware_update_capabilities_cached(
     multisensor_6: node_pkg.Node, uuid4, mock_command
 ):
-    """Test node.get_firmware_update_progress command."""
+    """Test node.get_firmware_update_capabilities_cached command."""
     node = multisensor_6
     ack_commands = mock_command(
-        {"command": "node.get_firmware_update_progress", "nodeId": node.node_id},
-        {"progress": True},
+        {
+            "command": "node.get_firmware_update_capabilities_cached",
+            "nodeId": node.node_id,
+        },
+        {
+            "capabilities": {
+                "firmwareUpgradable": True,
+                "firmwareTargets": [0],
+                "continuesToFunction": True,
+                "supportsActivation": True,
+            }
+        },
     )
-
-    assert await node.async_get_firmware_update_progress()
+    capabilities = await node.async_get_firmware_update_capabilities_cached()
+    assert capabilities.firmware_upgradable
+    assert capabilities.firmware_targets == [0]
+    assert capabilities.continues_to_function
+    assert capabilities.supports_activation
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
-        "command": "node.get_firmware_update_progress",
+        "command": "node.get_firmware_update_capabilities_cached",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }
+
+    assert capabilities.to_dict() == {
+        "firmware_upgradable": True,
+        "firmware_targets": [0],
+        "continues_to_function": True,
+        "supports_activation": True,
+    }
+
+
+async def test_is_firmware_update_in_progress(
+    multisensor_6: node_pkg.Node, uuid4, mock_command
+):
+    """Test node.is_firmware_update_in_progress command."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.is_firmware_update_in_progress", "nodeId": node.node_id},
+        {"progress": True},
+    )
+
+    assert await node.async_is_firmware_update_in_progress()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.is_firmware_update_in_progress",
         "nodeId": node.node_id,
         "messageId": uuid4,
     }

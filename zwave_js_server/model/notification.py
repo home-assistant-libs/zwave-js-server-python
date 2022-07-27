@@ -33,7 +33,9 @@ class EntryControlNotificationArgsDataType(TypedDict, total=False):
     """Represent args for a Entry Control CC notification event data dict type."""
 
     eventType: int  # required
+    eventTypeLabel: str  # required
     dataType: int  # required
+    dataTypeLabel: str  # required
     eventData: Union[str, Dict[str, Any]]
 
 
@@ -67,9 +69,19 @@ class EntryControlNotification:
         return self.data["args"]["eventType"]
 
     @property
+    def event_type_label(self) -> str:
+        """Return event type label property."""
+        return self.data["args"]["eventTypeLabel"]
+
+    @property
     def data_type(self) -> int:
         """Return data type property."""
         return self.data["args"]["dataType"]
+
+    @property
+    def data_type_label(self) -> str:
+        """Return data type label property."""
+        return self.data["args"]["dataTypeLabel"]
 
     @property
     def event_data(self) -> Optional[str]:
@@ -191,6 +203,7 @@ class MultilevelSwitchNotificationArgsDataType(TypedDict, total=False):
     """Represent args for a Multi Level Switch CC notification event data dict type."""
 
     eventType: int  # required
+    eventTypeLabel: str  # required
     direction: str
 
 
@@ -224,6 +237,11 @@ class MultilevelSwitchNotification:
     def event_type(self) -> MultilevelSwitchCommand:
         """Return event type property."""
         return MultilevelSwitchCommand(self.data["args"]["eventType"])
+
+    @property
+    def event_type_label(self) -> str:
+        """Return event type label property."""
+        return self.data["args"]["eventTypeLabel"]
 
     @property
     def direction(self) -> Optional[str]:

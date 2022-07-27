@@ -1,4 +1,5 @@
 """Provide a model for Z-Wave firmware."""
+from dataclasses import dataclass
 from enum import IntEnum
 from typing import TYPE_CHECKING, List, Optional, Union
 
@@ -153,3 +154,46 @@ class FirmwareUpdateFinished:
     def wait_time(self) -> Optional[int]:
         """Return the wait time in seconds before the device is functional again."""
         return self.data.get("waitTime")
+
+
+class FirmwareUpdateFileInfoDataType(TypedDict):
+    """Represent a firmware update file info data dict type."""
+
+    target: int
+    url: str
+    integrity: str  # sha256
+
+
+@dataclass
+class FirmwareUpdateFileInfo:
+    """Represent a firmware update file info."""
+
+    target: int
+    url: str
+    integrity: str
+
+
+class FirmwareUpdateInfoDataType(TypedDict):
+    """Represent a firmware update info data dict type."""
+
+    version: str
+    changelog: str
+    files: List[FirmwareUpdateFileInfoDataType]
+
+
+@dataclass
+class FirmwareUpdateInfo:
+    """Represent a firmware update info."""
+
+    version: str
+    changelog: str
+    files: List[FirmwareUpdateFileInfo]
+
+    @classmethod
+    def from_dict(cls, data: FirmwareUpdateInfoDataType) -> "FirmwareUpdateInfo":
+        """Initialize from dict."""
+        return cls(
+            version=data["version"],
+            changelog=data["changelog"],
+            files=[FirmwareUpdateFileInfo(**file) for file in data["files"]],
+        )
