@@ -6,8 +6,10 @@ from zwave_js_server.model.firmware import FirmwareUpdateFileInfo, FirmwareUpdat
 
 from ...const import (
     MINIMUM_QR_STRING_LENGTH,
+    ExclusionStrategy,
     InclusionState,
     InclusionStrategy,
+    NodeType,
     QRCodeVersion,
     RFRegion,
     ZwaveFeature,
@@ -87,9 +89,9 @@ class Controller(EventBase):
         return self.data.get("ownNodeId")
 
     @property
-    def is_secondary(self) -> Optional[bool]:
-        """Return is_secondary."""
-        return self.data.get("isSecondary")  # TODO: This is missing in the docs.
+    def is_primary(self) -> Optional[bool]:
+        """Return is_primary."""
+        return self.data.get("isPrimary")
 
     @property
     def is_using_home_id_from_other_network(self) -> Optional[bool]:
@@ -107,14 +109,16 @@ class Controller(EventBase):
         return self.data.get("wasRealPrimary")
 
     @property
-    def is_static_update_controller(self) -> Optional[bool]:
-        """Return is_static_update_controller."""
-        return self.data.get("isStaticUpdateController")
+    def is_suc(self) -> Optional[bool]:
+        """Return is_suc."""
+        return self.data.get("isSUC")
 
     @property
-    def is_slave(self) -> Optional[bool]:
-        """Return is_slave."""
-        return self.data.get("isSlave")
+    def node_type(self) -> Optional[NodeType]:
+        """Return node_type."""
+        if (node_type := self.data.get("nodeType")) is not None:
+            return NodeType(node_type)
+        return None
 
     @property
     def firmware_version(self) -> Optional[str]:
@@ -312,13 +316,13 @@ class Controller(EventBase):
         return cast(bool, data["success"])
 
     async def async_begin_exclusion(
-        self, unprovision: Optional[Union[bool, Literal["inactive"]]] = None
+        self, strategy: Optional[ExclusionStrategy] = None
     ) -> bool:
         """Send beginExclusion command to Controller."""
         payload: Dict[str, Union[str, bool]] = {"command": "controller.begin_exclusion"}
-        if unprovision is not None:
-            payload["unprovision"] = unprovision
-        data = await self.client.async_send_command(payload)
+        if strategy is not None:
+            payload["strategy"] = strategy
+        data = await self.client.async_send_command(payload, require_schema=22)
         return cast(bool, data["success"])
 
     async def async_stop_exclusion(self) -> bool:
@@ -707,15 +711,16 @@ class Controller(EventBase):
         return cast(bool, data["progress"])
 
     async def async_get_available_firmware_updates(
-        self, node: Node
+        self, node: Node, api_key: str
     ) -> List[FirmwareUpdateInfo]:
         """Send getAvailableFirmwareUpdates command to Controller."""
         data = await self.client.async_send_command(
             {
                 "command": "controller.get_available_firmware_updates",
                 "nodeId": node.node_id,
+                "apiKey": api_key,
             },
-            require_schema=21,
+            require_schema=22,
         )
         assert data
         return [FirmwareUpdateInfo.from_dict(update) for update in data["updates"]]
