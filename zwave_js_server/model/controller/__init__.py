@@ -319,7 +319,9 @@ class Controller(EventBase):
         self, strategy: Optional[ExclusionStrategy] = None
     ) -> bool:
         """Send beginExclusion command to Controller."""
-        payload: Dict[str, Union[str, bool]] = {"command": "controller.begin_exclusion"}
+        payload: Dict[str, Union[str, ExclusionStrategy]] = {
+            "command": "controller.begin_exclusion"
+        }
         if strategy is not None:
             payload["strategy"] = strategy
         data = await self.client.async_send_command(payload, require_schema=22)
