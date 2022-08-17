@@ -1817,6 +1817,24 @@ async def test_is_firmware_update_in_progress(
     }
 
 
+async def test_interview(multisensor_6: node_pkg.Node, uuid4, mock_command):
+    """Test node.interview command."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.interview", "nodeId": node.node_id},
+        {},
+    )
+
+    await node.async_interview()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.interview",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }
+
+
 async def test_unknown_event(multisensor_6: node_pkg.Node):
     """Test that an unknown event type causes an exception."""
     with pytest.raises(KeyError):
