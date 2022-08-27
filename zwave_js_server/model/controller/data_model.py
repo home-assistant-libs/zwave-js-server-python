@@ -17,12 +17,12 @@ class ControllerDataType(TypedDict, total=False):
     type: int
     homeId: int
     ownNodeId: int
-    isSecondary: bool  # TODO: The following items are missing in the docs.
-    isUsingHomeIdFromOtherNetwork: bool
+    isPrimary: bool
+    isSUC: bool
+    nodeType: int
+    isUsingHomeIdFromOtherNetwork: bool  # TODO: The following items are missing in the docs.
     isSISPresent: bool
     wasRealPrimary: bool
-    isStaticUpdateController: bool
-    isSlave: bool
     firmwareVersion: str
     manufacturerId: int
     productType: int

@@ -3,9 +3,9 @@ import sys
 from enum import Enum, IntEnum
 
 # minimal server schema version we can handle
-MIN_SERVER_SCHEMA_VERSION = 21
+MIN_SERVER_SCHEMA_VERSION = 22
 # max server schema version we can handle (and our code is compatible with)
-MAX_SERVER_SCHEMA_VERSION = 21
+MAX_SERVER_SCHEMA_VERSION = 22
 
 TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED = sys.version_info < (3, 9, 2)
 
@@ -202,6 +202,24 @@ class ConfigurationValueType(str, Enum):
     MANUAL_ENTRY = "manual_entry"
     RANGE = "range"
     UNDEFINED = "undefined"
+
+
+class NodeType(IntEnum):
+    """Enum with all Node types."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/capabilities/NodeInfo.ts#L151-L156
+    CONTROLLER = 0
+    END_NODE = 1
+
+
+# Exclusion enums
+class ExclusionStrategy(IntEnum):
+    """Enum with all exclusion strategies."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/controller/Inclusion.ts#L49-L56
+    EXCLUDE_ONLY = 0
+    DISABLE_PROVISIONING_ENTRY = 1
+    UNPROVISION = 2
 
 
 # Inclusion enums

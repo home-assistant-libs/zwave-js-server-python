@@ -706,6 +706,14 @@ class Node(EventBase):
         )
         self.data["keepAwake"] = keep_awake
 
+    async def async_interview(self) -> None:
+        """Interview node."""
+        await self.async_send_command(
+            "interview",
+            wait_for_result=False,
+            require_schema=22,
+        )
+
     def handle_test_powerlevel_progress(self, event: Event) -> None:
         """Process a test power level progress event."""
         event.data["test_power_level_progress"] = TestPowerLevelProgress(

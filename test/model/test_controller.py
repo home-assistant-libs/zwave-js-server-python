@@ -6,8 +6,10 @@ from unittest.mock import patch
 import pytest
 
 from zwave_js_server.const import (
+    ExclusionStrategy,
     InclusionState,
     InclusionStrategy,
+    NodeType,
     ProtocolDataRate,
     Protocols,
     ProvisioningEntryStatus,
@@ -36,12 +38,12 @@ def test_from_state():
     assert ctrl.controller_type == 1
     assert ctrl.home_id == 3601639587
     assert ctrl.own_node_id == 1
-    assert ctrl.is_secondary is False
+    assert ctrl.is_primary
     assert ctrl.is_using_home_id_from_other_network is False
     assert ctrl.is_SIS_present is True
     assert ctrl.was_real_primary is True
-    assert ctrl.is_static_update_controller is True
-    assert ctrl.is_slave is False
+    assert ctrl.is_suc is True
+    assert ctrl.node_type == NodeType.CONTROLLER
     assert ctrl.firmware_version == "1.0"
     assert ctrl.manufacturer_id == 134
     assert ctrl.product_type == 257
@@ -620,12 +622,12 @@ async def test_begin_exclusion_unprovision(controller, uuid4, mock_command):
         {"command": "controller.begin_exclusion"},
         {"success": True},
     )
-    assert await controller.async_begin_exclusion(True)
+    assert await controller.async_begin_exclusion(ExclusionStrategy.EXCLUDE_ONLY)
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.begin_exclusion",
-        "unprovision": True,
+        "strategy": ExclusionStrategy.EXCLUDE_ONLY,
         "messageId": uuid4,
     }
 
@@ -1597,7 +1599,7 @@ async def test_get_available_firmware_updates(multisensor_6, uuid4, mock_command
         },
     )
     updates = await multisensor_6.client.driver.controller.async_get_available_firmware_updates(
-        multisensor_6
+        multisensor_6, "test"
     )
 
     assert len(updates) == 1
@@ -1614,6 +1616,7 @@ async def test_get_available_firmware_updates(multisensor_6, uuid4, mock_command
     assert ack_commands[0] == {
         "command": "controller.get_available_firmware_updates",
         "nodeId": multisensor_6.node_id,
+        "apiKey": "test",
         "messageId": uuid4,
     }
 
