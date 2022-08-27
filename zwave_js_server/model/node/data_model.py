@@ -14,7 +14,7 @@ else:
     from typing import TypedDict
 
 
-class FoundNodeDataType(TypedDict):
+class FoundNodeDataType(TypedDict, total=False):
     """Represent a found node data dict type."""
     nodeId: int
     deviceClass: DeviceClassDataType
