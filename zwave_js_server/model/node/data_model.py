@@ -16,6 +16,7 @@ else:
 
 class FoundNodeDataType(TypedDict, total=False):
     """Represent a found node data dict type."""
+
     nodeId: int
     deviceClass: DeviceClassDataType
 
