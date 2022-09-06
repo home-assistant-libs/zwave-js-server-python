@@ -151,6 +151,7 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "QRProvisioningInformation":
         """Return QRProvisioningInformation from data dict."""
+        # pylint: disable=unexpected-keyword-arg
         cls_instance = cls(
             version=QRCodeVersion(data["version"]),
             security_classes=[
