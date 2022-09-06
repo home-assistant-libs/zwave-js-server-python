@@ -568,6 +568,7 @@ async def test_value_updated_events(multisensor_6):
                 "endpoint": 0,
                 "property": 2,
                 "propertyName": "Stay Awake in Battery Mode",
+                "value": -1,
                 "newValue": 1,
                 "prevValue": 0,
             },
@@ -587,6 +588,7 @@ async def test_value_updated_events(multisensor_6):
     # ensure that the value's state data was updated and that old keys were removed
     val = node.values[value_id]
     assert val.data["value"] == 1
+    assert val.value == 1
     assert "newValue" not in val.data
     assert "prevValue" not in val.data
 

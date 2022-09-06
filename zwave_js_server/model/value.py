@@ -265,7 +265,7 @@ class Value:
         self.data.update(data)
         if "newValue" in data:
             self._value = self.data["value"] = data["newValue"]
-        if "value" in data:
+        elif "value" in data:
             self._value = self.data["value"] = data["value"]
         if "metadata" in data:
             self._metadata.update(data["metadata"])
