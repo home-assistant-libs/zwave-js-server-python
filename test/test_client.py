@@ -22,8 +22,6 @@ from zwave_js_server.exceptions import (
     NotConnected,
 )
 
-# pylint: disable=too-many-arguments
-
 
 async def test_connect_disconnect(client_session, url):
     """Test client connect and disconnect."""
