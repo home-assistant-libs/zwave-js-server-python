@@ -7,8 +7,8 @@ https://zwave-js.github.io/node-zwave-js/#/api/node?id=quotnotificationquot
 from typing import TYPE_CHECKING, Any, Dict, Literal, Optional, Union
 
 from ..const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED
-from ..const.command_class.power_level import PowerLevelTestStatus
 from ..const.command_class.multilevel_switch import MultilevelSwitchCommand
+from ..const.command_class.power_level import PowerLevelTestStatus
 from ..util.helpers import parse_buffer
 
 if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
