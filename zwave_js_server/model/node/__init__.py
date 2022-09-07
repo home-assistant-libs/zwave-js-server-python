@@ -32,12 +32,12 @@ from ..firmware import (
 from ..notification import (
     EntryControlNotification,
     EntryControlNotificationDataType,
+    MultilevelSwitchNotification,
+    MultilevelSwitchNotificationDataType,
     NotificationNotification,
     NotificationNotificationDataType,
     PowerLevelNotification,
     PowerLevelNotificationDataType,
-    MultilevelSwitchNotification,
-    MultilevelSwitchNotificationDataType,
 )
 from ..value import (
     ConfigurationValue,
