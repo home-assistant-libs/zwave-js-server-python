@@ -7,8 +7,6 @@ from zwave_js_server.dump import dump_msgs
 
 from .common import update_ws_client_msg_queue
 
-# pylint: disable=too-many-arguments
-
 
 @pytest.fixture(name="event")
 def event_fixture():
