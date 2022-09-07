@@ -66,9 +66,8 @@ if TYPE_CHECKING:
 _LOGGER = logging.getLogger(__package__)
 
 
-def get_value_id_dict_from_value(val: Union[Value, ValueDataType]) -> Dict[str, Any]:
-    """Return a value ID dict from Value."""
-    value_data = val.data if isinstance(val, Value) else val
+def get_value_id_dict_from_value(value_data: ValueDataType) -> Dict[str, Any]:
+    """Return a value ID dict from ValueDataType."""
     data = {
         "commandClass": value_data["commandClass"],
         "property": value_data["property"],
@@ -452,7 +451,7 @@ class Node(EventBase):
             raise UnwriteableValue
 
         cmd_args = {
-            "valueId": get_value_id_dict_from_value(val),
+            "valueId": get_value_id_dict_from_value(val.data),
             "value": new_value,
         }
         if options:
@@ -521,7 +520,7 @@ class Node(EventBase):
         # the value object needs to be send to the server
         data = await self.async_send_command(
             "get_value_metadata",
-            valueId=get_value_id_dict_from_value(val),
+            valueId=get_value_id_dict_from_value(val.data),
             wait_for_result=True,
         )
         return ValueMetadata(cast(MetaDataType, data))
@@ -564,7 +563,7 @@ class Node(EventBase):
         if not isinstance(val, Value):
             val = self.values[val]
         await self.async_send_command(
-            "poll_value", valueId=get_value_id_dict_from_value(val), require_schema=1
+            "poll_value", valueId=get_value_id_dict_from_value(val.data), require_schema=1
         )
 
     async def async_ping(self) -> bool:
