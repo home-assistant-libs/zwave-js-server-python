@@ -64,7 +64,12 @@ async def test_configuration_parameter_values(
     assert ack_commands_2[0] == {
         "command": "node.set_value",
         "nodeId": node_2.node_id,
-        "valueId": value.data,
+        "valueId": {
+            "commandClass": 112,
+            "endpoint": 0,
+            "property": 8,
+            "propertyKey": 255,
+        },
         "value": 190,
         "messageId": uuid4,
     }
@@ -78,7 +83,12 @@ async def test_configuration_parameter_values(
     assert ack_commands_2[1] == {
         "command": "node.set_value",
         "nodeId": node_2.node_id,
-        "valueId": value.data,
+        "valueId": {
+            "commandClass": 112,
+            "endpoint": 0,
+            "property": 8,
+            "propertyKey": 255,
+        },
         "value": 170,
         "messageId": uuid4,
     }
@@ -115,7 +125,11 @@ async def test_configuration_parameter_values(
     assert ack_commands[2] == {
         "command": "node.set_value",
         "nodeId": node.node_id,
-        "valueId": value.data,
+        "valueId": {
+            "commandClass": 112,
+            "endpoint": 0,
+            "property": 1,
+        },
         "value": 4,
         "messageId": uuid4,
     }

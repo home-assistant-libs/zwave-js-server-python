@@ -12,7 +12,7 @@ from ..exceptions import (
     ValueTypeError,
 )
 from ..model.node import Node
-from ..model.value import ConfigurationValue, get_value_id
+from ..model.value import ConfigurationValue, get_value_id_str
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -53,7 +53,7 @@ async def async_set_config_parameter(
                 f"{property_or_property_name} could not be found"
             ) from None
     else:
-        value_id = get_value_id(
+        value_id = get_value_id_str(
             node,
             CommandClass.CONFIGURATION,
             property_or_property_name,
@@ -100,7 +100,7 @@ async def async_bulk_set_partial_config_parameters(
     if not partial_param_values:
         # If we find a value with this property_, we know this value isn't split
         # into partial params
-        if get_value_id(node, CommandClass.CONFIGURATION, property_) in config_values:
+        if get_value_id_str(node, CommandClass.CONFIGURATION, property_) in config_values:
             # If the new value is provided as a dict, we don't have enough information
             # to set the parameter.
             if isinstance(new_value, dict):
@@ -258,7 +258,7 @@ def _get_int_from_partials_dict(
         # If the dict key is a property key, we can generate the value ID to find the
         # partial value
         if isinstance(property_key_or_name, int):
-            value_id = get_value_id(
+            value_id = get_value_id_str(
                 node,
                 CommandClass.CONFIGURATION,
                 property_,

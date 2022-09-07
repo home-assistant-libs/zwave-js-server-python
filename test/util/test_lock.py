@@ -65,22 +65,10 @@ async def test_set_usercode(lock_schlage_be469, mock_command, uuid4):
         "nodeId": 20,
         "messageId": uuid4,
         "valueId": {
-            "commandClassName": "User Code",
             "commandClass": 99,
             "endpoint": 0,
             "property": "userCode",
-            "propertyName": "userCode",
             "propertyKey": 1,
-            "propertyKeyName": "1",
-            "metadata": {
-                "type": "string",
-                "readable": True,
-                "writeable": True,
-                "minLength": 4,
-                "maxLength": 10,
-                "label": "User Code (1)",
-            },
-            "value": "**********",
         },
         "value": "1234",
     }
@@ -116,25 +104,10 @@ async def test_clear_usercode(lock_schlage_be469, mock_command, uuid4):
         "nodeId": 20,
         "messageId": uuid4,
         "valueId": {
-            "commandClassName": "User Code",
             "commandClass": 99,
             "endpoint": 0,
             "property": "userIdStatus",
-            "propertyName": "userIdStatus",
             "propertyKey": 1,
-            "propertyKeyName": "1",
-            "metadata": {
-                "type": "number",
-                "readable": True,
-                "writeable": True,
-                "label": "User ID status (1)",
-                "states": {
-                    "0": "Available",
-                    "1": "Enabled",
-                    "2": "Disabled",
-                },
-            },
-            "value": 1,
         },
         "value": 0,
     }

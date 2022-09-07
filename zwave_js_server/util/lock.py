@@ -13,13 +13,13 @@ from ..const.command_class.lock import (
 )
 from ..exceptions import NotFoundError
 from ..model.node import Node
-from ..model.value import Value, get_value_id
+from ..model.value import Value, get_value_id_str
 
 
 def get_code_slot_value(node: Node, code_slot: int, property_name: str) -> Value:
     """Get a code slot value."""
     value = node.values.get(
-        get_value_id(
+        get_value_id_str(
             node,
             CommandClass.USER_CODE,
             property_name,
