@@ -8,7 +8,12 @@ from zwave_js_server.const.command_class.multilevel_sensor import (
 )
 from zwave_js_server.exceptions import InvalidCommandClass, UnknownValueData
 from zwave_js_server.model.node import Node
-from zwave_js_server.model.value import MetaDataType, Value, ValueDataType, get_value_id_str
+from zwave_js_server.model.value import (
+    MetaDataType,
+    Value,
+    ValueDataType,
+    get_value_id_str,
+)
 from zwave_js_server.util.command_class.multilevel_sensor import (
     CC_SPECIFIC_SCALE,
     CC_SPECIFIC_SENSOR_TYPE,

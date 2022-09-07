@@ -100,7 +100,10 @@ async def async_bulk_set_partial_config_parameters(
     if not partial_param_values:
         # If we find a value with this property_, we know this value isn't split
         # into partial params
-        if get_value_id_str(node, CommandClass.CONFIGURATION, property_) in config_values:
+        if (
+            get_value_id_str(node, CommandClass.CONFIGURATION, property_)
+            in config_values
+        ):
             # If the new value is provided as a dict, we don't have enough information
             # to set the parameter.
             if isinstance(new_value, dict):

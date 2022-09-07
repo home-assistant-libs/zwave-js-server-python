@@ -10,7 +10,12 @@ from zwave_js_server.const.command_class.meter import (
 )
 from zwave_js_server.exceptions import InvalidCommandClass, UnknownValueData
 from zwave_js_server.model.node import Node
-from zwave_js_server.model.value import MetaDataType, Value, ValueDataType, get_value_id_str
+from zwave_js_server.model.value import (
+    MetaDataType,
+    Value,
+    ValueDataType,
+    get_value_id_str,
+)
 from zwave_js_server.util.command_class.meter import (
     get_meter_scale_type,
     get_meter_type,

@@ -231,11 +231,7 @@ async def test_set_value(multisensor_6, uuid4, mock_command):
     assert ack_commands[0] == {
         "command": "node.set_value",
         "nodeId": node.node_id,
-        "valueId": {
-            "commandClass": 32,
-            "endpoint": 0,
-            "property": "targetValue"
-        },
+        "valueId": {"commandClass": 32, "endpoint": 0, "property": "targetValue"},
         "value": 42,
         "messageId": uuid4,
     }
@@ -247,11 +243,7 @@ async def test_set_value(multisensor_6, uuid4, mock_command):
     assert ack_commands[1] == {
         "command": "node.set_value",
         "nodeId": node.node_id,
-        "valueId": {
-            "commandClass": 32,
-            "endpoint": 0,
-            "property": "targetValue"
-        },
+        "valueId": {"commandClass": 32, "endpoint": 0, "property": "targetValue"},
         "value": 42,
         "options": {"transitionDuration": 1},
         "messageId": uuid4,
@@ -280,11 +272,7 @@ async def test_poll_value(multisensor_6, uuid4, mock_command):
     assert ack_commands[0] == {
         "command": "node.poll_value",
         "nodeId": node.node_id,
-        "valueId": {
-            "commandClass": 32,
-            "endpoint": 0,
-            "property": "currentValue"
-        },
+        "valueId": {"commandClass": 32, "endpoint": 0, "property": "currentValue"},
         "messageId": uuid4,
     }
 
@@ -438,11 +426,7 @@ async def test_get_value_metadata(multisensor_6, uuid4, mock_command):
     assert ack_commands[0] == {
         "command": "node.get_value_metadata",
         "nodeId": node.node_id,
-        "valueId": {
-            "commandClass": 32,
-            "endpoint": 0,
-            "property": "targetValue"
-        },
+        "valueId": {"commandClass": 32, "endpoint": 0, "property": "targetValue"},
         "messageId": uuid4,
     }
 
