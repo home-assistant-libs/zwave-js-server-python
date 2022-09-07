@@ -66,7 +66,7 @@ if TYPE_CHECKING:
 _LOGGER = logging.getLogger(__package__)
 
 
-def get_value_id_dict_from_value(val: Union[Value, Dict[str, Any]]) -> Dict[str, Any]:
+def get_value_id_dict_from_value(val: Union[Value, ValueDataType]) -> Dict[str, Any]:
     """Return a value ID dict from Value."""
     value_data = val.data if isinstance(val, Value) else val
     data = {
