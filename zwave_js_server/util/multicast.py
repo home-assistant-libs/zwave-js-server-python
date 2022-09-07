@@ -4,7 +4,7 @@ from typing import Any, List, Optional, cast
 from ..client import Client
 from ..const import TARGET_VALUE_PROPERTY, CommandClass
 from ..exceptions import NotFoundError
-from ..model.node import Node, get_value_id_dict_from_value_data
+from ..model.node import Node, _get_value_id_dict_from_value_data
 from ..model.value import ValueDataType, _get_value_id_str_from_dict
 
 
@@ -60,7 +60,7 @@ async def async_multicast_set_value(
         client,
         "set_value",
         nodes,
-        valueId=get_value_id_dict_from_value_data(value_data),
+        valueId=_get_value_id_dict_from_value_data(value_data),
         value=new_value,
         options=options,
         require_schema=5,
