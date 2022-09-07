@@ -37,7 +37,7 @@ from zwave_js_server.model.node.health_check import (
     RouteHealthCheckResultDataType,
 )
 from zwave_js_server.model.node.statistics import NodeStatistics
-from zwave_js_server.model.value import ConfigurationValue, get_value_id
+from zwave_js_server.model.value import ConfigurationValue, get_value_id_str
 
 from .. import load_fixture
 
@@ -225,14 +225,13 @@ async def test_set_value(multisensor_6, uuid4, mock_command):
         {"success": True},
     )
     value_id = "52-32-0-targetValue"
-    value = node.values[value_id]
     assert await node.async_set_value(value_id, 42) is None
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "node.set_value",
         "nodeId": node.node_id,
-        "valueId": value.data,
+        "valueId": {"commandClass": 32, "endpoint": 0, "property": "targetValue"},
         "value": 42,
         "messageId": uuid4,
     }
@@ -244,7 +243,7 @@ async def test_set_value(multisensor_6, uuid4, mock_command):
     assert ack_commands[1] == {
         "command": "node.set_value",
         "nodeId": node.node_id,
-        "valueId": value.data,
+        "valueId": {"commandClass": 32, "endpoint": 0, "property": "targetValue"},
         "value": 42,
         "options": {"transitionDuration": 1},
         "messageId": uuid4,
@@ -267,14 +266,13 @@ async def test_poll_value(multisensor_6, uuid4, mock_command):
         {"result": "something"},
     )
     value_id = "52-32-0-currentValue"
-    value = node.values[value_id]
     assert await node.async_poll_value(value_id) is None
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "node.poll_value",
         "nodeId": node.node_id,
-        "valueId": value.data,
+        "valueId": {"commandClass": 32, "endpoint": 0, "property": "currentValue"},
         "messageId": uuid4,
     }
 
@@ -428,7 +426,7 @@ async def test_get_value_metadata(multisensor_6, uuid4, mock_command):
     assert ack_commands[0] == {
         "command": "node.get_value_metadata",
         "nodeId": node.node_id,
-        "valueId": value.data,
+        "valueId": {"commandClass": 32, "endpoint": 0, "property": "targetValue"},
         "messageId": uuid4,
     }
 
@@ -1555,7 +1553,7 @@ async def test_get_state(
 ):
     """Test node.get_state command."""
     node = multisensor_6
-    value_id = get_value_id(node, 32, "currentValue", 0)
+    value_id = get_value_id_str(node, 32, "currentValue", 0)
 
     # Verify original values
     assert node.endpoints[0].installer_icon == 3079

@@ -8,7 +8,12 @@ from zwave_js_server.const.command_class.multilevel_sensor import (
 )
 from zwave_js_server.exceptions import InvalidCommandClass, UnknownValueData
 from zwave_js_server.model.node import Node
-from zwave_js_server.model.value import MetaDataType, Value, ValueDataType, get_value_id
+from zwave_js_server.model.value import (
+    MetaDataType,
+    Value,
+    ValueDataType,
+    get_value_id_str,
+)
 from zwave_js_server.util.command_class.multilevel_sensor import (
     CC_SPECIFIC_SCALE,
     CC_SPECIFIC_SENSOR_TYPE,
@@ -21,11 +26,11 @@ async def test_get_multilevel_sensor_type(multisensor_6: Node):
     """Test get_multilevel_sensor_type function."""
     node = multisensor_6
 
-    value_id = get_value_id(node, CommandClass.SENSOR_BINARY, "Any")
+    value_id = get_value_id_str(node, CommandClass.SENSOR_BINARY, "Any")
     with pytest.raises(InvalidCommandClass):
         get_multilevel_sensor_type(node.values.get(value_id))
 
-    value_id = get_value_id(node, CommandClass.SENSOR_MULTILEVEL, "Air temperature")
+    value_id = get_value_id_str(node, CommandClass.SENSOR_MULTILEVEL, "Air temperature")
     assert (
         get_multilevel_sensor_type(node.values.get(value_id))
         == MultilevelSensorType.AIR_TEMPERATURE
@@ -36,7 +41,7 @@ async def test_get_invalid_multilevel_sensor_type(invalid_multilevel_sensor_type
     """Test receiving an invalid multilevel sensor type."""
     node = invalid_multilevel_sensor_type
 
-    value_id = get_value_id(
+    value_id = get_value_id_str(
         node, CommandClass.SENSOR_MULTILEVEL, "UNKNOWN (0x00)", endpoint=2
     )
     with pytest.raises(UnknownValueData):
@@ -47,7 +52,7 @@ async def test_get_multilevel_sensor_scale_type(multisensor_6: Node):
     """Test get_multilevel_sensor_scale_type function."""
     node = multisensor_6
 
-    value_id = get_value_id(node, CommandClass.SENSOR_MULTILEVEL, "Air temperature")
+    value_id = get_value_id_str(node, CommandClass.SENSOR_MULTILEVEL, "Air temperature")
     assert (
         get_multilevel_sensor_scale_type(node.values.get(value_id))
         == TemperatureScale.CELSIUS

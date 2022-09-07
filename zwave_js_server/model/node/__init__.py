@@ -46,7 +46,7 @@ from ..value import (
     ValueDataType,
     ValueMetadata,
     ValueNotification,
-    _get_value_id_from_dict,
+    _get_value_id_str_from_dict,
     _init_value,
 )
 from .data_model import NodeDataType
@@ -64,6 +64,21 @@ if TYPE_CHECKING:
 
 
 _LOGGER = logging.getLogger(__package__)
+
+
+def _get_value_id_dict_from_value_data(value_data: ValueDataType) -> Dict[str, Any]:
+    """Return a value ID dict from ValueDataType."""
+    data = {
+        "commandClass": value_data["commandClass"],
+        "property": value_data["property"],
+    }
+
+    if (endpoint := value_data.get("endpoint")) is not None:
+        data["endpoint"] = endpoint
+    if (property_key := value_data.get("propertyKey")) is not None:
+        data["propertyKey"] = property_key
+
+    return data
 
 
 class Node(EventBase):
@@ -322,7 +337,7 @@ class Node(EventBase):
         self._statistics = NodeStatistics(self.client, self.data.get("statistics"))
 
         # Remove stale values
-        value_ids = (_get_value_id_from_dict(self, val) for val in data["values"])
+        value_ids = (_get_value_id_str_from_dict(self, val) for val in data["values"])
         self.values = {
             value_id: val
             for value_id, val in self.values.items()
@@ -332,7 +347,7 @@ class Node(EventBase):
         # Populate new values
         for val in data["values"]:
             try:
-                if (value_id := _get_value_id_from_dict(self, val)) in self.values:
+                if (value_id := _get_value_id_str_from_dict(self, val)) in self.values:
                     self.values[value_id].update(val)
                 else:
                     self.values[value_id] = _init_value(self, val)
@@ -436,7 +451,7 @@ class Node(EventBase):
             raise UnwriteableValue
 
         cmd_args = {
-            "valueId": val.data,
+            "valueId": _get_value_id_dict_from_value_data(val.data),
             "value": new_value,
         }
         if options:
@@ -504,7 +519,9 @@ class Node(EventBase):
             val = self.values[val]
         # the value object needs to be send to the server
         data = await self.async_send_command(
-            "get_value_metadata", valueId=val.data, wait_for_result=True
+            "get_value_metadata",
+            valueId=_get_value_id_dict_from_value_data(val.data),
+            wait_for_result=True,
         )
         return ValueMetadata(cast(MetaDataType, data))
 
@@ -545,7 +562,11 @@ class Node(EventBase):
         # a value may be specified as value_id or the value itself
         if not isinstance(val, Value):
             val = self.values[val]
-        await self.async_send_command("poll_value", valueId=val.data, require_schema=1)
+        await self.async_send_command(
+            "poll_value",
+            valueId=_get_value_id_dict_from_value_data(val.data),
+            require_schema=1,
+        )
 
     async def async_ping(self) -> bool:
         """Send ping command to Node."""
@@ -787,13 +808,13 @@ class Node(EventBase):
         return next(
             idx
             for idx in range(len(values))
-            if _get_value_id_from_dict(self, values[idx]) == value_id
+            if _get_value_id_str_from_dict(self, values[idx]) == value_id
         )
 
     def handle_value_updated(self, event: Event) -> None:
         """Process a node value updated event."""
         evt_val_data: ValueDataType = event.data["args"]
-        value_id = _get_value_id_from_dict(self, evt_val_data)
+        value_id = _get_value_id_str_from_dict(self, evt_val_data)
         value = self.values.get(value_id)
         if value is None:
             value = _init_value(self, evt_val_data)
@@ -813,7 +834,7 @@ class Node(EventBase):
 
     def handle_value_removed(self, event: Event) -> None:
         """Process a node value removed event."""
-        value_id = _get_value_id_from_dict(self, event.data["args"])
+        value_id = _get_value_id_str_from_dict(self, event.data["args"])
         event.data["value"] = self.values.pop(value_id)
         self.data["values"].pop(self.value_data_idx(value_id))
 
@@ -822,7 +843,7 @@ class Node(EventBase):
         # if value is found, use value data as base and update what is provided
         # in the event, otherwise use the event data
         event_data = event.data["args"]
-        if value := self.values.get(_get_value_id_from_dict(self, event_data)):
+        if value := self.values.get(_get_value_id_str_from_dict(self, event_data)):
             value_notification = ValueNotification(
                 self, cast(ValueDataType, dict(value.data))
             )

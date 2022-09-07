@@ -4,8 +4,8 @@ from typing import Any, List, Optional, cast
 from ..client import Client
 from ..const import TARGET_VALUE_PROPERTY, CommandClass
 from ..exceptions import NotFoundError
-from ..model.node import Node
-from ..model.value import ValueDataType, _get_value_id_from_dict
+from ..model.node import Node, _get_value_id_dict_from_value_data
+from ..model.value import ValueDataType, _get_value_id_str_from_dict
 
 
 async def _async_send_command(
@@ -45,7 +45,7 @@ async def async_multicast_set_value(
             and value_data["property"] == TARGET_VALUE_PROPERTY
         ):
             break
-        value_id = _get_value_id_from_dict(node, value_data)
+        value_id = _get_value_id_str_from_dict(node, value_data)
         # Check that the value exists on the node
         if value_id not in node.values:
             raise NotFoundError(f"Node {node} doesn't have value {value_id}")
@@ -60,7 +60,7 @@ async def async_multicast_set_value(
         client,
         "set_value",
         nodes,
-        valueId=value_data,
+        valueId=_get_value_id_dict_from_value_data(value_data),
         value=new_value,
         options=options,
         require_schema=5,

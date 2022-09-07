@@ -10,7 +10,12 @@ from zwave_js_server.const.command_class.meter import (
 )
 from zwave_js_server.exceptions import InvalidCommandClass, UnknownValueData
 from zwave_js_server.model.node import Node
-from zwave_js_server.model.value import MetaDataType, Value, ValueDataType, get_value_id
+from zwave_js_server.model.value import (
+    MetaDataType,
+    Value,
+    ValueDataType,
+    get_value_id_str,
+)
 from zwave_js_server.util.command_class.meter import (
     get_meter_scale_type,
     get_meter_type,
@@ -21,11 +26,11 @@ async def test_get_meter_type(inovelli_switch: Node):
     """Test get_meter_type function."""
     node = inovelli_switch
 
-    value_id = get_value_id(node, CommandClass.SWITCH_BINARY, "currentValue")
+    value_id = get_value_id_str(node, CommandClass.SWITCH_BINARY, "currentValue")
     with pytest.raises(InvalidCommandClass):
         get_meter_type(node.values.get(value_id))
 
-    value_id = get_value_id(node, CommandClass.METER, "value", property_key=65537)
+    value_id = get_value_id_str(node, CommandClass.METER, "value", property_key=65537)
     assert get_meter_type(node.values.get(value_id)) == MeterType.ELECTRIC
 
 
@@ -52,7 +57,7 @@ async def test_get_meter_scale_type(inovelli_switch: Node):
     """Test get_meter_scale_type function."""
     node = inovelli_switch
 
-    value_id = get_value_id(node, CommandClass.METER, "value", property_key=65537)
+    value_id = get_value_id_str(node, CommandClass.METER, "value", property_key=65537)
     assert (
         get_meter_scale_type(node.values.get(value_id)) == ElectricScale.KILOWATT_HOUR
     )

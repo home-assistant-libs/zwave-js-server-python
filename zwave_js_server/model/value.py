@@ -63,9 +63,9 @@ def _init_value(
     return Value(node, val)
 
 
-def _get_value_id_from_dict(node: "Node", val: ValueDataType) -> str:
-    """Return ID of value from ValueDataType dict."""
-    return get_value_id(
+def _get_value_id_str_from_dict(node: "Node", val: ValueDataType) -> str:
+    """Return string ID of value from ValueDataType dict."""
+    return get_value_id_str(
         node,
         val["commandClass"],
         val["property"],
@@ -74,14 +74,14 @@ def _get_value_id_from_dict(node: "Node", val: ValueDataType) -> str:
     )
 
 
-def get_value_id(
+def get_value_id_str(
     node: "Node",
     command_class: int,
     property_: Union[str, int],
     endpoint: Optional[int] = None,
     property_key: Optional[Union[str, int]] = None,
 ) -> str:
-    """Return ID of value."""
+    """Return string ID of value."""
     # If endpoint is not provided, assume root endpoint
     endpoint_ = endpoint or 0
     value_id = f"{node.node_id}-{command_class}-{endpoint_}-{property_}"
@@ -196,7 +196,7 @@ class Value:
     @property
     def value_id(self) -> str:
         """Return value ID."""
-        return _get_value_id_from_dict(self.node, self.data)
+        return _get_value_id_str_from_dict(self.node, self.data)
 
     @property
     def metadata(self) -> ValueMetadata:
