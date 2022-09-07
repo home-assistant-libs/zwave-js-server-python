@@ -1321,7 +1321,7 @@ async def test_statistics_updated_rssi_error(
     event_stats: NodeStatistics = event.data["statistics_updated"]
     assert isinstance(event_stats, NodeStatistics)
     with pytest.raises(RssiErrorReceived):
-        event_stats.rssi
+        assert event_stats.rssi
 
 
 async def test_has_security_class(multisensor_6: node_pkg.Node, uuid4, mock_command):

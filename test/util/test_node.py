@@ -244,7 +244,7 @@ async def test_bulk_set_partial_config_parameters(multisensor_6, uuid4, mock_com
     with patch("zwave_js_server.util.node.async_set_config_parameter") as mock_cmd:
         mock_cmd.return_value = (None, None)
         await async_bulk_set_partial_config_parameters(node, 252, 1)
-        mock_cmd.assert_called_once
+        mock_cmd.assert_called_once()
 
 
 async def test_bulk_set_with_full_and_partial_parameters(
