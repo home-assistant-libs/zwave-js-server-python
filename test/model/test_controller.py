@@ -1553,7 +1553,7 @@ async def test_get_known_lifeline_routes(
     assert lifeline_routes.nlwr.repeaters == []
     assert lifeline_routes.nlwr.rssi == 1
     with pytest.raises(RepeaterRssiErrorReceived):
-        lifeline_routes.nlwr.repeater_rssi
+        assert lifeline_routes.nlwr.repeater_rssi
     assert not lifeline_routes.nlwr.route_failed_between
 
     assert len(ack_commands) == 1
@@ -1676,7 +1676,7 @@ async def test_get_known_lifeline_routes_rssi_error(
     assert multisensor_6 in routes
     lifeline_routes = routes[multisensor_6]
     with pytest.raises(RssiErrorReceived):
-        lifeline_routes.nlwr.rssi
+        assert lifeline_routes.nlwr.rssi
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
