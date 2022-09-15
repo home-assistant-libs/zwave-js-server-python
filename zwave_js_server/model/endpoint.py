@@ -240,4 +240,4 @@ class Endpoint(EventBase):
             wait_for_result=True,
         )
         assert result
-        return result["node"]
+        return cast("NodeDataType", result["node"])
