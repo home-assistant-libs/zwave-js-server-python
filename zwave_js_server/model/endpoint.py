@@ -20,6 +20,7 @@ else:
 
 if TYPE_CHECKING:
     from ..client import Client
+    from .node.data_model import NodeDataType
 
 
 class EndpointDataType(TypedDict, total=False):
@@ -186,3 +187,57 @@ class Endpoint(EventBase):
         )
         assert result
         return cast(bool, result["supported"])
+
+    async def async_supports_cc(self, command_class: CommandClass) -> bool:
+        """Call endpoint.supports_cc command."""
+        result = await self.async_send_command(
+            "supports_cc",
+            commandClass=command_class.value,
+            require_schema=23,
+            wait_for_result=True,
+        )
+        assert result
+        return cast(bool, result["supported"])
+
+    async def async_controls_cc(self, command_class: CommandClass) -> bool:
+        """Call endpoint.controls_cc command."""
+        result = await self.async_send_command(
+            "controls_cc",
+            commandClass=command_class.value,
+            require_schema=23,
+            wait_for_result=True,
+        )
+        assert result
+        return cast(bool, result["controlled"])
+
+    async def async_is_cc_secure(self, command_class: CommandClass) -> bool:
+        """Call endpoint.is_cc_secure command."""
+        result = await self.async_send_command(
+            "is_cc_secure",
+            commandClass=command_class.value,
+            require_schema=23,
+            wait_for_result=True,
+        )
+        assert result
+        return cast(bool, result["secure"])
+
+    async def async_get_cc_version(self, command_class: CommandClass) -> bool:
+        """Call endpoint.get_cc_version command."""
+        result = await self.async_send_command(
+            "get_cc_version",
+            commandClass=command_class.value,
+            require_schema=23,
+            wait_for_result=True,
+        )
+        assert result
+        return cast(bool, result["version"])
+
+    async def async_get_node_unsafe(self) -> "NodeDataType":
+        """Call endpoint.get_node_unsafe command."""
+        result = await self.async_send_command(
+            "get_node_unsafe",
+            require_schema=23,
+            wait_for_result=True,
+        )
+        assert result
+        return result["node"]
