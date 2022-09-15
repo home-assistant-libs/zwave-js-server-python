@@ -660,13 +660,14 @@ class Node(EventBase):
         assert data
         return RouteHealthCheckSummary(data["summary"])
 
-    async def async_get_state(self) -> None:
+    async def async_get_state(self, update_internal_state: bool = True) -> None:
         """Get node state."""
         data = await self.async_send_command(
             "get_state", require_schema=14, wait_for_result=True
         )
         assert data
-        self.update(data["state"])
+        if update_internal_state:
+            self.update(data["state"])
 
     async def async_set_name(
         self, name: str, update_cc: bool = True, wait_for_result: Optional[bool] = None
