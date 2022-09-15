@@ -620,12 +620,12 @@ class Controller(EventBase):
         )
         return cast(Optional[bool], data.get("supported"))
 
-    async def async_get_state(self) -> None:
+    async def async_get_state(self) -> ControllerDataType:
         """Get controller state."""
         data = await self.client.async_send_command(
             {"command": "controller.get_state"}, require_schema=14
         )
-        self.update(data["state"])
+        return cast(ControllerDataType, data["state"])
 
     async def async_backup_nvm_raw(self) -> bytes:
         """Send backupNVMRaw command to Controller."""

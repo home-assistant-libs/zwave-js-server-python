@@ -1398,8 +1398,9 @@ async def test_get_state(controller, controller_state, uuid4, mock_command):
         {"state": new_state},
     )
     assert controller.inclusion_state == InclusionState.IDLE
-    assert await controller.async_get_state() is None
-    assert controller.inclusion_state == InclusionState.INCLUDING
+    assert await controller.async_get_state() == new_state
+    # Verify state hasn't changed
+    assert controller.inclusion_state == InclusionState.IDLE
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {

@@ -1586,8 +1586,9 @@ async def test_get_state(
 
     # Verify new values
     assert await node.async_get_state() == new_state
-    assert node.endpoints[0].installer_icon == 1
-    assert node.values[value_id].value == 0
+    # Verify original values are still the same
+    assert node.endpoints[0].installer_icon != 1
+    assert node.values[value_id].value != 0
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
