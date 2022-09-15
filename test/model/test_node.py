@@ -1585,7 +1585,7 @@ async def test_get_state(
     )
 
     # Verify new values
-    assert await node.async_get_state() is None
+    assert await node.async_get_state() == new_state
     assert node.endpoints[0].installer_icon == 1
     assert node.values[value_id].value == 0
 
