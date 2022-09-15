@@ -1599,7 +1599,7 @@ async def test_get_available_firmware_updates(multisensor_6, uuid4, mock_command
         },
     )
     updates = await multisensor_6.client.driver.controller.async_get_available_firmware_updates(
-        multisensor_6, "test"
+        multisensor_6, "test", {"test": "test"}
     )
 
     assert len(updates) == 1
@@ -1617,6 +1617,7 @@ async def test_get_available_firmware_updates(multisensor_6, uuid4, mock_command
         "command": "controller.get_available_firmware_updates",
         "nodeId": multisensor_6.node_id,
         "apiKey": "test",
+        "additionalUserAgentComponents": {"test": "test"},
         "messageId": uuid4,
     }
 

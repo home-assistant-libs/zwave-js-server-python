@@ -713,17 +713,20 @@ class Controller(EventBase):
         return cast(bool, data["progress"])
 
     async def async_get_available_firmware_updates(
-        self, node: Node, api_key: str
+        self,
+        node: Node,
+        api_key: str,
+        additional_user_agent_components: Optional[Dict[str, str]] = None,
     ) -> List[FirmwareUpdateInfo]:
         """Send getAvailableFirmwareUpdates command to Controller."""
-        data = await self.client.async_send_command(
-            {
-                "command": "controller.get_available_firmware_updates",
-                "nodeId": node.node_id,
-                "apiKey": api_key,
-            },
-            require_schema=22,
-        )
+        payload = {
+            "command": "controller.get_available_firmware_updates",
+            "nodeId": node.node_id,
+            "apiKey": api_key,
+        }
+        if additional_user_agent_components:
+            payload["additionalUserAgentComponents"] = additional_user_agent_components
+        data = await self.client.async_send_command(payload, require_schema=23)
         assert data
         return [FirmwareUpdateInfo.from_dict(update) for update in data["updates"]]
 
