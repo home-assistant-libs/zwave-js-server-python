@@ -95,7 +95,7 @@ class Client:
                 self.version.server_version,
                 require_schema,
                 "Command not available due to incompatible server version. Update the Z-Wave "
-                f"JS Server to a version that supports at least api schema {require_schema}."
+                f"JS Server to a version that supports at least api schema {require_schema}.",
             )
         future: "asyncio.Future[dict]" = self._loop.create_future()
         message_id = message["messageId"] = uuid.uuid4().hex
@@ -115,7 +115,7 @@ class Client:
                 self.version.server_version,
                 require_schema,
                 "Command not available due to incompatible server version. Update the Z-Wave "
-                f"JS Server to a version that supports at least api schema {require_schema}."
+                f"JS Server to a version that supports at least api schema {require_schema}.",
             )
         message["messageId"] = uuid.uuid4().hex
         await self._send_json_message(message)
