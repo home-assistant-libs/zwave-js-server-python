@@ -93,6 +93,7 @@ class Client:
         if require_schema is not None and require_schema > self.schema_version:
             raise InvalidServerVersion(
                 self.version.server_version,
+                self.version.max_schema_version,
                 require_schema,
                 "Command not available due to incompatible server version. Update the Z-Wave "
                 f"JS Server to a version that supports at least api schema {require_schema}.",
@@ -113,6 +114,7 @@ class Client:
         if require_schema is not None and require_schema > self.schema_version:
             raise InvalidServerVersion(
                 self.version.server_version,
+                self.version.max_schema_version,
                 require_schema,
                 "Command not available due to incompatible server version. Update the Z-Wave "
                 f"JS Server to a version that supports at least api schema {require_schema}.",
@@ -151,6 +153,7 @@ class Client:
             await self._client.close()
             raise InvalidServerVersion(
                 self.version.server_version,
+                self.version.max_schema_version,
                 MIN_SERVER_SCHEMA_VERSION,
                 f"Z-Wave JS Server version ({self.version.server_version}) is "
                 "incompatible. Update the Z-Wave JS Server to a version that supports "
