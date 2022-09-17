@@ -91,6 +91,7 @@ class Client:
     ) -> dict:
         """Send a command and get a response."""
         if require_schema is not None and require_schema > self.schema_version:
+            assert self.version
             raise InvalidServerVersion(
                 self.version,
                 require_schema,
@@ -111,6 +112,7 @@ class Client:
     ) -> None:
         """Send a command without waiting for the response."""
         if require_schema is not None and require_schema > self.schema_version:
+            assert self.version
             raise InvalidServerVersion(
                 self.version,
                 require_schema,
@@ -149,6 +151,7 @@ class Client:
             or self.version.max_schema_version < MIN_SERVER_SCHEMA_VERSION
         ):
             await self._client.close()
+            assert self.version
             raise InvalidServerVersion(
                 self.version,
                 MIN_SERVER_SCHEMA_VERSION,
