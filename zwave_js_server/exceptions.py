@@ -65,7 +65,10 @@ class InvalidServerVersion(BaseZwaveJSServerError):
     """Exception raised when connected to server with incompatible version."""
 
     def __init__(
-        self, version_info: Optional["VersionInfo"], required_schema_version: int, message: str
+        self,
+        version_info: Optional["VersionInfo"],
+        required_schema_version: int,
+        message: str,
     ) -> None:
         """Initialize an invalid server version error."""
         assert version_info
