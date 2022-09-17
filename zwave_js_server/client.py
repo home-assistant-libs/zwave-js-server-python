@@ -92,6 +92,8 @@ class Client:
         """Send a command and get a response."""
         if require_schema is not None and require_schema > self.schema_version:
             raise InvalidServerVersion(
+                self.version.server_version,
+                require_schema,
                 "Command not available due to incompatible server version. Update the Z-Wave "
                 f"JS Server to a version that supports at least api schema {require_schema}."
             )
@@ -110,6 +112,8 @@ class Client:
         """Send a command without waiting for the response."""
         if require_schema is not None and require_schema > self.schema_version:
             raise InvalidServerVersion(
+                self.version.server_version,
+                require_schema,
                 "Command not available due to incompatible server version. Update the Z-Wave "
                 f"JS Server to a version that supports at least api schema {require_schema}."
             )
@@ -146,9 +150,11 @@ class Client:
         ):
             await self._client.close()
             raise InvalidServerVersion(
-                f"Z-Wave JS Server version is incompatible: {self.version.server_version} "
-                "a version is required that supports at least "
-                f"api schema {MIN_SERVER_SCHEMA_VERSION}"
+                self.version.server_version,
+                MIN_SERVER_SCHEMA_VERSION,
+                f"Z-Wave JS Server version ({self.version.server_version}) is "
+                "incompatible. Update the Z-Wave JS Server to a version that supports "
+                f"at least api schema {MIN_SERVER_SCHEMA_VERSION}",
             )
         # store the (highest possible) schema version we're going to use/request
         # this is a bit future proof as we might decide to use a pinned version at some point
