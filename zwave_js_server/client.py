@@ -31,13 +31,13 @@ from .model.version import VersionInfo, VersionInfoDataType
 SIZE_PARSE_JSON_EXECUTOR = 8192
 
 # Message IDs
-SET_API_SCHEMA_MESSAGE_ID = "api-schema-id"
+INITIALIZE_MESSAGE_ID = "initialize"
 GET_INITIAL_LOG_CONFIG_MESSAGE_ID = "get-initial-log-config"
-START_LISTENING_MESSAGE_ID = "listen-id"
+START_LISTENING_MESSAGE_ID = "start-listening"
 
 LISTEN_MESSAGE_IDS = (
     GET_INITIAL_LOG_CONFIG_MESSAGE_ID,
-    SET_API_SCHEMA_MESSAGE_ID,
+    INITIALIZE_MESSAGE_ID,
     START_LISTENING_MESSAGE_ID,
 )
 
@@ -50,6 +50,7 @@ class Client:
         ws_server_url: str,
         aiohttp_session: ClientSession,
         schema_version: int = MAX_SERVER_SCHEMA_VERSION,
+        additional_user_agent_components: Optional[Dict[str, str]] = None,
         record_messages: bool = False,
     ):
         """Initialize the Client class."""
@@ -61,6 +62,7 @@ class Client:
         # Version of the connected server
         self.version: Optional[VersionInfo] = None
         self.schema_version: int = schema_version
+        self.additional_user_agent_components = additional_user_agent_components
         self._logger = logging.getLogger(__package__)
         self._loop = asyncio.get_running_loop()
         self._result_futures: Dict[str, asyncio.Future] = {}
@@ -165,18 +167,21 @@ class Client:
             self.schema_version,
         )
 
-    async def set_api_schema(self) -> None:
-        """Set API schema version on server."""
+    async def initialize(self) -> None:
+        """Initialize connection to server by setting schema version and user agent."""
         assert self._client
+
+        payload = {
+            "command": "initialize",
+            "messageId": INITIALIZE_MESSAGE_ID,
+            "schemaVersion": self.schema_version,
+            "additionalUserAgentComponents": self.additional_user_agent_components,
+        }
 
         # set preferred schema version on the server
         # note: we already check for (in)compatible schemas in the connect call
         await self._send_json_message(
-            {
-                "command": "set_api_schema",
-                "messageId": SET_API_SCHEMA_MESSAGE_ID,
-                "schemaVersion": self.schema_version,
-            }
+            {k: v for k, v in payload.items() if v is not None}
         )
         set_api_msg = await self._receive_json_or_raise()
 
@@ -193,7 +198,7 @@ class Client:
         assert self._client
 
         try:
-            await self.set_api_schema()
+            await self.initialize()
 
             await self._send_json_message(
                 {

@@ -216,12 +216,12 @@ async def test_listen_not_success(client_session, url, result, driver_ready):
     assert not client.connected
 
 
-async def test_set_api_schema_not_success(
-    client_session, url, set_api_schema_data, driver_ready
+async def test_initialize_not_success(
+    client_session, url, initialize_data, driver_ready
 ):
     """Test receive result message with success False on listen."""
-    set_api_schema_data["success"] = False
-    set_api_schema_data["errorCode"] = "error_code"
+    initialize_data["success"] = False
+    initialize_data["errorCode"] = "error_code"
     client = Client(url, client_session)
     await client.connect()
 

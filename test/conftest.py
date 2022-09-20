@@ -129,7 +129,7 @@ async def ws_client_fixture(
     ws_message,
     result,
     messages,
-    set_api_schema_data,
+    initialize_data,
     get_log_config_data,
 ):
     """Mock a websocket client.
@@ -139,11 +139,11 @@ async def ws_client_fixture(
     ws_client = AsyncMock(spec_set=ClientWebSocketResponse, closed=False)
     ws_client.receive_json.side_effect = (
         version_data,
-        set_api_schema_data,
+        initialize_data,
         get_log_config_data,
         result,
     )
-    for data in (version_data, set_api_schema_data, get_log_config_data, result):
+    for data in (version_data, initialize_data, get_log_config_data, result):
         messages.append(create_ws_message(data))
 
     async def receive():
@@ -160,7 +160,7 @@ async def ws_client_fixture(
 
     async def close_client(msg):
         """Close the client."""
-        if msg["command"] in ("set_api_schema", "start_listening"):
+        if msg["command"] in ("initialize", "start_listening"):
             return
 
         # We only want to skip for the initial call
@@ -215,14 +215,14 @@ def version_data_fixture():
     }
 
 
-@pytest.fixture(name="set_api_schema_data")
-def set_api_schema_data_fixture():
-    """Return mock set_api_schema data."""
+@pytest.fixture(name="initialize_data")
+def initialize_data_fixture():
+    """Return mock initialize data."""
     return {
         "type": "result",
         "success": True,
         "result": {},
-        "messageId": "api-schema-id",
+        "messageId": "initialize",
     }
 
 

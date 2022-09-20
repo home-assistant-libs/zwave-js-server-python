@@ -7,8 +7,8 @@ from zwave_js_server.firmware import begin_firmware_update
 async def test_begin_firmware_update_guess_format(url, client_session, multisensor_6):
     """Test begin_firmware_update with guessed format."""
     with patch("zwave_js_server.firmware.Client.connect") as connect_mock, patch(
-        "zwave_js_server.firmware.Client.set_api_schema"
-    ) as set_api_schema_mock, patch(
+        "zwave_js_server.firmware.Client.initialize"
+    ) as initialize_mock, patch(
         "zwave_js_server.firmware.Client.async_send_command"
     ) as cmd_mock, patch(
         "zwave_js_server.firmware.Client.disconnect"
@@ -17,7 +17,7 @@ async def test_begin_firmware_update_guess_format(url, client_session, multisens
         await begin_firmware_update(url, node, "test", bytes(10), client_session)
 
         connect_mock.assert_called_once()
-        set_api_schema_mock.assert_called_once()
+        initialize_mock.assert_called_once()
         cmd_mock.assert_called_once_with(
             {
                 "command": "node.begin_firmware_update",
@@ -35,8 +35,8 @@ async def test_begin_firmware_update_known_format_and_target(
 ):
     """Test begin_firmware_update with known format."""
     with patch("zwave_js_server.firmware.Client.connect") as connect_mock, patch(
-        "zwave_js_server.firmware.Client.set_api_schema"
-    ) as set_api_schema_mock, patch(
+        "zwave_js_server.firmware.Client.initialize"
+    ) as initialize_mock, patch(
         "zwave_js_server.firmware.Client.async_send_command"
     ) as cmd_mock, patch(
         "zwave_js_server.firmware.Client.disconnect"
@@ -53,7 +53,7 @@ async def test_begin_firmware_update_known_format_and_target(
         )
 
         connect_mock.assert_called_once()
-        set_api_schema_mock.assert_called_once()
+        initialize_mock.assert_called_once()
         cmd_mock.assert_called_once_with(
             {
                 "command": "node.begin_firmware_update",

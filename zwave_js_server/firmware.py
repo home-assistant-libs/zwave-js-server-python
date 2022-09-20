@@ -1,6 +1,6 @@
 """Firmware update helper."""
 import asyncio
-from typing import Optional
+from typing import Dict, Optional
 
 import aiohttp
 
@@ -15,13 +15,16 @@ async def begin_firmware_update(
     filename: str,
     file: bytes,
     session: aiohttp.ClientSession,
+    additional_user_agent_components: Optional[Dict[str, str]] = None,
     file_format: Optional[str] = None,
     target: Optional[int] = None,
 ) -> None:
     """Send beginFirmwareUpdate command to Node."""
-    client = Client(url, session)
+    client = Client(
+        url, session, additional_user_agent_components=additional_user_agent_components
+    )
     await client.connect()
-    await client.set_api_schema()
+    await client.initialize()
 
     receive_task = asyncio.get_running_loop().create_task(client.receive_until_closed())
 
