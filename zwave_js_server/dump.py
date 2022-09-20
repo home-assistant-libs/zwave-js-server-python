@@ -27,7 +27,9 @@ async def dump_msgs(
         "schemaVersion": MAX_SERVER_SCHEMA_VERSION,
     }
     if additional_user_agent_components:
-        initialize_payload["additionalUserAgentComponents"] = additional_user_agent_components
+        initialize_payload[
+            "additionalUserAgentComponents"
+        ] = additional_user_agent_components
 
     for to_send in (
         initialize_payload,
