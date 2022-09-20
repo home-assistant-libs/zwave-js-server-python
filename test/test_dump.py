@@ -93,9 +93,7 @@ async def test_dump_additional_user_agent_components(
     ws_client,
 ):
     """Test the dump function with additional user agent components."""
-    update_ws_client_msg_queue(
-        ws_client, (version_data, initialize_data, result)
-    )
+    update_ws_client_msg_queue(ws_client, (version_data, initialize_data, result))
     messages = await dump_msgs(
         url, client_session, additional_user_agent_components={"foo": "bar"}
     )
