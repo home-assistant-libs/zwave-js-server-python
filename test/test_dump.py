@@ -82,3 +82,37 @@ async def test_dump_timeout(
     assert messages[1] == initialize_data
     assert messages[2] == result
     assert messages[3] == event
+
+
+async def test_dump_additional_user_agent_components(
+    client_session,
+    result,
+    url,
+    version_data,
+    initialize_data,
+    ws_client,
+):
+    """Test the dump function with additional user agent components."""
+    update_ws_client_msg_queue(
+        ws_client, (version_data, initialize_data, result)
+    )
+    messages = await dump_msgs(
+        url, client_session, additional_user_agent_components={"foo": "bar"}
+    )
+
+    assert ws_client.receive_json.call_count == 3
+    assert ws_client.send_json.call_count == 2
+    assert ws_client.send_json.call_args_list[0] == call(
+        {
+            "command": "initialize",
+            "messageId": "initialize",
+            "schemaVersion": 23,
+            "additionalUserAgentComponents": {"foo": "bar"},
+        }
+    )
+    assert ws_client.close.call_count == 1
+    assert messages
+    assert len(messages) == 3
+    assert messages[0] == version_data
+    assert messages[1] == initialize_data
+    assert messages[2] == result

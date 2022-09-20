@@ -433,3 +433,26 @@ async def test_record_messages(wallmote_central_scene, mock_command, uuid4):
 
     with pytest.raises(InvalidState):
         client.end_recording_messages()
+
+
+async def test_additional_user_agent_components(client_session, url):
+    """Test additionalUserAgentComponents parameter."""
+    client = Client(
+        url, client_session, additional_user_agent_components={"foo": "bar"}
+    )
+    client._client = True
+    with patch(
+        "zwave_js_server.client.Client._send_json_message", return_value=None
+    ) as send_json_mock, patch(
+        "zwave_js_server.client.Client._receive_json_or_raise",
+        return_value={"success": True},
+    ):
+        await client.initialize()
+        send_json_mock.assert_called_once_with(
+            {
+                "command": "initialize",
+                "messageId": "initialize",
+                "schemaVersion": 23,
+                "additionalUserAgentComponents": {"foo": "bar"},
+            }
+        )
