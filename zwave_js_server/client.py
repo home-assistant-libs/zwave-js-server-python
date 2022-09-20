@@ -12,7 +12,12 @@ from typing import Any, DefaultDict, Dict, List, Optional, cast
 
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, client_exceptions
 
-from .const import MAX_SERVER_SCHEMA_VERSION, MIN_SERVER_SCHEMA_VERSION
+from .const import (
+    MAX_SERVER_SCHEMA_VERSION,
+    MIN_SERVER_SCHEMA_VERSION,
+    PACKAGE_NAME,
+    __version__,
+)
 from .event import Event
 from .exceptions import (
     CannotConnect,
@@ -62,7 +67,10 @@ class Client:
         # Version of the connected server
         self.version: Optional[VersionInfo] = None
         self.schema_version: int = schema_version
-        self.additional_user_agent_components = additional_user_agent_components
+        self.additional_user_agent_components = {
+            PACKAGE_NAME: __version__,
+            **(additional_user_agent_components or {}),
+        }
         self._logger = logging.getLogger(__package__)
         self._loop = asyncio.get_running_loop()
         self._result_futures: Dict[str, asyncio.Future] = {}
@@ -171,17 +179,15 @@ class Client:
         """Initialize connection to server by setting schema version and user agent."""
         assert self._client
 
-        payload = {
-            "command": "initialize",
-            "messageId": INITIALIZE_MESSAGE_ID,
-            "schemaVersion": self.schema_version,
-            "additionalUserAgentComponents": self.additional_user_agent_components,
-        }
-
         # set preferred schema version on the server
         # note: we already check for (in)compatible schemas in the connect call
         await self._send_json_message(
-            {k: v for k, v in payload.items() if v is not None}
+            {
+                "command": "initialize",
+                "messageId": INITIALIZE_MESSAGE_ID,
+                "schemaVersion": self.schema_version,
+                "additionalUserAgentComponents": self.additional_user_agent_components,
+            }
         )
         set_api_msg = await self._receive_json_or_raise()
 

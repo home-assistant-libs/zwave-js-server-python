@@ -3,6 +3,7 @@ from unittest.mock import call
 
 import pytest
 
+from zwave_js_server.const import __version__
 from zwave_js_server.dump import dump_msgs
 
 from .common import update_ws_client_msg_queue
@@ -105,7 +106,10 @@ async def test_dump_additional_user_agent_components(
             "command": "initialize",
             "messageId": "initialize",
             "schemaVersion": 23,
-            "additionalUserAgentComponents": {"foo": "bar"},
+            "additionalUserAgentComponents": {
+                "zwave-js-server-python": __version__,
+                "foo": "bar",
+            },
         }
     )
     assert ws_client.close.call_count == 1

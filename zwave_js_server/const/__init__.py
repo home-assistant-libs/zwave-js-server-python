@@ -1,6 +1,10 @@
 """Constants for the Z-Wave JS python library."""
 import sys
 from enum import Enum, IntEnum
+from importlib import metadata
+
+PACKAGE_NAME = "zwave-js-server-python"
+__version__ = metadata.version(PACKAGE_NAME)
 
 # minimal server schema version we can handle
 MIN_SERVER_SCHEMA_VERSION = 23

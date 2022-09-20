@@ -10,7 +10,7 @@ from aiohttp.client_reqrep import ClientResponse, RequestInfo
 from aiohttp.http_websocket import WSMsgType
 
 from zwave_js_server.client import Client
-from zwave_js_server.const import MAX_SERVER_SCHEMA_VERSION
+from zwave_js_server.const import MAX_SERVER_SCHEMA_VERSION, __version__
 from zwave_js_server.exceptions import (
     CannotConnect,
     ConnectionFailed,
@@ -453,6 +453,9 @@ async def test_additional_user_agent_components(client_session, url):
                 "command": "initialize",
                 "messageId": "initialize",
                 "schemaVersion": 23,
-                "additionalUserAgentComponents": {"foo": "bar"},
+                "additionalUserAgentComponents": {
+                    "zwave-js-server-python": __version__,
+                    "foo": "bar",
+                },
             }
         )

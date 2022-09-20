@@ -1,11 +1,11 @@
 """Dump helper."""
 import asyncio
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 
 import aiohttp
 
 from .client import INITIALIZE_MESSAGE_ID
-from .const import MAX_SERVER_SCHEMA_VERSION
+from .const import MAX_SERVER_SCHEMA_VERSION, PACKAGE_NAME, __version__
 
 
 async def dump_msgs(
@@ -21,18 +21,16 @@ async def dump_msgs(
     version = await client.receive_json()
     msgs.append(version)
 
-    initialize_payload: Dict[str, Union[int, str, Dict[str, str]]] = {
-        "command": "initialize",
-        "messageId": INITIALIZE_MESSAGE_ID,
-        "schemaVersion": MAX_SERVER_SCHEMA_VERSION,
-    }
-    if additional_user_agent_components:
-        initialize_payload[
-            "additionalUserAgentComponents"
-        ] = additional_user_agent_components
-
     for to_send in (
-        initialize_payload,
+        {
+            "command": "initialize",
+            "messageId": INITIALIZE_MESSAGE_ID,
+            "schemaVersion": MAX_SERVER_SCHEMA_VERSION,
+            "additionalUserAgentComponents": {
+                PACKAGE_NAME: __version__,
+                **(additional_user_agent_components or {}),
+            },
+        },
         {"command": "start_listening", "messageId": "start-listening"},
     ):
         await client.send_json(to_send)
