@@ -136,7 +136,7 @@ class MockZwaveJsServer:
 
                 cmd = data["command"]
                 message_id = data["messageId"]
-                if cmd == "set_api_schema":
+                if cmd == "initialize":
                     await self.send_json(self.network_state_dump[1])
                 elif cmd == "driver.get_log_config":
                     await self.send_success_command_result(

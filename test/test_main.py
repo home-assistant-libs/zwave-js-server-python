@@ -41,10 +41,10 @@ def test_server_version(client_session, url, ws_client, result, capsys):
 
 @pytest.mark.parametrize("result", ["test_result"])
 def test_dump_state(
-    client_session, url, ws_client, result, version_data, set_api_schema_data, capsys
+    client_session, url, ws_client, result, version_data, initialize_data, capsys
 ):
     """Test dump state."""
-    update_ws_client_msg_queue(ws_client, (version_data, set_api_schema_data, result))
+    update_ws_client_msg_queue(ws_client, (version_data, initialize_data, result))
     with patch.object(
         sys, "argv", ["zwave_js_server", url, "--dump-state"]
     ), pytest.raises(SystemExit) as sys_exit:
@@ -56,7 +56,7 @@ def test_dump_state(
         "{'type': 'version', 'driverVersion': 'test_driver_version', "
         "'serverVersion': 'test_server_version', 'homeId': 'test_home_id', "
         "'minSchemaVersion': 0, 'maxSchemaVersion': 23}\n"
-        "{'type': 'result', 'success': True, 'result': {}, 'messageId': 'api-schema-id'}\n"
+        "{'type': 'result', 'success': True, 'result': {}, 'messageId': 'initialize'}\n"
         "test_result\n"
     )
 

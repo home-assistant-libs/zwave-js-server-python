@@ -10,7 +10,7 @@ from aiohttp.client_reqrep import ClientResponse, RequestInfo
 from aiohttp.http_websocket import WSMsgType
 
 from zwave_js_server.client import Client
-from zwave_js_server.const import MAX_SERVER_SCHEMA_VERSION
+from zwave_js_server.const import MAX_SERVER_SCHEMA_VERSION, __version__
 from zwave_js_server.exceptions import (
     CannotConnect,
     ConnectionFailed,
@@ -216,12 +216,12 @@ async def test_listen_not_success(client_session, url, result, driver_ready):
     assert not client.connected
 
 
-async def test_set_api_schema_not_success(
-    client_session, url, set_api_schema_data, driver_ready
+async def test_initialize_not_success(
+    client_session, url, initialize_data, driver_ready
 ):
     """Test receive result message with success False on listen."""
-    set_api_schema_data["success"] = False
-    set_api_schema_data["errorCode"] = "error_code"
+    initialize_data["success"] = False
+    initialize_data["errorCode"] = "error_code"
     client = Client(url, client_session)
     await client.connect()
 
@@ -433,3 +433,29 @@ async def test_record_messages(wallmote_central_scene, mock_command, uuid4):
 
     with pytest.raises(InvalidState):
         client.end_recording_messages()
+
+
+async def test_additional_user_agent_components(client_session, url):
+    """Test additionalUserAgentComponents parameter."""
+    client = Client(
+        url, client_session, additional_user_agent_components={"foo": "bar"}
+    )
+    client._client = True
+    with patch(
+        "zwave_js_server.client.Client._send_json_message", return_value=None
+    ) as send_json_mock, patch(
+        "zwave_js_server.client.Client._receive_json_or_raise",
+        return_value={"success": True},
+    ):
+        await client.initialize()
+        send_json_mock.assert_called_once_with(
+            {
+                "command": "initialize",
+                "messageId": "initialize",
+                "schemaVersion": 23,
+                "additionalUserAgentComponents": {
+                    "zwave-js-server-python": __version__,
+                    "foo": "bar",
+                },
+            }
+        )

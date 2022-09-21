@@ -1,15 +1,17 @@
 """Dump helper."""
 import asyncio
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 import aiohttp
 
-from .const import MAX_SERVER_SCHEMA_VERSION
+from .client import INITIALIZE_MESSAGE_ID
+from .const import MAX_SERVER_SCHEMA_VERSION, PACKAGE_NAME, __version__
 
 
 async def dump_msgs(
     url: str,
     session: aiohttp.ClientSession,
+    additional_user_agent_components: Optional[Dict[str, str]] = None,
     timeout: Optional[float] = None,
 ) -> List[dict]:
     """Dump server state."""
@@ -21,11 +23,15 @@ async def dump_msgs(
 
     for to_send in (
         {
-            "command": "set_api_schema",
-            "messageId": "api-schema-id",
+            "command": "initialize",
+            "messageId": INITIALIZE_MESSAGE_ID,
             "schemaVersion": MAX_SERVER_SCHEMA_VERSION,
+            "additionalUserAgentComponents": {
+                PACKAGE_NAME: __version__,
+                **(additional_user_agent_components or {}),
+            },
         },
-        {"command": "start_listening", "messageId": "listen-id"},
+        {"command": "start_listening", "messageId": "start-listening"},
     ):
         await client.send_json(to_send)
         msgs.append(await client.receive_json())

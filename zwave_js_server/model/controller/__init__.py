@@ -722,7 +722,7 @@ class Controller(EventBase):
                 "nodeId": node.node_id,
                 "apiKey": api_key,
             },
-            require_schema=22,
+            require_schema=23,
         )
         assert data
         return [FirmwareUpdateInfo.from_dict(update) for update in data["updates"]]
