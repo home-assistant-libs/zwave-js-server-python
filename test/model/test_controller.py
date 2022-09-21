@@ -1398,8 +1398,9 @@ async def test_get_state(controller, controller_state, uuid4, mock_command):
         {"state": new_state},
     )
     assert controller.inclusion_state == InclusionState.IDLE
-    assert await controller.async_get_state() is None
-    assert controller.inclusion_state == InclusionState.INCLUDING
+    assert await controller.async_get_state() == new_state
+    # Verify state hasn't changed
+    assert controller.inclusion_state == InclusionState.IDLE
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
@@ -1724,18 +1725,30 @@ async def test_nvm_events(controller):
     assert event.data["nvm_restore_progress"] == controller_pkg.NVMProgress(5, 6)
 
 
-async def test_node_found(controller, multisensor_6_state):
+async def test_node_found(controller):
     """Test node found event."""
+    found_node = {
+        "id": 1,
+        "deviceClass": {
+            "basic": {"key": 2, "label": "1"},
+            "generic": {"key": 3, "label": "2"},
+            "specific": {"key": 4, "label": "3"},
+            "mandatorySupportedCCs": [112],
+            "mandatoryControlledCCs": [112],
+        },
+        "supportedCCs": [112],
+        "controlledCCs": [112],
+    }
     event = Event(
         "node found",
         {
             "source": "controller",
             "event": "node found",
-            "node": multisensor_6_state,
+            "node": found_node,
         },
     )
     controller.receive_event(event)
-    assert event.data["node"] == multisensor_6_state
+    assert event.data["node"] == found_node
 
 
 async def test_node_added(controller, multisensor_6_state):

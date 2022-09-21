@@ -594,6 +594,26 @@ class Node(EventBase):
         """Call endpoint.supports_cc_api command."""
         return await self.endpoints[0].async_supports_cc_api(command_class)
 
+    async def async_supports_cc(self, command_class: CommandClass) -> bool:
+        """Call endpoint.supports_cc command."""
+        return await self.endpoints[0].async_supports_cc(command_class)
+
+    async def async_controls_cc(self, command_class: CommandClass) -> bool:
+        """Call endpoint.controls_cc command."""
+        return await self.endpoints[0].async_controls_cc(command_class)
+
+    async def async_is_cc_secure(self, command_class: CommandClass) -> bool:
+        """Call endpoint.is_cc_secure command."""
+        return await self.endpoints[0].async_is_cc_secure(command_class)
+
+    async def async_get_cc_version(self, command_class: CommandClass) -> bool:
+        """Call endpoint.get_cc_version command."""
+        return await self.endpoints[0].async_get_cc_version(command_class)
+
+    async def async_get_node_unsafe(self) -> NodeDataType:
+        """Call endpoint.get_node_unsafe command."""
+        return await self.endpoints[0].async_get_node_unsafe()
+
     async def async_has_security_class(self, security_class: SecurityClass) -> bool:
         """Return whether node has the given security class."""
         data = await self.async_send_command(
@@ -660,13 +680,13 @@ class Node(EventBase):
         assert data
         return RouteHealthCheckSummary(data["summary"])
 
-    async def async_get_state(self) -> None:
+    async def async_get_state(self) -> NodeDataType:
         """Get node state."""
         data = await self.async_send_command(
             "get_state", require_schema=14, wait_for_result=True
         )
         assert data
-        self.update(data["state"])
+        return cast(NodeDataType, data["state"])
 
     async def async_set_name(
         self, name: str, update_cc: bool = True, wait_for_result: Optional[bool] = None

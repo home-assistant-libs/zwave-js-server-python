@@ -19,6 +19,8 @@ class FoundNodeDataType(TypedDict, total=False):
 
     nodeId: int
     deviceClass: DeviceClassDataType
+    supportedCCs: List[int]
+    controlledCCs: List[int]
 
 
 class NodeDataType(TypedDict, total=False):

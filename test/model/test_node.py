@@ -1170,6 +1170,140 @@ async def test_supports_cc_api(multisensor_6, uuid4, mock_command):
         await node.async_supports_cc_api(CommandClass.USER_CODE)
 
 
+async def test_supports_cc(multisensor_6, uuid4, mock_command):
+    """Test endpoint.supports_cc_api commands."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "endpoint.supports_cc", "nodeId": node.node_id, "endpoint": 0},
+        {"supported": True},
+    )
+
+    assert await node.async_supports_cc(CommandClass.USER_CODE)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "endpoint.supports_cc",
+        "nodeId": node.node_id,
+        "endpoint": 0,
+        "commandClass": 99,
+        "messageId": uuid4,
+    }
+
+    # Test that command fails when client is disconnected
+    with patch("zwave_js_server.client.asyncio.Event.wait", return_value=True):
+        await node.client.disconnect()
+
+    with pytest.raises(FailedCommand):
+        await node.async_supports_cc(CommandClass.USER_CODE)
+
+
+async def test_controls_cc(multisensor_6, uuid4, mock_command):
+    """Test endpoint.controls_cc commands."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "endpoint.controls_cc", "nodeId": node.node_id, "endpoint": 0},
+        {"controlled": True},
+    )
+
+    assert await node.async_controls_cc(CommandClass.USER_CODE)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "endpoint.controls_cc",
+        "nodeId": node.node_id,
+        "endpoint": 0,
+        "commandClass": 99,
+        "messageId": uuid4,
+    }
+
+    # Test that command fails when client is disconnected
+    with patch("zwave_js_server.client.asyncio.Event.wait", return_value=True):
+        await node.client.disconnect()
+
+    with pytest.raises(FailedCommand):
+        await node.async_controls_cc(CommandClass.USER_CODE)
+
+
+async def test_is_cc_secure(multisensor_6, uuid4, mock_command):
+    """Test endpoint.is_cc_secure commands."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "endpoint.is_cc_secure", "nodeId": node.node_id, "endpoint": 0},
+        {"secure": True},
+    )
+
+    assert await node.async_is_cc_secure(CommandClass.USER_CODE)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "endpoint.is_cc_secure",
+        "nodeId": node.node_id,
+        "endpoint": 0,
+        "commandClass": 99,
+        "messageId": uuid4,
+    }
+
+    # Test that command fails when client is disconnected
+    with patch("zwave_js_server.client.asyncio.Event.wait", return_value=True):
+        await node.client.disconnect()
+
+    with pytest.raises(FailedCommand):
+        await node.async_is_cc_secure(CommandClass.USER_CODE)
+
+
+async def test_get_cc_version(multisensor_6, uuid4, mock_command):
+    """Test endpoint.get_cc_version commands."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "endpoint.get_cc_version", "nodeId": node.node_id, "endpoint": 0},
+        {"version": 1},
+    )
+
+    assert await node.async_get_cc_version(CommandClass.USER_CODE) == 1
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "endpoint.get_cc_version",
+        "nodeId": node.node_id,
+        "endpoint": 0,
+        "commandClass": 99,
+        "messageId": uuid4,
+    }
+
+    # Test that command fails when client is disconnected
+    with patch("zwave_js_server.client.asyncio.Event.wait", return_value=True):
+        await node.client.disconnect()
+
+    with pytest.raises(FailedCommand):
+        await node.async_get_cc_version(CommandClass.USER_CODE)
+
+
+async def test_get_node_unsafe(multisensor_6, uuid4, mock_command):
+    """Test endpoint.get_node_unsafe commands."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "endpoint.get_node_unsafe", "nodeId": node.node_id, "endpoint": 0},
+        {"node": multisensor_6},
+    )
+
+    assert await node.async_get_node_unsafe() == multisensor_6
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "endpoint.get_node_unsafe",
+        "nodeId": node.node_id,
+        "endpoint": 0,
+        "messageId": uuid4,
+    }
+
+    # Test that command fails when client is disconnected
+    with patch("zwave_js_server.client.asyncio.Event.wait", return_value=True):
+        await node.client.disconnect()
+
+    with pytest.raises(FailedCommand):
+        await node.async_get_node_unsafe()
+
+
 async def test_statistics_updated(
     wallmote_central_scene: node_pkg.Node, multisensor_6, ring_keypad
 ):
@@ -1585,9 +1719,10 @@ async def test_get_state(
     )
 
     # Verify new values
-    assert await node.async_get_state() is None
-    assert node.endpoints[0].installer_icon == 1
-    assert node.values[value_id].value == 0
+    assert await node.async_get_state() == new_state
+    # Verify original values are still the same
+    assert node.endpoints[0].installer_icon != 1
+    assert node.values[value_id].value != 0
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {

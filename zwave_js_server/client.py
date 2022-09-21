@@ -101,9 +101,12 @@ class Client:
     ) -> dict:
         """Send a command and get a response."""
         if require_schema is not None and require_schema > self.schema_version:
+            assert self.version
             raise InvalidServerVersion(
+                self.version,
+                require_schema,
                 "Command not available due to incompatible server version. Update the Z-Wave "
-                f"JS Server to a version that supports at least api schema {require_schema}."
+                f"JS Server to a version that supports at least api schema {require_schema}.",
             )
         future: "asyncio.Future[dict]" = self._loop.create_future()
         message_id = message["messageId"] = uuid.uuid4().hex
@@ -119,9 +122,12 @@ class Client:
     ) -> None:
         """Send a command without waiting for the response."""
         if require_schema is not None and require_schema > self.schema_version:
+            assert self.version
             raise InvalidServerVersion(
+                self.version,
+                require_schema,
                 "Command not available due to incompatible server version. Update the Z-Wave "
-                f"JS Server to a version that supports at least api schema {require_schema}."
+                f"JS Server to a version that supports at least api schema {require_schema}.",
             )
         message["messageId"] = uuid.uuid4().hex
         await self._send_json_message(message)
@@ -155,10 +161,13 @@ class Client:
             or self.version.max_schema_version < MIN_SERVER_SCHEMA_VERSION
         ):
             await self._client.close()
+            assert self.version
             raise InvalidServerVersion(
-                f"Z-Wave JS Server version is incompatible: {self.version.server_version} "
-                "a version is required that supports at least "
-                f"api schema {MIN_SERVER_SCHEMA_VERSION}"
+                self.version,
+                MIN_SERVER_SCHEMA_VERSION,
+                f"Z-Wave JS Server version ({self.version.server_version}) is "
+                "incompatible. Update the Z-Wave JS Server to a version that supports "
+                f"at least api schema {MIN_SERVER_SCHEMA_VERSION}",
             )
         # store the (highest possible) schema version we're going to use/request
         # this is a bit future proof as we might decide to use a pinned version at some point

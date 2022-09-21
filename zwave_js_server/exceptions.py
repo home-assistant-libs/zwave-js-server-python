@@ -6,6 +6,7 @@ from .const import RssiError
 if TYPE_CHECKING:
     from .const import CommandClass
     from .model.value import Value
+    from .model.version import VersionInfo
 
 
 class BaseZwaveJSServerError(Exception):
@@ -62,6 +63,18 @@ class InvalidMessage(BaseZwaveJSServerError):
 
 class InvalidServerVersion(BaseZwaveJSServerError):
     """Exception raised when connected to server with incompatible version."""
+
+    def __init__(
+        self,
+        version_info: "VersionInfo",
+        required_schema_version: int,
+        message: str,
+    ) -> None:
+        """Initialize an invalid server version error."""
+        self.server_version = version_info.server_version
+        self.server_max_schema_version = version_info.max_schema_version
+        self.required_schema_version = required_schema_version
+        super().__init__(message)
 
 
 class FailedCommand(BaseZwaveJSServerError):
