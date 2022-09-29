@@ -15,7 +15,7 @@ async def update_firmware(
     updates: List[FirmwareUpdateData],
     session: aiohttp.ClientSession,
     additional_user_agent_components: Optional[Dict[str, str]] = None,
-) -> None:
+) -> bool:
     """Send beginFirmwareUpdate command to Node."""
     client = Client(
         url, session, additional_user_agent_components=additional_user_agent_components

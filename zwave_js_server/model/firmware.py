@@ -1,7 +1,7 @@
 """Provide a model for Z-Wave firmware."""
 from dataclasses import asdict, dataclass
 from enum import IntEnum
-from typing import TYPE_CHECKING, List, Optional, Union
+from typing import TYPE_CHECKING, List, Optional, Union, cast
 
 from ..const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED, VALUE_UNKNOWN
 from ..util.helpers import convert_bytes_to_base64
@@ -20,7 +20,7 @@ class FirmwareUpdateDataDataType(TypedDict, total=False):
 
     filename: str  # required
     file: str  # required
-    file_format: str
+    fileFormat: str
 
 
 @dataclass
@@ -33,7 +33,7 @@ class FirmwareUpdateData:
 
     def to_dict(self) -> FirmwareUpdateDataDataType:
         """Convert firmware update data to dict."""
-        data = {
+        data: FirmwareUpdateDataDataType = {
             "filename": self.filename,
             "file": convert_bytes_to_base64(self.file),
         }
@@ -232,7 +232,7 @@ class FirmwareUpdateFileInfo:
 
     def to_dict(self) -> FirmwareUpdateFileInfoDataType:
         """Return dict representation of the object."""
-        return asdict(self)
+        return cast(FirmwareUpdateFileInfoDataType, asdict(self))
 
 
 class FirmwareUpdateInfoDataType(TypedDict):
