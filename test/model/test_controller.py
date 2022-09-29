@@ -1572,9 +1572,8 @@ async def test_is_any_ota_firmware_update_in_progress(
         {"command": "controller.is_any_ota_firmware_update_in_progress"},
         {"progress": False},
     )
-    assert (
-        not await multisensor_6.client.driver.controller.async_is_any_ota_firmware_update_in_progress()
-    )
+    controller = multisensor_6.client.driver.controller
+    assert not await controller.async_is_any_ota_firmware_update_in_progress()
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
@@ -1618,6 +1617,7 @@ async def test_get_available_firmware_updates(multisensor_6, uuid4, mock_command
         "command": "controller.get_available_firmware_updates",
         "nodeId": multisensor_6.node_id,
         "apiKey": "test",
+        "includePrereleases": False,
         "messageId": uuid4,
     }
 
@@ -1625,19 +1625,19 @@ async def test_get_available_firmware_updates(multisensor_6, uuid4, mock_command
 async def test_begin_ota_firmware_update(multisensor_6, uuid4, mock_command):
     """Test get available firmware updates."""
     ack_commands = mock_command(
-        {"command": "controller.begin_ota_firmware_update"},
-        {},
+        {"command": "controller.firmware_update_ota"},
+        {"success": True},
     )
-    await multisensor_6.client.driver.controller.async_begin_ota_firmware_update(
+    assert await multisensor_6.client.driver.controller.async_firmware_update_ota(
         multisensor_6,
-        FirmwareUpdateFileInfo(target=0, url="http://example.com", integrity="test"),
+        [FirmwareUpdateFileInfo(target=0, url="http://example.com", integrity="test")],
     )
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
-        "command": "controller.begin_ota_firmware_update",
+        "command": "controller.firmware_update_ota",
         "nodeId": multisensor_6.node_id,
-        "update": {"target": 0, "url": "http://example.com", "integrity": "test"},
+        "updates": [{"target": 0, "url": "http://example.com", "integrity": "test"}],
         "messageId": uuid4,
     }
 

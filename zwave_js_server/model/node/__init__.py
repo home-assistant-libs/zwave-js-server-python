@@ -24,10 +24,10 @@ from ..endpoint import Endpoint
 from ..firmware import (
     FirmwareUpdateCapabilities,
     FirmwareUpdateCapabilitiesDataType,
-    FirmwareUpdateFinished,
-    FirmwareUpdateFinishedDataType,
     FirmwareUpdateProgress,
     FirmwareUpdateProgressDataType,
+    FirmwareUpdateResult,
+    FirmwareUpdateResultDataType,
 )
 from ..notification import (
     EntryControlNotification,
@@ -906,14 +906,14 @@ class Node(EventBase):
         self._firmware_update_progress = event.data[
             "firmware_update_progress"
         ] = FirmwareUpdateProgress(
-            self, cast(FirmwareUpdateProgressDataType, event.data)
+            self, cast(FirmwareUpdateProgressDataType, event.data["progress"])
         )
 
     def handle_firmware_update_finished(self, event: Event) -> None:
         """Process a node firmware update finished event."""
         self._firmware_update_progress = None
-        event.data["firmware_update_finished"] = FirmwareUpdateFinished(
-            self, cast(FirmwareUpdateFinishedDataType, event.data)
+        event.data["firmware_update_finished"] = FirmwareUpdateResult(
+            self, cast(FirmwareUpdateResultDataType, event.data["result"])
         )
 
     def handle_statistics_updated(self, event: Event) -> None:

@@ -1003,17 +1003,29 @@ async def test_firmware_events(wallmote_central_scene: node_pkg.Node):
             "source": "node",
             "event": "firmware update progress",
             "nodeId": 35,
-            "sentFragments": 1,
-            "totalFragments": 10,
+            "progress": {
+                "currentFile": 1,
+                "totalFiles": 1,
+                "sentFragments": 1,
+                "totalFragments": 10,
+                "progress": 10.0,
+            },
         },
     )
 
     node.handle_firmware_update_progress(event)
-    assert event.data["firmware_update_progress"].sent_fragments == 1
-    assert event.data["firmware_update_progress"].total_fragments == 10
+    progress = event.data["firmware_update_progress"]
+    assert progress.current_file == 1
+    assert progress.total_files == 1
+    assert progress.sent_fragments == 1
+    assert progress.total_fragments == 10
+    assert progress.progress == 10.0
     assert node.firmware_update_progress
+    assert node.firmware_update_progress.current_file == 1
+    assert node.firmware_update_progress.total_files == 1
     assert node.firmware_update_progress.sent_fragments == 1
     assert node.firmware_update_progress.total_fragments == 10
+    assert node.firmware_update_progress.progress == 10.0
 
     event = Event(
         type="firmware update finished",
@@ -1021,17 +1033,21 @@ async def test_firmware_events(wallmote_central_scene: node_pkg.Node):
             "source": "node",
             "event": "firmware update finished",
             "nodeId": 35,
-            "status": 255,
-            "waitTime": 10,
+            "result": {
+                "status": 255,
+                "success": True,
+                "waitTime": 10,
+                "reInterview": False,
+            },
         },
     )
 
     node.handle_firmware_update_finished(event)
-    assert (
-        event.data["firmware_update_finished"].status
-        == FirmwareUpdateStatus.OK_RESTART_PENDING
-    )
-    assert event.data["firmware_update_finished"].wait_time == 10
+    result = event.data["firmware_update_finished"]
+    assert result.status == FirmwareUpdateStatus.OK_RESTART_PENDING
+    assert result.success
+    assert result.wait_time == 10
+    assert not result.reinterview
     assert node.firmware_update_progress is None
 
 
