@@ -1,5 +1,5 @@
 """Provide a model for the Z-Wave JS controller."""
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Union, cast
 
 from zwave_js_server.model.firmware import FirmwareUpdateFileInfo, FirmwareUpdateInfo
@@ -713,7 +713,7 @@ class Controller(EventBase):
         return cast(bool, data["progress"])
 
     async def async_get_available_firmware_updates(
-        self, node: Node, api_key: str
+        self, node: Node, api_key: str, include_prereleases: bool = False
     ) -> List[FirmwareUpdateInfo]:
         """Send getAvailableFirmwareUpdates command to Controller."""
         data = await self.client.async_send_command(
@@ -721,24 +721,26 @@ class Controller(EventBase):
                 "command": "controller.get_available_firmware_updates",
                 "nodeId": node.node_id,
                 "apiKey": api_key,
+                "includePrereleases": include_prereleases,
             },
-            require_schema=23,
+            require_schema=24,
         )
         assert data
         return [FirmwareUpdateInfo.from_dict(update) for update in data["updates"]]
 
-    async def async_begin_ota_firmware_update(
-        self, node: Node, update: FirmwareUpdateFileInfo
-    ) -> None:
-        """Send beginOTAFirmwareUpdate command to Controller."""
-        await self.client.async_send_command(
+    async def async_firmware_update_ota(
+        self, node: Node, updates: List[FirmwareUpdateFileInfo]
+    ) -> bool:
+        """Send firmwareUpdateOTA command to Controller."""
+        data = await self.client.async_send_command(
             {
-                "command": "controller.begin_ota_firmware_update",
+                "command": "controller.firmware_update_ota",
                 "nodeId": node.node_id,
-                "update": asdict(update),
+                "updates": [update.to_dict() for update in updates],
             },
-            require_schema=21,
+            require_schema=24,
         )
+        return cast(bool, data["success"])
 
     def receive_event(self, event: Event) -> None:
         """Receive an event."""

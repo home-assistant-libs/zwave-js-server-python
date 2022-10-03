@@ -1,12 +1,12 @@
 """Provide a model for the Z-Wave JS node's events."""
 from typing import Dict, Literal, Optional, Type, Union
 
-from pydantic import BaseModel, create_model_from_typeddict
+from pydantic import BaseModel
 
 from zwave_js_server.const import CommandClass
 
 from ...event import BaseEventModel
-from ..firmware import FirmwareUpdateFinishedDataType, FirmwareUpdateProgressDataType
+from ..firmware import FirmwareUpdateProgressDataType, FirmwareUpdateResultDataType
 from ..notification import (
     EntryControlNotificationArgsDataType,
     NotificationNotificationArgsDataType,
@@ -182,16 +182,18 @@ class WakeUpEventModel(BaseNodeEventModel):
     event: Literal["wake up"]
 
 
-FirmwareUpdateFinishedEventModel = create_model_from_typeddict(
-    FirmwareUpdateFinishedDataType,
-    __base__=BaseNodeEventModel,
-    event=(Literal["firmware update finished"], ...),
-)
-FirmwareUpdateProgressEventModel = create_model_from_typeddict(
-    FirmwareUpdateProgressDataType,
-    __base__=BaseNodeEventModel,
-    event=(Literal["firmware update progress"], ...),
-)
+class FirmwareUpdateFinishedEventModel(BaseNodeEventModel):
+    """Model for `firmware update finished` event data."""
+
+    event: Literal["firmware update finished"]
+    result: FirmwareUpdateResultDataType
+
+
+class FirmwareUpdateProgressEventModel(BaseNodeEventModel):
+    """Model for `firmware update progress` event data."""
+
+    event: Literal["firmware update progress"]
+    progress: FirmwareUpdateProgressDataType
 
 
 NODE_EVENT_MODEL_MAP: Dict[str, Type["BaseNodeEventModel"]] = {

@@ -1,9 +1,10 @@
 """Provide a model for Z-Wave firmware."""
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from enum import IntEnum
-from typing import TYPE_CHECKING, List, Optional, Union
+from typing import TYPE_CHECKING, List, Optional, Union, cast
 
 from ..const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED, VALUE_UNKNOWN
+from ..util.helpers import convert_bytes_to_base64
 
 if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
     from typing_extensions import TypedDict
@@ -12,6 +13,33 @@ else:
 
 if TYPE_CHECKING:
     from .node import Node
+
+
+class FirmwareUpdateDataDataType(TypedDict, total=False):
+    """Represent a firmware update data dict type."""
+
+    filename: str  # required
+    file: str  # required
+    fileFormat: str
+
+
+@dataclass
+class FirmwareUpdateData:
+    """Firmware update data."""
+
+    filename: str
+    file: bytes
+    file_format: Optional[str] = None
+
+    def to_dict(self) -> FirmwareUpdateDataDataType:
+        """Convert firmware update data to dict."""
+        data: FirmwareUpdateDataDataType = {
+            "filename": self.filename,
+            "file": convert_bytes_to_base64(self.file),
+        }
+        if self.file_format is not None:
+            data["fileFormat"] = self.file_format
+        return data
 
 
 class FirmwareUpdateCapabilitiesDataType(TypedDict, total=False):
@@ -105,19 +133,32 @@ class FirmwareUpdateStatus(IntEnum):
 
 
 class FirmwareUpdateProgressDataType(TypedDict):
-    """Represent a firmware update progress event dict type."""
+    """Represent a firmware update progress dict type."""
 
-    sentFragments: int  # required
-    totalFragments: int  # required
+    currentFile: int
+    totalFiles: int
+    sentFragments: int
+    totalFragments: int
+    progress: float
 
 
 class FirmwareUpdateProgress:
-    """Model for firmware update progress event."""
+    """Model for firmware update progress data."""
 
     def __init__(self, node: "Node", data: FirmwareUpdateProgressDataType) -> None:
         """Initialize."""
         self.data = data
         self.node = node
+
+    @property
+    def current_file(self) -> int:
+        """Return current file."""
+        return self.data["currentFile"]
+
+    @property
+    def total_files(self) -> int:
+        """Return total files."""
+        return self.data["totalFiles"]
 
     @property
     def sent_fragments(self) -> int:
@@ -129,18 +170,25 @@ class FirmwareUpdateProgress:
         """Return the total number of fragments that need to be sent to the device."""
         return self.data["totalFragments"]
 
+    @property
+    def progress(self) -> float:
+        """Return progress."""
+        return float(self.data["progress"])
 
-class FirmwareUpdateFinishedDataType(TypedDict, total=False):
-    """Represent a firmware update finished event dict type."""
+
+class FirmwareUpdateResultDataType(TypedDict, total=False):
+    """Represent a firmware update result dict type."""
 
     status: int  # required
+    success: bool  # required
     waitTime: int
+    reInterview: bool  # required
 
 
-class FirmwareUpdateFinished:
-    """Model for firmware update finished event."""
+class FirmwareUpdateResult:
+    """Model for firmware update result data."""
 
-    def __init__(self, node: "Node", data: FirmwareUpdateFinishedDataType) -> None:
+    def __init__(self, node: "Node", data: FirmwareUpdateResultDataType) -> None:
         """Initialize."""
         self.data = data
         self.node = node
@@ -151,9 +199,19 @@ class FirmwareUpdateFinished:
         return FirmwareUpdateStatus(self.data["status"])
 
     @property
+    def success(self) -> bool:
+        """Return whether the firmware update was successful."""
+        return self.data["success"]
+
+    @property
     def wait_time(self) -> Optional[int]:
         """Return the wait time in seconds before the device is functional again."""
         return self.data.get("waitTime")
+
+    @property
+    def reinterview(self) -> bool:
+        """Return whether the node will be re-interviewed."""
+        return self.data["reInterview"]
 
 
 class FirmwareUpdateFileInfoDataType(TypedDict):
@@ -171,6 +229,10 @@ class FirmwareUpdateFileInfo:
     target: int
     url: str
     integrity: str
+
+    def to_dict(self) -> FirmwareUpdateFileInfoDataType:
+        """Return dict representation of the object."""
+        return cast(FirmwareUpdateFileInfoDataType, asdict(self))
 
 
 class FirmwareUpdateInfoDataType(TypedDict):
