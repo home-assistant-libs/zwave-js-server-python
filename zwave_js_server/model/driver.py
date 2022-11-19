@@ -88,7 +88,7 @@ class Driver(EventBase):
         self.emit(event.type, event.data)
 
     async def _async_send_command(
-        self, command: str, require_schema: int = None, **kwargs: Any
+        self, command: str, require_schema: Optional[int] = None, **kwargs: Any
     ) -> dict:
         """Send a driver command. For internal use only."""
         return await self.client.async_send_command(
