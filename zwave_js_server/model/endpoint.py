@@ -158,7 +158,7 @@ class Endpoint(EventBase):
         command_class: CommandClass,
         method_name: str,
         *args: Any,
-        wait_for_result: bool = None,
+        wait_for_result: Optional[bool] = None,
     ) -> Any:
         """Call endpoint.invoke_cc_api command."""
         if not any(cc.id == command_class.value for cc in self.command_classes):
