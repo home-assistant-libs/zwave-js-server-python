@@ -37,8 +37,8 @@ async def async_multicast_set_value(
 ) -> bool:
     """Send a multicast set_value command."""
     assert client.driver
-    # Iterate through nodes specified or all nodes if not specified
-    for node in nodes or client.driver.controller.nodes.values():
+    # Iterate through nodes specified (if any) and validate that the value exists
+    for node in nodes or ():
         # If the value to set is for Basic CC and targetValue property, skip validation
         if (
             value_data["commandClass"] == CommandClass.BASIC
