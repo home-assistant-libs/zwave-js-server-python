@@ -319,3 +319,25 @@ async def test_supports_cc_api_multicast(
         "commandClass": 1,
         "messageId": uuid4,
     }
+
+
+async def test_set_value_broadcast_missing_value(
+    climate_radio_thermostat_ct100_plus, inovelli_switch, client, uuid4, mock_command
+):
+    """Test multicast_group.set_value command with value missing from a node."""
+    ack_commands = mock_command(
+        {"command": "broadcast_node.set_value"},
+        {"success": True},
+    )
+
+    assert await async_multicast_set_value(
+        client, 1, {"commandClass": 67, "property": "blah"}
+    )
+
+    assert ack_commands[0] == {
+        "command": "broadcast_node.set_value",
+        "value": 1,
+        "valueId": {"commandClass": 67, "property": "blah"},
+        "options": None,
+        "messageId": uuid4,
+    }
