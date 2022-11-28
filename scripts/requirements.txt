@@ -1,2 +1,2 @@
 requests==2.28.1
-python-slugify==6.1.2
+python-slugify==7.0.0
