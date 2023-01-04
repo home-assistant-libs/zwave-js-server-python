@@ -6,7 +6,7 @@
 # ----------------------------------------------------------------------------------- #
 
 from enum import IntEnum
-from typing import Dict, Set, Type
+from typing import Dict, List, Type
 
 CC_SPECIFIC_SCALE = "scale"
 CC_SPECIFIC_SENSOR_TYPE = "sensorType"
@@ -627,97 +627,103 @@ MULTILEVEL_SENSOR_TYPE_TO_SCALE_MAP: Dict[
     MultilevelSensorType.WEIGHT: WeightScale,
 }
 
-UNIT_ABSOLUTE_HUMIDITY: Set[MultilevelSensorScaleType] = {
+UNIT_ABSOLUTE_HUMIDITY: List[MultilevelSensorScaleType] = [
     HumidityScale.ABSOLUTE_HUMIDITY
-}
-UNIT_ACIDITY: Set[MultilevelSensorScaleType] = {AcidityScale.ACIDITY}
-UNIT_AMPERE: Set[MultilevelSensorScaleType] = {CurrentScale.AMPERE}
-UNIT_A_WEIGHTED_DECIBELS: Set[MultilevelSensorScaleType] = {
+]
+UNIT_ACIDITY: List[MultilevelSensorScaleType] = [AcidityScale.ACIDITY]
+UNIT_AMPERE: List[MultilevelSensorScaleType] = [CurrentScale.AMPERE]
+UNIT_A_WEIGHTED_DECIBELS: List[MultilevelSensorScaleType] = [
     LoudnessScale.A_WEIGHTED_DECIBELS
-}
-UNIT_BEATS_PER_MINUTE: Set[MultilevelSensorScaleType] = {
+]
+UNIT_BEATS_PER_MINUTE: List[MultilevelSensorScaleType] = [
     HeartRateScale.BEATS_PER_MINUTE
-}
-UNIT_BECQUEREL_PER_CUBIC_METER: Set[MultilevelSensorScaleType] = {
+]
+UNIT_BECQUEREL_PER_CUBIC_METER: List[MultilevelSensorScaleType] = [
     RadonConcentrationScale.BECQUEREL_PER_CUBIC_METER
-}
-UNIT_BODY_MASS_INDEX: Set[MultilevelSensorScaleType] = {
+]
+UNIT_BODY_MASS_INDEX: List[MultilevelSensorScaleType] = [
     BodyMassIndexScale.BODY_MASS_INDEX
-}
-UNIT_BODY_WAVE: Set[MultilevelSensorScaleType] = {SeismicMagnitudeScale.BODY_WAVE}
-UNIT_BREATHS_PER_MINUTE: Set[MultilevelSensorScaleType] = {
+]
+UNIT_BODY_WAVE: List[MultilevelSensorScaleType] = [SeismicMagnitudeScale.BODY_WAVE]
+UNIT_BREATHS_PER_MINUTE: List[MultilevelSensorScaleType] = [
     RespiratoryRateScale.BREATHS_PER_MINUTE
-}
-UNIT_BTU_H: Set[MultilevelSensorScaleType] = {PowerScale.BTU_H}
-UNIT_CELSIUS: Set[MultilevelSensorScaleType] = {TemperatureScale.CELSIUS}
-UNIT_CENTIMETER: Set[MultilevelSensorScaleType] = {DistanceScale.CENTIMETER}
-UNIT_CUBIC_FEET_PER_MINUTE: Set[MultilevelSensorScaleType] = {
+]
+UNIT_BTU_H: List[MultilevelSensorScaleType] = [PowerScale.BTU_H]
+UNIT_CELSIUS: List[MultilevelSensorScaleType] = [TemperatureScale.CELSIUS]
+UNIT_CENTIMETER: List[MultilevelSensorScaleType] = [DistanceScale.CENTIMETER]
+UNIT_CUBIC_FEET_PER_MINUTE: List[MultilevelSensorScaleType] = [
     AirFlowScale.CUBIC_FEET_PER_MINUTE
-}
-UNIT_CUBIC_METER: Set[MultilevelSensorScaleType] = {TankCapacityScale.CUBIC_METER}
-UNIT_CUBIC_METER_PER_HOUR: Set[MultilevelSensorScaleType] = {
+]
+UNIT_CUBIC_METER: List[MultilevelSensorScaleType] = [TankCapacityScale.CUBIC_METER]
+UNIT_CUBIC_METER_PER_HOUR: List[MultilevelSensorScaleType] = [
     AirFlowScale.CUBIC_METER_PER_HOUR
-}
-UNIT_DECIBEL: Set[MultilevelSensorScaleType] = {LoudnessScale.DECIBEL}
-UNIT_DEGREES: Set[MultilevelSensorScaleType] = {DirectionScale.DEGREES}
-UNIT_DEGREES_RELATIVE_TO_NORTH_POLE_OF_STANDING_EYE_VIEW: Set[
+]
+UNIT_DECIBEL: List[MultilevelSensorScaleType] = [LoudnessScale.DECIBEL]
+UNIT_DEGREES: List[MultilevelSensorScaleType] = [DirectionScale.DEGREES]
+UNIT_DEGREES_RELATIVE_TO_NORTH_POLE_OF_STANDING_EYE_VIEW: List[
     MultilevelSensorScaleType
-] = {AnglePositionScale.DEGREES_RELATIVE_TO_NORTH_POLE_OF_STANDING_EYE_VIEW}
-UNIT_DEGREES_RELATIVE_TO_SOUTH_POLE_OF_STANDING_EYE_VIEW: Set[
+] = [AnglePositionScale.DEGREES_RELATIVE_TO_NORTH_POLE_OF_STANDING_EYE_VIEW]
+UNIT_DEGREES_RELATIVE_TO_SOUTH_POLE_OF_STANDING_EYE_VIEW: List[
     MultilevelSensorScaleType
-] = {AnglePositionScale.DEGREES_RELATIVE_TO_SOUTH_POLE_OF_STANDING_EYE_VIEW}
-UNIT_DENSITY: Set[MultilevelSensorScaleType] = {DensityScale.DENSITY}
-UNIT_DIASTOLIC: Set[MultilevelSensorScaleType] = {BloodPressureScale.DIASTOLIC}
-UNIT_DIMENSIONLESS_VALUE: Set[MultilevelSensorScaleType] = {
+] = [AnglePositionScale.DEGREES_RELATIVE_TO_SOUTH_POLE_OF_STANDING_EYE_VIEW]
+UNIT_DENSITY: List[MultilevelSensorScaleType] = [DensityScale.DENSITY]
+UNIT_DIASTOLIC: List[MultilevelSensorScaleType] = [BloodPressureScale.DIASTOLIC]
+UNIT_DIMENSIONLESS_VALUE: List[MultilevelSensorScaleType] = [
     GeneralPurposeScale.DIMENSIONLESS_VALUE
-}
-UNIT_EUROPEAN_MACROSEISMIC: Set[MultilevelSensorScaleType] = {
+]
+UNIT_EUROPEAN_MACROSEISMIC: List[MultilevelSensorScaleType] = [
     SeismicIntensityScale.EUROPEAN_MACROSEISMIC
-}
-UNIT_FAHRENHEIT: Set[MultilevelSensorScaleType] = {TemperatureScale.FAHRENHEIT}
-UNIT_FEET: Set[MultilevelSensorScaleType] = {DistanceScale.FEET, TideLevelScale.FEET}
-UNIT_GALLONS: Set[MultilevelSensorScaleType] = {TankCapacityScale.GALLONS}
-UNIT_HERTZ: Set[MultilevelSensorScaleType] = {FrequencyScale.HERTZ, RotationScale.HERTZ}
-UNIT_IMPEDANCE: Set[MultilevelSensorScaleType] = {MoistureScale.IMPEDANCE}
-UNIT_INCHES_OF_MERCURY: Set[MultilevelSensorScaleType] = {
+]
+UNIT_FAHRENHEIT: List[MultilevelSensorScaleType] = [TemperatureScale.FAHRENHEIT]
+UNIT_FEET: List[MultilevelSensorScaleType] = [DistanceScale.FEET, TideLevelScale.FEET]
+UNIT_GALLONS: List[MultilevelSensorScaleType] = [TankCapacityScale.GALLONS]
+UNIT_HERTZ: List[MultilevelSensorScaleType] = [
+    FrequencyScale.HERTZ,
+    RotationScale.HERTZ,
+]
+UNIT_IMPEDANCE: List[MultilevelSensorScaleType] = [MoistureScale.IMPEDANCE]
+UNIT_INCHES_OF_MERCURY: List[MultilevelSensorScaleType] = [
     AirPressureScale.INCHES_OF_MERCURY
-}
-UNIT_INCHES_PER_HOUR: Set[MultilevelSensorScaleType] = {RainRateScale.INCHES_PER_HOUR}
-UNIT_JOULE: Set[MultilevelSensorScaleType] = {BasisMetabolicRateScale.JOULE}
-UNIT_KILOGRAM: Set[MultilevelSensorScaleType] = {
+]
+UNIT_INCHES_PER_HOUR: List[MultilevelSensorScaleType] = [RainRateScale.INCHES_PER_HOUR]
+UNIT_JOULE: List[MultilevelSensorScaleType] = [BasisMetabolicRateScale.JOULE]
+UNIT_KILOGRAM: List[MultilevelSensorScaleType] = [
     MassScale.KILOGRAM,
     WeightScale.KILOGRAM,
-}
-UNIT_KILOHERTZ: Set[MultilevelSensorScaleType] = {FrequencyScale.KILOHERTZ}
-UNIT_KILOPASCAL: Set[MultilevelSensorScaleType] = {
+]
+UNIT_KILOHERTZ: List[MultilevelSensorScaleType] = [FrequencyScale.KILOHERTZ]
+UNIT_KILOPASCAL: List[MultilevelSensorScaleType] = [
     AirPressureScale.KILOPASCAL,
     PressureScale.KILOPASCAL,
     WaterPressureScale.KILOPASCAL,
-}
-UNIT_LIEDU: Set[MultilevelSensorScaleType] = {SeismicIntensityScale.LIEDU}
-UNIT_LITER: Set[MultilevelSensorScaleType] = {TankCapacityScale.LITER}
-UNIT_LITER_PER_HOUR: Set[MultilevelSensorScaleType] = {WaterFlowScale.LITER_PER_HOUR}
-UNIT_LOCAL: Set[MultilevelSensorScaleType] = {SeismicMagnitudeScale.LOCAL}
-UNIT_LUX: Set[MultilevelSensorScaleType] = {IlluminanceScale.LUX}
-UNIT_MERCALLI: Set[MultilevelSensorScaleType] = {SeismicIntensityScale.MERCALLI}
-UNIT_METER: Set[MultilevelSensorScaleType] = {DistanceScale.METER, TideLevelScale.METER}
-UNIT_METER_PER_SQUARE_SECOND: Set[MultilevelSensorScaleType] = {
+]
+UNIT_LIEDU: List[MultilevelSensorScaleType] = [SeismicIntensityScale.LIEDU]
+UNIT_LITER: List[MultilevelSensorScaleType] = [TankCapacityScale.LITER]
+UNIT_LITER_PER_HOUR: List[MultilevelSensorScaleType] = [WaterFlowScale.LITER_PER_HOUR]
+UNIT_LOCAL: List[MultilevelSensorScaleType] = [SeismicMagnitudeScale.LOCAL]
+UNIT_LUX: List[MultilevelSensorScaleType] = [IlluminanceScale.LUX]
+UNIT_MERCALLI: List[MultilevelSensorScaleType] = [SeismicIntensityScale.MERCALLI]
+UNIT_METER: List[MultilevelSensorScaleType] = [
+    DistanceScale.METER,
+    TideLevelScale.METER,
+]
+UNIT_METER_PER_SQUARE_SECOND: List[MultilevelSensorScaleType] = [
     AccelerationScale.METER_PER_SQUARE_SECOND
-}
-UNIT_MICROGRAM_PER_CUBIC_METER: Set[MultilevelSensorScaleType] = {
+]
+UNIT_MICROGRAM_PER_CUBIC_METER: List[MultilevelSensorScaleType] = [
     ParticulateMatter10Scale.MICROGRAM_PER_CUBIC_METER,
     ParticulateMatter25Scale.MICROGRAM_PER_CUBIC_METER,
-}
-UNIT_MILLIAMPERE: Set[MultilevelSensorScaleType] = {CurrentScale.MILLIAMPERE}
-UNIT_MILLIGRAM_PER_LITER: Set[MultilevelSensorScaleType] = {
+]
+UNIT_MILLIAMPERE: List[MultilevelSensorScaleType] = [CurrentScale.MILLIAMPERE]
+UNIT_MILLIGRAM_PER_LITER: List[MultilevelSensorScaleType] = [
     WaterChlorineLevelScale.MILLIGRAM_PER_LITER
-}
-UNIT_MILLIMETER_HOUR: Set[MultilevelSensorScaleType] = {RainRateScale.MILLIMETER_HOUR}
-UNIT_MILLIVOLT: Set[MultilevelSensorScaleType] = {
+]
+UNIT_MILLIMETER_HOUR: List[MultilevelSensorScaleType] = [RainRateScale.MILLIMETER_HOUR]
+UNIT_MILLIVOLT: List[MultilevelSensorScaleType] = [
     VoltageScale.MILLIVOLT,
     WaterOxidationReductionPotentialScale.MILLIVOLT,
-}
-UNIT_MOLE_PER_CUBIC_METER: Set[MultilevelSensorScaleType] = {
+]
+UNIT_MOLE_PER_CUBIC_METER: List[MultilevelSensorScaleType] = [
     CarbonMonoxideLevelScale.MOLE_PER_CUBIC_METER,
     FormaldehydeLevelScale.MOLE_PER_CUBIC_METER,
     MethaneDensityScale.MOLE_PER_CUBIC_METER,
@@ -725,55 +731,57 @@ UNIT_MOLE_PER_CUBIC_METER: Set[MultilevelSensorScaleType] = {
     ParticulateMatter25Scale.MOLE_PER_CUBIC_METER,
     SoilSalinityScale.MOLE_PER_CUBIC_METER,
     VolatileOrganicCompoundLevelScale.MOLE_PER_CUBIC_METER,
-}
-UNIT_MOMENT: Set[MultilevelSensorScaleType] = {SeismicMagnitudeScale.MOMENT}
-UNIT_MPH: Set[MultilevelSensorScaleType] = {VelocityScale.MPH}
-UNIT_M_S: Set[MultilevelSensorScaleType] = {VelocityScale.M_S}
-UNIT_NEWTON: Set[MultilevelSensorScaleType] = {AppliedForceOnTheSensorScale.NEWTON}
-UNIT_OHM_METER: Set[MultilevelSensorScaleType] = {ElectricalResistivityScale.OHM_METER}
-UNIT_PARTS_MILLION: Set[MultilevelSensorScaleType] = {
+]
+UNIT_MOMENT: List[MultilevelSensorScaleType] = [SeismicMagnitudeScale.MOMENT]
+UNIT_MPH: List[MultilevelSensorScaleType] = [VelocityScale.MPH]
+UNIT_M_S: List[MultilevelSensorScaleType] = [VelocityScale.M_S]
+UNIT_NEWTON: List[MultilevelSensorScaleType] = [AppliedForceOnTheSensorScale.NEWTON]
+UNIT_OHM_METER: List[MultilevelSensorScaleType] = [ElectricalResistivityScale.OHM_METER]
+UNIT_PARTS_MILLION: List[MultilevelSensorScaleType] = [
     CarbonDioxideLevelScale.PARTS_MILLION,
     CarbonMonoxideLevelScale.PARTS_MILLION,
     VolatileOrganicCompoundLevelScale.PARTS_MILLION,
-}
-UNIT_PERCENTAGE_VALUE: Set[MultilevelSensorScaleType] = {
+]
+UNIT_PERCENTAGE_VALUE: List[MultilevelSensorScaleType] = [
     AnglePositionScale.PERCENTAGE_VALUE,
     GeneralPurposeScale.PERCENTAGE_VALUE,
     HumidityScale.PERCENTAGE_VALUE,
     IlluminanceScale.PERCENTAGE_VALUE,
     MoistureScale.PERCENTAGE_VALUE,
     PercentageScale.PERCENTAGE_VALUE,
-}
-UNIT_PICOCURIES_PER_LITER: Set[MultilevelSensorScaleType] = {
+]
+UNIT_PICOCURIES_PER_LITER: List[MultilevelSensorScaleType] = [
     RadonConcentrationScale.PICOCURIES_PER_LITER
-}
-UNIT_POUNDS: Set[MultilevelSensorScaleType] = {WeightScale.POUNDS}
-UNIT_POUND_PER_SQUARE_INCH: Set[MultilevelSensorScaleType] = {
+]
+UNIT_POUNDS: List[MultilevelSensorScaleType] = [WeightScale.POUNDS]
+UNIT_POUND_PER_SQUARE_INCH: List[MultilevelSensorScaleType] = [
     PressureScale.POUND_PER_SQUARE_INCH
-}
-UNIT_POWER_LEVEL: Set[MultilevelSensorScaleType] = {RfSignalStrengthScale.POWER_LEVEL}
-UNIT_REVOLUTIONS_PER_MINUTE: Set[MultilevelSensorScaleType] = {
+]
+UNIT_POWER_LEVEL: List[MultilevelSensorScaleType] = [RfSignalStrengthScale.POWER_LEVEL]
+UNIT_REVOLUTIONS_PER_MINUTE: List[MultilevelSensorScaleType] = [
     RotationScale.REVOLUTIONS_PER_MINUTE
-}
-UNIT_RSSI: Set[MultilevelSensorScaleType] = {RfSignalStrengthScale.RSSI}
-UNIT_SECOND: Set[MultilevelSensorScaleType] = {TimeScale.SECOND}
-UNIT_SHINDO: Set[MultilevelSensorScaleType] = {SeismicIntensityScale.SHINDO}
-UNIT_SIEMENS_PER_METER: Set[MultilevelSensorScaleType] = {
+]
+UNIT_RSSI: List[MultilevelSensorScaleType] = [RfSignalStrengthScale.RSSI]
+UNIT_SECOND: List[MultilevelSensorScaleType] = [TimeScale.SECOND]
+UNIT_SHINDO: List[MultilevelSensorScaleType] = [SeismicIntensityScale.SHINDO]
+UNIT_SIEMENS_PER_METER: List[MultilevelSensorScaleType] = [
     ElectricalConductivityScale.SIEMENS_PER_METER
-}
-UNIT_SURFACE_WAVE: Set[MultilevelSensorScaleType] = {SeismicMagnitudeScale.SURFACE_WAVE}
-UNIT_SYSTOLIC: Set[MultilevelSensorScaleType] = {BloodPressureScale.SYSTOLIC}
-UNIT_UNITLESS: Set[MultilevelSensorScaleType] = {UnitlessScale.UNITLESS}
-UNIT_UV_INDEX: Set[MultilevelSensorScaleType] = {UltravioletScale.UV_INDEX}
-UNIT_VOLT: Set[MultilevelSensorScaleType] = {VoltageScale.VOLT}
-UNIT_VOLUME_WATER_CONTENT: Set[MultilevelSensorScaleType] = {
+]
+UNIT_SURFACE_WAVE: List[MultilevelSensorScaleType] = [
+    SeismicMagnitudeScale.SURFACE_WAVE
+]
+UNIT_SYSTOLIC: List[MultilevelSensorScaleType] = [BloodPressureScale.SYSTOLIC]
+UNIT_UNITLESS: List[MultilevelSensorScaleType] = [UnitlessScale.UNITLESS]
+UNIT_UV_INDEX: List[MultilevelSensorScaleType] = [UltravioletScale.UV_INDEX]
+UNIT_VOLT: List[MultilevelSensorScaleType] = [VoltageScale.VOLT]
+UNIT_VOLUME_WATER_CONTENT: List[MultilevelSensorScaleType] = [
     MoistureScale.VOLUME_WATER_CONTENT
-}
-UNIT_WATER_ACTIVITY: Set[MultilevelSensorScaleType] = {MoistureScale.WATER_ACTIVITY}
-UNIT_WATT: Set[MultilevelSensorScaleType] = {PowerScale.WATT}
-UNIT_WATT_PER_SQUARE_METER: Set[MultilevelSensorScaleType] = {
+]
+UNIT_WATER_ACTIVITY: List[MultilevelSensorScaleType] = [MoistureScale.WATER_ACTIVITY]
+UNIT_WATT: List[MultilevelSensorScaleType] = [PowerScale.WATT]
+UNIT_WATT_PER_SQUARE_METER: List[MultilevelSensorScaleType] = [
     SolarRadiationScale.WATT_PER_SQUARE_METER
-}
+]
 
 # ----------------------------------------------------------------------------------- #
 # **END OF AUTOGENERATED CONTENT** (DO NOT EDIT/REMOVE THIS COMMENT BLOCK AND DO NOT  #
@@ -782,23 +790,23 @@ UNIT_WATT_PER_SQUARE_METER: Set[MultilevelSensorScaleType] = {
 # LINES WRITTEN BELOW THIS BLOCK WILL BE PRESERVED AS LONG AS THIS BLOCK REMAINS)     #
 # ----------------------------------------------------------------------------------- #
 
-CO_SENSORS = {MultilevelSensorType.CARBON_MONOXIDE_LEVEL}
-CO2_SENSORS = {MultilevelSensorType.CARBON_DIOXIDE_LEVEL}
-CURRENT_SENSORS = {MultilevelSensorType.CURRENT}
-ENERGY_MEASUREMENT_SENSORS = {MultilevelSensorType.BASIS_METABOLIC_RATE}
-HUMIDITY_SENSORS = {MultilevelSensorType.HUMIDITY}
-ILLUMINANCE_SENSORS = {MultilevelSensorType.ILLUMINANCE}
-POWER_SENSORS = {MultilevelSensorType.POWER}
-PRESSURE_SENSORS = {
+CO_SENSORS = [MultilevelSensorType.CARBON_MONOXIDE_LEVEL]
+CO2_SENSORS = [MultilevelSensorType.CARBON_DIOXIDE_LEVEL]
+CURRENT_SENSORS = [MultilevelSensorType.CURRENT]
+ENERGY_MEASUREMENT_SENSORS = [MultilevelSensorType.BASIS_METABOLIC_RATE]
+HUMIDITY_SENSORS = [MultilevelSensorType.HUMIDITY]
+ILLUMINANCE_SENSORS = [MultilevelSensorType.ILLUMINANCE]
+POWER_SENSORS = [MultilevelSensorType.POWER]
+PRESSURE_SENSORS = [
     MultilevelSensorType.BLOOD_PRESSURE,
     MultilevelSensorType.WATER_PRESSURE,
     MultilevelSensorType.SUCTION_PRESSURE,
     MultilevelSensorType.DISCHARGE_PRESSURE,
     MultilevelSensorType.BAROMETRIC_PRESSURE,
     MultilevelSensorType.ATMOSPHERIC_PRESSURE,
-}
-SIGNAL_STRENGTH_SENSORS = {MultilevelSensorType.RF_SIGNAL_STRENGTH}
-TEMPERATURE_SENSORS = {
+]
+SIGNAL_STRENGTH_SENSORS = [MultilevelSensorType.RF_SIGNAL_STRENGTH]
+TEMPERATURE_SENSORS = [
     MultilevelSensorType.AIR_TEMPERATURE,
     MultilevelSensorType.DEW_POINT,
     MultilevelSensorType.WATER_TEMPERATURE,
@@ -815,8 +823,8 @@ TEMPERATURE_SENSORS = {
     MultilevelSensorType.LIQUID_LINE_TEMPERATURE,
     MultilevelSensorType.DISCHARGE_LINE_TEMPERATURE,
     MultilevelSensorType.DEFROST_TEMPERATURE,
-}
-VOLTAGE_SENSORS = {
+]
+VOLTAGE_SENSORS = [
     MultilevelSensorType.VOLTAGE,
     MultilevelSensorType.WATER_OXIDATION_REDUCTION_POTENTIAL,
-}
+]

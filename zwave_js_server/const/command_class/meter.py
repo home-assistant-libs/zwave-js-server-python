@@ -1,6 +1,6 @@
 """Constants for Meter CC."""
 from enum import IntEnum
-from typing import Dict, Set, Type
+from typing import Dict, List, Type
 
 VALUE_PROPERTY = "value"
 
@@ -78,54 +78,54 @@ METER_TYPE_TO_SCALE_ENUM_MAP: Dict[MeterType, Type[MeterScaleType]] = {
     MeterType.COOLING: CoolingScale,
 }
 
-ENERGY_TOTAL_INCREASING_METER_TYPES: Set[MeterScaleType] = {
+ENERGY_TOTAL_INCREASING_METER_TYPES: List[MeterScaleType] = [
     ElectricScale.KILOWATT_HOUR,
     ElectricScale.KILOVOLT_AMPERE_HOUR,
     ElectricScale.KILOVOLT_AMPERE_REACTIVE_HOUR,
     HeatingScale.KILOWATT_HOUR,
     CoolingScale.KILOWATT_HOUR,
     ElectricScale.PULSE_COUNT,
-}
-POWER_METER_TYPES: Set[MeterScaleType] = {
+]
+POWER_METER_TYPES: List[MeterScaleType] = [
     ElectricScale.WATT,
     ElectricScale.KILOVOLT_AMPERE_REACTIVE,
-}
-POWER_FACTOR_METER_TYPES: Set[MeterScaleType] = {ElectricScale.POWER_FACTOR}
-VOLTAGE_METER_TYPES: Set[MeterScaleType] = {ElectricScale.VOLT}
-CURRENT_METER_TYPES: Set[MeterScaleType] = {ElectricScale.AMPERE}
-GAS_METER_TYPES: Set[MeterScaleType] = {
+]
+POWER_FACTOR_METER_TYPES: List[MeterScaleType] = [ElectricScale.POWER_FACTOR]
+VOLTAGE_METER_TYPES: List[MeterScaleType] = [ElectricScale.VOLT]
+CURRENT_METER_TYPES: List[MeterScaleType] = [ElectricScale.AMPERE]
+GAS_METER_TYPES: List[MeterScaleType] = [
     GasScale.CUBIC_METER,
     GasScale.CUBIC_FEET,
     GasScale.PULSE_COUNT,
-}
-WATER_METER_TYPES: Set[MeterScaleType] = {
+]
+WATER_METER_TYPES: List[MeterScaleType] = [
     WaterScale.CUBIC_METER,
     WaterScale.CUBIC_FEET,
     WaterScale.US_GALLON,
     WaterScale.PULSE_COUNT,
-}
+]
 
-UNIT_KILOWATT_HOUR: Set[MeterScaleType] = {
+UNIT_KILOWATT_HOUR: List[MeterScaleType] = [
     ElectricScale.KILOWATT_HOUR,
     HeatingScale.KILOWATT_HOUR,
     CoolingScale.KILOWATT_HOUR,
-}
-UNIT_KILOVOLT_AMPERE_HOUR: Set[MeterScaleType] = {ElectricScale.KILOVOLT_AMPERE_HOUR}
-UNIT_WATT: Set[MeterScaleType] = {ElectricScale.WATT}
-UNIT_PULSE_COUNT: Set[MeterScaleType] = {
+]
+UNIT_KILOVOLT_AMPERE_HOUR: List[MeterScaleType] = [ElectricScale.KILOVOLT_AMPERE_HOUR]
+UNIT_WATT: List[MeterScaleType] = [ElectricScale.WATT]
+UNIT_PULSE_COUNT: List[MeterScaleType] = [
     ElectricScale.PULSE_COUNT,
     GasScale.PULSE_COUNT,
     WaterScale.PULSE_COUNT,
-}
-UNIT_VOLT: Set[MeterScaleType] = {ElectricScale.VOLT}
-UNIT_AMPERE: Set[MeterScaleType] = {ElectricScale.AMPERE}
-UNIT_POWER_FACTOR: Set[MeterScaleType] = {ElectricScale.POWER_FACTOR}
-UNIT_KILOVOLT_AMPERE_REACTIVE: Set[MeterScaleType] = {
+]
+UNIT_VOLT: List[MeterScaleType] = [ElectricScale.VOLT]
+UNIT_AMPERE: List[MeterScaleType] = [ElectricScale.AMPERE]
+UNIT_POWER_FACTOR: List[MeterScaleType] = [ElectricScale.POWER_FACTOR]
+UNIT_KILOVOLT_AMPERE_REACTIVE: List[MeterScaleType] = [
     ElectricScale.KILOVOLT_AMPERE_REACTIVE
-}
-UNIT_KILOVOLT_AMPERE_REACTIVE_HOUR: Set[MeterScaleType] = {
+]
+UNIT_KILOVOLT_AMPERE_REACTIVE_HOUR: List[MeterScaleType] = [
     ElectricScale.KILOVOLT_AMPERE_REACTIVE_HOUR
-}
-UNIT_CUBIC_METER: Set[MeterScaleType] = {GasScale.CUBIC_METER, WaterScale.CUBIC_METER}
-UNIT_CUBIC_FEET: Set[MeterScaleType] = {GasScale.CUBIC_FEET, WaterScale.CUBIC_FEET}
-UNIT_US_GALLON: Set[MeterScaleType] = {WaterScale.US_GALLON}
+]
+UNIT_CUBIC_METER: List[MeterScaleType] = [GasScale.CUBIC_METER, WaterScale.CUBIC_METER]
+UNIT_CUBIC_FEET: List[MeterScaleType] = [GasScale.CUBIC_FEET, WaterScale.CUBIC_FEET]
+UNIT_US_GALLON: List[MeterScaleType] = [WaterScale.US_GALLON]
