@@ -159,7 +159,7 @@ lines = [
     "# ----------------------------------------------------------------------------------- #",
     "",
     "from enum import IntEnum",
-    "from typing import Dict, Set, Type",
+    "from typing import Dict, List, Type",
     'CC_SPECIFIC_SCALE = "scale"',
     'CC_SPECIFIC_SENSOR_TYPE = "sensorType"',
 ]
@@ -217,7 +217,7 @@ lines.append("")
 
 for unit_name, unit_enums in unit_name_to_enum_map.items():
     lines.append(
-        f"UNIT_{unit_name}: Set[MultilevelSensorScaleType] = {{{','.join(sorted(unit_enums))}}}"
+        f"UNIT_{unit_name}: List[MultilevelSensorScaleType] = [{','.join(sorted(unit_enums))}]"
     )
 
 lines.extend(
