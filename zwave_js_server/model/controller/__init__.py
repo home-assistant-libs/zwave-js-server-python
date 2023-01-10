@@ -89,6 +89,13 @@ class Controller(EventBase):
         return self.data.get("ownNodeId")
 
     @property
+    def own_node(self) -> Optional[Node]:
+        """Return own_node."""
+        if self.own_node_id is None:
+            return None
+        return self.nodes.get(self.own_node_id)
+
+    @property
     def is_primary(self) -> Optional[bool]:
         """Return is_primary."""
         return self.data.get("isPrimary")

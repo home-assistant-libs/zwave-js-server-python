@@ -24,6 +24,7 @@ from zwave_js_server.model import association as association_pkg
 from zwave_js_server.model import controller as controller_pkg
 from zwave_js_server.model.controller.statistics import ControllerStatistics
 from zwave_js_server.model.firmware import FirmwareUpdateFileInfo
+from zwave_js_server.model.node import Node
 
 from .. import load_fixture
 
@@ -38,6 +39,7 @@ def test_from_state():
     assert ctrl.controller_type == 1
     assert ctrl.home_id == 3601639587
     assert ctrl.own_node_id == 1
+    assert isinstance(ctrl.own_node, Node)
     assert ctrl.is_primary
     assert ctrl.is_using_home_id_from_other_network is False
     assert ctrl.is_SIS_present is True
@@ -141,6 +143,16 @@ def test_from_state():
         == stats.timeout_response
         == 0
     )
+
+
+def test_no_own_node_id():
+    """Test no own_node_id method."""
+    state = json.loads(load_fixture("basic_dump.txt").split("\n")[0])["result"]["state"]
+    state["controller"].pop("ownNodeId")
+
+    ctrl = controller_pkg.Controller(None, state)
+    assert ctrl.own_node_id is None
+    assert ctrl.own_node is None
 
 
 async def test_begin_inclusion(controller, uuid4, mock_command):
