@@ -404,7 +404,7 @@ class Client:
                     "record_type": "event",
                     "ts": datetime.utcnow().isoformat(),
                     "type": msg["event"]["event"],
-                    "event": deepcopy(msg),
+                    "event_msg": deepcopy(msg),
                 }
             )
 

@@ -93,7 +93,7 @@ class MockZwaveJsServer:
         if record.get("record_type") not in ("event", "command"):
             raise TypeError(f"Malformed record: {record}")
         if record["record_type"] == "event":
-            await self.send_json(record["data"])
+            await self.send_json(record["event_msg"])
         else:
             add_command_result(self.command_results, record)
 
@@ -241,7 +241,7 @@ def add_command_result(
 
 def get_args() -> argparse.Namespace:
     """Get arguments."""
-    parser = argparse.ArgumentParser(description="Dump Instance")
+    parser = argparse.ArgumentParser(description="Mock Z-Wave JS Server")
     parser.add_argument(
         "network_state_path", type=str, help="File path to network state dump JSON."
     )
@@ -252,7 +252,7 @@ def get_args() -> argparse.Namespace:
     parser.add_argument(
         "--log-level",
         type=str.upper,
-        help="Log level",
+        help="Log level for the mock server instance",
         default="INFO",
         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
     )
@@ -308,7 +308,7 @@ def main() -> None:
                         f"Invalid record in combined replay dump file: {record}"
                     )
                 if record["record_type"] == "event":
-                    events_to_replay.append(record["data"])
+                    events_to_replay.append(record["event_msg"])
                 else:
                     add_command_result(command_results, record)
 
@@ -328,7 +328,7 @@ def main() -> None:
                 raise ExitException(
                     f"Malformed record in events to replay file: {bad_record}"
                 )
-            events_to_replay.extend([record["data"] for record in records])
+            events_to_replay.extend([record["event_msg"] for record in records])
 
     if args.command_results_path:
         with open(args.command_results_path, "r", encoding="utf8") as fp:
