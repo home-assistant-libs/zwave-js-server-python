@@ -148,7 +148,7 @@ def test_from_state():
 def test_no_own_node_id():
     """Test no own_node_id method."""
     state = json.loads(load_fixture("basic_dump.txt").split("\n")[0])["result"]["state"]
-    state.pop("ownNodeId")
+    state["controller"].pop("ownNodeId")
 
     ctrl = controller_pkg.Controller(None, state)
     assert ctrl.own_node_id is None
