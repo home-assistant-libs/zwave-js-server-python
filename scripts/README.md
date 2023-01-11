@@ -92,9 +92,9 @@ The network state dump tells the server what the initial state of the network sh
 
 #### Events to Replay (optional)
 
-`zwave-js` events can be replayed on the server once a client has connected to the server instance and started listening to emulate things happening on the network. These events can be provided initially at runtime via a JSON file, but the server also has an endpoint `/replay` that can be POSTed to in order to add events to the replay queue.
+`zwave-js` events can be replayed on the server once a client has connected to the server instance and started listening to emulate things happening on the network. These events can be provided initially at runtime via a JSON file, but the server also has a [`/replay` endpoint](#replay-endpoint) that can be POSTed to in order to add events to the replay queue.
 
-Command results can be recorded from a live network using the library's Client class (see the Recording section)
+Command results can be recorded from a live network using the library's Client class (see the [Recording section](#recording-events-and-commandscommand-responses) for more details)
 
 ##### Limitations
 
@@ -122,9 +122,9 @@ Command results can be recorded from a live network using the library's Client c
 
 #### Command Results (optional)
 
-The server can respond to commands from a queue of command responses. After each command, the first response for that command is removed from the queue and sent back to the client. In this way, you can control the exact behavior of what the server would send the client, even if there are multiple calls for the same command. These command results can be provided initially at runtime via a JSON file, but the server also has an endpoint `/replay` that can be POSTed to in order to add command results to the queue.
+The server can respond to commands from a queue of command responses. After each command, the first response for that command is removed from the queue and sent back to the client. In this way, you can control the exact behavior of what the server would send the client, even if there are multiple calls for the same command. These command results can be provided initially at runtime via a JSON file, but the server also has a [`/replay` endpoint](#replay-endpoint) that can be POSTed to in order to add command results to the queue.
 
-Command results can be recorded from a live network using the library's Client class (see the Recording section)
+Command results can be recorded from a live network using the library's Client class (see the [Recording section](#recording-events-and-commandscommand-responses) for more details)
 
 ##### Limitations
 
