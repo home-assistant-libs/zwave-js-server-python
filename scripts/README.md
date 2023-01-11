@@ -14,8 +14,6 @@ This script is used to download the latest multilevel sensor types and scales JS
 
 This script allows you to run a mock Z-Wave JS Server instance using a network state dump from the `zwave-js-server-python` library. While the functionality is limited for now and is intended to be expanded in the future, the mock server also supports manipulating the state of the network by replaying events on it and emulating a responsive network by setting up mocked responses to commands. The main purpose of this mock server is to allow developers to test, build, and troubleshoot applications that use the `zwave-js-server-python` library to integrate with [zwave-js](https://github.com/zwave-js/node-zwave-js) (e.g. Home Assistant).
 
-To run the mock server, you will need to install [requirements.txt](requirements.txt) into your environment.
-
 ### Usage
 
 At a minimum, the mock server instance needs the file path to a network state dump (which can be retrieved from an existing network using the library's [dump](../../zwave_js_server/dump.py) module). All other inputs are optional.

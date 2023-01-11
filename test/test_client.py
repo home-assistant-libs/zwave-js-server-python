@@ -402,7 +402,7 @@ async def test_record_messages(wallmote_central_scene, mock_command, uuid4):
     event = client._recorded_events[0]
     assert event["record_type"] == "event"
     assert event["type"] == "value updated"
-    assert event["event"] == {
+    assert event["event_msg"] == {
         "type": "event",
         "event": {
             "source": "node",
