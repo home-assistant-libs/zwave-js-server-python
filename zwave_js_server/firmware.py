@@ -6,7 +6,7 @@ import aiohttp
 
 from .client import Client
 from .model.node import Node
-from .model.node.firmware import FirmwareUpdateData
+from .model.firmware import FirmwareUpdateData
 
 
 async def update_firmware(
