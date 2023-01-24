@@ -39,7 +39,7 @@ async def update_firmware(
     return cast(bool, data["success"])
 
 
-async def update_controller_firmware_otw(
+async def controller_firmware_update_otw(
     url: str,
     firmware_file: FirmwareUpdateData,
     session: aiohttp.ClientSession,
