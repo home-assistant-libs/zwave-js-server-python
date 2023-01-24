@@ -1842,13 +1842,17 @@ async def test_firmware_events(controller):
         data={
             "source": "controller",
             "event": "firmware update finished",
-            "result": 255,
+            "result": {
+                "status": 255,
+                "success": True
+            },
         },
     )
 
     controller.handle_firmware_update_finished(event)
     result = event.data["firmware_update_finished"]
-    assert result == FirmwareUpdateStatus.OK
+    assert result.status == FirmwareUpdateStatus.OK
+    assert result.success
 
 
 async def test_unknown_event(controller):

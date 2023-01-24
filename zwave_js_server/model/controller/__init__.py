@@ -23,7 +23,7 @@ from ..association import AssociationAddress, AssociationGroup
 from ..node import Node
 from .data_model import ControllerDataType
 from .event_model import CONTROLLER_EVENT_MODEL_MAP
-from .firmware import FirmwareUpdateProgress, FirmwareUpdateStatus
+from .firmware import FirmwareUpdateProgress, FirmwareUpdateResult
 from .inclusion_and_provisioning import (
     InclusionGrant,
     ProvisioningEntry,
@@ -792,7 +792,7 @@ class Controller(EventBase):
 
     def handle_firmware_update_finished(self, event: Event) -> None:
         """Process a firmware update finished event."""
-        event.data["firmware_update_finished"] = FirmwareUpdateStatus(
+        event.data["firmware_update_finished"] = FirmwareUpdateResult(
             event.data["result"]
         )
 

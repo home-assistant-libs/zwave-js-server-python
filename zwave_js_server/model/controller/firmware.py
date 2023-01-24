@@ -11,7 +11,7 @@ class FirmwareUpdateStatus(IntEnum):
 
     ERROR_TIMEOUT = 0
     # The maximum number of retry attempts for a firmware fragments were reached
-    ERROR_RETRYLIMITREACHED = 1
+    ERROR_RETRY_LIMIT_REACHED = 1
     # The update was aborted by the bootloader
     ERROR_ABORTED = 2
     OK = 255
@@ -46,3 +46,28 @@ class FirmwareUpdateProgress:
     def progress(self) -> float:
         """Return progress."""
         return float(self.data["progress"])
+
+
+class FirmwareUpdateResultDataType(TypedDict):
+    """Represent a controller firmware update result dict type."""
+
+    status: int
+    success: bool
+
+
+class FirmwareUpdateResult:
+    """Model for controller firmware update result data."""
+
+    def __init__(self, data: FirmwareUpdateResultDataType) -> None:
+        """Initialize."""
+        self.data = data
+
+    @property
+    def status(self) -> FirmwareUpdateStatus:
+        """Return the firmware update status."""
+        return FirmwareUpdateStatus(self.data["status"])
+
+    @property
+    def success(self) -> bool:
+        """Return whether the firmware update was successful."""
+        return self.data["success"]
