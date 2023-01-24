@@ -5,8 +5,8 @@ from typing import Dict, List, Optional, cast
 import aiohttp
 
 from .client import Client
-from .model.node import Node
 from .model.firmware import FirmwareUpdateData
+from .model.node import Node
 
 
 async def update_firmware(
