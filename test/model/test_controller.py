@@ -1842,10 +1842,7 @@ async def test_firmware_events(controller):
         data={
             "source": "controller",
             "event": "firmware update finished",
-            "result": {
-                "status": 255,
-                "success": True
-            },
+            "result": {"status": 255, "success": True},
         },
     )
 
