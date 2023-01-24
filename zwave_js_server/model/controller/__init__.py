@@ -2,7 +2,10 @@
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Union, cast
 
-from zwave_js_server.model.firmware import FirmwareUpdateFileInfo, FirmwareUpdateInfo
+from zwave_js_server.model.node.firmware import (
+    FirmwareUpdateFileInfo,
+    FirmwareUpdateInfo,
+)
 
 from ...const import (
     MINIMUM_QR_STRING_LENGTH,
@@ -772,6 +775,12 @@ class Controller(EventBase):
 
         event.data["controller"] = self
         self.emit(event.type, event.data)
+
+    def handle_firmware_update_progress(self, event: Event) -> None:
+        """Process a firmware update progress event."""
+
+    def handle_firmware_update_finished(self, event: Event) -> None:
+        """Process a firmware update finished event."""
 
     def handle_inclusion_failed(self, event: Event) -> None:
         """Process an inclusion failed event."""

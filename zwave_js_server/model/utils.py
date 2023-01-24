@@ -1,4 +1,6 @@
 """Model for utils commands."""
+from typing import Optional
+
 from ..client import Client
 from ..const import MINIMUM_QR_STRING_LENGTH
 from .controller import QRProvisioningInformation
@@ -19,3 +21,13 @@ async def async_parse_qr_code_string(
         {"command": "utils.parse_qr_code_string", "qr": qr_code_string}
     )
     return QRProvisioningInformation.from_dict(data["qrProvisioningInformation"])
+
+
+async def async_try_parse_dsk_from_qr_code_string(
+    client: Client, qr_code_string: str
+) -> Optional[str]:
+    """Try to get DSK QR code."""
+    data = await client.async_send_command(
+        {"command": "utils.try_parse_dsk_from_qr_code_string", "qr": qr_code_string}
+    )
+    return data.get("dsk")

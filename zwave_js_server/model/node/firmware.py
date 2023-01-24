@@ -1,14 +1,18 @@
 """Provide a model for Z-Wave firmware."""
 from dataclasses import asdict, dataclass
-from typing import List, Optional, Union, cast
+from enum import IntEnum
+from typing import TYPE_CHECKING, List, Optional, Union, cast
 
-from ..const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED, VALUE_UNKNOWN
-from ..util.helpers import convert_bytes_to_base64
+from ...const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED, VALUE_UNKNOWN
+from ...util.helpers import convert_bytes_to_base64
 
 if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
     from typing_extensions import TypedDict
 else:
     from typing import TypedDict
+
+if TYPE_CHECKING:
+    from . import Node
 
 
 class FirmwareUpdateDataDataType(TypedDict, total=False):
@@ -105,6 +109,109 @@ class FirmwareUpdateCapabilities:
             "continues_to_function": self.continues_to_function,
             "supports_activation": self.supports_activation,
         }
+
+
+class FirmwareUpdateStatus(IntEnum):
+    """Enum with all node firmware update status values.
+
+    https://zwave-js.github.io/node-zwave-js/#/api/node?id=status
+    """
+
+    ERROR_TIMEOUT = -1
+    ERROR_CHECKSUM = 0
+    ERROR_TRANSMISSION_FAILED = 1
+    ERROR_INVALID_MANUFACTURER_ID = 2
+    ERROR_INVALID_FIRMWARE_ID = 3
+    ERROR_INVALID_FIRMWARE_TARGET = 4
+    ERROR_INVALID_HEADER_INFORMATION = 5
+    ERROR_INVALID_HEADER_FORMAT = 6
+    ERROR_INSUFFICIENT_MEMORY = 7
+    ERROR_INVALID_HARDWARE_VERSION = 8
+    OK_WAITING_FOR_ACTIVATION = 253
+    OK_NO_RESTART = 254
+    OK_RESTART_PENDING = 255
+
+
+class FirmwareUpdateProgressDataType(TypedDict):
+    """Represent a node firmware update progress dict type."""
+
+    currentFile: int
+    totalFiles: int
+    sentFragments: int
+    totalFragments: int
+    progress: float
+
+
+class FirmwareUpdateProgress:
+    """Model for a node firmware update progress data."""
+
+    def __init__(self, node: "Node", data: FirmwareUpdateProgressDataType) -> None:
+        """Initialize."""
+        self.data = data
+        self.node = node
+
+    @property
+    def current_file(self) -> int:
+        """Return current file."""
+        return self.data["currentFile"]
+
+    @property
+    def total_files(self) -> int:
+        """Return total files."""
+        return self.data["totalFiles"]
+
+    @property
+    def sent_fragments(self) -> int:
+        """Return the number of fragments sent to the device so far."""
+        return self.data["sentFragments"]
+
+    @property
+    def total_fragments(self) -> int:
+        """Return the total number of fragments that need to be sent to the device."""
+        return self.data["totalFragments"]
+
+    @property
+    def progress(self) -> float:
+        """Return progress."""
+        return float(self.data["progress"])
+
+
+class FirmwareUpdateResultDataType(TypedDict, total=False):
+    """Represent a node firmware update result dict type."""
+
+    status: int  # required
+    success: bool  # required
+    waitTime: int
+    reInterview: bool  # required
+
+
+class FirmwareUpdateResult:
+    """Model for node firmware update result data."""
+
+    def __init__(self, node: "Node", data: FirmwareUpdateResultDataType) -> None:
+        """Initialize."""
+        self.data = data
+        self.node = node
+
+    @property
+    def status(self) -> FirmwareUpdateStatus:
+        """Return the firmware update status."""
+        return FirmwareUpdateStatus(self.data["status"])
+
+    @property
+    def success(self) -> bool:
+        """Return whether the firmware update was successful."""
+        return self.data["success"]
+
+    @property
+    def wait_time(self) -> Optional[int]:
+        """Return the wait time in seconds before the device is functional again."""
+        return self.data.get("waitTime")
+
+    @property
+    def reinterview(self) -> bool:
+        """Return whether the node will be re-interviewed."""
+        return self.data["reInterview"]
 
 
 class FirmwareUpdateFileInfoDataType(TypedDict):

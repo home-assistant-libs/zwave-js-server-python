@@ -2,7 +2,7 @@
 from unittest.mock import patch
 
 from zwave_js_server.firmware import update_firmware
-from zwave_js_server.model.firmware import FirmwareUpdateData
+from zwave_js_server.model.node.firmware import FirmwareUpdateData
 
 
 async def test_update_firmware_guess_format(url, client_session, multisensor_6):

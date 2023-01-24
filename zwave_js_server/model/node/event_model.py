@@ -6,7 +6,6 @@ from pydantic import BaseModel
 from zwave_js_server.const import CommandClass
 
 from ...event import BaseEventModel
-from ..firmware import FirmwareUpdateProgressDataType, FirmwareUpdateResultDataType
 from ..notification import (
     EntryControlNotificationArgsDataType,
     NotificationNotificationArgsDataType,
@@ -14,6 +13,7 @@ from ..notification import (
 )
 from ..value import ValueDataType
 from .data_model import NodeDataType
+from .firmware import FirmwareUpdateProgressDataType, FirmwareUpdateResultDataType
 from .statistics import NodeStatisticsDataType
 
 

@@ -21,14 +21,6 @@ from ..command_class import CommandClassInfo
 from ..device_class import DeviceClass
 from ..device_config import DeviceConfig
 from ..endpoint import Endpoint
-from ..firmware import (
-    FirmwareUpdateCapabilities,
-    FirmwareUpdateCapabilitiesDataType,
-    FirmwareUpdateProgress,
-    FirmwareUpdateProgressDataType,
-    FirmwareUpdateResult,
-    FirmwareUpdateResultDataType,
-)
 from ..notification import (
     EntryControlNotification,
     EntryControlNotificationDataType,
@@ -51,6 +43,14 @@ from ..value import (
 )
 from .data_model import NodeDataType
 from .event_model import NODE_EVENT_MODEL_MAP
+from .firmware import (
+    FirmwareUpdateCapabilities,
+    FirmwareUpdateCapabilitiesDataType,
+    FirmwareUpdateProgress,
+    FirmwareUpdateProgressDataType,
+    FirmwareUpdateResult,
+    FirmwareUpdateResultDataType,
+)
 from .health_check import (
     CheckHealthProgress,
     LifelineHealthCheckSummary,

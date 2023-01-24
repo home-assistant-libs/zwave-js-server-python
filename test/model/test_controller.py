@@ -23,8 +23,8 @@ from zwave_js_server.exceptions import RepeaterRssiErrorReceived, RssiErrorRecei
 from zwave_js_server.model import association as association_pkg
 from zwave_js_server.model import controller as controller_pkg
 from zwave_js_server.model.controller.statistics import ControllerStatistics
-from zwave_js_server.model.firmware import FirmwareUpdateFileInfo
 from zwave_js_server.model.node import Node
+from zwave_js_server.model.node.firmware import FirmwareUpdateFileInfo
 
 from .. import load_fixture
 
