@@ -46,17 +46,3 @@ class FirmwareUpdateProgress:
     def progress(self) -> float:
         """Return progress."""
         return float(self.data["progress"])
-
-
-class FirmwareUpdateResultDataType(TypedDict):
-    """Represent a controller firmware update result dict type."""
-
-    result: int
-
-
-class FirmwareUpdateResult:
-    """Model for controller firmware update result data."""
-
-    def __init__(self, data: FirmwareUpdateResultDataType) -> None:
-        """Initialize."""
-        self.result = FirmwareUpdateStatus(data["result"])

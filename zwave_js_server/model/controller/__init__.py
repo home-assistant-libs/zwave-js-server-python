@@ -23,6 +23,7 @@ from ..association import AssociationAddress, AssociationGroup
 from ..node import Node
 from .data_model import ControllerDataType
 from .event_model import CONTROLLER_EVENT_MODEL_MAP
+from .firmware import FirmwareUpdateProgress, FirmwareUpdateStatus
 from .inclusion_and_provisioning import (
     InclusionGrant,
     ProvisioningEntry,
@@ -184,6 +185,13 @@ class Controller(EventBase):
     def inclusion_state(self) -> InclusionState:
         """Return inclusion state."""
         return InclusionState(self.data["inclusionState"])
+
+    @property
+    def rf_region(self) -> Optional[RFRegion]:
+        """Return RF region of controller."""
+        if (rf_region := self.data.get("rfRegion")) is None:
+            return None
+        return RFRegion(rf_region)
 
     def update(self, data: ControllerDataType) -> None:
         """Update controller data."""
@@ -778,9 +786,15 @@ class Controller(EventBase):
 
     def handle_firmware_update_progress(self, event: Event) -> None:
         """Process a firmware update progress event."""
+        event.data["firmware_update_progress"] = FirmwareUpdateProgress(
+            event.data["progress"]
+        )
 
     def handle_firmware_update_finished(self, event: Event) -> None:
         """Process a firmware update finished event."""
+        event.data["firmware_update_finished"] = FirmwareUpdateStatus(
+            event.data["result"]
+        )
 
     def handle_inclusion_failed(self, event: Event) -> None:
         """Process an inclusion failed event."""

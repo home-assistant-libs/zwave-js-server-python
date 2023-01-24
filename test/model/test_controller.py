@@ -22,6 +22,7 @@ from zwave_js_server.event import Event
 from zwave_js_server.exceptions import RepeaterRssiErrorReceived, RssiErrorReceived
 from zwave_js_server.model import association as association_pkg
 from zwave_js_server.model import controller as controller_pkg
+from zwave_js_server.model.controller.firmware import FirmwareUpdateStatus
 from zwave_js_server.model.controller.statistics import ControllerStatistics
 from zwave_js_server.model.node import Node
 from zwave_js_server.model.node.firmware import FirmwareUpdateFileInfo
@@ -143,16 +144,19 @@ def test_from_state():
         == stats.timeout_response
         == 0
     )
+    assert ctrl.rf_region is None
 
 
-def test_no_own_node_id():
-    """Test no own_node_id method."""
+def test_controller_mods():
+    """Test modifications to controller method."""
     state = json.loads(load_fixture("basic_dump.txt").split("\n")[0])["result"]["state"]
     state["controller"].pop("ownNodeId")
+    state["controller"]["rfRegion"] = 0
 
     ctrl = controller_pkg.Controller(None, state)
     assert ctrl.own_node_id is None
     assert ctrl.own_node is None
+    assert ctrl.rf_region == RFRegion.EUROPE
 
 
 async def test_begin_inclusion(controller, uuid4, mock_command):
@@ -1810,6 +1814,41 @@ async def test_inclusion_aborted(controller):
 
     # Ensure that the handler doesn't modify the event
     assert {k: v for k, v in event.data.items() if k != "controller"} == event_data
+
+
+async def test_firmware_events(controller):
+    """Test firmware events."""
+    event = Event(
+        type="firmware update progress",
+        data={
+            "source": "controller",
+            "event": "firmware update progress",
+            "progress": {
+                "sentFragments": 1,
+                "totalFragments": 10,
+                "progress": 10.0,
+            },
+        },
+    )
+
+    controller.handle_firmware_update_progress(event)
+    progress = event.data["firmware_update_progress"]
+    assert progress.sent_fragments == 1
+    assert progress.total_fragments == 10
+    assert progress.progress == 10.0
+
+    event = Event(
+        type="firmware update finished",
+        data={
+            "source": "controller",
+            "event": "firmware update finished",
+            "result": 255,
+        },
+    )
+
+    controller.handle_firmware_update_finished(event)
+    result = event.data["firmware_update_finished"]
+    assert result == FirmwareUpdateStatus.OK
 
 
 async def test_unknown_event(controller):
