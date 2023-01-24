@@ -22,10 +22,10 @@ from zwave_js_server.event import Event
 from zwave_js_server.exceptions import RepeaterRssiErrorReceived, RssiErrorReceived
 from zwave_js_server.model import association as association_pkg
 from zwave_js_server.model import controller as controller_pkg
-from zwave_js_server.model.controller.firmware import FirmwareUpdateStatus
+from zwave_js_server.model.controller.firmware import ControllerFirmwareUpdateStatus
 from zwave_js_server.model.controller.statistics import ControllerStatistics
 from zwave_js_server.model.node import Node
-from zwave_js_server.model.node.firmware import FirmwareUpdateFileInfo
+from zwave_js_server.model.node.firmware import NodeFirmwareUpdateFileInfo
 
 from .. import load_fixture
 
@@ -1646,7 +1646,11 @@ async def test_begin_ota_firmware_update(multisensor_6, uuid4, mock_command):
     )
     assert await multisensor_6.client.driver.controller.async_firmware_update_ota(
         multisensor_6,
-        [FirmwareUpdateFileInfo(target=0, url="http://example.com", integrity="test")],
+        [
+            NodeFirmwareUpdateFileInfo(
+                target=0, url="http://example.com", integrity="test"
+            )
+        ],
     )
 
     assert len(ack_commands) == 1
@@ -1848,7 +1852,7 @@ async def test_firmware_events(controller):
 
     controller.handle_firmware_update_finished(event)
     result = event.data["firmware_update_finished"]
-    assert result.status == FirmwareUpdateStatus.OK
+    assert result.status == ControllerFirmwareUpdateStatus.OK
     assert result.success
 
 

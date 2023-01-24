@@ -44,12 +44,12 @@ from ..value import (
 from .data_model import NodeDataType
 from .event_model import NODE_EVENT_MODEL_MAP
 from .firmware import (
-    FirmwareUpdateCapabilities,
-    FirmwareUpdateCapabilitiesDataType,
-    FirmwareUpdateProgress,
-    FirmwareUpdateProgressDataType,
-    FirmwareUpdateResult,
-    FirmwareUpdateResultDataType,
+    NodeFirmwareUpdateCapabilities,
+    NodeFirmwareUpdateCapabilitiesDataType,
+    NodeFirmwareUpdateProgress,
+    NodeFirmwareUpdateProgressDataType,
+    NodeFirmwareUpdateResult,
+    NodeFirmwareUpdateResultDataType,
 )
 from .health_check import (
     CheckHealthProgress,
@@ -91,7 +91,7 @@ class Node(EventBase):
         self.data: NodeDataType = {}
         self._device_config = DeviceConfig({})
         self._statistics = NodeStatistics(client, data.get("statistics"))
-        self._firmware_update_progress: Optional[FirmwareUpdateProgress] = None
+        self._firmware_update_progress: Optional[NodeFirmwareUpdateProgress] = None
         self.values: Dict[str, Union[ConfigurationValue, Value]] = {}
         self.endpoints: Dict[int, Endpoint] = {}
         self.update(data)
@@ -309,7 +309,7 @@ class Node(EventBase):
         return self._statistics
 
     @property
-    def firmware_update_progress(self) -> Optional[FirmwareUpdateProgress]:
+    def firmware_update_progress(self) -> Optional[NodeFirmwareUpdateProgress]:
         """Return firmware update progress."""
         return self._firmware_update_progress
 
@@ -527,7 +527,7 @@ class Node(EventBase):
 
     async def async_get_firmware_update_capabilities(
         self,
-    ) -> FirmwareUpdateCapabilities:
+    ) -> NodeFirmwareUpdateCapabilities:
         """Send getFirmwareUpdateCapabilities command to Node."""
         data = await self.async_send_command(
             "get_firmware_update_capabilities",
@@ -535,13 +535,13 @@ class Node(EventBase):
             wait_for_result=True,
         )
         assert data
-        return FirmwareUpdateCapabilities(
-            cast(FirmwareUpdateCapabilitiesDataType, data["capabilities"])
+        return NodeFirmwareUpdateCapabilities(
+            cast(NodeFirmwareUpdateCapabilitiesDataType, data["capabilities"])
         )
 
     async def async_get_firmware_update_capabilities_cached(
         self,
-    ) -> FirmwareUpdateCapabilities:
+    ) -> NodeFirmwareUpdateCapabilities:
         """Send getFirmwareUpdateCapabilitiesCached command to Node."""
         data = await self.async_send_command(
             "get_firmware_update_capabilities_cached",
@@ -549,8 +549,8 @@ class Node(EventBase):
             wait_for_result=True,
         )
         assert data
-        return FirmwareUpdateCapabilities(
-            cast(FirmwareUpdateCapabilitiesDataType, data["capabilities"])
+        return NodeFirmwareUpdateCapabilities(
+            cast(NodeFirmwareUpdateCapabilitiesDataType, data["capabilities"])
         )
 
     async def async_abort_firmware_update(self) -> None:
@@ -905,15 +905,15 @@ class Node(EventBase):
         """Process a node firmware update progress event."""
         self._firmware_update_progress = event.data[
             "firmware_update_progress"
-        ] = FirmwareUpdateProgress(
-            self, cast(FirmwareUpdateProgressDataType, event.data["progress"])
+        ] = NodeFirmwareUpdateProgress(
+            self, cast(NodeFirmwareUpdateProgressDataType, event.data["progress"])
         )
 
     def handle_firmware_update_finished(self, event: Event) -> None:
         """Process a node firmware update finished event."""
         self._firmware_update_progress = None
-        event.data["firmware_update_finished"] = FirmwareUpdateResult(
-            self, cast(FirmwareUpdateResultDataType, event.data["result"])
+        event.data["firmware_update_finished"] = NodeFirmwareUpdateResult(
+            self, cast(NodeFirmwareUpdateResultDataType, event.data["result"])
         )
 
     def handle_statistics_updated(self, event: Event) -> None:

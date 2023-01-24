@@ -3,7 +3,7 @@ from enum import IntEnum
 from typing import TypedDict
 
 
-class FirmwareUpdateStatus(IntEnum):
+class ControllerFirmwareUpdateStatus(IntEnum):
     """Enum with all controller firmware update status values.
 
     https://zwave-js.github.io/node-zwave-js/#/api/node?id=status
@@ -17,7 +17,7 @@ class FirmwareUpdateStatus(IntEnum):
     OK = 255
 
 
-class FirmwareUpdateProgressDataType(TypedDict):
+class ControllerFirmwareUpdateProgressDataType(TypedDict):
     """Represent a controller firmware update progress dict type."""
 
     sentFragments: int
@@ -25,10 +25,10 @@ class FirmwareUpdateProgressDataType(TypedDict):
     progress: float
 
 
-class FirmwareUpdateProgress:
+class ControllerFirmwareUpdateProgress:
     """Model for a controller firmware update progress data."""
 
-    def __init__(self, data: FirmwareUpdateProgressDataType) -> None:
+    def __init__(self, data: ControllerFirmwareUpdateProgressDataType) -> None:
         """Initialize."""
         self.data = data
 
@@ -48,24 +48,24 @@ class FirmwareUpdateProgress:
         return float(self.data["progress"])
 
 
-class FirmwareUpdateResultDataType(TypedDict):
+class ControllerFirmwareUpdateResultDataType(TypedDict):
     """Represent a controller firmware update result dict type."""
 
     status: int
     success: bool
 
 
-class FirmwareUpdateResult:
+class ControllerFirmwareUpdateResult:
     """Model for controller firmware update result data."""
 
-    def __init__(self, data: FirmwareUpdateResultDataType) -> None:
+    def __init__(self, data: ControllerFirmwareUpdateResultDataType) -> None:
         """Initialize."""
         self.data = data
 
     @property
-    def status(self) -> FirmwareUpdateStatus:
+    def status(self) -> ControllerFirmwareUpdateStatus:
         """Return the firmware update status."""
-        return FirmwareUpdateStatus(self.data["status"])
+        return ControllerFirmwareUpdateStatus(self.data["status"])
 
     @property
     def success(self) -> bool:

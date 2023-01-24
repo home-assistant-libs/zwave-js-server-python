@@ -13,7 +13,10 @@ from ..notification import (
 )
 from ..value import ValueDataType
 from .data_model import NodeDataType
-from .firmware import FirmwareUpdateProgressDataType, FirmwareUpdateResultDataType
+from .firmware import (
+    NodeFirmwareUpdateProgressDataType,
+    NodeFirmwareUpdateResultDataType,
+)
 from .statistics import NodeStatisticsDataType
 
 
@@ -186,14 +189,14 @@ class FirmwareUpdateFinishedEventModel(BaseNodeEventModel):
     """Model for `firmware update finished` event data."""
 
     event: Literal["firmware update finished"]
-    result: FirmwareUpdateResultDataType
+    result: NodeFirmwareUpdateResultDataType
 
 
 class FirmwareUpdateProgressEventModel(BaseNodeEventModel):
     """Model for `firmware update progress` event data."""
 
     event: Literal["firmware update progress"]
-    progress: FirmwareUpdateProgressDataType
+    progress: NodeFirmwareUpdateProgressDataType
 
 
 NODE_EVENT_MODEL_MAP: Dict[str, Type["BaseNodeEventModel"]] = {

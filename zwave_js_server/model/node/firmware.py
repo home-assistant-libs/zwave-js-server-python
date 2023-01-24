@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from . import Node
 
 
-class FirmwareUpdateCapabilitiesDataType(TypedDict, total=False):
+class NodeFirmwareUpdateCapabilitiesDataType(TypedDict, total=False):
     """Represent a firmware update capabilities dict type."""
 
     firmwareUpgradable: bool  # required
@@ -23,7 +23,7 @@ class FirmwareUpdateCapabilitiesDataType(TypedDict, total=False):
     supportsActivation: Union[bool, str]
 
 
-class FirmwareUpdateCapabilitiesDict(TypedDict, total=False):
+class NodeFirmwareUpdateCapabilitiesDict(TypedDict, total=False):
     """Represent a dict from FirmwareUpdateCapabilities."""
 
     firmware_upgradable: bool  # required
@@ -32,10 +32,10 @@ class FirmwareUpdateCapabilitiesDict(TypedDict, total=False):
     supports_activation: Optional[bool]
 
 
-class FirmwareUpdateCapabilities:
+class NodeFirmwareUpdateCapabilities:
     """Model for firmware update capabilities."""
 
-    def __init__(self, data: FirmwareUpdateCapabilitiesDataType) -> None:
+    def __init__(self, data: NodeFirmwareUpdateCapabilitiesDataType) -> None:
         """Initialize class."""
         self.data = data
 
@@ -71,7 +71,7 @@ class FirmwareUpdateCapabilities:
         assert isinstance(val, bool)
         return val
 
-    def to_dict(self) -> FirmwareUpdateCapabilitiesDict:
+    def to_dict(self) -> NodeFirmwareUpdateCapabilitiesDict:
         """Return dict representation of the object."""
         if not self.firmware_upgradable:
             return {"firmware_upgradable": self.firmware_upgradable}
@@ -83,7 +83,7 @@ class FirmwareUpdateCapabilities:
         }
 
 
-class FirmwareUpdateStatus(IntEnum):
+class NodeFirmwareUpdateStatus(IntEnum):
     """Enum with all node firmware update status values.
 
     https://zwave-js.github.io/node-zwave-js/#/api/node?id=status
@@ -104,7 +104,7 @@ class FirmwareUpdateStatus(IntEnum):
     OK_RESTART_PENDING = 255
 
 
-class FirmwareUpdateProgressDataType(TypedDict):
+class NodeFirmwareUpdateProgressDataType(TypedDict):
     """Represent a node firmware update progress dict type."""
 
     currentFile: int
@@ -114,10 +114,10 @@ class FirmwareUpdateProgressDataType(TypedDict):
     progress: float
 
 
-class FirmwareUpdateProgress:
+class NodeFirmwareUpdateProgress:
     """Model for a node firmware update progress data."""
 
-    def __init__(self, node: "Node", data: FirmwareUpdateProgressDataType) -> None:
+    def __init__(self, node: "Node", data: NodeFirmwareUpdateProgressDataType) -> None:
         """Initialize."""
         self.data = data
         self.node = node
@@ -148,7 +148,7 @@ class FirmwareUpdateProgress:
         return float(self.data["progress"])
 
 
-class FirmwareUpdateResultDataType(TypedDict, total=False):
+class NodeFirmwareUpdateResultDataType(TypedDict, total=False):
     """Represent a node firmware update result dict type."""
 
     status: int  # required
@@ -157,18 +157,18 @@ class FirmwareUpdateResultDataType(TypedDict, total=False):
     reInterview: bool  # required
 
 
-class FirmwareUpdateResult:
+class NodeFirmwareUpdateResult:
     """Model for node firmware update result data."""
 
-    def __init__(self, node: "Node", data: FirmwareUpdateResultDataType) -> None:
+    def __init__(self, node: "Node", data: NodeFirmwareUpdateResultDataType) -> None:
         """Initialize."""
         self.data = data
         self.node = node
 
     @property
-    def status(self) -> FirmwareUpdateStatus:
+    def status(self) -> NodeFirmwareUpdateStatus:
         """Return the firmware update status."""
-        return FirmwareUpdateStatus(self.data["status"])
+        return NodeFirmwareUpdateStatus(self.data["status"])
 
     @property
     def success(self) -> bool:
@@ -186,7 +186,7 @@ class FirmwareUpdateResult:
         return self.data["reInterview"]
 
 
-class FirmwareUpdateFileInfoDataType(TypedDict):
+class NodeFirmwareUpdateFileInfoDataType(TypedDict):
     """Represent a firmware update file info data dict type."""
 
     target: int
@@ -195,39 +195,41 @@ class FirmwareUpdateFileInfoDataType(TypedDict):
 
 
 @dataclass
-class FirmwareUpdateFileInfo:
+class NodeFirmwareUpdateFileInfo:
     """Represent a firmware update file info."""
 
     target: int
     url: str
     integrity: str
 
-    def to_dict(self) -> FirmwareUpdateFileInfoDataType:
+    def to_dict(self) -> NodeFirmwareUpdateFileInfoDataType:
         """Return dict representation of the object."""
-        return cast(FirmwareUpdateFileInfoDataType, asdict(self))
+        return cast(NodeFirmwareUpdateFileInfoDataType, asdict(self))
 
 
-class FirmwareUpdateInfoDataType(TypedDict):
+class NodeFirmwareUpdateInfoDataType(TypedDict):
     """Represent a firmware update info data dict type."""
 
     version: str
     changelog: str
-    files: List[FirmwareUpdateFileInfoDataType]
+    files: List[NodeFirmwareUpdateFileInfoDataType]
 
 
 @dataclass
-class FirmwareUpdateInfo:
+class NodeFirmwareUpdateInfo:
     """Represent a firmware update info."""
 
     version: str
     changelog: str
-    files: List[FirmwareUpdateFileInfo]
+    files: List[NodeFirmwareUpdateFileInfo]
 
     @classmethod
-    def from_dict(cls, data: FirmwareUpdateInfoDataType) -> "FirmwareUpdateInfo":
+    def from_dict(
+        cls, data: NodeFirmwareUpdateInfoDataType
+    ) -> "NodeFirmwareUpdateInfo":
         """Initialize from dict."""
         return cls(
             version=data["version"],
             changelog=data["changelog"],
-            files=[FirmwareUpdateFileInfo(**file) for file in data["files"]],
+            files=[NodeFirmwareUpdateFileInfo(**file) for file in data["files"]],
         )
