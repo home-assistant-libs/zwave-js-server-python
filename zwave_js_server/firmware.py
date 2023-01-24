@@ -60,12 +60,13 @@ async def update_controller_firmware_otw(
 
     receive_task = asyncio.get_running_loop().create_task(client.receive_until_closed())
 
-    cmd = {
-        "command": "controller.firmware_update_otw",
-        **firmware_file.to_dict(),
-    }
-
-    data = await client.async_send_command(cmd, require_schema=25)
+    data = await client.async_send_command(
+        {
+            "command": "controller.firmware_update_otw",
+            **firmware_file.to_dict(),
+        },
+        require_schema=25,
+    )
     await client.disconnect()
     if not receive_task.done():
         receive_task.cancel()

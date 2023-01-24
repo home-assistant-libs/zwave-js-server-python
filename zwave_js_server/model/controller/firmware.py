@@ -1,8 +1,9 @@
 """Provide a model for Z-Wave controller firmware."""
+from enum import IntEnum
 from typing import TypedDict
 
 
-class FirmwareUpdateStatus:
+class FirmwareUpdateStatus(IntEnum):
     """Enum with all controller firmware update status values.
 
     https://zwave-js.github.io/node-zwave-js/#/api/node?id=status
