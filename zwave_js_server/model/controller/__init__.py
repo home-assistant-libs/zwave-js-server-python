@@ -2,7 +2,10 @@
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Union, cast
 
-from zwave_js_server.model.firmware import FirmwareUpdateFileInfo, FirmwareUpdateInfo
+from zwave_js_server.model.node.firmware import (
+    NodeFirmwareUpdateFileInfo,
+    NodeFirmwareUpdateInfo,
+)
 
 from ...const import (
     MINIMUM_QR_STRING_LENGTH,
@@ -20,6 +23,7 @@ from ..association import AssociationAddress, AssociationGroup
 from ..node import Node
 from .data_model import ControllerDataType
 from .event_model import CONTROLLER_EVENT_MODEL_MAP
+from .firmware import ControllerFirmwareUpdateProgress, ControllerFirmwareUpdateResult
 from .inclusion_and_provisioning import (
     InclusionGrant,
     ProvisioningEntry,
@@ -181,6 +185,13 @@ class Controller(EventBase):
     def inclusion_state(self) -> InclusionState:
         """Return inclusion state."""
         return InclusionState(self.data["inclusionState"])
+
+    @property
+    def rf_region(self) -> Optional[RFRegion]:
+        """Return RF region of controller."""
+        if (rf_region := self.data.get("rfRegion")) is None:
+            return None
+        return RFRegion(rf_region)
 
     def update(self, data: ControllerDataType) -> None:
         """Update controller data."""
@@ -721,7 +732,7 @@ class Controller(EventBase):
 
     async def async_get_available_firmware_updates(
         self, node: Node, api_key: str, include_prereleases: bool = False
-    ) -> List[FirmwareUpdateInfo]:
+    ) -> List[NodeFirmwareUpdateInfo]:
         """Send getAvailableFirmwareUpdates command to Controller."""
         data = await self.client.async_send_command(
             {
@@ -733,10 +744,10 @@ class Controller(EventBase):
             require_schema=24,
         )
         assert data
-        return [FirmwareUpdateInfo.from_dict(update) for update in data["updates"]]
+        return [NodeFirmwareUpdateInfo.from_dict(update) for update in data["updates"]]
 
     async def async_firmware_update_ota(
-        self, node: Node, updates: List[FirmwareUpdateFileInfo]
+        self, node: Node, updates: List[NodeFirmwareUpdateFileInfo]
     ) -> bool:
         """Send firmwareUpdateOTA command to Controller."""
         data = await self.client.async_send_command(
@@ -772,6 +783,18 @@ class Controller(EventBase):
 
         event.data["controller"] = self
         self.emit(event.type, event.data)
+
+    def handle_firmware_update_progress(self, event: Event) -> None:
+        """Process a firmware update progress event."""
+        event.data["firmware_update_progress"] = ControllerFirmwareUpdateProgress(
+            event.data["progress"]
+        )
+
+    def handle_firmware_update_finished(self, event: Event) -> None:
+        """Process a firmware update finished event."""
+        event.data["firmware_update_finished"] = ControllerFirmwareUpdateResult(
+            event.data["result"]
+        )
 
     def handle_inclusion_failed(self, event: Event) -> None:
         """Process an inclusion failed event."""

@@ -33,3 +33,4 @@ class ControllerDataType(TypedDict, total=False):
     isHealNetworkActive: bool
     statistics: ControllerStatisticsDataType
     inclusionState: int
+    rfRegion: int

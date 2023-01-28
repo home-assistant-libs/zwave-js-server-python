@@ -31,7 +31,7 @@ from zwave_js_server.exceptions import (
 )
 from zwave_js_server.model import endpoint as endpoint_pkg
 from zwave_js_server.model import node as node_pkg
-from zwave_js_server.model.firmware import FirmwareUpdateStatus
+from zwave_js_server.model.node.firmware import NodeFirmwareUpdateStatus
 from zwave_js_server.model.node.health_check import (
     LifelineHealthCheckResultDataType,
     RouteHealthCheckResultDataType,
@@ -1044,7 +1044,7 @@ async def test_firmware_events(wallmote_central_scene: node_pkg.Node):
 
     node.handle_firmware_update_finished(event)
     result = event.data["firmware_update_finished"]
-    assert result.status == FirmwareUpdateStatus.OK_RESTART_PENDING
+    assert result.status == NodeFirmwareUpdateStatus.OK_RESTART_PENDING
     assert result.success
     assert result.wait_time == 10
     assert not result.reinterview
