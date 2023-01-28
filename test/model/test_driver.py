@@ -338,6 +338,45 @@ async def test_enable_error_reporting(driver, uuid4, mock_command):
     }
 
 
+async def test_hard_reset(driver, uuid4, mock_command):
+    """Test driver hard reset command."""
+    ack_commands = mock_command({"command": "driver.hard_reset"}, {})
+
+    assert not await driver.async_hard_reset()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.hard_reset",
+        "messageId": uuid4,
+    }
+
+
+async def test_try_soft_reset(driver, uuid4, mock_command):
+    """Test driver try soft reset command."""
+    ack_commands = mock_command({"command": "driver.try_soft_reset"}, {})
+
+    assert not await driver.async_try_soft_reset()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.try_soft_reset",
+        "messageId": uuid4,
+    }
+
+
+async def test_soft_reset(driver, uuid4, mock_command):
+    """Test driver soft reset command."""
+    ack_commands = mock_command({"command": "driver.soft_reset"}, {})
+
+    assert not await driver.async_soft_reset()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.soft_reset",
+        "messageId": uuid4,
+    }
+
+
 async def test_unknown_event(driver):
     """Test that an unknown event type causes an exception."""
     with pytest.raises(KeyError):

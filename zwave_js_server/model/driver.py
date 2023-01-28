@@ -166,6 +166,18 @@ class Driver(EventBase):
         """Send command to enable Sentry error reporting."""
         await self._async_send_command("enable_error_reporting", require_schema=16)
 
+    async def async_hard_reset(self) -> None:
+        """Send command to hard reset controller."""
+        await self._async_send_command("hard_reset", require_schema=25)
+
+    async def async_try_soft_reset(self) -> None:
+        """Send command to try to soft reset controller."""
+        await self._async_send_command("try_soft_reset", require_schema=25)
+
+    async def async_soft_reset(self) -> None:
+        """Send command to soft reset controller."""
+        await self._async_send_command("soft_reset", require_schema=25)
+
     def handle_logging(self, event: Event) -> None:
         """Process a driver logging event."""
         event.data["log_message"] = LogMessage(cast(LogMessageDataType, event.data))
