@@ -218,6 +218,7 @@ class Controller(EventBase):
         provisioning: Optional[
             Union[str, ProvisioningEntry, QRProvisioningInformation]
         ] = None,
+        dsk: Optional[str] = None,
     ) -> bool:
         """Send beginInclusion command to Controller."""
         # Most functionality was introduced in Schema 8
@@ -237,6 +238,11 @@ class Controller(EventBase):
             if inclusion_strategy != InclusionStrategy.SECURITY_S2:
                 raise ValueError(
                     "`provisioning` option is only supported with inclusion_strategy=SECURITY_S2"
+                )
+
+            if dsk is not None:
+                raise ValueError(
+                    "Only one of `provisioning` and `dsk` can be provided"
                 )
             # Provisioning option was introduced in Schema 11
             require_schema = 11
@@ -264,6 +270,15 @@ class Controller(EventBase):
             # QRProvisioningInformation that is not a Smart Start QR code
             else:
                 options["provisioning"] = provisioning.to_dict()
+
+        if dsk is not None:
+            if inclusion_strategy != InclusionStrategy.SECURITY_S2:
+                raise ValueError(
+                    "`dsk` option is only supported with inclusion_strategy=SECURITY_S2"
+                )
+
+            require_schema = 25
+            options["dsk"] = dsk
 
         data = await self.client.async_send_command(
             {
