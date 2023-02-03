@@ -1822,6 +1822,7 @@ async def test_inclusion_aborted(controller):
 
 async def test_firmware_events(controller):
     """Test firmware events."""
+    assert controller.firmware_update_progress is None
     event = Event(
         type="firmware update progress",
         data={
@@ -1840,6 +1841,10 @@ async def test_firmware_events(controller):
     assert progress.sent_fragments == 1
     assert progress.total_fragments == 10
     assert progress.progress == 10.0
+    assert controller.firmware_update_progress
+    assert controller.firmware_update_progress.sent_fragments == 1
+    assert controller.firmware_update_progress.total_fragments == 10
+    assert controller.firmware_update_progress.progress == 10.0
 
     event = Event(
         type="firmware update finished",
@@ -1854,6 +1859,7 @@ async def test_firmware_events(controller):
     result = event.data["firmware_update_finished"]
     assert result.status == ControllerFirmwareUpdateStatus.OK
     assert result.success
+    assert controller.firmware_update_progress is None
 
 
 async def test_unknown_event(controller):
