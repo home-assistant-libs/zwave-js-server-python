@@ -31,6 +31,7 @@ class EndpointDataType(TypedDict, total=False):
     deviceClass: DeviceClassDataType  # required
     installerIcon: int
     userIcon: int
+    endpointLabel: str
     commandClasses: List[CommandClassInfoDataType]
 
 
@@ -97,6 +98,11 @@ class Endpoint(EventBase):
     def command_classes(self) -> List[CommandClassInfo]:
         """Return all CommandClasses supported on this node."""
         return [CommandClassInfo(cc) for cc in self.data["commandClasses"]]
+
+    @property
+    def endpoint_label(self) -> Optional[str]:
+        """Return endpoint label property."""
+        return self.data.get("endpointLabel")
 
     def update(
         self,

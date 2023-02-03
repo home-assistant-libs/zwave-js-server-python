@@ -1706,6 +1706,23 @@ async def test_get_known_lifeline_routes_rssi_error(
     }
 
 
+async def test_is_firmware_update_in_progress(
+    controller, uuid4, mock_command
+):
+    """Test is_firmware_update_in_progress command."""
+    ack_commands = mock_command(
+        {"command": "controller.is_firmware_update_in_progress"},
+        {"progress": True},
+    )
+    assert await controller.async_is_firmware_update_in_progress()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.provision_smart_start_node",
+        "messageId": uuid4,
+    }
+
+
 async def test_nvm_events(controller):
     """Test NVM progress events."""
     event = Event(

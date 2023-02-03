@@ -92,6 +92,7 @@ def test_from_state(client):
     assert node.endpoints[0].installer_icon is None
     assert node.endpoints[0].user_icon is None
     assert node.endpoints[0].command_classes == []
+    assert node.endpoints[0].endpoint_label is None
     device_class = node.endpoints[0].device_class
     assert device_class.basic.key == 2
     assert device_class.generic.key == 2
