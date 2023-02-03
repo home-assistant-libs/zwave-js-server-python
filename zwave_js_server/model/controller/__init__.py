@@ -53,6 +53,9 @@ class Controller(EventBase):
         self.nodes: Dict[int, Node] = {}
         self._heal_network_progress: Optional[Dict[int, str]] = None
         self._statistics = ControllerStatistics()
+        self._firmware_update_progress: Optional[
+            ControllerFirmwareUpdateProgress
+        ] = None
         for node_state in state["nodes"]:
             node = Node(client, node_state)
             self.nodes[node.node_id] = node
@@ -192,6 +195,11 @@ class Controller(EventBase):
         if (rf_region := self.data.get("rfRegion")) is None:
             return None
         return RFRegion(rf_region)
+
+    @property
+    def firmware_update_progress(self) -> Optional[ControllerFirmwareUpdateProgress]:
+        """Return firmware update progress."""
+        return self._firmware_update_progress
 
     def update(self, data: ControllerDataType) -> None:
         """Update controller data."""
@@ -786,12 +794,13 @@ class Controller(EventBase):
 
     def handle_firmware_update_progress(self, event: Event) -> None:
         """Process a firmware update progress event."""
-        event.data["firmware_update_progress"] = ControllerFirmwareUpdateProgress(
-            event.data["progress"]
-        )
+        self._firmware_update_progress = event.data[
+            "firmware_update_progress"
+        ] = ControllerFirmwareUpdateProgress(event.data["progress"])
 
     def handle_firmware_update_finished(self, event: Event) -> None:
         """Process a firmware update finished event."""
+        self._firmware_update_progress = None
         event.data["firmware_update_finished"] = ControllerFirmwareUpdateResult(
             event.data["result"]
         )
