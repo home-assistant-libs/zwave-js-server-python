@@ -345,6 +345,27 @@ async def test_begin_inclusion_s2_qr_info(controller, uuid4, mock_command):
     }
 
 
+async def test_begin_inclusion_s2_dsk(controller, uuid4, mock_command):
+    """Test begin inclusion S2 Mode with DSK string."""
+    ack_commands = mock_command(
+        {"command": "controller.begin_inclusion"},
+        {"success": True},
+    )
+    assert await controller.async_begin_inclusion(
+        InclusionStrategy.SECURITY_S2, dsk="test"
+    )
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.begin_inclusion",
+        "options": {
+            "strategy": InclusionStrategy.SECURITY_S2,
+            "dsk": "test",
+        },
+        "messageId": uuid4,
+    }
+
+
 async def test_begin_inclusion_errors(controller, uuid4, mock_command):
     """Test begin inclusion error scenarios."""
     provisioning_entry = controller_pkg.ProvisioningEntry(
@@ -359,6 +380,13 @@ async def test_begin_inclusion_errors(controller, uuid4, mock_command):
         await controller.async_begin_inclusion(
             InclusionStrategy.SECURITY_S0, provisioning=provisioning_entry
         )
+
+    # Test that Security S0 Inclusion Strategy doesn't support providing a DSK string
+    with pytest.raises(ValueError):
+        await controller.async_begin_inclusion(
+            InclusionStrategy.SECURITY_S0, dsk="test"
+        )
+
     # Test that Security S2 Inclusion Strategy doesn't support providing `force_security`
     with pytest.raises(ValueError):
         await controller.async_begin_inclusion(
@@ -385,6 +413,18 @@ async def test_begin_inclusion_errors(controller, uuid4, mock_command):
     with pytest.raises(ValueError):
         await controller.async_begin_inclusion(
             InclusionStrategy.SECURITY_S2, provisioning=provisioning_entry
+        )
+
+    provisioning_entry = controller_pkg.ProvisioningEntry(
+        "test",
+        [SecurityClass.S2_UNAUTHENTICATED],
+        requested_security_classes=[SecurityClass.S2_UNAUTHENTICATED],
+        additional_properties={"test": "test"},
+    )
+    # Test that provisioning entry and dsk string can't be provided together
+    with pytest.raises(ValueError):
+        await controller.async_begin_inclusion(
+            InclusionStrategy.SECURITY_S2, provisioning=provisioning_entry, dsk="test"
         )
 
 
