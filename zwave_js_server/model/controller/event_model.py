@@ -4,7 +4,10 @@ from typing import Dict, Literal, Type
 from ...const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED
 from ...event import BaseEventModel
 from ..node.data_model import FoundNodeDataType, NodeDataType
-from .firmware import ControllerFirmwareUpdateProgressDataType
+from .firmware import (
+    ControllerFirmwareUpdateProgressDataType,
+    ControllerFirmwareUpdateResultDataType,
+)
 from .inclusion_and_provisioning import InclusionGrantDataType
 from .statistics import ControllerStatisticsDataType
 
@@ -48,7 +51,7 @@ class FirmwareUpdateFinishedEventModel(BaseControllerEventModel):
     """Model for `firmware update finished` event data."""
 
     event: Literal["firmware update finished"]
-    result: int
+    result: ControllerFirmwareUpdateResultDataType
 
 
 class FirmwareUpdateProgressEventModel(BaseControllerEventModel):

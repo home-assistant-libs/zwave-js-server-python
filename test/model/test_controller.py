@@ -1836,7 +1836,7 @@ async def test_firmware_events(controller):
         },
     )
 
-    controller.handle_firmware_update_progress(event)
+    controller.receive_event(event)
     progress = event.data["firmware_update_progress"]
     assert progress.sent_fragments == 1
     assert progress.total_fragments == 10
@@ -1855,7 +1855,7 @@ async def test_firmware_events(controller):
         },
     )
 
-    controller.handle_firmware_update_finished(event)
+    controller.receive_event(event)
     result = event.data["firmware_update_finished"]
     assert result.status == ControllerFirmwareUpdateStatus.OK
     assert result.success
