@@ -241,9 +241,7 @@ class Controller(EventBase):
                 )
 
             if dsk is not None:
-                raise ValueError(
-                    "Only one of `provisioning` and `dsk` can be provided"
-                )
+                raise ValueError("Only one of `provisioning` and `dsk` can be provided")
             # Provisioning option was introduced in Schema 11
             require_schema = 11
             # String is assumed to be the QR code string so we can pass as is
