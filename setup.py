@@ -20,7 +20,7 @@ setup(
     long_description_content_type="text/markdown",
     packages=find_packages(exclude=["test.*", "test"]),
     package_data={"zwave_js_server": ["py.typed"]},
-    python_requires=">=3.9",
+    python_requires=">=3.10",
     install_requires=["aiohttp>3", "pydantic>=1.9.0"],
     entry_points={
         "console_scripts": ["zwave-js-server-python = zwave_js_server.__main__:main"]
@@ -32,7 +32,6 @@ setup(
         "Intended Audience :: Developers",
         "Natural Language :: English",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Topic :: Home Automation",
     ],
