@@ -1718,7 +1718,7 @@ async def test_is_firmware_update_in_progress(
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
-        "command": "controller.provision_smart_start_node",
+        "command": "controller.is_firmware_update_in_progress",
         "messageId": uuid4,
     }
 
