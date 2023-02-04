@@ -768,7 +768,7 @@ class Controller(EventBase):
         )
         return cast(bool, data["success"])
 
-    async def async_is_firmware_update_in_progress(self) -> None:
+    async def async_is_firmware_update_in_progress(self) -> bool:
         """Send isFirmwareUpdateInProgress command to Controller."""
         data = await self.client.async_send_command(
             {"command": "controller.is_firmware_update_in_progress"}, require_schema=26

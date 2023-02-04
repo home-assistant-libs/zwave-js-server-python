@@ -1706,9 +1706,7 @@ async def test_get_known_lifeline_routes_rssi_error(
     }
 
 
-async def test_is_firmware_update_in_progress(
-    controller, uuid4, mock_command
-):
+async def test_is_firmware_update_in_progress(controller, uuid4, mock_command):
     """Test is_firmware_update_in_progress command."""
     ack_commands = mock_command(
         {"command": "controller.is_firmware_update_in_progress"},
