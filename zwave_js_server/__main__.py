@@ -78,7 +78,6 @@ async def handle_dump_state(
 async def connect(args: argparse.Namespace, session: aiohttp.ClientSession) -> None:
     """Connect to the server."""
     async with Client(args.url, session) as client:
-
         driver_ready = asyncio.Event()
         asyncio.create_task(on_driver_ready(client, driver_ready))
 
