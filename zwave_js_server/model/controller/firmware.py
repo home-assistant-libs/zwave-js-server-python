@@ -6,7 +6,7 @@ from typing import TypedDict
 class ControllerFirmwareUpdateStatus(IntEnum):
     """Enum with all controller firmware update status values.
 
-    https://zwave-js.github.io/node-zwave-js/#/api/node?id=status
+    https://zwave-js.github.io/node-zwave-js/#/api/controller?id=quotfirmware-update-finishedquot
     """
 
     ERROR_TIMEOUT = 0
@@ -14,6 +14,8 @@ class ControllerFirmwareUpdateStatus(IntEnum):
     ERROR_RETRY_LIMIT_REACHED = 1
     # The update was aborted by the bootloader
     ERROR_ABORTED = 2
+    # This controller does not support firmware updates
+    ERROR_NOT_SUPPORTED = 3
     OK = 255
 
 
