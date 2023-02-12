@@ -86,7 +86,7 @@ class NodeFirmwareUpdateCapabilities:
 class NodeFirmwareUpdateStatus(IntEnum):
     """Enum with all node firmware update status values.
 
-    https://zwave-js.github.io/node-zwave-js/#/api/node?id=status
+    https://zwave-js.github.io/node-zwave-js/#/api/node?id=quotfirmware-update-finishedquot
     """
 
     ERROR_TIMEOUT = -1
