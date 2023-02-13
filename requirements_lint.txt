@@ -1,6 +1,6 @@
 black==23.1.0
 flake8==6.0.0
-mypy==0.991
+mypy==1.0.0
 pydocstyle==6.3.0
 pylint==2.16.1
 pylint-strict-informational==0.1
