@@ -1,13 +1,7 @@
 """Data model for a Z-Wave JS controller."""
-from typing import List
+from typing import List, TypedDict
 
-from ...const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED
 from .statistics import ControllerStatisticsDataType
-
-if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
-    from typing_extensions import TypedDict
-else:
-    from typing import TypedDict
 
 
 class ControllerDataType(TypedDict, total=False):

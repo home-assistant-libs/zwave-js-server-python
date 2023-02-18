@@ -1,18 +1,13 @@
 """Provide a model for the Z-Wave JS node's statistics."""
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, TypedDict
 
 from zwave_js_server.exceptions import RssiErrorReceived
 
-from ...const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED, RssiError
+from ...const import RssiError
 from ..statistics import RouteStatistics, RouteStatisticsDataType
 
 if TYPE_CHECKING:
     from ...client import Client
-
-if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
-    from typing_extensions import TypedDict
-else:
-    from typing import TypedDict
 
 
 class NodeStatisticsDataType(TypedDict, total=False):

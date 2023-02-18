@@ -1,14 +1,8 @@
 """Provide a model for the Z-Wave JS controller's statistics."""
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, TypedDict
 
-from ...const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED
 from ..statistics import RouteStatistics, RouteStatisticsDataType
-
-if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
-    from typing_extensions import TypedDict
-else:
-    from typing import TypedDict
 
 if TYPE_CHECKING:
     from ...client import Client

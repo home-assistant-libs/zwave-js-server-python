@@ -1,13 +1,8 @@
 """Provide a model for the Z-Wave JS node's health checks and power tests."""
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, TypedDict
 
-from ...const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED, PowerLevel
-
-if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
-    from typing_extensions import TypedDict
-else:
-    from typing import TypedDict
+from ...const import PowerLevel
 
 
 class LifelineHealthCheckResultDataType(TypedDict, total=False):
