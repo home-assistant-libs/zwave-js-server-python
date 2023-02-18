@@ -2,12 +2,7 @@
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, TypedDict
 
-from ...const import (
-    Protocols,
-    ProvisioningEntryStatus,
-    QRCodeVersion,
-    SecurityClass
-)
+from ...const import Protocols, ProvisioningEntryStatus, QRCodeVersion, SecurityClass
 
 
 class InclusionGrantDataType(TypedDict):
