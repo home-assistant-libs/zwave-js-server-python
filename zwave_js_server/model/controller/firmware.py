@@ -1,6 +1,36 @@
 """Provide a model for Z-Wave controller firmware."""
+from dataclasses import dataclass
 from enum import IntEnum
-from typing import TypedDict
+from typing import Optional, TypedDict
+
+from ...util.helpers import convert_bytes_to_base64
+
+
+class ControllerFirmwareUpdateDataDataType(TypedDict, total=False):
+    """Represent a controller firmware update data dict type."""
+
+    filename: str  # required
+    file: str  # required
+    fileFormat: str
+
+
+@dataclass
+class ControllerFirmwareUpdateData:
+    """Controller firmware update data."""
+
+    filename: str
+    file: bytes
+    file_format: Optional[str] = None
+
+    def to_dict(self) -> ControllerFirmwareUpdateDataDataType:
+        """Convert firmware update data to dict."""
+        data: ControllerFirmwareUpdateDataDataType = {
+            "filename": self.filename,
+            "file": convert_bytes_to_base64(self.file),
+        }
+        if self.file_format is not None:
+            data["fileFormat"] = self.file_format
+        return data
 
 
 class ControllerFirmwareUpdateStatus(IntEnum):

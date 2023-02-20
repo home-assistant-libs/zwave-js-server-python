@@ -5,14 +5,15 @@ from typing import Dict, List, Optional, cast
 import aiohttp
 
 from .client import Client
-from .model.firmware import FirmwareUpdateData
+from .model.controller.firmware import ControllerFirmwareUpdateData
 from .model.node import Node
+from .model.node.firmware import NodeFirmwareUpdateData
 
 
 async def update_firmware(
     url: str,
     node: Node,
-    updates: List[FirmwareUpdateData],
+    updates: List[NodeFirmwareUpdateData],
     session: aiohttp.ClientSession,
     additional_user_agent_components: Optional[Dict[str, str]] = None,
 ) -> bool:
@@ -41,7 +42,7 @@ async def update_firmware(
 
 async def controller_firmware_update_otw(
     url: str,
-    firmware_file: FirmwareUpdateData,
+    firmware_file: ControllerFirmwareUpdateData,
     session: aiohttp.ClientSession,
     additional_user_agent_components: Optional[Dict[str, str]] = None,
 ) -> bool:

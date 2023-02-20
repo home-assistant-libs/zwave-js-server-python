@@ -4,9 +4,41 @@ from enum import IntEnum
 from typing import TYPE_CHECKING, List, Optional, TypedDict, Union, cast
 
 from ...const import VALUE_UNKNOWN
+from ...util.helpers import convert_bytes_to_base64
 
 if TYPE_CHECKING:
     from . import Node
+
+
+class NodeFirmwareUpdateDataDataType(TypedDict, total=False):
+    """Represent a firmware update data dict type."""
+
+    filename: str  # required
+    file: str  # required
+    fileFormat: str
+    firmwareTarget: int
+
+
+@dataclass
+class NodeFirmwareUpdateData:
+    """Firmware update data."""
+
+    filename: str
+    file: bytes
+    file_format: Optional[str] = None
+    firmware_target: Optional[int] = None
+
+    def to_dict(self) -> NodeFirmwareUpdateDataDataType:
+        """Convert firmware update data to dict."""
+        data: NodeFirmwareUpdateDataDataType = {
+            "filename": self.filename,
+            "file": convert_bytes_to_base64(self.file),
+        }
+        if self.file_format is not None:
+            data["fileFormat"] = self.file_format
+        if self.firmware_target is not None:
+            data["firmwareTarget"] = self.firmware_target
+        return data
 
 
 class NodeFirmwareUpdateCapabilitiesDataType(TypedDict, total=False):
