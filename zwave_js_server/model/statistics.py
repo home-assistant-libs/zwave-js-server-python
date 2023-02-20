@@ -1,19 +1,14 @@
 """Common models for statistics."""
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, List, Optional, Tuple
+from typing import TYPE_CHECKING, List, Optional, Tuple, TypedDict
 
 from zwave_js_server.exceptions import RepeaterRssiErrorReceived, RssiErrorReceived
 
-from ..const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED, ProtocolDataRate, RssiError
+from ..const import ProtocolDataRate, RssiError
 
 if TYPE_CHECKING:
     from ..client import Client
     from .node import Node
-
-if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
-    from typing_extensions import TypedDict
-else:
-    from typing import TypedDict
 
 
 class RouteStatisticsDataType(TypedDict, total=False):

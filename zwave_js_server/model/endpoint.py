@@ -4,19 +4,14 @@ Model for a Zwave Node's endpoints.
 https://zwave-js.github.io/node-zwave-js/#/api/endpoint?id=endpoint-properties
 """
 
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, cast
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
 
-from ..const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED, NodeStatus
+from ..const import NodeStatus
 from ..event import EventBase
 from ..exceptions import FailedCommand, NotFoundError
 from .command_class import CommandClass, CommandClassInfo, CommandClassInfoDataType
 from .device_class import DeviceClass, DeviceClassDataType
 from .value import ConfigurationValue, Value
-
-if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
-    from typing_extensions import TypedDict
-else:
-    from typing import TypedDict
 
 if TYPE_CHECKING:
     from ..client import Client

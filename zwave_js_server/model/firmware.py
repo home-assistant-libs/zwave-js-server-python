@@ -1,14 +1,8 @@
 """Provide a model for Z-Wave firmware."""
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, TypedDict
 
-from ..const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED
 from ..util.helpers import convert_bytes_to_base64
-
-if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
-    from typing_extensions import TypedDict
-else:
-    from typing import TypedDict
 
 
 class FirmwareUpdateDataDataType(TypedDict, total=False):

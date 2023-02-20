@@ -1,14 +1,9 @@
 """Provide a model for Z-Wave firmware."""
 from dataclasses import asdict, dataclass
 from enum import IntEnum
-from typing import TYPE_CHECKING, List, Optional, Union, cast
+from typing import TYPE_CHECKING, List, Optional, TypedDict, Union, cast
 
-from ...const import TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED, VALUE_UNKNOWN
-
-if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
-    from typing_extensions import TypedDict
-else:
-    from typing import TypedDict
+from ...const import VALUE_UNKNOWN
 
 if TYPE_CHECKING:
     from . import Node

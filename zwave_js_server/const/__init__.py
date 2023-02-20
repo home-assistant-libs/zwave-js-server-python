@@ -1,5 +1,4 @@
 """Constants for the Z-Wave JS python library."""
-import sys
 from enum import Enum, IntEnum
 from importlib import metadata
 
@@ -10,8 +9,6 @@ __version__ = metadata.version(PACKAGE_NAME)
 MIN_SERVER_SCHEMA_VERSION = 25
 # max server schema version we can handle (and our code is compatible with)
 MAX_SERVER_SCHEMA_VERSION = 25
-
-TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED = sys.version_info < (3, 9, 2)
 
 VALUE_UNKNOWN = "unknown"
 

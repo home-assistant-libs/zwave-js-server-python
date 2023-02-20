@@ -1,19 +1,9 @@
 """Provide a model for the Z-Wave JS value."""
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union
 
-from ..const import (
-    TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED,
-    VALUE_UNKNOWN,
-    CommandClass,
-    ConfigurationValueType,
-)
+from ..const import VALUE_UNKNOWN, CommandClass, ConfigurationValueType
 from ..event import Event
 from ..util.helpers import parse_buffer
-
-if TYPING_EXTENSION_FOR_TYPEDDICT_REQUIRED:
-    from typing_extensions import TypedDict
-else:
-    from typing import TypedDict
 
 if TYPE_CHECKING:
     from .node import Node
