@@ -1,6 +1,6 @@
 colorlog==6.7.0
 requests==2.28.2
-python-slugify==8.0.0
+python-slugify==8.0.1
 types-python-slugify==8.0.0.0
 types-requests==2.28.11.15
 -r requirements.txt
