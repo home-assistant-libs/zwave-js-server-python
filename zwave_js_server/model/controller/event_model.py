@@ -1,5 +1,5 @@
 """Provide a model for the Z-Wave JS controller's events."""
-from typing import Dict, Literal, Type, TypedDict
+from typing import Literal, Type, TypedDict
 
 from ...event import BaseEventModel
 from ..node.data_model import FoundNodeDataType, NodeDataType
@@ -66,14 +66,14 @@ class HealNetworkDoneEventModel(BaseControllerEventModel):
     """Model for `heal network done` event data."""
 
     event: Literal["heal network done"]
-    result: Dict[int, str]
+    result: dict[int, str]
 
 
 class HealNetworkProgressEventModel(BaseControllerEventModel):
     """Model for `heal network progress` event data."""
 
     event: Literal["heal network progress"]
-    progress: Dict[int, str]
+    progress: dict[int, str]
 
 
 class InclusionAbortedEventModel(BaseControllerEventModel):
@@ -165,7 +165,7 @@ class ValidateDSKAndEnterPINEventModel(BaseControllerEventModel):
     dsk: str
 
 
-CONTROLLER_EVENT_MODEL_MAP: Dict[str, Type["BaseControllerEventModel"]] = {
+CONTROLLER_EVENT_MODEL_MAP: dict[str, Type["BaseControllerEventModel"]] = {
     "exclusion failed": ExclusionFailedEventModel,
     "exclusion started": ExclusionStartedEventModel,
     "exclusion stopped": ExclusionStoppedEventModel,

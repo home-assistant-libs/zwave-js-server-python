@@ -4,7 +4,7 @@ Model for a Zwave Node's Notification Event.
 https://zwave-js.github.io/node-zwave-js/#/api/node?id=quotnotificationquot
 """
 
-from typing import TYPE_CHECKING, Any, Dict, Literal, Optional, TypedDict, Union
+from typing import TYPE_CHECKING, Any, Literal, Optional, TypedDict, Union
 
 from ..const.command_class.multilevel_switch import MultilevelSwitchCommand
 from ..const.command_class.power_level import PowerLevelTestStatus
@@ -30,7 +30,7 @@ class EntryControlNotificationArgsDataType(TypedDict, total=False):
     eventTypeLabel: str  # required
     dataType: int  # required
     dataTypeLabel: str  # required
-    eventData: Union[str, Dict[str, Any]]
+    eventData: Union[str, dict[str, Any]]
 
 
 class EntryControlNotificationDataType(BaseNotificationDataType):
@@ -92,7 +92,7 @@ class NotificationNotificationArgsDataType(TypedDict, total=False):
     label: str  # required
     event: int  # required
     eventLabel: str  # required
-    parameters: Dict[str, Any]
+    parameters: dict[str, Any]
 
 
 class NotificationNotificationDataType(BaseNotificationDataType):
@@ -140,7 +140,7 @@ class NotificationNotification:
         return self.data["args"]["eventLabel"]
 
     @property
-    def parameters(self) -> Dict[str, Any]:
+    def parameters(self) -> dict[str, Any]:
         """Return installer icon property."""
         return self.data["args"].get("parameters", {})
 

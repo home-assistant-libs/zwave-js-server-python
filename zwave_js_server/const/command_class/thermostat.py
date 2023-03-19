@@ -5,7 +5,6 @@ Includes Thermostat Fan Mode, Thermostat Fan State, Thermostat Mode, Thermostat
 Operating State, Thermostat Setback, and Thermostat Setpoint CCs.
 """
 from enum import IntEnum
-from typing import Dict, List
 
 THERMOSTAT_MODE_PROPERTY = "mode"
 THERMOSTAT_SETPOINT_PROPERTY = "setpoint"
@@ -89,7 +88,7 @@ THERMOSTAT_MODES = [
     ThermostatMode.AUTO_CHANGE_OVER,
 ]
 
-THERMOSTAT_MODE_SETPOINT_MAP: Dict[int, List[ThermostatSetpointType]] = {
+THERMOSTAT_MODE_SETPOINT_MAP: dict[int, list[ThermostatSetpointType]] = {
     ThermostatMode.OFF: [],
     ThermostatMode.HEAT: [ThermostatSetpointType.HEATING],
     ThermostatMode.COOL: [ThermostatSetpointType.COOLING],

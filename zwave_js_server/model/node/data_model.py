@@ -1,5 +1,5 @@
 """Data model for a Z-Wave JS node."""
-from typing import List, Literal, Optional, TypedDict, Union
+from typing import Literal, Optional, TypedDict, Union
 
 from ..device_class import DeviceClassDataType
 from ..device_config import DeviceConfigDataType
@@ -13,8 +13,8 @@ class FoundNodeDataType(TypedDict, total=False):
 
     nodeId: int
     deviceClass: DeviceClassDataType
-    supportedCCs: List[int]
-    controlledCCs: List[int]
+    supportedCCs: list[int]
+    controlledCCs: list[int]
 
 
 class NodeDataType(TypedDict, total=False):
@@ -35,7 +35,7 @@ class NodeDataType(TypedDict, total=False):
     isFrequentListening: Union[bool, str]
     isRouting: bool
     maxDataRate: int
-    supportedDataRates: List[int]
+    supportedDataRates: list[int]
     isSecure: Union[bool, Literal["unknown"]]
     supportsBeaming: bool
     supportsSecurity: bool
@@ -49,14 +49,14 @@ class NodeDataType(TypedDict, total=False):
     keepAwake: bool
     ready: bool
     label: str
-    endpoints: List[EndpointDataType]
+    endpoints: list[EndpointDataType]
     endpointCountIsDynamic: bool
     endpointsHaveIdenticalCapabilities: bool
     individualEndpointCount: int
     aggregatedEndpointCount: int
     interviewAttempts: int
     interviewStage: Optional[Union[int, str]]
-    values: List[ValueDataType]
+    values: list[ValueDataType]
     statistics: NodeStatisticsDataType
     highestSecurityClass: int
     isControllerNode: bool

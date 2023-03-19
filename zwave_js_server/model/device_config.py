@@ -3,7 +3,7 @@ Model for a Zwave Node's device config.
 
 https://zwave-js.github.io/node-zwave-js/#/api/node?id=deviceconfig
 """
-from typing import Any, Dict, List, Literal, Optional, TypedDict, Union
+from typing import Any, Literal, Optional, TypedDict, Union
 
 
 class DeviceDeviceDataType(TypedDict, total=False):
@@ -73,7 +73,7 @@ class DeviceMetadataDataType(TypedDict, total=False):
     exclusion: str
     reset: str
     manual: str
-    comments: Union[CommentDataType, List[CommentDataType]]
+    comments: Union[CommentDataType, list[CommentDataType]]
 
 
 class DeviceMetadata:
@@ -109,7 +109,7 @@ class DeviceMetadata:
         return self.data.get("manual")
 
     @property
-    def comments(self) -> List[CommentDataType]:
+    def comments(self) -> list[CommentDataType]:
         """Return list of comments about device."""
         comments = self.data.get("comments", [])
         if isinstance(comments, dict):
@@ -125,13 +125,13 @@ class DeviceConfigDataType(TypedDict, total=False):
     manufacturerId: str
     label: str
     description: str
-    devices: List[DeviceDeviceDataType]
+    devices: list[DeviceDeviceDataType]
     firmwareVersion: DeviceFirmwareVersionRangeDataType
-    associations: Dict[str, dict]
-    paramInformation: Dict[str, dict]
+    associations: dict[str, dict]
+    paramInformation: dict[str, dict]
     supportsZWavePlus: bool
     proprietary: dict
-    compat: Dict[str, Any]
+    compat: dict[str, Any]
     metadata: DeviceMetadataDataType
     isEmbedded: bool
 
@@ -176,7 +176,7 @@ class DeviceConfig:
         return self.data.get("description")
 
     @property
-    def devices(self) -> List[DeviceDevice]:
+    def devices(self) -> list[DeviceDevice]:
         """Return list of product type and product ID combinations."""
         return self._devices
 
@@ -186,12 +186,12 @@ class DeviceConfig:
         return self._firmware_version
 
     @property
-    def associations(self) -> Dict[str, dict]:
+    def associations(self) -> dict[str, dict]:
         """Return dict of association groups the device supports."""
         return self.data.get("associations", {})
 
     @property
-    def param_information(self) -> Dict[str, dict]:
+    def param_information(self) -> dict[str, dict]:
         """Return dictionary of configuration parameters the device supports."""
         return self.data.get("paramInformation", {})
 
@@ -206,7 +206,7 @@ class DeviceConfig:
         return self.data.get("proprietary", {})
 
     @property
-    def compat(self) -> Dict[str, dict]:
+    def compat(self) -> dict[str, dict]:
         """Return compatibility flags."""
         return self.data.get("compat", {})
 

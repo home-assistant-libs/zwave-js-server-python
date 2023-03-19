@@ -1,5 +1,5 @@
 """Exceptions for zwave-js-server."""
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Optional
 
 from .const import RssiError
 
@@ -184,7 +184,7 @@ class RssiErrorReceived(BaseZwaveJSServerError):
 class RepeaterRssiErrorReceived(BaseZwaveJSServerError):
     """Exception raised when an RSSI error is received in list of RSSIs."""
 
-    def __init__(self, rssi_list: List[int]) -> None:
+    def __init__(self, rssi_list: list[int]) -> None:
         """Initialize an RSSI error."""
         self.rssi_list = rssi_list
         rssi_errors = [item.value for item in RssiError]

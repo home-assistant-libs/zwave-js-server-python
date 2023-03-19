@@ -1,6 +1,6 @@
 """Constants for Meter CC."""
 from enum import IntEnum
-from typing import Dict, List, Type
+from typing import Type
 
 VALUE_PROPERTY = "value"
 
@@ -70,7 +70,7 @@ class HeatingScale(MeterScaleType):
 
 CoolingScale = HeatingScale
 
-METER_TYPE_TO_SCALE_ENUM_MAP: Dict[MeterType, Type[MeterScaleType]] = {
+METER_TYPE_TO_SCALE_ENUM_MAP: dict[MeterType, Type[MeterScaleType]] = {
     MeterType.ELECTRIC: ElectricScale,
     MeterType.GAS: GasScale,
     MeterType.WATER: WaterScale,
@@ -78,7 +78,7 @@ METER_TYPE_TO_SCALE_ENUM_MAP: Dict[MeterType, Type[MeterScaleType]] = {
     MeterType.COOLING: CoolingScale,
 }
 
-ENERGY_TOTAL_INCREASING_METER_TYPES: List[MeterScaleType] = [
+ENERGY_TOTAL_INCREASING_METER_TYPES: list[MeterScaleType] = [
     ElectricScale.KILOWATT_HOUR,
     ElectricScale.KILOVOLT_AMPERE_HOUR,
     ElectricScale.KILOVOLT_AMPERE_REACTIVE_HOUR,
@@ -86,46 +86,46 @@ ENERGY_TOTAL_INCREASING_METER_TYPES: List[MeterScaleType] = [
     CoolingScale.KILOWATT_HOUR,
     ElectricScale.PULSE_COUNT,
 ]
-POWER_METER_TYPES: List[MeterScaleType] = [
+POWER_METER_TYPES: list[MeterScaleType] = [
     ElectricScale.WATT,
     ElectricScale.KILOVOLT_AMPERE_REACTIVE,
 ]
-POWER_FACTOR_METER_TYPES: List[MeterScaleType] = [ElectricScale.POWER_FACTOR]
-VOLTAGE_METER_TYPES: List[MeterScaleType] = [ElectricScale.VOLT]
-CURRENT_METER_TYPES: List[MeterScaleType] = [ElectricScale.AMPERE]
-GAS_METER_TYPES: List[MeterScaleType] = [
+POWER_FACTOR_METER_TYPES: list[MeterScaleType] = [ElectricScale.POWER_FACTOR]
+VOLTAGE_METER_TYPES: list[MeterScaleType] = [ElectricScale.VOLT]
+CURRENT_METER_TYPES: list[MeterScaleType] = [ElectricScale.AMPERE]
+GAS_METER_TYPES: list[MeterScaleType] = [
     GasScale.CUBIC_METER,
     GasScale.CUBIC_FEET,
     GasScale.PULSE_COUNT,
 ]
-WATER_METER_TYPES: List[MeterScaleType] = [
+WATER_METER_TYPES: list[MeterScaleType] = [
     WaterScale.CUBIC_METER,
     WaterScale.CUBIC_FEET,
     WaterScale.US_GALLON,
     WaterScale.PULSE_COUNT,
 ]
 
-UNIT_KILOWATT_HOUR: List[MeterScaleType] = [
+UNIT_KILOWATT_HOUR: list[MeterScaleType] = [
     ElectricScale.KILOWATT_HOUR,
     HeatingScale.KILOWATT_HOUR,
     CoolingScale.KILOWATT_HOUR,
 ]
-UNIT_KILOVOLT_AMPERE_HOUR: List[MeterScaleType] = [ElectricScale.KILOVOLT_AMPERE_HOUR]
-UNIT_WATT: List[MeterScaleType] = [ElectricScale.WATT]
-UNIT_PULSE_COUNT: List[MeterScaleType] = [
+UNIT_KILOVOLT_AMPERE_HOUR: list[MeterScaleType] = [ElectricScale.KILOVOLT_AMPERE_HOUR]
+UNIT_WATT: list[MeterScaleType] = [ElectricScale.WATT]
+UNIT_PULSE_COUNT: list[MeterScaleType] = [
     ElectricScale.PULSE_COUNT,
     GasScale.PULSE_COUNT,
     WaterScale.PULSE_COUNT,
 ]
-UNIT_VOLT: List[MeterScaleType] = [ElectricScale.VOLT]
-UNIT_AMPERE: List[MeterScaleType] = [ElectricScale.AMPERE]
-UNIT_POWER_FACTOR: List[MeterScaleType] = [ElectricScale.POWER_FACTOR]
-UNIT_KILOVOLT_AMPERE_REACTIVE: List[MeterScaleType] = [
+UNIT_VOLT: list[MeterScaleType] = [ElectricScale.VOLT]
+UNIT_AMPERE: list[MeterScaleType] = [ElectricScale.AMPERE]
+UNIT_POWER_FACTOR: list[MeterScaleType] = [ElectricScale.POWER_FACTOR]
+UNIT_KILOVOLT_AMPERE_REACTIVE: list[MeterScaleType] = [
     ElectricScale.KILOVOLT_AMPERE_REACTIVE
 ]
-UNIT_KILOVOLT_AMPERE_REACTIVE_HOUR: List[MeterScaleType] = [
+UNIT_KILOVOLT_AMPERE_REACTIVE_HOUR: list[MeterScaleType] = [
     ElectricScale.KILOVOLT_AMPERE_REACTIVE_HOUR
 ]
-UNIT_CUBIC_METER: List[MeterScaleType] = [GasScale.CUBIC_METER, WaterScale.CUBIC_METER]
-UNIT_CUBIC_FEET: List[MeterScaleType] = [GasScale.CUBIC_FEET, WaterScale.CUBIC_FEET]
-UNIT_US_GALLON: List[MeterScaleType] = [WaterScale.US_GALLON]
+UNIT_CUBIC_METER: list[MeterScaleType] = [GasScale.CUBIC_METER, WaterScale.CUBIC_METER]
+UNIT_CUBIC_FEET: list[MeterScaleType] = [GasScale.CUBIC_FEET, WaterScale.CUBIC_FEET]
+UNIT_US_GALLON: list[MeterScaleType] = [WaterScale.US_GALLON]

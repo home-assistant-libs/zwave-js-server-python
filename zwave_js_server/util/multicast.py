@@ -1,5 +1,5 @@
 """Support for multicast commands."""
-from typing import Any, List, Optional, cast
+from typing import Any, Optional, cast
 
 from ..client import Client
 from ..const import TARGET_VALUE_PROPERTY, CommandClass
@@ -11,7 +11,7 @@ from ..model.value import ValueDataType, _get_value_id_str_from_dict
 async def _async_send_command(
     client: Client,
     command: str,
-    nodes: Optional[List[Node]] = None,
+    nodes: Optional[list[Node]] = None,
     require_schema: Optional[int] = None,
     **kwargs: Any,
 ) -> dict:
@@ -32,7 +32,7 @@ async def async_multicast_set_value(
     client: Client,
     new_value: Any,
     value_data: ValueDataType,
-    nodes: Optional[List[Node]] = None,
+    nodes: Optional[list[Node]] = None,
     options: Optional[dict] = None,
 ) -> bool:
     """Send a multicast set_value command."""
@@ -69,7 +69,7 @@ async def async_multicast_set_value(
 
 
 async def async_multicast_get_endpoint_count(
-    client: Client, nodes: Optional[List[Node]] = None
+    client: Client, nodes: Optional[list[Node]] = None
 ) -> int:
     """Send a multicast get_endpoint_count command."""
     result = await _async_send_command(
@@ -82,7 +82,7 @@ async def async_multicast_endpoint_supports_cc(
     client: Client,
     endpoint: int,
     command_class: CommandClass,
-    nodes: Optional[List[Node]] = None,
+    nodes: Optional[list[Node]] = None,
 ) -> bool:
     """Send a supports_cc command to a multicast endpoint."""
     result = await _async_send_command(
@@ -100,7 +100,7 @@ async def async_multicast_endpoint_get_cc_version(
     client: Client,
     endpoint: int,
     command_class: CommandClass,
-    nodes: Optional[List[Node]] = None,
+    nodes: Optional[list[Node]] = None,
 ) -> int:
     """Send a get_cc_version command to a multicast endpoint."""
     result = await _async_send_command(
@@ -119,8 +119,8 @@ async def async_multicast_endpoint_invoke_cc_api(
     endpoint: int,
     command_class: CommandClass,
     method_name: str,
-    args: Optional[List[Any]] = None,
-    nodes: Optional[List[Node]] = None,
+    args: Optional[list[Any]] = None,
+    nodes: Optional[list[Node]] = None,
 ) -> Any:
     """Send a invoke_cc_api command to a multicast endpoint."""
     result = await _async_send_command(
@@ -140,7 +140,7 @@ async def async_multicast_endpoint_supports_cc_api(
     client: Client,
     endpoint: int,
     command_class: CommandClass,
-    nodes: Optional[List[Node]] = None,
+    nodes: Optional[list[Node]] = None,
 ) -> bool:
     """Send a supports_cc_api command to a multicast endpoint."""
     result = await _async_send_command(

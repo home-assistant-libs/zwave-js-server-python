@@ -8,7 +8,7 @@ from copy import deepcopy
 from datetime import datetime
 from operator import itemgetter
 from types import TracebackType
-from typing import Any, DefaultDict, Dict, List, Optional, cast
+from typing import Any, Optional, cast
 
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, client_exceptions
 
@@ -55,7 +55,7 @@ class Client:
         ws_server_url: str,
         aiohttp_session: ClientSession,
         schema_version: int = MAX_SERVER_SCHEMA_VERSION,
-        additional_user_agent_components: Optional[Dict[str, str]] = None,
+        additional_user_agent_components: Optional[dict[str, str]] = None,
         record_messages: bool = False,
     ):
         """Initialize the Client class."""
@@ -73,11 +73,11 @@ class Client:
         }
         self._logger = logging.getLogger(__package__)
         self._loop = asyncio.get_running_loop()
-        self._result_futures: Dict[str, asyncio.Future] = {}
+        self._result_futures: dict[str, asyncio.Future] = {}
         self._shutdown_complete_event: Optional[asyncio.Event] = None
         self._record_messages = record_messages
-        self._recorded_commands: DefaultDict[str, dict] = defaultdict(dict)
-        self._recorded_events: List[dict] = []
+        self._recorded_commands: defaultdict[str, dict] = defaultdict(dict)
+        self._recorded_events: list[dict] = []
 
     def __repr__(self) -> str:
         """Return the representation."""
@@ -96,7 +96,7 @@ class Client:
 
     async def async_send_command(
         self,
-        message: Dict[str, Any],
+        message: dict[str, Any],
         require_schema: Optional[int] = None,
     ) -> dict:
         """Send a command and get a response."""
@@ -118,7 +118,7 @@ class Client:
             self._result_futures.pop(message_id)
 
     async def async_send_command_no_wait(
-        self, message: Dict[str, Any], require_schema: Optional[int] = None
+        self, message: dict[str, Any], require_schema: Optional[int] = None
     ) -> None:
         """Send a command without waiting for the response."""
         if require_schema is not None and require_schema > self.schema_version:
@@ -303,7 +303,7 @@ class Client:
 
         self._record_messages = True
 
-    def end_recording_messages(self) -> List[dict]:
+    def end_recording_messages(self) -> list[dict]:
         """End recording messages and return messages that were recorded."""
         if not self._record_messages:
             raise InvalidState("Not recording messages")
@@ -411,7 +411,7 @@ class Client:
         event = Event(type=msg["event"]["event"], data=msg["event"])
         self.driver.receive_event(event)  # type: ignore
 
-    async def _send_json_message(self, message: Dict[str, Any]) -> None:
+    async def _send_json_message(self, message: dict[str, Any]) -> None:
         """Send a message.
 
         Raises NotConnected if client not connected.

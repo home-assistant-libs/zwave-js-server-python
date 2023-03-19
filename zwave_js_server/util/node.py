@@ -1,7 +1,7 @@
 """Utility functions for Z-Wave JS nodes."""
 import json
 import logging
-from typing import Dict, Optional, Tuple, Union, cast
+from typing import Optional, Union, cast
 
 from ..const import CommandClass, CommandStatus, ConfigurationValueType
 from ..exceptions import (
@@ -29,7 +29,7 @@ async def async_set_config_parameter(
     new_value: Union[int, str],
     property_or_property_name: Union[int, str],
     property_key: Optional[Union[int, str]] = None,
-) -> Tuple[ConfigurationValue, CommandStatus]:
+) -> tuple[ConfigurationValue, CommandStatus]:
     """
     Set a value for a config parameter on this node.
 
@@ -87,7 +87,7 @@ async def async_set_config_parameter(
 async def async_bulk_set_partial_config_parameters(
     node: Node,
     property_: int,
-    new_value: Union[int, Dict[Union[int, str], Union[int, str]]],
+    new_value: Union[int, dict[Union[int, str], Union[int, str]]],
 ) -> CommandStatus:
     """Bulk set partial configuration values on this node."""
     config_values = node.get_configuration_values()
@@ -248,9 +248,9 @@ def _bulk_set_validate_and_transform_new_value(
 
 def _get_int_from_partials_dict(
     node: Node,
-    partial_param_values: Dict[str, ConfigurationValue],
+    partial_param_values: dict[str, ConfigurationValue],
     property_: int,
-    new_value: Dict[Union[int, str], Union[int, str]],
+    new_value: dict[Union[int, str], Union[int, str]],
 ) -> int:
     """Take an input dict for a set of partial values and compute the raw int value."""
     int_value = 0
@@ -308,7 +308,7 @@ def _get_int_from_partials_dict(
 
 
 def _validate_raw_int(
-    partial_param_values: Dict[str, ConfigurationValue], new_value: int
+    partial_param_values: dict[str, ConfigurationValue], new_value: int
 ) -> None:
     """
     Validate raw value against all partial values.

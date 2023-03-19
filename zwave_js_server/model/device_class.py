@@ -5,7 +5,7 @@ https://zwave-js.github.io/node-zwave-js/#/api/node?id=deviceclass
 """
 
 from dataclasses import dataclass
-from typing import List, TypedDict
+from typing import TypedDict
 
 
 class DeviceClassItemDataType(TypedDict):
@@ -21,8 +21,8 @@ class DeviceClassDataType(TypedDict):
     basic: DeviceClassItemDataType
     generic: DeviceClassItemDataType
     specific: DeviceClassItemDataType
-    mandatorySupportedCCs: List[int]
-    mandatoryControlledCCs: List[int]
+    mandatorySupportedCCs: list[int]
+    mandatoryControlledCCs: list[int]
 
 
 @dataclass
@@ -56,11 +56,11 @@ class DeviceClass:
         return DeviceClassItem(**self.data["specific"])
 
     @property
-    def mandatory_supported_ccs(self) -> List[int]:
+    def mandatory_supported_ccs(self) -> list[int]:
         """Return list of mandatory Supported CC id's."""
         return self.data["mandatorySupportedCCs"]
 
     @property
-    def mandatory_controlled_ccs(self) -> List[int]:
+    def mandatory_controlled_ccs(self) -> list[int]:
         """Return list of mandatory Controlled CC id's."""
         return self.data["mandatoryControlledCCs"]
