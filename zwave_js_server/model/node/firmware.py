@@ -229,6 +229,13 @@ class NodeFirmwareUpdateFileInfo:
     url: str
     integrity: str
 
+    @classmethod
+    def from_dict(
+        cls, data: NodeFirmwareUpdateFileInfoDataType
+    ) -> "NodeFirmwareUpdateFileInfo":
+        """Initialize from dict."""
+        return cls(**data)
+
     def to_dict(self) -> NodeFirmwareUpdateFileInfoDataType:
         """Return dict representation of the object."""
         return cast(NodeFirmwareUpdateFileInfoDataType, asdict(self))
@@ -258,5 +265,18 @@ class NodeFirmwareUpdateInfo:
         return cls(
             version=data["version"],
             changelog=data["changelog"],
-            files=[NodeFirmwareUpdateFileInfo(**file) for file in data["files"]],
+            files=[
+                NodeFirmwareUpdateFileInfo.from_dict(file) for file in data["files"]
+            ],
+        )
+
+    def to_dict(self) -> NodeFirmwareUpdateInfoDataType:
+        """Return dict representation of the object."""
+        return cast(
+            NodeFirmwareUpdateInfoDataType,
+            {
+                "version": self.version,
+                "changelog": self.changelog,
+                "files": [file.to_dict() for file in self.files],
+            },
         )

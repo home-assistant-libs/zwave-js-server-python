@@ -31,7 +31,10 @@ from zwave_js_server.exceptions import (
 )
 from zwave_js_server.model import endpoint as endpoint_pkg
 from zwave_js_server.model import node as node_pkg
-from zwave_js_server.model.node.firmware import NodeFirmwareUpdateStatus
+from zwave_js_server.model.node.firmware import (
+    NodeFirmwareUpdateStatus,
+    NodeFirmwareUpdateInfo,
+)
 from zwave_js_server.model.node.health_check import (
     LifelineHealthCheckResultDataType,
     RouteHealthCheckResultDataType,
@@ -40,6 +43,24 @@ from zwave_js_server.model.node.statistics import NodeStatistics
 from zwave_js_server.model.value import ConfigurationValue, get_value_id_str
 
 from .. import load_fixture
+
+FIRMWARE_UPDATE_INFO = {
+    "version": "1.0.0",
+    "changelog": "changelog",
+    "files": [{"target": 0, "url": "http://example.com", "integrity": "test"}],
+}
+
+
+def test_firmware():
+    """Test NodeFirmwareUpdateInfo."""
+    firmware_update_info = NodeFirmwareUpdateInfo.from_dict(FIRMWARE_UPDATE_INFO)
+    assert firmware_update_info.version == "1.0.0"
+    assert firmware_update_info.changelog == "changelog"
+    assert len(firmware_update_info.files) == 1
+    assert firmware_update_info.files[0].target == 0
+    assert firmware_update_info.files[0].url == "http://example.com"
+    assert firmware_update_info.files[0].integrity == "test"
+    assert firmware_update_info.to_dict() == FIRMWARE_UPDATE_INFO
 
 
 def test_from_state(client):
