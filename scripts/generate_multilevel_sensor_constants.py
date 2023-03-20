@@ -158,7 +158,6 @@ lines = [
     "# ----------------------------------------------------------------------------------- #",
     "",
     "from enum import IntEnum",
-    "from typing import Type",
     'CC_SPECIFIC_SCALE = "scale"',
     'CC_SPECIFIC_SENSOR_TYPE = "sensorType"',
 ]
@@ -203,7 +202,7 @@ for unit_name, enum_list in unit_name_to_enum_map.items():
 
 multilevel_sensor_type_to_scale_map_line = (
     "MULTILEVEL_SENSOR_TYPE_TO_SCALE_MAP: dict[MultilevelSensorType, "
-    "Type[MultilevelSensorScaleType]] = {"
+    "type[MultilevelSensorScaleType]] = {"
 )
 for sensor_name, sensor_def in sensors.items():
     multilevel_sensor_type_to_scale_map_line += (

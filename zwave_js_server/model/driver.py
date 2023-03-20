@@ -1,5 +1,5 @@
 """Provide a model for the Z-Wave JS Driver."""
-from typing import TYPE_CHECKING, Any, Literal, Optional, Type, Union, cast
+from typing import TYPE_CHECKING, Any, Literal, Optional, Union, cast
 
 from pydantic import create_model_from_typeddict
 
@@ -36,7 +36,7 @@ LoggingEventModel = create_model_from_typeddict(
 )
 
 
-DRIVER_EVENT_MODEL_MAP: dict[str, Type["BaseDriverEventModel"]] = {
+DRIVER_EVENT_MODEL_MAP: dict[str, type["BaseDriverEventModel"]] = {
     "all nodes ready": AllNodesReadyEventModel,
     "log config updated": LogConfigUpdatedEventModel,
     "logging": LoggingEventModel,

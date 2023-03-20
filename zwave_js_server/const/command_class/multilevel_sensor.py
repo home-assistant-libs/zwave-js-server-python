@@ -6,7 +6,6 @@
 # ----------------------------------------------------------------------------------- #
 
 from enum import IntEnum
-from typing import Type
 
 CC_SPECIFIC_SCALE = "scale"
 CC_SPECIFIC_SENSOR_TYPE = "sensorType"
@@ -535,7 +534,7 @@ class WeightScale(MultilevelSensorScaleType):
 
 
 MULTILEVEL_SENSOR_TYPE_TO_SCALE_MAP: dict[
-    MultilevelSensorType, Type[MultilevelSensorScaleType]
+    MultilevelSensorType, type[MultilevelSensorScaleType]
 ] = {
     MultilevelSensorType.ACCELERATION_X_AXIS: AccelerationScale,
     MultilevelSensorType.ACCELERATION_Y_AXIS: AccelerationScale,

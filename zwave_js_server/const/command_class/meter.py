@@ -1,6 +1,5 @@
 """Constants for Meter CC."""
 from enum import IntEnum
-from typing import Type
 
 VALUE_PROPERTY = "value"
 
@@ -70,7 +69,7 @@ class HeatingScale(MeterScaleType):
 
 CoolingScale = HeatingScale
 
-METER_TYPE_TO_SCALE_ENUM_MAP: dict[MeterType, Type[MeterScaleType]] = {
+METER_TYPE_TO_SCALE_ENUM_MAP: dict[MeterType, type[MeterScaleType]] = {
     MeterType.ELECTRIC: ElectricScale,
     MeterType.GAS: GasScale,
     MeterType.WATER: WaterScale,

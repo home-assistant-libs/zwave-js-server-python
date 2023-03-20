@@ -1,5 +1,5 @@
 """Provide a model for the Z-Wave JS node's events."""
-from typing import Literal, Optional, Type, Union
+from typing import Literal, Optional, Union
 
 from pydantic import BaseModel
 
@@ -199,7 +199,7 @@ class FirmwareUpdateProgressEventModel(BaseNodeEventModel):
     progress: NodeFirmwareUpdateProgressDataType
 
 
-NODE_EVENT_MODEL_MAP: dict[str, Type["BaseNodeEventModel"]] = {
+NODE_EVENT_MODEL_MAP: dict[str, type["BaseNodeEventModel"]] = {
     "alive": AliveEventModel,
     "check lifeline health progress": CheckLifelineHealthProgressEventModel,
     "check route health progress": CheckRouteHealthProgressEventModel,
