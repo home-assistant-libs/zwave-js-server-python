@@ -4,7 +4,7 @@ Model for a Zwave Node's endpoints.
 https://zwave-js.github.io/node-zwave-js/#/api/endpoint?id=endpoint-properties
 """
 
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict, Union, cast
+from typing import TYPE_CHECKING, Any, Optional, TypedDict, Union, cast
 
 from ..const import NodeStatus
 from ..event import EventBase
@@ -27,7 +27,7 @@ class EndpointDataType(TypedDict, total=False):
     installerIcon: int
     userIcon: int
     endpointLabel: str
-    commandClasses: List[CommandClassInfoDataType]
+    commandClasses: list[CommandClassInfoDataType]
 
 
 class Endpoint(EventBase):
@@ -37,13 +37,13 @@ class Endpoint(EventBase):
         self,
         client: "Client",
         data: EndpointDataType,
-        values: Dict[str, Union[ConfigurationValue, Value]],
+        values: dict[str, Union[ConfigurationValue, Value]],
     ) -> None:
         """Initialize."""
         super().__init__()
         self.client = client
         self.data: EndpointDataType = {}
-        self.values: Dict[str, Union[ConfigurationValue, Value]] = {}
+        self.values: dict[str, Union[ConfigurationValue, Value]] = {}
         self.update(data, values)
 
     def __repr__(self) -> str:
@@ -90,7 +90,7 @@ class Endpoint(EventBase):
         return self.data.get("userIcon")
 
     @property
-    def command_classes(self) -> List[CommandClassInfo]:
+    def command_classes(self) -> list[CommandClassInfo]:
         """Return all CommandClasses supported on this node."""
         return [CommandClassInfo(cc) for cc in self.data["commandClasses"]]
 
@@ -102,7 +102,7 @@ class Endpoint(EventBase):
     def update(
         self,
         data: EndpointDataType,
-        values: Dict[str, Union[ConfigurationValue, Value]],
+        values: dict[str, Union[ConfigurationValue, Value]],
     ) -> None:
         """Update the endpoint data."""
         self.data = data
@@ -123,7 +123,7 @@ class Endpoint(EventBase):
         require_schema: Optional[int] = None,
         wait_for_result: Optional[bool] = None,
         **cmd_kwargs: Any,
-    ) -> Optional[Dict[str, Any]]:
+    ) -> Optional[dict[str, Any]]:
         """
         Send an endpoint command. For internal use only.
 

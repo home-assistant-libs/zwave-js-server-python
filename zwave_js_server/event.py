@@ -1,7 +1,7 @@
 """Provide Event base classes for Z-Wave JS."""
 import logging
 from dataclasses import dataclass, field
-from typing import Callable, Dict, List, Literal
+from typing import Callable, Literal
 
 from pydantic import BaseModel
 
@@ -28,7 +28,7 @@ class EventBase:
 
     def __init__(self) -> None:
         """Initialize event base."""
-        self._listeners: Dict[str, List[Callable]] = {}
+        self._listeners: dict[str, list[Callable]] = {}
 
     def on(  # pylint: disable=invalid-name
         self, event_name: str, callback: Callable

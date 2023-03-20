@@ -1,6 +1,6 @@
 """Dump helper."""
 import asyncio
-from typing import Dict, List, Optional
+from typing import Optional
 
 import aiohttp
 
@@ -11,9 +11,9 @@ from .const import MAX_SERVER_SCHEMA_VERSION, PACKAGE_NAME, __version__
 async def dump_msgs(
     url: str,
     session: aiohttp.ClientSession,
-    additional_user_agent_components: Optional[Dict[str, str]] = None,
+    additional_user_agent_components: Optional[dict[str, str]] = None,
     timeout: Optional[float] = None,
-) -> List[dict]:
+) -> list[dict]:
     """Dump server state."""
     client = await session.ws_connect(url, compress=15, max_msg_size=0)
     msgs = []

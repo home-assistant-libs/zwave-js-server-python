@@ -1,6 +1,6 @@
 """Provide a model for the Z-Wave JS node."""
 import logging
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, cast
+from typing import TYPE_CHECKING, Any, Optional, Union, cast
 
 from ...const import (
     INTERVIEW_FAILED,
@@ -66,7 +66,7 @@ if TYPE_CHECKING:
 _LOGGER = logging.getLogger(__package__)
 
 
-def _get_value_id_dict_from_value_data(value_data: ValueDataType) -> Dict[str, Any]:
+def _get_value_id_dict_from_value_data(value_data: ValueDataType) -> dict[str, Any]:
     """Return a value ID dict from ValueDataType."""
     data = {
         "commandClass": value_data["commandClass"],
@@ -92,8 +92,8 @@ class Node(EventBase):
         self._device_config = DeviceConfig({})
         self._statistics = NodeStatistics(client, data.get("statistics"))
         self._firmware_update_progress: Optional[NodeFirmwareUpdateProgress] = None
-        self.values: Dict[str, Union[ConfigurationValue, Value]] = {}
-        self.endpoints: Dict[int, Endpoint] = {}
+        self.values: dict[str, Union[ConfigurationValue, Value]] = {}
+        self.endpoints: dict[int, Endpoint] = {}
         self.update(data)
 
     def __repr__(self) -> str:
@@ -168,7 +168,7 @@ class Node(EventBase):
         return self.data.get("maxDataRate")
 
     @property
-    def supported_data_rates(self) -> List[int]:
+    def supported_data_rates(self) -> list[int]:
         """Return the supported_data_rates."""
         return self.data.get("supportedDataRates", [])
 
@@ -299,7 +299,7 @@ class Node(EventBase):
         return self.interview_stage in (None, NOT_INTERVIEWED)
 
     @property
-    def command_classes(self) -> List[CommandClassInfo]:
+    def command_classes(self) -> list[CommandClassInfo]:
         """Return all CommandClasses supported on this node."""
         return self.endpoints[0].command_classes
 
@@ -381,7 +381,7 @@ class Node(EventBase):
 
     def get_command_class_values(
         self, command_class: CommandClass, endpoint: Optional[int] = None
-    ) -> Dict[str, Union[ConfigurationValue, Value]]:
+    ) -> dict[str, Union[ConfigurationValue, Value]]:
         """Return all values for a given command class."""
         return {
             value_id: value
@@ -390,10 +390,10 @@ class Node(EventBase):
             and (endpoint is None or value.endpoint == endpoint)
         }
 
-    def get_configuration_values(self) -> Dict[str, ConfigurationValue]:
+    def get_configuration_values(self) -> dict[str, ConfigurationValue]:
         """Return all configuration values for a node."""
         return cast(
-            Dict[str, ConfigurationValue],
+            dict[str, ConfigurationValue],
             self.get_command_class_values(CommandClass.CONFIGURATION),
         )
 
@@ -412,7 +412,7 @@ class Node(EventBase):
         require_schema: Optional[int] = None,
         wait_for_result: Optional[bool] = None,
         **cmd_kwargs: Any,
-    ) -> Optional[Dict[str, Any]]:
+    ) -> Optional[dict[str, Any]]:
         """
         Send a node command. For internal use only.
 
@@ -498,7 +498,7 @@ class Node(EventBase):
             require_schema=4,
         )
 
-    async def async_get_defined_value_ids(self) -> List[Value]:
+    async def async_get_defined_value_ids(self) -> list[Value]:
         """Send getDefinedValueIDs command to Node."""
         data = await self.async_send_command(
             "get_defined_value_ids", wait_for_result=True

@@ -1,6 +1,6 @@
 """Provide a model for the Z-Wave JS controller's inclusion/provisioning data structures."""
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, TypedDict
+from typing import Any, Optional, TypedDict
 
 from ...const import Protocols, ProvisioningEntryStatus, QRCodeVersion, SecurityClass
 
@@ -9,7 +9,7 @@ class InclusionGrantDataType(TypedDict):
     """Representation of an inclusion grant data dict type."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/controller/Inclusion.ts#L48-L56
-    securityClasses: List[int]
+    securityClasses: list[int]
     clientSideAuth: bool
 
 
@@ -17,7 +17,7 @@ class InclusionGrantDataType(TypedDict):
 class InclusionGrant:
     """Representation of an inclusion grant."""
 
-    security_classes: List[SecurityClass]
+    security_classes: list[SecurityClass]
     client_side_auth: bool
 
     def to_dict(self) -> InclusionGrantDataType:
@@ -43,12 +43,12 @@ class ProvisioningEntry:
     """Class to represent the base fields of a provisioning entry."""
 
     dsk: str
-    security_classes: List[SecurityClass]
-    requested_security_classes: Optional[List[SecurityClass]] = None
+    security_classes: list[SecurityClass]
+    requested_security_classes: Optional[list[SecurityClass]] = None
     status: ProvisioningEntryStatus = ProvisioningEntryStatus.ACTIVE
-    additional_properties: Optional[Dict[str, Any]] = None
+    additional_properties: Optional[dict[str, Any]] = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Return PlannedProvisioning data dict from self."""
         data = {
             "dsk": self.dsk,
@@ -63,7 +63,7 @@ class ProvisioningEntry:
         return data
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "ProvisioningEntry":
+    def from_dict(cls, data: dict[str, Any]) -> "ProvisioningEntry":
         """Return ProvisioningEntry from data dict."""
         cls_instance = cls(
             dsk=data["dsk"],
@@ -100,14 +100,14 @@ class QRProvisioningInformationMixin:
     application_version: str
     max_inclusion_request_interval: Optional[int]
     uuid: Optional[str]
-    supported_protocols: Optional[List[Protocols]]
+    supported_protocols: Optional[list[Protocols]]
 
 
 @dataclass
 class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixin):
     """Representation of provisioning information retrieved from a QR code."""
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Return QRProvisioningInformation data dict from self."""
         data = {
             "version": self.version.value,
@@ -138,7 +138,7 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
         return data
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "QRProvisioningInformation":
+    def from_dict(cls, data: dict[str, Any]) -> "QRProvisioningInformation":
         """Return QRProvisioningInformation from data dict."""
         cls_instance = cls(
             version=QRCodeVersion(data["version"]),

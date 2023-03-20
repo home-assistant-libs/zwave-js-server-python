@@ -1,6 +1,6 @@
 """Provide a model for the Z-Wave JS controller."""
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Union, cast
+from typing import TYPE_CHECKING, Any, Literal, Optional, Union, cast
 
 from zwave_js_server.model.node.firmware import (
     NodeFirmwareUpdateFileInfo,
@@ -50,8 +50,8 @@ class Controller(EventBase):
         """Initialize controller."""
         super().__init__()
         self.client = client
-        self.nodes: Dict[int, Node] = {}
-        self._heal_network_progress: Optional[Dict[int, str]] = None
+        self.nodes: dict[int, Node] = {}
+        self._heal_network_progress: Optional[dict[int, str]] = None
         self._statistics = ControllerStatistics()
         self._firmware_update_progress: Optional[
             ControllerFirmwareUpdateProgress
@@ -155,7 +155,7 @@ class Controller(EventBase):
         return self.data.get("productId")
 
     @property
-    def supported_function_types(self) -> List[int]:
+    def supported_function_types(self) -> list[int]:
         """Return supported_function_types."""
         return self.data.get("supportedFunctionTypes", [])
 
@@ -180,7 +180,7 @@ class Controller(EventBase):
         return self._statistics
 
     @property
-    def heal_network_progress(self) -> Optional[Dict[int, str]]:
+    def heal_network_progress(self) -> Optional[dict[int, str]]:
         """Return heal network progress state."""
         return self._heal_network_progress
 
@@ -223,7 +223,7 @@ class Controller(EventBase):
         """Send beginInclusion command to Controller."""
         # Most functionality was introduced in Schema 8
         require_schema = 8
-        options: Dict[str, Any] = {"strategy": inclusion_strategy}
+        options: dict[str, Any] = {"strategy": inclusion_strategy}
         # forceSecurity can only be used with the default inclusion strategy
         if force_security is not None:
             if inclusion_strategy != InclusionStrategy.DEFAULT:
@@ -337,7 +337,7 @@ class Controller(EventBase):
             return ProvisioningEntry.from_dict(data["entry"])
         return None
 
-    async def async_get_provisioning_entries(self) -> List[ProvisioningEntry]:
+    async def async_get_provisioning_entries(self) -> list[ProvisioningEntry]:
         """Send getProvisioningEntries command to Controller."""
         data = await self.client.async_send_command(
             {
@@ -358,7 +358,7 @@ class Controller(EventBase):
         self, strategy: Optional[ExclusionStrategy] = None
     ) -> bool:
         """Send beginExclusion command to Controller."""
-        payload: Dict[str, Union[str, ExclusionStrategy]] = {
+        payload: dict[str, Union[str, ExclusionStrategy]] = {
             "command": "controller.begin_exclusion"
         }
         if strategy is not None:
@@ -396,7 +396,7 @@ class Controller(EventBase):
         """Send replaceFailedNode command to Controller."""
         # Most functionality was introduced in Schema 8
         require_schema = 8
-        options: Dict[str, Any] = {"strategy": inclusion_strategy}
+        options: dict[str, Any] = {"strategy": inclusion_strategy}
         # forceSecurity can only be used with the default inclusion strategy
         if force_security is not None:
             if inclusion_strategy != InclusionStrategy.DEFAULT:
@@ -473,7 +473,7 @@ class Controller(EventBase):
 
     async def async_get_association_groups(
         self, source: AssociationAddress
-    ) -> Dict[int, AssociationGroup]:
+    ) -> dict[int, AssociationGroup]:
         """Send getAssociationGroups command to Controller."""
         source_data = {"nodeId": source.node_id}
         if source.endpoint is not None:
@@ -498,7 +498,7 @@ class Controller(EventBase):
 
     async def async_get_associations(
         self, source: AssociationAddress
-    ) -> Dict[int, List[AssociationAddress]]:
+    ) -> dict[int, list[AssociationAddress]]:
         """Send getAssociations command to Controller."""
         source_data = {"nodeId": source.node_id}
         if source.endpoint is not None:
@@ -545,7 +545,7 @@ class Controller(EventBase):
         self,
         source: AssociationAddress,
         group: int,
-        associations: List[AssociationAddress],
+        associations: list[AssociationAddress],
         wait_for_result: bool = False,
     ) -> None:
         """Send addAssociations command to Controller."""
@@ -575,7 +575,7 @@ class Controller(EventBase):
         self,
         source: AssociationAddress,
         group: int,
-        associations: List[AssociationAddress],
+        associations: list[AssociationAddress],
         wait_for_result: bool = False,
     ) -> None:
         """Send removeAssociations command to Controller."""
@@ -616,7 +616,7 @@ class Controller(EventBase):
         else:
             await self.client.async_send_command_no_wait(cmd)
 
-    async def async_get_node_neighbors(self, node: Node) -> List[int]:
+    async def async_get_node_neighbors(self, node: Node) -> list[int]:
         """Send getNodeNeighbors command to Controller to get node's neighbors."""
         data = await self.client.async_send_command(
             {
@@ -624,7 +624,7 @@ class Controller(EventBase):
                 "nodeId": node.node_id,
             }
         )
-        return cast(List[int], data["neighbors"])
+        return cast(list[int], data["neighbors"])
 
     async def async_grant_security_classes(
         self, inclusion_grant: InclusionGrant
@@ -683,7 +683,7 @@ class Controller(EventBase):
             require_schema=14,
         )
 
-    async def async_get_power_level(self) -> Dict[str, int]:
+    async def async_get_power_level(self) -> dict[str, int]:
         """Send getPowerlevel command to Controller."""
         data = await self.client.async_send_command(
             {"command": "controller.get_powerlevel"}, require_schema=14
@@ -727,7 +727,7 @@ class Controller(EventBase):
 
     async def async_get_known_lifeline_routes(
         self,
-    ) -> Dict[Node, ControllerLifelineRoutes]:
+    ) -> dict[Node, ControllerLifelineRoutes]:
         """Send getKnownLifelineRoutes command to Controller."""
         data = await self.client.async_send_command(
             {"command": "controller.get_known_lifeline_routes"}, require_schema=16
@@ -753,7 +753,7 @@ class Controller(EventBase):
 
     async def async_get_available_firmware_updates(
         self, node: Node, api_key: str, include_prereleases: bool = False
-    ) -> List[NodeFirmwareUpdateInfo]:
+    ) -> list[NodeFirmwareUpdateInfo]:
         """Send getAvailableFirmwareUpdates command to Controller."""
         data = await self.client.async_send_command(
             {
@@ -768,7 +768,7 @@ class Controller(EventBase):
         return [NodeFirmwareUpdateInfo.from_dict(update) for update in data["updates"]]
 
     async def async_firmware_update_ota(
-        self, node: Node, updates: List[NodeFirmwareUpdateFileInfo]
+        self, node: Node, updates: list[NodeFirmwareUpdateFileInfo]
     ) -> bool:
         """Send firmwareUpdateOTA command to Controller."""
         data = await self.client.async_send_command(

@@ -6,7 +6,6 @@
 # ----------------------------------------------------------------------------------- #
 
 from enum import IntEnum
-from typing import Dict, List, Type
 
 CC_SPECIFIC_SCALE = "scale"
 CC_SPECIFIC_SENSOR_TYPE = "sensorType"
@@ -534,8 +533,8 @@ class WeightScale(MultilevelSensorScaleType):
     POUNDS = 1
 
 
-MULTILEVEL_SENSOR_TYPE_TO_SCALE_MAP: Dict[
-    MultilevelSensorType, Type[MultilevelSensorScaleType]
+MULTILEVEL_SENSOR_TYPE_TO_SCALE_MAP: dict[
+    MultilevelSensorType, type[MultilevelSensorScaleType]
 ] = {
     MultilevelSensorType.ACCELERATION_X_AXIS: AccelerationScale,
     MultilevelSensorType.ACCELERATION_Y_AXIS: AccelerationScale,
@@ -627,103 +626,103 @@ MULTILEVEL_SENSOR_TYPE_TO_SCALE_MAP: Dict[
     MultilevelSensorType.WEIGHT: WeightScale,
 }
 
-UNIT_ABSOLUTE_HUMIDITY: List[MultilevelSensorScaleType] = [
+UNIT_ABSOLUTE_HUMIDITY: list[MultilevelSensorScaleType] = [
     HumidityScale.ABSOLUTE_HUMIDITY
 ]
-UNIT_ACIDITY: List[MultilevelSensorScaleType] = [AcidityScale.ACIDITY]
-UNIT_AMPERE: List[MultilevelSensorScaleType] = [CurrentScale.AMPERE]
-UNIT_A_WEIGHTED_DECIBELS: List[MultilevelSensorScaleType] = [
+UNIT_ACIDITY: list[MultilevelSensorScaleType] = [AcidityScale.ACIDITY]
+UNIT_AMPERE: list[MultilevelSensorScaleType] = [CurrentScale.AMPERE]
+UNIT_A_WEIGHTED_DECIBELS: list[MultilevelSensorScaleType] = [
     LoudnessScale.A_WEIGHTED_DECIBELS
 ]
-UNIT_BEATS_PER_MINUTE: List[MultilevelSensorScaleType] = [
+UNIT_BEATS_PER_MINUTE: list[MultilevelSensorScaleType] = [
     HeartRateScale.BEATS_PER_MINUTE
 ]
-UNIT_BECQUEREL_PER_CUBIC_METER: List[MultilevelSensorScaleType] = [
+UNIT_BECQUEREL_PER_CUBIC_METER: list[MultilevelSensorScaleType] = [
     RadonConcentrationScale.BECQUEREL_PER_CUBIC_METER
 ]
-UNIT_BODY_MASS_INDEX: List[MultilevelSensorScaleType] = [
+UNIT_BODY_MASS_INDEX: list[MultilevelSensorScaleType] = [
     BodyMassIndexScale.BODY_MASS_INDEX
 ]
-UNIT_BODY_WAVE: List[MultilevelSensorScaleType] = [SeismicMagnitudeScale.BODY_WAVE]
-UNIT_BREATHS_PER_MINUTE: List[MultilevelSensorScaleType] = [
+UNIT_BODY_WAVE: list[MultilevelSensorScaleType] = [SeismicMagnitudeScale.BODY_WAVE]
+UNIT_BREATHS_PER_MINUTE: list[MultilevelSensorScaleType] = [
     RespiratoryRateScale.BREATHS_PER_MINUTE
 ]
-UNIT_BTU_H: List[MultilevelSensorScaleType] = [PowerScale.BTU_H]
-UNIT_CELSIUS: List[MultilevelSensorScaleType] = [TemperatureScale.CELSIUS]
-UNIT_CENTIMETER: List[MultilevelSensorScaleType] = [DistanceScale.CENTIMETER]
-UNIT_CUBIC_FEET_PER_MINUTE: List[MultilevelSensorScaleType] = [
+UNIT_BTU_H: list[MultilevelSensorScaleType] = [PowerScale.BTU_H]
+UNIT_CELSIUS: list[MultilevelSensorScaleType] = [TemperatureScale.CELSIUS]
+UNIT_CENTIMETER: list[MultilevelSensorScaleType] = [DistanceScale.CENTIMETER]
+UNIT_CUBIC_FEET_PER_MINUTE: list[MultilevelSensorScaleType] = [
     AirFlowScale.CUBIC_FEET_PER_MINUTE
 ]
-UNIT_CUBIC_METER: List[MultilevelSensorScaleType] = [TankCapacityScale.CUBIC_METER]
-UNIT_CUBIC_METER_PER_HOUR: List[MultilevelSensorScaleType] = [
+UNIT_CUBIC_METER: list[MultilevelSensorScaleType] = [TankCapacityScale.CUBIC_METER]
+UNIT_CUBIC_METER_PER_HOUR: list[MultilevelSensorScaleType] = [
     AirFlowScale.CUBIC_METER_PER_HOUR
 ]
-UNIT_DECIBEL: List[MultilevelSensorScaleType] = [LoudnessScale.DECIBEL]
-UNIT_DEGREES: List[MultilevelSensorScaleType] = [DirectionScale.DEGREES]
-UNIT_DEGREES_RELATIVE_TO_NORTH_POLE_OF_STANDING_EYE_VIEW: List[
+UNIT_DECIBEL: list[MultilevelSensorScaleType] = [LoudnessScale.DECIBEL]
+UNIT_DEGREES: list[MultilevelSensorScaleType] = [DirectionScale.DEGREES]
+UNIT_DEGREES_RELATIVE_TO_NORTH_POLE_OF_STANDING_EYE_VIEW: list[
     MultilevelSensorScaleType
 ] = [AnglePositionScale.DEGREES_RELATIVE_TO_NORTH_POLE_OF_STANDING_EYE_VIEW]
-UNIT_DEGREES_RELATIVE_TO_SOUTH_POLE_OF_STANDING_EYE_VIEW: List[
+UNIT_DEGREES_RELATIVE_TO_SOUTH_POLE_OF_STANDING_EYE_VIEW: list[
     MultilevelSensorScaleType
 ] = [AnglePositionScale.DEGREES_RELATIVE_TO_SOUTH_POLE_OF_STANDING_EYE_VIEW]
-UNIT_DENSITY: List[MultilevelSensorScaleType] = [DensityScale.DENSITY]
-UNIT_DIASTOLIC: List[MultilevelSensorScaleType] = [BloodPressureScale.DIASTOLIC]
-UNIT_DIMENSIONLESS_VALUE: List[MultilevelSensorScaleType] = [
+UNIT_DENSITY: list[MultilevelSensorScaleType] = [DensityScale.DENSITY]
+UNIT_DIASTOLIC: list[MultilevelSensorScaleType] = [BloodPressureScale.DIASTOLIC]
+UNIT_DIMENSIONLESS_VALUE: list[MultilevelSensorScaleType] = [
     GeneralPurposeScale.DIMENSIONLESS_VALUE
 ]
-UNIT_EUROPEAN_MACROSEISMIC: List[MultilevelSensorScaleType] = [
+UNIT_EUROPEAN_MACROSEISMIC: list[MultilevelSensorScaleType] = [
     SeismicIntensityScale.EUROPEAN_MACROSEISMIC
 ]
-UNIT_FAHRENHEIT: List[MultilevelSensorScaleType] = [TemperatureScale.FAHRENHEIT]
-UNIT_FEET: List[MultilevelSensorScaleType] = [DistanceScale.FEET, TideLevelScale.FEET]
-UNIT_GALLONS: List[MultilevelSensorScaleType] = [TankCapacityScale.GALLONS]
-UNIT_HERTZ: List[MultilevelSensorScaleType] = [
+UNIT_FAHRENHEIT: list[MultilevelSensorScaleType] = [TemperatureScale.FAHRENHEIT]
+UNIT_FEET: list[MultilevelSensorScaleType] = [DistanceScale.FEET, TideLevelScale.FEET]
+UNIT_GALLONS: list[MultilevelSensorScaleType] = [TankCapacityScale.GALLONS]
+UNIT_HERTZ: list[MultilevelSensorScaleType] = [
     FrequencyScale.HERTZ,
     RotationScale.HERTZ,
 ]
-UNIT_IMPEDANCE: List[MultilevelSensorScaleType] = [MoistureScale.IMPEDANCE]
-UNIT_INCHES_OF_MERCURY: List[MultilevelSensorScaleType] = [
+UNIT_IMPEDANCE: list[MultilevelSensorScaleType] = [MoistureScale.IMPEDANCE]
+UNIT_INCHES_OF_MERCURY: list[MultilevelSensorScaleType] = [
     AirPressureScale.INCHES_OF_MERCURY
 ]
-UNIT_INCHES_PER_HOUR: List[MultilevelSensorScaleType] = [RainRateScale.INCHES_PER_HOUR]
-UNIT_JOULE: List[MultilevelSensorScaleType] = [BasisMetabolicRateScale.JOULE]
-UNIT_KILOGRAM: List[MultilevelSensorScaleType] = [
+UNIT_INCHES_PER_HOUR: list[MultilevelSensorScaleType] = [RainRateScale.INCHES_PER_HOUR]
+UNIT_JOULE: list[MultilevelSensorScaleType] = [BasisMetabolicRateScale.JOULE]
+UNIT_KILOGRAM: list[MultilevelSensorScaleType] = [
     MassScale.KILOGRAM,
     WeightScale.KILOGRAM,
 ]
-UNIT_KILOHERTZ: List[MultilevelSensorScaleType] = [FrequencyScale.KILOHERTZ]
-UNIT_KILOPASCAL: List[MultilevelSensorScaleType] = [
+UNIT_KILOHERTZ: list[MultilevelSensorScaleType] = [FrequencyScale.KILOHERTZ]
+UNIT_KILOPASCAL: list[MultilevelSensorScaleType] = [
     AirPressureScale.KILOPASCAL,
     PressureScale.KILOPASCAL,
     WaterPressureScale.KILOPASCAL,
 ]
-UNIT_LIEDU: List[MultilevelSensorScaleType] = [SeismicIntensityScale.LIEDU]
-UNIT_LITER: List[MultilevelSensorScaleType] = [TankCapacityScale.LITER]
-UNIT_LITER_PER_HOUR: List[MultilevelSensorScaleType] = [WaterFlowScale.LITER_PER_HOUR]
-UNIT_LOCAL: List[MultilevelSensorScaleType] = [SeismicMagnitudeScale.LOCAL]
-UNIT_LUX: List[MultilevelSensorScaleType] = [IlluminanceScale.LUX]
-UNIT_MERCALLI: List[MultilevelSensorScaleType] = [SeismicIntensityScale.MERCALLI]
-UNIT_METER: List[MultilevelSensorScaleType] = [
+UNIT_LIEDU: list[MultilevelSensorScaleType] = [SeismicIntensityScale.LIEDU]
+UNIT_LITER: list[MultilevelSensorScaleType] = [TankCapacityScale.LITER]
+UNIT_LITER_PER_HOUR: list[MultilevelSensorScaleType] = [WaterFlowScale.LITER_PER_HOUR]
+UNIT_LOCAL: list[MultilevelSensorScaleType] = [SeismicMagnitudeScale.LOCAL]
+UNIT_LUX: list[MultilevelSensorScaleType] = [IlluminanceScale.LUX]
+UNIT_MERCALLI: list[MultilevelSensorScaleType] = [SeismicIntensityScale.MERCALLI]
+UNIT_METER: list[MultilevelSensorScaleType] = [
     DistanceScale.METER,
     TideLevelScale.METER,
 ]
-UNIT_METER_PER_SQUARE_SECOND: List[MultilevelSensorScaleType] = [
+UNIT_METER_PER_SQUARE_SECOND: list[MultilevelSensorScaleType] = [
     AccelerationScale.METER_PER_SQUARE_SECOND
 ]
-UNIT_MICROGRAM_PER_CUBIC_METER: List[MultilevelSensorScaleType] = [
+UNIT_MICROGRAM_PER_CUBIC_METER: list[MultilevelSensorScaleType] = [
     ParticulateMatter10Scale.MICROGRAM_PER_CUBIC_METER,
     ParticulateMatter25Scale.MICROGRAM_PER_CUBIC_METER,
 ]
-UNIT_MILLIAMPERE: List[MultilevelSensorScaleType] = [CurrentScale.MILLIAMPERE]
-UNIT_MILLIGRAM_PER_LITER: List[MultilevelSensorScaleType] = [
+UNIT_MILLIAMPERE: list[MultilevelSensorScaleType] = [CurrentScale.MILLIAMPERE]
+UNIT_MILLIGRAM_PER_LITER: list[MultilevelSensorScaleType] = [
     WaterChlorineLevelScale.MILLIGRAM_PER_LITER
 ]
-UNIT_MILLIMETER_HOUR: List[MultilevelSensorScaleType] = [RainRateScale.MILLIMETER_HOUR]
-UNIT_MILLIVOLT: List[MultilevelSensorScaleType] = [
+UNIT_MILLIMETER_HOUR: list[MultilevelSensorScaleType] = [RainRateScale.MILLIMETER_HOUR]
+UNIT_MILLIVOLT: list[MultilevelSensorScaleType] = [
     VoltageScale.MILLIVOLT,
     WaterOxidationReductionPotentialScale.MILLIVOLT,
 ]
-UNIT_MOLE_PER_CUBIC_METER: List[MultilevelSensorScaleType] = [
+UNIT_MOLE_PER_CUBIC_METER: list[MultilevelSensorScaleType] = [
     CarbonMonoxideLevelScale.MOLE_PER_CUBIC_METER,
     FormaldehydeLevelScale.MOLE_PER_CUBIC_METER,
     MethaneDensityScale.MOLE_PER_CUBIC_METER,
@@ -732,17 +731,17 @@ UNIT_MOLE_PER_CUBIC_METER: List[MultilevelSensorScaleType] = [
     SoilSalinityScale.MOLE_PER_CUBIC_METER,
     VolatileOrganicCompoundLevelScale.MOLE_PER_CUBIC_METER,
 ]
-UNIT_MOMENT: List[MultilevelSensorScaleType] = [SeismicMagnitudeScale.MOMENT]
-UNIT_MPH: List[MultilevelSensorScaleType] = [VelocityScale.MPH]
-UNIT_M_S: List[MultilevelSensorScaleType] = [VelocityScale.M_S]
-UNIT_NEWTON: List[MultilevelSensorScaleType] = [AppliedForceOnTheSensorScale.NEWTON]
-UNIT_OHM_METER: List[MultilevelSensorScaleType] = [ElectricalResistivityScale.OHM_METER]
-UNIT_PARTS_MILLION: List[MultilevelSensorScaleType] = [
+UNIT_MOMENT: list[MultilevelSensorScaleType] = [SeismicMagnitudeScale.MOMENT]
+UNIT_MPH: list[MultilevelSensorScaleType] = [VelocityScale.MPH]
+UNIT_M_S: list[MultilevelSensorScaleType] = [VelocityScale.M_S]
+UNIT_NEWTON: list[MultilevelSensorScaleType] = [AppliedForceOnTheSensorScale.NEWTON]
+UNIT_OHM_METER: list[MultilevelSensorScaleType] = [ElectricalResistivityScale.OHM_METER]
+UNIT_PARTS_MILLION: list[MultilevelSensorScaleType] = [
     CarbonDioxideLevelScale.PARTS_MILLION,
     CarbonMonoxideLevelScale.PARTS_MILLION,
     VolatileOrganicCompoundLevelScale.PARTS_MILLION,
 ]
-UNIT_PERCENTAGE_VALUE: List[MultilevelSensorScaleType] = [
+UNIT_PERCENTAGE_VALUE: list[MultilevelSensorScaleType] = [
     AnglePositionScale.PERCENTAGE_VALUE,
     GeneralPurposeScale.PERCENTAGE_VALUE,
     HumidityScale.PERCENTAGE_VALUE,
@@ -750,36 +749,36 @@ UNIT_PERCENTAGE_VALUE: List[MultilevelSensorScaleType] = [
     MoistureScale.PERCENTAGE_VALUE,
     PercentageScale.PERCENTAGE_VALUE,
 ]
-UNIT_PICOCURIES_PER_LITER: List[MultilevelSensorScaleType] = [
+UNIT_PICOCURIES_PER_LITER: list[MultilevelSensorScaleType] = [
     RadonConcentrationScale.PICOCURIES_PER_LITER
 ]
-UNIT_POUNDS: List[MultilevelSensorScaleType] = [WeightScale.POUNDS]
-UNIT_POUND_PER_SQUARE_INCH: List[MultilevelSensorScaleType] = [
+UNIT_POUNDS: list[MultilevelSensorScaleType] = [WeightScale.POUNDS]
+UNIT_POUND_PER_SQUARE_INCH: list[MultilevelSensorScaleType] = [
     PressureScale.POUND_PER_SQUARE_INCH
 ]
-UNIT_POWER_LEVEL: List[MultilevelSensorScaleType] = [RfSignalStrengthScale.POWER_LEVEL]
-UNIT_REVOLUTIONS_PER_MINUTE: List[MultilevelSensorScaleType] = [
+UNIT_POWER_LEVEL: list[MultilevelSensorScaleType] = [RfSignalStrengthScale.POWER_LEVEL]
+UNIT_REVOLUTIONS_PER_MINUTE: list[MultilevelSensorScaleType] = [
     RotationScale.REVOLUTIONS_PER_MINUTE
 ]
-UNIT_RSSI: List[MultilevelSensorScaleType] = [RfSignalStrengthScale.RSSI]
-UNIT_SECOND: List[MultilevelSensorScaleType] = [TimeScale.SECOND]
-UNIT_SHINDO: List[MultilevelSensorScaleType] = [SeismicIntensityScale.SHINDO]
-UNIT_SIEMENS_PER_METER: List[MultilevelSensorScaleType] = [
+UNIT_RSSI: list[MultilevelSensorScaleType] = [RfSignalStrengthScale.RSSI]
+UNIT_SECOND: list[MultilevelSensorScaleType] = [TimeScale.SECOND]
+UNIT_SHINDO: list[MultilevelSensorScaleType] = [SeismicIntensityScale.SHINDO]
+UNIT_SIEMENS_PER_METER: list[MultilevelSensorScaleType] = [
     ElectricalConductivityScale.SIEMENS_PER_METER
 ]
-UNIT_SURFACE_WAVE: List[MultilevelSensorScaleType] = [
+UNIT_SURFACE_WAVE: list[MultilevelSensorScaleType] = [
     SeismicMagnitudeScale.SURFACE_WAVE
 ]
-UNIT_SYSTOLIC: List[MultilevelSensorScaleType] = [BloodPressureScale.SYSTOLIC]
-UNIT_UNITLESS: List[MultilevelSensorScaleType] = [UnitlessScale.UNITLESS]
-UNIT_UV_INDEX: List[MultilevelSensorScaleType] = [UltravioletScale.UV_INDEX]
-UNIT_VOLT: List[MultilevelSensorScaleType] = [VoltageScale.VOLT]
-UNIT_VOLUME_WATER_CONTENT: List[MultilevelSensorScaleType] = [
+UNIT_SYSTOLIC: list[MultilevelSensorScaleType] = [BloodPressureScale.SYSTOLIC]
+UNIT_UNITLESS: list[MultilevelSensorScaleType] = [UnitlessScale.UNITLESS]
+UNIT_UV_INDEX: list[MultilevelSensorScaleType] = [UltravioletScale.UV_INDEX]
+UNIT_VOLT: list[MultilevelSensorScaleType] = [VoltageScale.VOLT]
+UNIT_VOLUME_WATER_CONTENT: list[MultilevelSensorScaleType] = [
     MoistureScale.VOLUME_WATER_CONTENT
 ]
-UNIT_WATER_ACTIVITY: List[MultilevelSensorScaleType] = [MoistureScale.WATER_ACTIVITY]
-UNIT_WATT: List[MultilevelSensorScaleType] = [PowerScale.WATT]
-UNIT_WATT_PER_SQUARE_METER: List[MultilevelSensorScaleType] = [
+UNIT_WATER_ACTIVITY: list[MultilevelSensorScaleType] = [MoistureScale.WATER_ACTIVITY]
+UNIT_WATT: list[MultilevelSensorScaleType] = [PowerScale.WATT]
+UNIT_WATT_PER_SQUARE_METER: list[MultilevelSensorScaleType] = [
     SolarRadiationScale.WATT_PER_SQUARE_METER
 ]
 

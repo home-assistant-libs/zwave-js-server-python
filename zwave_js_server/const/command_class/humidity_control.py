@@ -5,7 +5,6 @@ Includes Humidity Control Mode, Humidity Control Operating State,
 and Humidity Control Setpoint CCs.
 """
 from enum import IntEnum
-from typing import Dict, List
 
 HUMIDITY_CONTROL_MODE_PROPERTY = "mode"
 HUMIDITY_CONTROL_OPERATING_STATE_PROPERTY = "state"
@@ -47,7 +46,7 @@ class HumidityControlSetpointType(IntEnum):
     AUTO = 3
 
 
-HUMIDITY_CONTROL_MODE_SETPOINT_MAP: Dict[int, List[HumidityControlSetpointType]] = {
+HUMIDITY_CONTROL_MODE_SETPOINT_MAP: dict[int, list[HumidityControlSetpointType]] = {
     HumidityControlMode.OFF: [],
     HumidityControlMode.HUMIDIFY: [HumidityControlSetpointType.HUMIDIFIER],
     HumidityControlMode.DEHUMIDIFY: [HumidityControlSetpointType.DEHUMIDIFIER],

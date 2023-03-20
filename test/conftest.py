@@ -3,7 +3,6 @@ import asyncio
 import json
 from collections import deque
 from copy import deepcopy
-from typing import List, Tuple
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
@@ -296,12 +295,12 @@ async def client_fixture(client_session, ws_client, uuid4):
 @pytest.fixture(name="mock_command")
 def mock_command_fixture(ws_client, client, uuid4):
     """Mock a command and response."""
-    mock_responses: List[Tuple[dict, dict, bool]] = []
-    ack_commands: List[dict] = []
+    mock_responses: list[tuple[dict, dict, bool]] = []
+    ack_commands: list[dict] = []
 
     def apply_mock_command(
         match_command: dict, response: dict, success: bool = True
-    ) -> List[dict]:
+    ) -> list[dict]:
         """Apply the mock command and response return value to the transport.
 
         Return the list with correctly acknowledged commands.

@@ -1,6 +1,6 @@
 """Common models for statistics."""
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, List, Optional, Tuple, TypedDict
+from typing import TYPE_CHECKING, Optional, TypedDict
 
 from zwave_js_server.exceptions import RepeaterRssiErrorReceived, RssiErrorReceived
 
@@ -15,20 +15,20 @@ class RouteStatisticsDataType(TypedDict, total=False):
     """Represent a route statistics data dict type."""
 
     protocolDataRate: int
-    repeaters: List[int]
+    repeaters: list[int]
     rssi: int
-    repeaterRSSI: List[int]
-    routeFailedBetween: List[int]
+    repeaterRSSI: list[int]
+    routeFailedBetween: list[int]
 
 
 class RouteStatisticsDict(TypedDict):
     """Represent a route statistics data dict type."""
 
     protocol_data_rate: int
-    repeaters: List["Node"]
+    repeaters: list["Node"]
     rssi: Optional[int]
-    repeater_rssi: List[int]
-    route_failed_between: Optional[Tuple["Node", "Node"]]
+    repeater_rssi: list[int]
+    route_failed_between: Optional[tuple["Node", "Node"]]
 
 
 @dataclass
@@ -46,7 +46,7 @@ class RouteStatistics:
         return ProtocolDataRate(self.data["protocolDataRate"])
 
     @property
-    def repeaters(self) -> List["Node"]:
+    def repeaters(self) -> list["Node"]:
         """Return repeaters."""
         assert self.client.driver
         return [
@@ -64,7 +64,7 @@ class RouteStatistics:
         return rssi
 
     @property
-    def repeater_rssi(self) -> List[int]:
+    def repeater_rssi(self) -> list[int]:
         """Return repeater RSSI."""
         repeater_rssi = self.data.get("repeaterRSSI", [])
         rssi_errors = [item.value for item in RssiError]
@@ -74,7 +74,7 @@ class RouteStatistics:
         return repeater_rssi
 
     @property
-    def route_failed_between(self) -> Optional[Tuple["Node", "Node"]]:
+    def route_failed_between(self) -> Optional[tuple["Node", "Node"]]:
         """Return route failed between."""
         if (node_ids := self.data.get("routeFailedBetween")) is None:
             return None

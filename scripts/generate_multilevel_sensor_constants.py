@@ -8,7 +8,6 @@ import re
 import subprocess
 from collections import defaultdict
 from collections.abc import Callable, Mapping
-from typing import List
 
 import requests
 from slugify import slugify
@@ -119,9 +118,9 @@ def generate_int_enum_class_definition(
     get_id_func: Callable | None = None,
     docstring_info: str = "",
     base_class: str = "IntEnum",
-) -> List[str]:
+) -> list[str]:
     """Generate an IntEnum class definition as an array of lines of string."""
-    class_def: List[str] = []
+    class_def: list[str] = []
     class_def.append(f"class {class_name}({base_class}):")
     docstring = (
         f'"""Enum for known {docstring_info} multilevel sensor types."""'.replace(
@@ -138,9 +137,9 @@ def generate_int_enum_class_definition(
     return class_def
 
 
-def generate_int_enum_base_class(class_name: str, docstring: str) -> List[str]:
+def generate_int_enum_base_class(class_name: str, docstring: str) -> list[str]:
     """Generate an IntEnum base class definition."""
-    class_def: List[str] = []
+    class_def: list[str] = []
     class_def.append(f"class {class_name}(IntEnum):")
     class_def.append(f"\t{docstring}")
     return class_def
@@ -159,7 +158,6 @@ lines = [
     "# ----------------------------------------------------------------------------------- #",
     "",
     "from enum import IntEnum",
-    "from typing import Dict, List, Type",
     'CC_SPECIFIC_SCALE = "scale"',
     'CC_SPECIFIC_SENSOR_TYPE = "sensorType"',
 ]
@@ -203,8 +201,8 @@ for unit_name, enum_list in unit_name_to_enum_map.items():
 
 
 multilevel_sensor_type_to_scale_map_line = (
-    "MULTILEVEL_SENSOR_TYPE_TO_SCALE_MAP: Dict[MultilevelSensorType, "
-    "Type[MultilevelSensorScaleType]] = {"
+    "MULTILEVEL_SENSOR_TYPE_TO_SCALE_MAP: dict[MultilevelSensorType, "
+    "type[MultilevelSensorScaleType]] = {"
 )
 for sensor_name, sensor_def in sensors.items():
     multilevel_sensor_type_to_scale_map_line += (
@@ -217,7 +215,7 @@ lines.append("")
 
 for unit_name, unit_enums in unit_name_to_enum_map.items():
     lines.append(
-        f"UNIT_{unit_name}: List[MultilevelSensorScaleType] = [{','.join(sorted(unit_enums))}]"
+        f"UNIT_{unit_name}: list[MultilevelSensorScaleType] = [{','.join(sorted(unit_enums))}]"
     )
 
 lines.extend(

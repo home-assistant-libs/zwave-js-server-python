@@ -1,5 +1,5 @@
 """Data model for a Z-Wave JS controller."""
-from typing import List, TypedDict
+from typing import TypedDict
 
 from .statistics import ControllerStatisticsDataType
 
@@ -21,7 +21,7 @@ class ControllerDataType(TypedDict, total=False):
     manufacturerId: int
     productType: int
     productId: int
-    supportedFunctionTypes: List[int]
+    supportedFunctionTypes: list[int]
     sucNodeId: int
     supportsTimers: bool
     isHealNetworkActive: bool

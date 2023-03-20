@@ -5,7 +5,7 @@ import json
 import logging
 from collections import defaultdict
 from collections.abc import Hashable
-from typing import Any, DefaultDict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from aiohttp import WSMsgType, web, web_request
 
@@ -45,9 +45,9 @@ class MockZwaveJsServer:
 
     def __init__(
         self,
-        network_state_dump: List[dict],
-        events_to_replay: List[dict],
-        command_results: DefaultDict[HashableDict, list],
+        network_state_dump: list[dict],
+        events_to_replay: list[dict],
+        command_results: defaultdict[HashableDict, list],
     ) -> None:
         """Initialize class."""
         self.network_state_dump = network_state_dump
@@ -221,7 +221,7 @@ def sanitize_msg(msg: dict) -> HashableDict:
 
 
 def add_command_result(
-    command_results: DefaultDict[HashableDict, list],
+    command_results: defaultdict[HashableDict, list],
     record: dict,
 ) -> None:
     """Add a command result to command_results map."""
@@ -293,14 +293,14 @@ def main() -> None:
     args = get_args()
 
     with open(args.network_state_path, "r", encoding="utf8") as fp:
-        network_state_dump: List[dict] = json.load(fp)
+        network_state_dump: list[dict] = json.load(fp)
 
     events_to_replay = []
-    command_results: DefaultDict[HashableDict, list] = defaultdict(list)
+    command_results: defaultdict[HashableDict, list] = defaultdict(list)
 
     if args.combined_replay_dump_path:
         with open(args.combined_replay_dump_path, "r", encoding="utf8") as fp:
-            records: List[dict] = json.load(fp)
+            records: list[dict] = json.load(fp)
 
             for record in records:
                 if record.get("record_type") not in ("event", "command"):

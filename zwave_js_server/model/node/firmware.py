@@ -1,7 +1,7 @@
 """Provide a model for Z-Wave firmware."""
 from dataclasses import asdict, dataclass
 from enum import IntEnum
-from typing import TYPE_CHECKING, List, Optional, TypedDict, Union, cast
+from typing import TYPE_CHECKING, Optional, TypedDict, Union, cast
 
 from ...const import VALUE_UNKNOWN
 from ...util.helpers import convert_bytes_to_base64
@@ -45,7 +45,7 @@ class NodeFirmwareUpdateCapabilitiesDataType(TypedDict, total=False):
     """Represent a firmware update capabilities dict type."""
 
     firmwareUpgradable: bool  # required
-    firmwareTargets: List[int]
+    firmwareTargets: list[int]
     continuesToFunction: Union[bool, str]
     supportsActivation: Union[bool, str]
 
@@ -54,7 +54,7 @@ class NodeFirmwareUpdateCapabilitiesDict(TypedDict, total=False):
     """Represent a dict from FirmwareUpdateCapabilities."""
 
     firmware_upgradable: bool  # required
-    firmware_targets: List[int]
+    firmware_targets: list[int]
     continues_to_function: Optional[bool]
     supports_activation: Optional[bool]
 
@@ -72,7 +72,7 @@ class NodeFirmwareUpdateCapabilities:
         return self.data["firmwareUpgradable"]
 
     @property
-    def firmware_targets(self) -> List[int]:
+    def firmware_targets(self) -> list[int]:
         """Return firmware targets."""
         if not self.firmware_upgradable:
             raise TypeError("Firmware is not upgradeable.")
@@ -246,7 +246,7 @@ class NodeFirmwareUpdateInfoDataType(TypedDict):
 
     version: str
     changelog: str
-    files: List[NodeFirmwareUpdateFileInfoDataType]
+    files: list[NodeFirmwareUpdateFileInfoDataType]
 
 
 @dataclass
@@ -255,7 +255,7 @@ class NodeFirmwareUpdateInfo:
 
     version: str
     changelog: str
-    files: List[NodeFirmwareUpdateFileInfo]
+    files: list[NodeFirmwareUpdateFileInfo]
 
     @classmethod
     def from_dict(

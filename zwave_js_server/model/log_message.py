@@ -1,5 +1,5 @@
 """Provide a model for a log message event."""
-from typing import List, Literal, Optional, TypedDict, Union
+from typing import Literal, Optional, TypedDict, Union
 
 from ..const import CommandClass
 
@@ -92,8 +92,8 @@ class LogMessageDataType(TypedDict, total=False):
 
     source: Literal["driver"]  # required
     event: Literal["logging"]  # required
-    message: Union[str, List[str]]  # required
-    formattedMessage: Union[str, List[str]]  # required
+    message: Union[str, list[str]]  # required
+    formattedMessage: Union[str, list[str]]  # required
     direction: str  # required
     level: str  # required
     context: LogMessageContextDataType  # required
@@ -114,7 +114,7 @@ class LogMessage:
 
     def _process_message(
         self, field_name: Union[Literal["message"], Literal["formattedMessage"]]
-    ) -> List[str]:
+    ) -> list[str]:
         """Process a message and always return a list."""
         if isinstance(self.data[field_name], str):
             return str(self.data[field_name]).splitlines()
@@ -124,12 +124,12 @@ class LogMessage:
         return [message.rstrip("\n") for message in self.data[field_name]]
 
     @property
-    def message(self) -> List[str]:
+    def message(self) -> list[str]:
         """Return message."""
         return self._process_message("message")
 
     @property
-    def formatted_message(self) -> List[str]:
+    def formatted_message(self) -> list[str]:
         """Return fully formatted message."""
         return self._process_message("formattedMessage")
 

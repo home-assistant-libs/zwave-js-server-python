@@ -1,6 +1,6 @@
 """Provide a model for the Z-Wave JS node's health checks and power tests."""
 from dataclasses import dataclass
-from typing import List, Optional, TypedDict
+from typing import Optional, TypedDict
 
 from ...const import PowerLevel
 
@@ -22,7 +22,7 @@ class LifelineHealthCheckSummaryDataType(TypedDict):
     """Represent a lifeline health check summary data dict type."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/node/Types.ts#L211
-    results: List[LifelineHealthCheckResultDataType]
+    results: list[LifelineHealthCheckResultDataType]
     rating: int
 
 
@@ -86,7 +86,7 @@ class LifelineHealthCheckSummary:
         return self._rating
 
     @property
-    def results(self) -> List[LifelineHealthCheckResult]:
+    def results(self) -> list[LifelineHealthCheckResult]:
         """Return lifeline health check results."""
         return self._results
 
@@ -107,7 +107,7 @@ class RouteHealthCheckSummaryDataType(TypedDict):
     """Represent a route health check summary data dict type."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/node/Types.ts#L274
-    results: List[RouteHealthCheckResultDataType]
+    results: list[RouteHealthCheckResultDataType]
     rating: int
 
 
@@ -169,7 +169,7 @@ class RouteHealthCheckSummary:
         return self._rating
 
     @property
-    def results(self) -> List[RouteHealthCheckResult]:
+    def results(self) -> list[RouteHealthCheckResult]:
         """Return route health check results."""
         return self._results
 
