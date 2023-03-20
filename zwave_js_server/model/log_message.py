@@ -1,5 +1,7 @@
 """Provide a model for a log message event."""
-from typing import Literal, Optional, TypedDict, Union
+from __future__ import annotations
+
+from typing import Literal, TypedDict
 
 from ..const import CommandClass
 
@@ -16,8 +18,8 @@ class LogMessageContextDataType(TypedDict, total=False):
     internal: bool
     endpoint: int
     commandClass: int
-    property: Union[int, str]
-    propertyKey: Union[int, str]
+    property: int | str
+    propertyKey: int | str
 
 
 class LogMessageContext:
@@ -33,56 +35,56 @@ class LogMessageContext:
         return self.data["source"]
 
     @property
-    def type(self) -> Optional[Literal["controller", "value", "node"]]:
+    def type(self) -> Literal["controller", "value", "node"] | None:
         """Return the object type for the log message if applicable."""
         return self.data.get("type")
 
     @property
-    def node_id(self) -> Optional[int]:
+    def node_id(self) -> int | None:
         """Return the Node ID for the log message if applicable."""
         return self.data.get("nodeId")
 
     @property
-    def header(self) -> Optional[str]:
+    def header(self) -> str | None:
         """Return the header for the log message if applicable."""
         return self.data.get("header")
 
     @property
-    def direction(self) -> Optional[Literal["inbound", "outbound", "none"]]:
+    def direction(self) -> Literal["inbound", "outbound", "none"] | None:
         """Return the direction for the log message if applicable."""
         return self.data.get("direction")
 
     @property
     def change(
         self,
-    ) -> Optional[Literal["added", "removed", "updated", "notification"]]:
+    ) -> Literal["added", "removed", "updated", "notification"] | None:
         """Return the change type for the log message if applicable."""
         return self.data.get("change")
 
     @property
-    def internal(self) -> Optional[bool]:
+    def internal(self) -> bool | None:
         """Return the internal flag for the log message if applicable."""
         return self.data.get("internal")
 
     @property
-    def endpoint(self) -> Optional[int]:
+    def endpoint(self) -> int | None:
         """Return the Node/Value endpoint for the log message if applicable."""
         return self.data.get("endpoint")
 
     @property
-    def command_class(self) -> Optional[CommandClass]:
+    def command_class(self) -> CommandClass | None:
         """Return the Value command class for the log message if applicable."""
         if command_class := self.data.get("commandClass"):
             return CommandClass(command_class)
         return None
 
     @property
-    def property_(self) -> Optional[Union[int, str]]:
+    def property_(self) -> int | str | None:
         """Return the Value property for the log message if applicable."""
         return self.data.get("property")
 
     @property
-    def property_key(self) -> Optional[Union[int, str]]:
+    def property_key(self) -> int | str | None:
         """Return the Value property key for the log message if applicable."""
         return self.data.get("propertyKey")
 
@@ -92,8 +94,8 @@ class LogMessageDataType(TypedDict, total=False):
 
     source: Literal["driver"]  # required
     event: Literal["logging"]  # required
-    message: Union[str, list[str]]  # required
-    formattedMessage: Union[str, list[str]]  # required
+    message: str | list[str]  # required
+    formattedMessage: str | list[str]  # required
     direction: str  # required
     level: str  # required
     context: LogMessageContextDataType  # required
@@ -113,7 +115,7 @@ class LogMessage:
         self.data = data
 
     def _process_message(
-        self, field_name: Union[Literal["message"], Literal["formattedMessage"]]
+        self, field_name: Literal["message", "formattedMessage"]
     ) -> list[str]:
         """Process a message and always return a list."""
         if isinstance(self.data[field_name], str):
@@ -144,32 +146,32 @@ class LogMessage:
         return self.data["level"]
 
     @property
-    def primary_tags(self) -> Optional[str]:
+    def primary_tags(self) -> str | None:
         """Return primary tags."""
         return self.data.get("primaryTags")
 
     @property
-    def secondary_tags(self) -> Optional[str]:
+    def secondary_tags(self) -> str | None:
         """Return secondary tags."""
         return self.data.get("secondaryTags")
 
     @property
-    def secondary_tag_padding(self) -> Optional[int]:
+    def secondary_tag_padding(self) -> int | None:
         """Return secondary tag padding."""
         return self.data.get("secondaryTagPadding")
 
     @property
-    def multiline(self) -> Optional[bool]:
+    def multiline(self) -> bool | None:
         """Return whether message is multiline."""
         return self.data.get("multiline")
 
     @property
-    def timestamp(self) -> Optional[str]:
+    def timestamp(self) -> str | None:
         """Return timestamp."""
         return self.data.get("timestamp")
 
     @property
-    def label(self) -> Optional[str]:
+    def label(self) -> str | None:
         """Return label."""
         return self.data.get("label")
 

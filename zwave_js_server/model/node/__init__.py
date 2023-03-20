@@ -1,6 +1,8 @@
 """Provide a model for the Z-Wave JS node."""
+from __future__ import annotations
+
 import logging
-from typing import TYPE_CHECKING, Any, Optional, Union, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from ...const import (
     INTERVIEW_FAILED,
@@ -91,8 +93,8 @@ class Node(EventBase):
         self.data: NodeDataType = {}
         self._device_config = DeviceConfig({})
         self._statistics = NodeStatistics(client, data.get("statistics"))
-        self._firmware_update_progress: Optional[NodeFirmwareUpdateProgress] = None
-        self.values: dict[str, Union[ConfigurationValue, Value]] = {}
+        self._firmware_update_progress: NodeFirmwareUpdateProgress | None = None
+        self.values: dict[str, ConfigurationValue | Value] = {}
         self.endpoints: dict[int, Endpoint] = {}
         self.update(data)
 
@@ -128,12 +130,12 @@ class Node(EventBase):
         return DeviceClass(self.data["deviceClass"])
 
     @property
-    def installer_icon(self) -> Optional[int]:
+    def installer_icon(self) -> int | None:
         """Return installer icon property."""
         return self.data.get("installerIcon")
 
     @property
-    def user_icon(self) -> Optional[int]:
+    def user_icon(self) -> int | None:
         """Return user icon property."""
         return self.data.get("userIcon")
 
@@ -143,27 +145,27 @@ class Node(EventBase):
         return NodeStatus(self.data["status"])
 
     @property
-    def ready(self) -> Optional[bool]:
+    def ready(self) -> bool | None:
         """Return the ready."""
         return self.data.get("ready")
 
     @property
-    def is_listening(self) -> Optional[bool]:
+    def is_listening(self) -> bool | None:
         """Return the is_listening."""
         return self.data.get("isListening")
 
     @property
-    def is_frequent_listening(self) -> Optional[Union[bool, str]]:
+    def is_frequent_listening(self) -> bool | str | None:
         """Return the is_frequent_listening."""
         return self.data.get("isFrequentListening")
 
     @property
-    def is_routing(self) -> Optional[bool]:
+    def is_routing(self) -> bool | None:
         """Return the is_routing."""
         return self.data.get("isRouting")
 
     @property
-    def max_data_rate(self) -> Optional[int]:
+    def max_data_rate(self) -> int | None:
         """Return the max_data_rate."""
         return self.data.get("maxDataRate")
 
@@ -173,69 +175,69 @@ class Node(EventBase):
         return self.data.get("supportedDataRates", [])
 
     @property
-    def is_secure(self) -> Optional[bool]:
+    def is_secure(self) -> bool | None:
         """Return the is_secure."""
         if (is_secure := self.data.get("isSecure")) == "unknown":
             return None
         return is_secure
 
     @property
-    def protocol_version(self) -> Optional[int]:
+    def protocol_version(self) -> int | None:
         """Return the protocol_version."""
         return self.data.get("protocolVersion")
 
     @property
-    def supports_beaming(self) -> Optional[bool]:
+    def supports_beaming(self) -> bool | None:
         """Return the supports_beaming."""
         return self.data.get("supportsBeaming")
 
     @property
-    def supports_security(self) -> Optional[bool]:
+    def supports_security(self) -> bool | None:
         """Return the supports_security."""
         return self.data.get("supportsSecurity")
 
     @property
-    def manufacturer_id(self) -> Optional[int]:
+    def manufacturer_id(self) -> int | None:
         """Return the manufacturer_id."""
         return self.data.get("manufacturerId")
 
     @property
-    def product_id(self) -> Optional[int]:
+    def product_id(self) -> int | None:
         """Return the product_id."""
         return self.data.get("productId")
 
     @property
-    def product_type(self) -> Optional[int]:
+    def product_type(self) -> int | None:
         """Return the product_type."""
         return self.data.get("productType")
 
     @property
-    def firmware_version(self) -> Optional[str]:
+    def firmware_version(self) -> str | None:
         """Return the firmware_version."""
         return self.data.get("firmwareVersion")
 
     @property
-    def zwave_plus_version(self) -> Optional[int]:
+    def zwave_plus_version(self) -> int | None:
         """Return the zwave_plus_version."""
         return self.data.get("zwavePlusVersion")
 
     @property
-    def zwave_plus_node_type(self) -> Optional[int]:
+    def zwave_plus_node_type(self) -> int | None:
         """Return the zwave_plus_node_type."""
         return self.data.get("zwavePlusNodeType")
 
     @property
-    def zwave_plus_role_type(self) -> Optional[int]:
+    def zwave_plus_role_type(self) -> int | None:
         """Return the zwave_plus_role_type."""
         return self.data.get("zwavePlusRoleType")
 
     @property
-    def name(self) -> Optional[str]:
+    def name(self) -> str | None:
         """Return the name."""
         return self.data.get("name")
 
     @property
-    def location(self) -> Optional[str]:
+    def location(self) -> str | None:
         """Return the location."""
         return self.data.get("location")
 
@@ -245,42 +247,42 @@ class Node(EventBase):
         return self._device_config
 
     @property
-    def label(self) -> Optional[str]:
+    def label(self) -> str | None:
         """Return the label."""
         return self.data.get("label")
 
     @property
-    def device_database_url(self) -> Optional[str]:
+    def device_database_url(self) -> str | None:
         """Return the device database URL."""
         return self.data.get("deviceDatabaseUrl")
 
     @property
-    def endpoint_count_is_dynamic(self) -> Optional[bool]:
+    def endpoint_count_is_dynamic(self) -> bool | None:
         """Return the endpoint_count_is_dynamic."""
         return self.data.get("endpointCountIsDynamic")
 
     @property
-    def endpoints_have_identical_capabilities(self) -> Optional[bool]:
+    def endpoints_have_identical_capabilities(self) -> bool | None:
         """Return the endpoints_have_identical_capabilities."""
         return self.data.get("endpointsHaveIdenticalCapabilities")
 
     @property
-    def individual_endpoint_count(self) -> Optional[int]:
+    def individual_endpoint_count(self) -> int | None:
         """Return the individual_endpoint_count."""
         return self.data.get("individualEndpointCount")
 
     @property
-    def aggregated_endpoint_count(self) -> Optional[int]:
+    def aggregated_endpoint_count(self) -> int | None:
         """Return the aggregated_endpoint_count."""
         return self.data.get("aggregatedEndpointCount")
 
     @property
-    def interview_attempts(self) -> Optional[int]:
+    def interview_attempts(self) -> int | None:
         """Return the interview_attempts."""
         return self.data.get("interviewAttempts")
 
     @property
-    def interview_stage(self) -> Optional[Union[int, str]]:
+    def interview_stage(self) -> int | str | None:
         """Return the interview_stage."""
         return self.data.get("interviewStage")
 
@@ -309,12 +311,12 @@ class Node(EventBase):
         return self._statistics
 
     @property
-    def firmware_update_progress(self) -> Optional[NodeFirmwareUpdateProgress]:
+    def firmware_update_progress(self) -> NodeFirmwareUpdateProgress | None:
         """Return firmware update progress."""
         return self._firmware_update_progress
 
     @property
-    def highest_security_class(self) -> Optional[SecurityClass]:
+    def highest_security_class(self) -> SecurityClass | None:
         """Return highest security class configured on the node."""
         if (security_class := self.data.get("highestSecurityClass")) is None:
             return None
@@ -380,8 +382,8 @@ class Node(EventBase):
                 )
 
     def get_command_class_values(
-        self, command_class: CommandClass, endpoint: Optional[int] = None
-    ) -> dict[str, Union[ConfigurationValue, Value]]:
+        self, command_class: CommandClass, endpoint: int | None = None
+    ) -> dict[str, ConfigurationValue | Value]:
         """Return all values for a given command class."""
         return {
             value_id: value
@@ -409,10 +411,10 @@ class Node(EventBase):
     async def async_send_command(
         self,
         cmd: str,
-        require_schema: Optional[int] = None,
-        wait_for_result: Optional[bool] = None,
+        require_schema: int | None = None,
+        wait_for_result: bool | None = None,
         **cmd_kwargs: Any,
-    ) -> Optional[dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """
         Send a node command. For internal use only.
 
@@ -435,11 +437,11 @@ class Node(EventBase):
 
     async def async_set_value(
         self,
-        val: Union[Value, str],
+        val: Value | str,
         new_value: Any,
-        options: Optional[dict] = None,
-        wait_for_result: Optional[bool] = None,
-    ) -> Optional[bool]:
+        options: dict | None = None,
+        wait_for_result: bool | None = None,
+    ) -> bool | None:
         """Send setValue command to Node for given value (or value_id)."""
         # a value may be specified as value_id or the value itself
         if not isinstance(val, Value):
@@ -512,7 +514,7 @@ class Node(EventBase):
             for value_id in data["valueIds"]
         ]
 
-    async def async_get_value_metadata(self, val: Union[Value, str]) -> ValueMetadata:
+    async def async_get_value_metadata(self, val: Value | str) -> ValueMetadata:
         """Send getValueMetadata command to Node."""
         # a value may be specified as value_id or the value itself
         if not isinstance(val, Value):
@@ -557,7 +559,7 @@ class Node(EventBase):
         """Send abortFirmwareUpdate command to Node."""
         await self.async_send_command("abort_firmware_update", wait_for_result=True)
 
-    async def async_poll_value(self, val: Union[Value, str]) -> None:
+    async def async_poll_value(self, val: Value | str) -> None:
         """Send pollValue command to Node for given value (or value_id)."""
         # a value may be specified as value_id or the value itself
         if not isinstance(val, Value):
@@ -583,7 +585,7 @@ class Node(EventBase):
         command_class: CommandClass,
         method_name: str,
         *args: Any,
-        wait_for_result: Optional[bool] = None,
+        wait_for_result: bool | None = None,
     ) -> Any:
         """Call endpoint.invoke_cc_api command."""
         return await self.endpoints[0].async_invoke_cc_api(
@@ -649,7 +651,7 @@ class Node(EventBase):
         return cast(int, data["framesAcked"])
 
     async def async_check_lifeline_health(
-        self, rounds: Optional[int] = None
+        self, rounds: int | None = None
     ) -> LifelineHealthCheckSummary:
         """Send checkLifelineHealth command to Node."""
         kwargs = {}
@@ -665,7 +667,7 @@ class Node(EventBase):
         return LifelineHealthCheckSummary(data["summary"])
 
     async def async_check_route_health(
-        self, target_node: "Node", rounds: Optional[int] = None
+        self, target_node: "Node", rounds: int | None = None
     ) -> RouteHealthCheckSummary:
         """Send checkRouteHealth command to Node."""
         kwargs = {"targetNodeId": target_node.node_id}
@@ -689,7 +691,7 @@ class Node(EventBase):
         return cast(NodeDataType, data["state"])
 
     async def async_set_name(
-        self, name: str, update_cc: bool = True, wait_for_result: Optional[bool] = None
+        self, name: str, update_cc: bool = True, wait_for_result: bool | None = None
     ) -> None:
         """Set node name."""
         # If we may not potentially update the name CC, we should just wait for the
@@ -709,7 +711,7 @@ class Node(EventBase):
         self,
         location: str,
         update_cc: bool = True,
-        wait_for_result: Optional[bool] = None,
+        wait_for_result: bool | None = None,
     ) -> None:
         """Set node location."""
         # If we may not potentially update the location CC, we should just wait for the

@@ -1,4 +1,6 @@
 """Constants for the Color Switch CC."""
+from __future__ import annotations
+
 from enum import IntEnum
 
 

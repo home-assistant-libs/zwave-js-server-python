@@ -1,6 +1,8 @@
 """Provide a model for the Z-Wave JS controller's inclusion/provisioning data structures."""
+from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import Any, Optional, TypedDict
+from typing import Any, TypedDict
 
 from ...const import Protocols, ProvisioningEntryStatus, QRCodeVersion, SecurityClass
 
@@ -44,9 +46,9 @@ class ProvisioningEntry:
 
     dsk: str
     security_classes: list[SecurityClass]
-    requested_security_classes: Optional[list[SecurityClass]] = None
+    requested_security_classes: list[SecurityClass] | None = None
     status: ProvisioningEntryStatus = ProvisioningEntryStatus.ACTIVE
-    additional_properties: Optional[dict[str, Any]] = None
+    additional_properties: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         """Return PlannedProvisioning data dict from self."""
@@ -98,9 +100,9 @@ class QRProvisioningInformationMixin:
     product_type: int
     product_id: int
     application_version: str
-    max_inclusion_request_interval: Optional[int]
-    uuid: Optional[str]
-    supported_protocols: Optional[list[Protocols]]
+    max_inclusion_request_interval: int | None
+    uuid: str | None
+    supported_protocols: list[Protocols] | None
 
 
 @dataclass

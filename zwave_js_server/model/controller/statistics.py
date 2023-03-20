@@ -1,6 +1,8 @@
 """Provide a model for the Z-Wave JS controller's statistics."""
+from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Optional, TypedDict
+from typing import TYPE_CHECKING, TypedDict
 
 from ..statistics import RouteStatistics, RouteStatisticsDataType
 
@@ -32,12 +34,12 @@ class ControllerLifelineRoutes:
             self._nlwr = RouteStatistics(client, nlwr)
 
     @property
-    def lwr(self) -> Optional[RouteStatistics]:
+    def lwr(self) -> RouteStatistics | None:
         """Return the last working route from the controller to this node."""
         return self._lwr
 
     @property
-    def nlwr(self) -> Optional[RouteStatistics]:
+    def nlwr(self) -> RouteStatistics | None:
         """Return the next to last working route from the controller to this node."""
         return self._nlwr
 
@@ -60,7 +62,7 @@ class ControllerStatisticsDataType(TypedDict):
 class ControllerStatistics:
     """Represent a controller statistics update."""
 
-    def __init__(self, data: Optional[ControllerStatisticsDataType] = None) -> None:
+    def __init__(self, data: ControllerStatisticsDataType | None = None) -> None:
         """Initialize controller statistics."""
         self.data = data or ControllerStatisticsDataType(
             CAN=0,

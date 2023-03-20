@@ -1,5 +1,5 @@
 """Utility functions for Z-Wave JS locks."""
-from typing import Optional, Union
+from __future__ import annotations
 
 from ..const import CommandClass
 from ..const.command_class.lock import (
@@ -36,10 +36,10 @@ def get_code_slot_value(node: Node, code_slot: int, property_name: str) -> Value
 
 def _get_code_slots(
     node: Node, include_usercode: bool = False
-) -> list[dict[str, Optional[Union[int, bool, str]]]]:
+) -> list[dict[str, int | bool | str | None]]:
     """Get all code slots on the lock and optionally include usercode."""
     code_slot = 1
-    slots: list[dict[str, Optional[Union[int, bool, str]]]] = []
+    slots: list[dict[str, int | bool | str | None]] = []
 
     # Loop until we can't find a code slot
     while True:
@@ -72,25 +72,23 @@ def _get_code_slots(
         code_slot += 1
 
 
-def get_code_slots(node: Node) -> list[dict[str, Optional[Union[int, bool, str]]]]:
+def get_code_slots(node: Node) -> list[dict[str, int | bool | str | None]]:
     """Get all code slots on the lock and whether or not they are used."""
     return _get_code_slots(node, False)
 
 
-def get_usercodes(node: Node) -> list[dict[str, Optional[Union[int, bool, str]]]]:
+def get_usercodes(node: Node) -> list[dict[str, int | bool | str | None]]:
     """Get all code slots and usercodes on the lock."""
     return _get_code_slots(node, True)
 
 
-def get_usercode(node: Node, code_slot: int) -> Optional[str]:
+def get_usercode(node: Node, code_slot: int) -> str | None:
     """Get usercode from slot X on the lock."""
     value = get_code_slot_value(node, code_slot, LOCK_USERCODE_PROPERTY)
     return value.value
 
 
-async def get_usercode_from_node(
-    node: Node, code_slot: int
-) -> dict[str, Union[str, bool]]:
+async def get_usercode_from_node(node: Node, code_slot: int) -> dict[str, str | bool]:
     """
     Fetch a usercode directly from a node.
 

@@ -1,4 +1,6 @@
 """Client."""
+from __future__ import annotations
+
 import asyncio
 import logging
 import pprint
@@ -8,7 +10,7 @@ from copy import deepcopy
 from datetime import datetime
 from operator import itemgetter
 from types import TracebackType
-from typing import Any, Optional, cast
+from typing import Any, cast
 
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, client_exceptions
 
@@ -55,17 +57,17 @@ class Client:
         ws_server_url: str,
         aiohttp_session: ClientSession,
         schema_version: int = MAX_SERVER_SCHEMA_VERSION,
-        additional_user_agent_components: Optional[dict[str, str]] = None,
+        additional_user_agent_components: dict[str, str] | None = None,
         record_messages: bool = False,
     ):
         """Initialize the Client class."""
         self.ws_server_url = ws_server_url
         self.aiohttp_session = aiohttp_session
-        self.driver: Optional[Driver] = None
+        self.driver: Driver | None = None
         # The WebSocket client
-        self._client: Optional[ClientWebSocketResponse] = None
+        self._client: ClientWebSocketResponse | None = None
         # Version of the connected server
-        self.version: Optional[VersionInfo] = None
+        self.version: VersionInfo | None = None
         self.schema_version: int = schema_version
         self.additional_user_agent_components = {
             PACKAGE_NAME: __version__,
@@ -74,7 +76,7 @@ class Client:
         self._logger = logging.getLogger(__package__)
         self._loop = asyncio.get_running_loop()
         self._result_futures: dict[str, asyncio.Future] = {}
-        self._shutdown_complete_event: Optional[asyncio.Event] = None
+        self._shutdown_complete_event: asyncio.Event | None = None
         self._record_messages = record_messages
         self._recorded_commands: defaultdict[str, dict] = defaultdict(dict)
         self._recorded_events: list[dict] = []
@@ -97,7 +99,7 @@ class Client:
     async def async_send_command(
         self,
         message: dict[str, Any],
-        require_schema: Optional[int] = None,
+        require_schema: int | None = None,
     ) -> dict:
         """Send a command and get a response."""
         if require_schema is not None and require_schema > self.schema_version:
@@ -118,7 +120,7 @@ class Client:
             self._result_futures.pop(message_id)
 
     async def async_send_command_no_wait(
-        self, message: dict[str, Any], require_schema: Optional[int] = None
+        self, message: dict[str, Any], require_schema: int | None = None
     ) -> None:
         """Send a command without waiting for the response."""
         if require_schema is not None and require_schema > self.schema_version:

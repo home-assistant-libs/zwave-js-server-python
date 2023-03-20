@@ -3,8 +3,9 @@ Model for a Zwave Node's endpoints.
 
 https://zwave-js.github.io/node-zwave-js/#/api/endpoint?id=endpoint-properties
 """
+from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Optional, TypedDict, Union, cast
+from typing import TYPE_CHECKING, Any, TypedDict, cast
 
 from ..const import NodeStatus
 from ..event import EventBase
@@ -37,13 +38,13 @@ class Endpoint(EventBase):
         self,
         client: "Client",
         data: EndpointDataType,
-        values: dict[str, Union[ConfigurationValue, Value]],
+        values: dict[str, ConfigurationValue | Value],
     ) -> None:
         """Initialize."""
         super().__init__()
         self.client = client
         self.data: EndpointDataType = {}
-        self.values: dict[str, Union[ConfigurationValue, Value]] = {}
+        self.values: dict[str, ConfigurationValue | Value] = {}
         self.update(data, values)
 
     def __repr__(self) -> str:
@@ -80,12 +81,12 @@ class Endpoint(EventBase):
         return DeviceClass(self.data["deviceClass"])
 
     @property
-    def installer_icon(self) -> Optional[int]:
+    def installer_icon(self) -> int | None:
         """Return installer icon property."""
         return self.data.get("installerIcon")
 
     @property
-    def user_icon(self) -> Optional[int]:
+    def user_icon(self) -> int | None:
         """Return user icon property."""
         return self.data.get("userIcon")
 
@@ -95,14 +96,14 @@ class Endpoint(EventBase):
         return [CommandClassInfo(cc) for cc in self.data["commandClasses"]]
 
     @property
-    def endpoint_label(self) -> Optional[str]:
+    def endpoint_label(self) -> str | None:
         """Return endpoint label property."""
         return self.data.get("endpointLabel")
 
     def update(
         self,
         data: EndpointDataType,
-        values: dict[str, Union[ConfigurationValue, Value]],
+        values: dict[str, ConfigurationValue | Value],
     ) -> None:
         """Update the endpoint data."""
         self.data = data
@@ -120,10 +121,10 @@ class Endpoint(EventBase):
     async def async_send_command(
         self,
         cmd: str,
-        require_schema: Optional[int] = None,
-        wait_for_result: Optional[bool] = None,
+        require_schema: int | None = None,
+        wait_for_result: bool | None = None,
         **cmd_kwargs: Any,
-    ) -> Optional[dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """
         Send an endpoint command. For internal use only.
 
@@ -159,7 +160,7 @@ class Endpoint(EventBase):
         command_class: CommandClass,
         method_name: str,
         *args: Any,
-        wait_for_result: Optional[bool] = None,
+        wait_for_result: bool | None = None,
     ) -> Any:
         """Call endpoint.invoke_cc_api command."""
         if not any(cc.id == command_class.value for cc in self.command_classes):

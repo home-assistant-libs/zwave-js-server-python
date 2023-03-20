@@ -1,6 +1,7 @@
 """Provide a model for the association."""
+from __future__ import annotations
+
 from dataclasses import dataclass, field
-from typing import Optional
 
 
 @dataclass
@@ -11,7 +12,7 @@ class AssociationGroup:
     is_lifeline: bool
     multi_channel: bool
     label: str
-    profile: Optional[int] = None
+    profile: int | None = None
     issued_commands: dict[int, list[int]] = field(default_factory=dict)
 
 
@@ -20,4 +21,4 @@ class AssociationAddress:
     """Represent a association dict type."""
 
     node_id: int
-    endpoint: Optional[int] = None
+    endpoint: int | None = None

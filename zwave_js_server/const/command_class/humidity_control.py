@@ -4,6 +4,8 @@ Constants for the Humidity Control CCs.
 Includes Humidity Control Mode, Humidity Control Operating State,
 and Humidity Control Setpoint CCs.
 """
+from __future__ import annotations
+
 from enum import IntEnum
 
 HUMIDITY_CONTROL_MODE_PROPERTY = "mode"

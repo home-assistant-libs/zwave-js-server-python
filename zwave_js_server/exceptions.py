@@ -1,5 +1,7 @@
 """Exceptions for zwave-js-server."""
-from typing import TYPE_CHECKING, Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from .const import RssiError
 
@@ -16,7 +18,7 @@ class BaseZwaveJSServerError(Exception):
 class TransportError(BaseZwaveJSServerError):
     """Exception raised to represent transport errors."""
 
-    def __init__(self, message: str, error: Optional[Exception] = None) -> None:
+    def __init__(self, message: str, error: Exception | None = None) -> None:
         """Initialize a transport error."""
         super().__init__(message)
         self.error = error
@@ -37,7 +39,7 @@ class CannotConnect(TransportError):
 class ConnectionFailed(TransportError):
     """Exception raised when an established connection fails."""
 
-    def __init__(self, error: Optional[Exception] = None) -> None:
+    def __init__(self, error: Exception | None = None) -> None:
         """Initialize a connection failed error."""
         if error is None:
             super().__init__("Connection failed.")
@@ -80,7 +82,7 @@ class InvalidServerVersion(BaseZwaveJSServerError):
 class FailedCommand(BaseZwaveJSServerError):
     """When a command has failed."""
 
-    def __init__(self, message_id: str, error_code: str, msg: Optional[str] = None):
+    def __init__(self, message_id: str, error_code: str, msg: str | None = None):
         """Initialize a failed command error."""
         super().__init__(msg or f"Command failed: {error_code}")
         self.message_id = message_id
@@ -91,10 +93,7 @@ class FailedZWaveCommand(FailedCommand):
     """When a command has failed because of Z-Wave JS error."""
 
     def __init__(
-        self,
-        message_id: str,
-        zwave_error_code: int,
-        zwave_error_message: str,
+        self, message_id: str, zwave_error_code: int, zwave_error_message: str
     ):
         """Initialize a failed command error."""
         super().__init__(

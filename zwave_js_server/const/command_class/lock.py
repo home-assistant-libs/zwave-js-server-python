@@ -3,6 +3,8 @@ Constants for lock related CCs.
 
 Includes Door Lock and Lock CCs.
 """
+from __future__ import annotations
+
 from enum import IntEnum
 
 from .. import CommandClass

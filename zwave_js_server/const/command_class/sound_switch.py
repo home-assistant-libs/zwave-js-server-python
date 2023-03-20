@@ -1,4 +1,6 @@
 """Constants for the Sound Switch CC."""
+from __future__ import annotations
+
 from enum import IntEnum
 
 TONE_ID_PROPERTY = "toneId"

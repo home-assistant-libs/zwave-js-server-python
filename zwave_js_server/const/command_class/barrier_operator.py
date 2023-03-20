@@ -1,4 +1,6 @@
 """Constants for the Barrier Operator CC."""
+from __future__ import annotations
+
 from enum import IntEnum
 
 SIGNALING_STATE_PROPERTY = "signalingState"

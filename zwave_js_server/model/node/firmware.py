@@ -1,7 +1,9 @@
 """Provide a model for Z-Wave firmware."""
+from __future__ import annotations
+
 from dataclasses import asdict, dataclass
 from enum import IntEnum
-from typing import TYPE_CHECKING, Optional, TypedDict, Union, cast
+from typing import TYPE_CHECKING, TypedDict, cast
 
 from ...const import VALUE_UNKNOWN
 from ...util.helpers import convert_bytes_to_base64
@@ -25,8 +27,8 @@ class NodeFirmwareUpdateData:
 
     filename: str
     file: bytes
-    file_format: Optional[str] = None
-    firmware_target: Optional[int] = None
+    file_format: str | None = None
+    firmware_target: int | None = None
 
     def to_dict(self) -> NodeFirmwareUpdateDataDataType:
         """Convert firmware update data to dict."""
@@ -46,8 +48,8 @@ class NodeFirmwareUpdateCapabilitiesDataType(TypedDict, total=False):
 
     firmwareUpgradable: bool  # required
     firmwareTargets: list[int]
-    continuesToFunction: Union[bool, str]
-    supportsActivation: Union[bool, str]
+    continuesToFunction: bool | str
+    supportsActivation: bool | str
 
 
 class NodeFirmwareUpdateCapabilitiesDict(TypedDict, total=False):
@@ -55,8 +57,8 @@ class NodeFirmwareUpdateCapabilitiesDict(TypedDict, total=False):
 
     firmware_upgradable: bool  # required
     firmware_targets: list[int]
-    continues_to_function: Optional[bool]
-    supports_activation: Optional[bool]
+    continues_to_function: bool | None
+    supports_activation: bool | None
 
 
 class NodeFirmwareUpdateCapabilities:
@@ -79,7 +81,7 @@ class NodeFirmwareUpdateCapabilities:
         return self.data["firmwareTargets"]
 
     @property
-    def continues_to_function(self) -> Optional[bool]:
+    def continues_to_function(self) -> bool | None:
         """Return whether node continues to function during update."""
         if not self.firmware_upgradable:
             raise TypeError("Firmware is not upgradeable.")
@@ -89,7 +91,7 @@ class NodeFirmwareUpdateCapabilities:
         return val
 
     @property
-    def supports_activation(self) -> Optional[bool]:
+    def supports_activation(self) -> bool | None:
         """Return whether node supports delayed activation of the new firmware."""
         if not self.firmware_upgradable:
             raise TypeError("Firmware is not upgradeable.")
@@ -203,7 +205,7 @@ class NodeFirmwareUpdateResult:
         return self.data["success"]
 
     @property
-    def wait_time(self) -> Optional[int]:
+    def wait_time(self) -> int | None:
         """Return the wait time in seconds before the device is functional again."""
         return self.data.get("waitTime")
 

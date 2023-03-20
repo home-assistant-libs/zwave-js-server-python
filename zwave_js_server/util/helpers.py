@@ -1,7 +1,9 @@
 """Generic Utility helper functions."""
+from __future__ import annotations
+
 import base64
 import json
-from typing import Any, Union
+from typing import Any
 
 from ..exceptions import UnparseableValue
 
@@ -22,7 +24,7 @@ def convert_base64_to_bytes(data: str) -> bytes:
     return base64.b64decode(data)
 
 
-def parse_buffer(value: Union[dict[str, Any], str]) -> str:
+def parse_buffer(value: dict[str, Any] | str) -> str:
     """Parse value from a buffer data type."""
     if isinstance(value, dict):
         return parse_buffer_from_dict(value)

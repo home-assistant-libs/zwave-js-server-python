@@ -5,6 +5,7 @@ disable=
   locally-disabled,
   too-few-public-methods,
   too-many-public-methods,
+  line-too-long,
 enable=
   useless-suppression,
   use-symbolic-message-instead,

@@ -1,4 +1,6 @@
 """Constants for the Multilevel Switch CC."""
+from __future__ import annotations
+
 from enum import IntEnum
 
 COVER_OPEN_PROPERTY = "Open"

@@ -1,6 +1,8 @@
 """Provide a model for the log config."""
+from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import Optional, TypedDict, cast
+from typing import TypedDict, cast
 
 from ..const import LogLevel
 
@@ -21,11 +23,11 @@ class LogConfig:
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/log/shared.ts#L85
     # Must include at least one key
-    enabled: Optional[bool] = None
-    level: Optional[LogLevel] = None
-    log_to_file: Optional[bool] = None
-    filename: Optional[str] = None
-    force_console: Optional[bool] = None
+    enabled: bool | None = None
+    level: LogLevel | None = None
+    log_to_file: bool | None = None
+    filename: str | None = None
+    force_console: bool | None = None
 
     def to_dict(self) -> LogConfigDataType:
         """Return LogConfigDataType dict from self."""
