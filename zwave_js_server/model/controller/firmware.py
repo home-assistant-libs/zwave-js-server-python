@@ -1,7 +1,7 @@
 """Provide a model for Z-Wave controller firmware."""
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import IntEnum
 from typing import TypedDict
 
@@ -59,27 +59,20 @@ class ControllerFirmwareUpdateProgressDataType(TypedDict):
     progress: float
 
 
+@dataclass
 class ControllerFirmwareUpdateProgress:
     """Model for a controller firmware update progress data."""
 
-    def __init__(self, data: ControllerFirmwareUpdateProgressDataType) -> None:
-        """Initialize."""
-        self.data = data
+    data: ControllerFirmwareUpdateProgressDataType
+    sent_fragments: int = field(init=False)
+    total_fragments: int = field(init=False)
+    progress: float = field(init=False)
 
-    @property
-    def sent_fragments(self) -> int:
-        """Return the number of fragments sent to the device so far."""
-        return self.data["sentFragments"]
-
-    @property
-    def total_fragments(self) -> int:
-        """Return the total number of fragments that need to be sent to the device."""
-        return self.data["totalFragments"]
-
-    @property
-    def progress(self) -> float:
-        """Return progress."""
-        return float(self.data["progress"])
+    def __post_init__(self) -> None:
+        """Post initialize."""
+        self.sent_fragments = self.data["sentFragments"]
+        self.total_fragments = self.data["totalFragments"]
+        self.progress = float(self.data["progress"])
 
 
 class ControllerFirmwareUpdateResultDataType(TypedDict):
@@ -89,19 +82,15 @@ class ControllerFirmwareUpdateResultDataType(TypedDict):
     success: bool
 
 
+@dataclass
 class ControllerFirmwareUpdateResult:
     """Model for controller firmware update result data."""
 
-    def __init__(self, data: ControllerFirmwareUpdateResultDataType) -> None:
-        """Initialize."""
-        self.data = data
+    data: ControllerFirmwareUpdateResultDataType
+    status: ControllerFirmwareUpdateStatus = field(init=False)
+    success: bool = field(init=False)
 
-    @property
-    def status(self) -> ControllerFirmwareUpdateStatus:
-        """Return the firmware update status."""
-        return ControllerFirmwareUpdateStatus(self.data["status"])
-
-    @property
-    def success(self) -> bool:
-        """Return whether the firmware update was successful."""
-        return self.data["success"]
+    def __post_init__(self) -> None:
+        """Post initialize."""
+        self.status = ControllerFirmwareUpdateStatus(self.data["status"])
+        self.success = self.data["success"]
