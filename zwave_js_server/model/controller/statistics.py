@@ -116,7 +116,7 @@ class ControllerStatistics:
     timeout_ack: int = field(init=False)
     timeout_response: int = field(init=False)
     timeout_callback: int = field(init=False)
-    background_rssi: BackgroundRSSI | None = field(init=False)
+    background_rssi: BackgroundRSSI | None = field(init=False, default=None)
 
     def __post_init__(self) -> None:
         """Post initialize."""
@@ -140,7 +140,5 @@ class ControllerStatistics:
         self.timeout_ack = data["timeoutACK"]
         self.timeout_response = data["timeoutResponse"]
         self.timeout_callback = data["timeoutCallback"]
-        if not (background_rssi := data.get("backgroundRSSI")):
-            self.background_rssi = None
-            return
-        self.background_rssi = BackgroundRSSI(background_rssi)
+        if background_rssi := data.get("backgroundRSSI"):
+            self.background_rssi = BackgroundRSSI(background_rssi)
