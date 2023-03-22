@@ -2027,6 +2027,16 @@ async def test_get_value_timestamp(multisensor_6: node_pkg.Node, uuid4, mock_com
         "messageId": uuid4,
     }
 
+    assert await node.async_get_value_timestamp("52-112-0-2") == 1234567890
+
+    assert len(ack_commands) == 2
+    assert ack_commands[1] == {
+        "command": "node.get_value_timestamp",
+        "nodeId": node.node_id,
+        "valueId": {"commandClass": 112, "endpoint": 0, "property": 2},
+        "messageId": uuid4,
+    }
+
 
 async def test_unknown_event(multisensor_6: node_pkg.Node):
     """Test that an unknown event type causes an exception."""
