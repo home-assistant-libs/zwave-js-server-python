@@ -44,19 +44,85 @@ class ControllerLifelineRoutes:
         return self._nlwr
 
 
-class ControllerStatisticsDataType(TypedDict):
+class ChannelRSSIDataType(TypedDict):
+    """Represent a channel RSSI data dict type."""
+
+    average: int
+    current: int
+
+
+class BackgroundRSSIDataType(TypedDict, total=False):
+    """Represent a background RSSI data dict type."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/controller/ControllerStatistics.ts#L40
+    timestamp: int  # required
+    channel0: ChannelRSSIDataType  # required
+    channel1: ChannelRSSIDataType  # required
+    channel2: ChannelRSSIDataType
+
+
+class ControllerStatisticsDataType(TypedDict, total=False):
     """Represent a controller statistics data dict type."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/controller/ControllerStatistics.ts#L20-L39
-    messagesTX: int
-    messagesRX: int
-    messagesDroppedTX: int
-    messagesDroppedRX: int
-    NAK: int
-    CAN: int
-    timeoutACK: int
-    timeoutResponse: int
-    timeoutCallback: int
+    messagesTX: int  # required
+    messagesRX: int  # required
+    messagesDroppedTX: int  # required
+    messagesDroppedRX: int  # required
+    NAK: int  # required
+    CAN: int  # required
+    timeoutACK: int  # required
+    timeoutResponse: int  # required
+    timeoutCallback: int  # required
+    backgroundRSSI: BackgroundRSSIDataType
+
+
+class ChannelRSSI:
+    """Represent a channel RSSI."""
+
+    def __init__(self, data: ChannelRSSIDataType) -> None:
+        """Initialize channel RSSI."""
+        self.data = data
+
+    @property
+    def average(self) -> int:
+        """Return the moving average RSSI."""
+        return self.data["average"]
+
+    @property
+    def current(self) -> int:
+        """Return the current RSSI."""
+        return self.data["current"]
+
+
+class BackgroundRSSI:
+    """Represent a background RSSI update."""
+
+    def __init__(self, data: BackgroundRSSIDataType) -> None:
+        """Initialize background RSSI."""
+        self.data = data
+
+    @property
+    def timestamp(self) -> int:
+        """Return the timestamp of the RSSI measurement."""
+        return self.data["timestamp"]
+
+    @property
+    def channel_0(self) -> ChannelRSSI:
+        """Return the RSSI data for channel 0."""
+        return ChannelRSSI(self.data["channel0"])
+
+    @property
+    def channel_1(self) -> ChannelRSSI:
+        """Return the RSSI data for channel 1."""
+        return ChannelRSSI(self.data["channel1"])
+
+    @property
+    def channel_2(self) -> Optional[ChannelRSSI]:
+        """Return the RSSI data for channel 2."""
+        if not (channel_2 := self.data.get("channel2")):
+            return None
+        return ChannelRSSI(channel_2)
 
 
 class ControllerStatistics:
@@ -124,3 +190,10 @@ class ControllerStatistics:
     def timeout_callback(self) -> int:
         """Return number of transmission attempts where controller callback timed out."""
         return self.data["timeoutCallback"]
+
+    @property
+    def background_rssi(self) -> Optional[BackgroundRSSIDataType]:
+        """Return background RSSI data."""
+        if not (background_rssi := self.data.get("backgroundRSSI")):
+            return None
+        return BackgroundRSSI(background_rssi)
