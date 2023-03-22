@@ -23,13 +23,15 @@ class ControllerLifelineRoutes:
 
     client: "Client"
     data: ControllerLifelineRoutesDataType
-    lwr: RouteStatistics | None = field(init=False)
-    nlwr: RouteStatistics | None = field(init=False)
+    lwr: RouteStatistics | None = field(init=False, default=None)
+    nlwr: RouteStatistics | None = field(init=False, default=None)
 
     def __post_init__(self) -> None:
         """Post initialize."""
-        self.lwr = RouteStatistics(self.client, self.data["lwr"])
-        self.nlwr = RouteStatistics(self.client, self.data["nlwr"])
+        if lwr := self.data.get("lwr"):
+            self.lwr = RouteStatistics(self.client, lwr)
+        if nlwr := self.data.get("nlwr"):
+            self.nlwr = RouteStatistics(self.client, nlwr)
 
 
 class ChannelRSSIDataType(TypedDict):

@@ -1,6 +1,7 @@
 """Provide a model for a log message event."""
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from typing import Literal, TypedDict
 
 from ..const import CommandClass
@@ -22,71 +23,39 @@ class LogMessageContextDataType(TypedDict, total=False):
     propertyKey: int | str
 
 
+@dataclass
 class LogMessageContext:
     """Represent log message context information."""
 
-    def __init__(self, data: LogMessageContextDataType) -> None:
-        """Initialize log message context."""
-        self.data = data
+    data: LogMessageContextDataType
+    source: Literal["config", "serial", "controller", "driver"] = field(init=False)
+    type: Literal["controller", "value", "node"] | None = field(init=False)
+    node_id: int | None = field(init=False)
+    header: str | None = field(init=False)
+    direction: Literal["inbound", "outbound", "none"] | None = field(init=False)
+    change: Literal["added", "removed", "updated", "notification"] | None = field(
+        init=False
+    )
+    internal: bool | None = field(init=False)
+    endpoint: int | None = field(init=False)
+    command_class: CommandClass | None = field(init=False, default=None)
+    property_: int | str | None = field(init=False)
+    property_key: int | str | None = field(init=False)
 
-    @property
-    def source(self) -> Literal["config", "serial", "controller", "driver"]:
-        """Return the log message source."""
-        return self.data["source"]
-
-    @property
-    def type(self) -> Literal["controller", "value", "node"] | None:
-        """Return the object type for the log message if applicable."""
-        return self.data.get("type")
-
-    @property
-    def node_id(self) -> int | None:
-        """Return the Node ID for the log message if applicable."""
-        return self.data.get("nodeId")
-
-    @property
-    def header(self) -> str | None:
-        """Return the header for the log message if applicable."""
-        return self.data.get("header")
-
-    @property
-    def direction(self) -> Literal["inbound", "outbound", "none"] | None:
-        """Return the direction for the log message if applicable."""
-        return self.data.get("direction")
-
-    @property
-    def change(
-        self,
-    ) -> Literal["added", "removed", "updated", "notification"] | None:
-        """Return the change type for the log message if applicable."""
-        return self.data.get("change")
-
-    @property
-    def internal(self) -> bool | None:
-        """Return the internal flag for the log message if applicable."""
-        return self.data.get("internal")
-
-    @property
-    def endpoint(self) -> int | None:
-        """Return the Node/Value endpoint for the log message if applicable."""
-        return self.data.get("endpoint")
-
-    @property
-    def command_class(self) -> CommandClass | None:
-        """Return the Value command class for the log message if applicable."""
-        if command_class := self.data.get("commandClass"):
-            return CommandClass(command_class)
-        return None
-
-    @property
-    def property_(self) -> int | str | None:
-        """Return the Value property for the log message if applicable."""
-        return self.data.get("property")
-
-    @property
-    def property_key(self) -> int | str | None:
-        """Return the Value property key for the log message if applicable."""
-        return self.data.get("propertyKey")
+    def __post_init__(self) -> None:
+        """Post initialize."""
+        self.source = self.data["source"]
+        self.type = self.data.get("type")
+        self.node_id = self.data.get("nodeId")
+        self.header = self.data.get("header")
+        self.direction = self.data.get("direction")
+        self.change = self.data.get("change")
+        self.internal = self.data.get("internal")
+        self.endpoint = self.data.get("endpoint")
+        if (command_class := self.data.get("commandClass")) is not None:
+            self.command_class = CommandClass(command_class)
+        self.property_ = self.data.get("property")
+        self.property_key = self.data.get("propertyKey")
 
 
 class LogMessageDataType(TypedDict, total=False):
@@ -107,75 +76,43 @@ class LogMessageDataType(TypedDict, total=False):
     label: str
 
 
+def _process_message(message: str | list[str]) -> list[str]:
+    """Process a message and always return a list."""
+    if isinstance(message, str):
+        return str(message).splitlines()
+
+    # We will assume each item in the array is on a separate line so we can
+    # remove trailing line breaks
+    return [message.rstrip("\n") for message in message]
+
+
+@dataclass
 class LogMessage:
     """Represent a log message."""
 
-    def __init__(self, data: LogMessageDataType):
-        """Initialize log message."""
-        self.data = data
+    data: LogMessageDataType
+    message: list[str] = field(init=False)
+    formatted_message: list[str] = field(init=False)
+    direction: str = field(init=False)
+    level: str = field(init=False)
+    context: LogMessageContext = field(init=False)
+    primary_tags: str | None = field(init=False)
+    secondary_tags: str | None = field(init=False)
+    secondary_tag_padding: int | None = field(init=False)
+    multiline: bool | None = field(init=False)
+    timestamp: str | None = field(init=False)
+    label: str | None = field(init=False)
 
-    def _process_message(
-        self, field_name: Literal["message", "formattedMessage"]
-    ) -> list[str]:
-        """Process a message and always return a list."""
-        if isinstance(self.data[field_name], str):
-            return str(self.data[field_name]).splitlines()
-
-        # We will assume each item in the array is on a separate line so we can
-        # remove trailing line breaks
-        return [message.rstrip("\n") for message in self.data[field_name]]
-
-    @property
-    def message(self) -> list[str]:
-        """Return message."""
-        return self._process_message("message")
-
-    @property
-    def formatted_message(self) -> list[str]:
-        """Return fully formatted message."""
-        return self._process_message("formattedMessage")
-
-    @property
-    def direction(self) -> str:
-        """Return direction."""
-        return self.data["direction"]
-
-    @property
-    def level(self) -> str:
-        """Return level."""
-        return self.data["level"]
-
-    @property
-    def primary_tags(self) -> str | None:
-        """Return primary tags."""
-        return self.data.get("primaryTags")
-
-    @property
-    def secondary_tags(self) -> str | None:
-        """Return secondary tags."""
-        return self.data.get("secondaryTags")
-
-    @property
-    def secondary_tag_padding(self) -> int | None:
-        """Return secondary tag padding."""
-        return self.data.get("secondaryTagPadding")
-
-    @property
-    def multiline(self) -> bool | None:
-        """Return whether message is multiline."""
-        return self.data.get("multiline")
-
-    @property
-    def timestamp(self) -> str | None:
-        """Return timestamp."""
-        return self.data.get("timestamp")
-
-    @property
-    def label(self) -> str | None:
-        """Return label."""
-        return self.data.get("label")
-
-    @property
-    def context(self) -> LogMessageContext:
-        """Return context."""
-        return LogMessageContext(self.data["context"])
+    def __post_init__(self) -> None:
+        """Post initialize."""
+        self.message = _process_message(self.data["message"])
+        self.formatted_message = _process_message(self.data["formattedMessage"])
+        self.direction = self.data["direction"]
+        self.level = self.data["level"]
+        self.context = LogMessageContext(self.data["context"])
+        self.primary_tags = self.data.get("primaryTags")
+        self.secondary_tags = self.data.get("secondaryTags")
+        self.secondary_tag_padding = self.data.get("secondaryTagPadding")
+        self.multiline = self.data.get("multiline")
+        self.timestamp = self.data.get("timestamp")
+        self.label = self.data.get("label")
