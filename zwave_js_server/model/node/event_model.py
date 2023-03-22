@@ -105,7 +105,7 @@ class NotificationEventModel(BaseNodeEventModel):
 
     event: Literal["notification"]
     ccId: CommandClass
-    args: NotificationNotificationArgsDataType | EntryControlNotificationArgsDataType | PowerLevelNotificationArgsDataType
+    args: (NotificationNotificationArgsDataType | EntryControlNotificationArgsDataType | PowerLevelNotificationArgsDataType)
 
 
 class ReadyEventModel(BaseNodeEventModel):
