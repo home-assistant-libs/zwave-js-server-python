@@ -27,6 +27,8 @@ class MetaDataType(TypedDict, total=False):
     valueChangeOptions: list[str]
     allowManualEntry: bool
     valueSize: int
+    stateful: bool
+    secret: bool
 
 
 class ValueDataType(TypedDict, total=False):
@@ -152,6 +154,16 @@ class ValueMetadata:
     def value_size(self) -> int | None:
         """Return valueSize."""
         return self.data.get("valueSize")
+
+    @property
+    def stateful(self) -> Optional[bool]:
+        """Return stateful."""
+        return self.data.get("stateful")
+
+    @property
+    def secret(self) -> Optional[bool]:
+        """Return secret."""
+        return self.data.get("secret")
 
     def update(self, data: MetaDataType) -> None:
         """Update data."""

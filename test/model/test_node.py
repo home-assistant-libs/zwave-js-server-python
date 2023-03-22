@@ -2008,6 +2008,26 @@ async def test_interview(multisensor_6: node_pkg.Node, uuid4, mock_command):
     }
 
 
+async def test_get_value_timestamp(multisensor_6: node_pkg.Node, uuid4, mock_command):
+    """Test node.get_value_timestamp command."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.get_value_timestamp", "nodeId": node.node_id},
+        {"timestamp": 123456789},
+    )
+
+    val = node.values["52-32-0-targetValue"]
+    assert await node.async_get_value_timestamp(val) == 123456789
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.get_value_timestamp",
+        "nodeId": node.node_id,
+        "valueId": {"commandClass": 32, "endpoint": 0, "property": "targetValue"},
+        "messageId": uuid4,
+    }
+
+
 async def test_unknown_event(multisensor_6: node_pkg.Node):
     """Test that an unknown event type causes an exception."""
     with pytest.raises(KeyError):

@@ -757,6 +757,18 @@ class Node(EventBase):
             require_schema=22,
         )
 
+    async def async_get_value_timestamp(self, val: Union[Value, str]) -> int:
+        """Send getValueTimestamp command to Node for given value (or value_id)."""
+        # a value may be specified as value_id or the value itself
+        if not isinstance(val, Value):
+            val = self.values[val]
+        data = await self.async_send_command(
+            "get_value_timestamp",
+            valueId=_get_value_id_dict_from_value_data(val.data),
+            require_schema=27,
+        )
+        return cast(int, data["timestamp"])
+
     def handle_test_powerlevel_progress(self, event: Event) -> None:
         """Process a test power level progress event."""
         event.data["test_power_level_progress"] = TestPowerLevelProgress(

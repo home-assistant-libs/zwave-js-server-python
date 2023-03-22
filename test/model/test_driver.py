@@ -377,6 +377,19 @@ async def test_soft_reset(driver, uuid4, mock_command):
     }
 
 
+async def test_shutdown(driver, uuid4, mock_command):
+    """Test driver shutdown command."""
+    ack_commands = mock_command({"command": "driver.shutdown"}, {"success": True})
+
+    assert await driver.async_shutdown()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.shutdown",
+        "messageId": uuid4,
+    }
+
+
 async def test_unknown_event(driver):
     """Test that an unknown event type causes an exception."""
     with pytest.raises(KeyError):

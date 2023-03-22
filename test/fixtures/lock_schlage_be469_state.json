@@ -1643,7 +1643,9 @@
           "255": "Enable Beeper"
         },
         "label": "Beeper",
-        "isFromConfig": true
+        "isFromConfig": true,
+        "secret": false,
+        "stateful": true
       },
       "value": 255
     },
