@@ -757,7 +757,7 @@ class Node(EventBase):
             require_schema=22,
         )
 
-    async def async_get_value_timestamp(self, val: Union[Value, str]) -> int:
+    async def async_get_value_timestamp(self, val: Value | str) -> int:
         """Send getValueTimestamp command to Node for given value (or value_id)."""
         # a value may be specified as value_id or the value itself
         if not isinstance(val, Value):

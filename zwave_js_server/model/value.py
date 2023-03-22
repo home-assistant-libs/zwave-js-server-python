@@ -156,12 +156,12 @@ class ValueMetadata:
         return self.data.get("valueSize")
 
     @property
-    def stateful(self) -> Optional[bool]:
+    def stateful(self) -> bool | None:
         """Return stateful."""
         return self.data.get("stateful")
 
     @property
-    def secret(self) -> Optional[bool]:
+    def secret(self) -> bool | None:
         """Return secret."""
         return self.data.get("secret")
 

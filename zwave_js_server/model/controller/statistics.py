@@ -1,7 +1,7 @@
 """Provide a model for the Z-Wave JS controller's statistics."""
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, TypedDict
 
 from ..statistics import RouteStatistics, RouteStatisticsDataType
@@ -77,52 +77,39 @@ class ControllerStatisticsDataType(TypedDict, total=False):
     backgroundRSSI: BackgroundRSSIDataType
 
 
+@dataclass
 class ChannelRSSI:
     """Represent a channel RSSI."""
 
-    def __init__(self, data: ChannelRSSIDataType) -> None:
-        """Initialize channel RSSI."""
-        self.data = data
+    data: ChannelRSSIDataType
+    average: int = field(init=False)
+    current: int = field(init=False)
 
-    @property
-    def average(self) -> int:
-        """Return the moving average RSSI."""
-        return self.data["average"]
-
-    @property
-    def current(self) -> int:
-        """Return the current RSSI."""
-        return self.data["current"]
+    def __post_init__(self) -> None:
+        """Post initialize."""
+        self.average = self.data["average"]
+        self.current = self.data["current"]
 
 
+@dataclass
 class BackgroundRSSI:
     """Represent a background RSSI update."""
 
-    def __init__(self, data: BackgroundRSSIDataType) -> None:
-        """Initialize background RSSI."""
-        self.data = data
+    data: BackgroundRSSIDataType
+    timestamp: int = field(init=False)
+    channel_0: ChannelRSSI = field(init=False)
+    channel_1: ChannelRSSI = field(init=False)
+    channel_2: ChannelRSSI | None = field(init=False)
 
-    @property
-    def timestamp(self) -> int:
-        """Return the timestamp of the RSSI measurement."""
-        return self.data["timestamp"]
-
-    @property
-    def channel_0(self) -> ChannelRSSI:
-        """Return the RSSI data for channel 0."""
-        return ChannelRSSI(self.data["channel0"])
-
-    @property
-    def channel_1(self) -> ChannelRSSI:
-        """Return the RSSI data for channel 1."""
-        return ChannelRSSI(self.data["channel1"])
-
-    @property
-    def channel_2(self) -> Optional[ChannelRSSI]:
-        """Return the RSSI data for channel 2."""
+    def __post_init__(self) -> None:
+        """Post initialize."""
+        self.timestamp = self.data["timestamp"]
+        self.channel_0 = ChannelRSSI(self.data["channel0"])
+        self.channel_1 = ChannelRSSI(self.data["channel1"])
         if not (channel_2 := self.data.get("channel2")):
-            return None
-        return ChannelRSSI(channel_2)
+            self.channel_2 = None
+            return
+        self.channel_2 = ChannelRSSI(channel_2)
 
 
 class ControllerStatistics:
@@ -192,7 +179,7 @@ class ControllerStatistics:
         return self.data["timeoutCallback"]
 
     @property
-    def background_rssi(self) -> Optional[BackgroundRSSI]:
+    def background_rssi(self) -> BackgroundRSSI | None:
         """Return background RSSI data."""
         if not (background_rssi := self.data.get("backgroundRSSI")):
             return None
