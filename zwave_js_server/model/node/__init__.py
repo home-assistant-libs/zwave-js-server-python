@@ -766,6 +766,7 @@ class Node(EventBase):
             "get_value_timestamp",
             valueId=_get_value_id_dict_from_value_data(val.data),
             require_schema=27,
+            wait_for_result=True,
         )
         return cast(int, data["timestamp"])
 

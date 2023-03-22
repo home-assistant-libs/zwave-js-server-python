@@ -2013,11 +2013,11 @@ async def test_get_value_timestamp(multisensor_6: node_pkg.Node, uuid4, mock_com
     node = multisensor_6
     ack_commands = mock_command(
         {"command": "node.get_value_timestamp", "nodeId": node.node_id},
-        {"timestamp": 123456789},
+        {"timestamp": 1234567890},
     )
 
     val = node.values["52-32-0-targetValue"]
-    assert await node.async_get_value_timestamp(val) == 123456789
+    assert await node.async_get_value_timestamp(val) == 1234567890
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
