@@ -101,9 +101,7 @@ class Endpoint(EventBase):
         return self.data.get("endpointLabel")
 
     def update(
-        self,
-        data: EndpointDataType,
-        values: dict[str, ConfigurationValue | Value],
+        self, data: EndpointDataType, values: dict[str, ConfigurationValue | Value]
     ) -> None:
         """Update the endpoint data."""
         self.data = data

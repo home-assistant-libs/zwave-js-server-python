@@ -308,8 +308,7 @@ class Controller(EventBase):
         )
 
     async def async_unprovision_smart_start_node(
-        self,
-        dsk_or_node_id: int | str,
+        self, dsk_or_node_id: int | str
     ) -> None:
         """Send unprovisionSmartStartNode command to Controller."""
         await self.client.async_send_command(

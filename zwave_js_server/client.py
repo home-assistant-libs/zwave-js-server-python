@@ -99,7 +99,7 @@ class Client:
     async def async_send_command(
         self,
         message: dict[str, Any],
-        require_schema: int | None = None,
+        require_schema: int | None = None
     ) -> dict:
         """Send a command and get a response."""
         if require_schema is not None and require_schema > self.schema_version:
