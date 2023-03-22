@@ -768,6 +768,7 @@ class Node(EventBase):
             require_schema=27,
             wait_for_result=True,
         )
+        assert data
         return cast(int, data["timestamp"])
 
     def handle_test_powerlevel_progress(self, event: Event) -> None:
