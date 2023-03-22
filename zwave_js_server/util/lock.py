@@ -48,7 +48,7 @@ class CodeSlot(TypedDict):
 def _get_code_slots(node: Node, include_usercode: bool = False) -> list[CodeSlot]:
     """Get all code slots on the lock and optionally include usercode."""
     code_slot = 1
-    slots: list[dict[str, int | bool | str | None]] = []
+    slots: list[CodeSlot] = []
 
     # Loop until we can't find a code slot
     while True:
