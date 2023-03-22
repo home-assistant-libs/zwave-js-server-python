@@ -45,22 +45,22 @@ class NodeStatistics:
 
     def __post_init__(self) -> None:
         """Post initialize."""
-        self.data = self.data or NodeStatisticsDataType(
+        data = self.data or NodeStatisticsDataType(
             commandsDroppedRX=0,
             commandsDroppedTX=0,
             commandsRX=0,
             commandsTX=0,
             timeoutResponse=0,
         )
-        self.commands_tx = self.data["commandsTX"]
-        self.commands_rx = self.data["commandsRX"]
-        self.commands_dropped_rx = self.data["commandsDroppedRX"]
-        self.commands_dropped_tx = self.data["commandsDroppedTX"]
-        self.timeout_response = self.data["timeoutResponse"]
-        self.rtt = self.data.get("rtt")
-        if lwr := self.data.get("lwr"):
+        self.commands_tx = data["commandsTX"]
+        self.commands_rx = data["commandsRX"]
+        self.commands_dropped_rx = data["commandsDroppedRX"]
+        self.commands_dropped_tx = data["commandsDroppedTX"]
+        self.timeout_response = data["timeoutResponse"]
+        self.rtt = data.get("rtt")
+        if lwr := data.get("lwr"):
             self.lwr = RouteStatistics(self.client, lwr)
-        if nlwr := self.data.get("nlwr"):
+        if nlwr := data.get("nlwr"):
             self.nlwr = RouteStatistics(self.client, nlwr)
 
     @property
@@ -71,7 +71,7 @@ class NodeStatistics:
         Consecutive non-error measurements are combined using an exponential moving
         average.
         """
-        if (rssi_ := self.data.get("rssi")) is None:
+        if not self.data or (rssi_ := self.data.get("rssi")) is None:
             return None
         if rssi_ in [item.value for item in RssiError]:
             raise RssiErrorReceived(RssiError(rssi_))
