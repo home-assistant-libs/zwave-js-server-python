@@ -53,12 +53,12 @@ class RouteStatistics:
         ]
         if (node_ids := self.data.get("routeFailedBetween")) is None:
             self.route_failed_between = None
-        else:
-            assert len(node_ids) == 2
-            self.route_failed_between = (
-                self.client.driver.controller.nodes[node_ids[0]],
-                self.client.driver.controller.nodes[node_ids[1]],
-            )
+            return
+        assert len(node_ids) == 2
+        self.route_failed_between = (
+            self.client.driver.controller.nodes[node_ids[0]],
+            self.client.driver.controller.nodes[node_ids[1]],
+        )
 
     @property
     def rssi(self) -> int | None:
