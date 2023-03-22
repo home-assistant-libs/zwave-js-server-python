@@ -1,7 +1,7 @@
 """Provide a model for the Z-Wave JS node's health checks and power tests."""
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TypedDict
 
 from ...const import PowerLevel
@@ -28,69 +28,45 @@ class LifelineHealthCheckSummaryDataType(TypedDict):
     rating: int
 
 
+@dataclass
 class LifelineHealthCheckResult:
     """Represent a lifeline health check result."""
 
-    def __init__(self, data: LifelineHealthCheckResultDataType) -> None:
-        """Initialize lifeline health check result."""
-        self.data = data
+    data: LifelineHealthCheckResultDataType
+    latency: int = field(init=False)
+    num_neighbors: int = field(init=False)
+    failed_pings_node: int = field(init=False)
+    route_changes: int | None = field(init=False)
+    min_power_level: PowerLevel | None = field(init=False, default=None)
+    failed_pings_controller: int | None = field(init=False)
+    snr_margin: int | None = field(init=False)
 
-    @property
-    def latency(self) -> int:
-        """Return latency."""
-        return self.data["latency"]
-
-    @property
-    def num_neighbors(self) -> int:
-        """Return number of neighbors."""
-        return self.data["numNeighbors"]
-
-    @property
-    def failed_pings_node(self) -> int:
-        """Return number of failed pings to node."""
-        return self.data["failedPingsNode"]
-
-    @property
-    def route_changes(self) -> int | None:
-        """Return number of route changes."""
-        return self.data.get("routeChanges")
-
-    @property
-    def min_power_level(self) -> PowerLevel | None:
-        """Return minimum power level."""
-        power_level = self.data.get("minPowerlevel")
-        if power_level is not None:
-            return PowerLevel(power_level)
-        return None
-
-    @property
-    def failed_pings_controller(self) -> int | None:
-        """Return number of failed pings to controller."""
-        return self.data.get("failedPingsController")
-
-    @property
-    def snr_margin(self) -> int | None:
-        """Return SNR margin."""
-        return self.data.get("snrMargin")
+    def __post_init__(self) -> None:
+        """Post initialize."""
+        self.latency = self.data["latency"]
+        self.num_neighbors = self.data["numNeighbors"]
+        self.failed_pings_node = self.data["failedPingsNode"]
+        self.route_changes = self.data.get("routeChanges")
+        if (min_power_level := self.data.get("minPowerlevel")) is not None:
+            self.min_power_level = PowerLevel(min_power_level)
+        self.failed_pings_controller = self.data.get("failedPingsController")
+        self.snr_margin = self.data.get("snrMargin")
 
 
+@dataclass
 class LifelineHealthCheckSummary:
     """Represent a lifeline health check summary update."""
 
-    def __init__(self, data: LifelineHealthCheckSummaryDataType) -> None:
-        """Initialize lifeline health check summary."""
-        self._rating = data["rating"]
-        self._results = [LifelineHealthCheckResult(r) for r in data.get("results", [])]
+    data: LifelineHealthCheckSummaryDataType
+    rating: int = field(init=False)
+    results: list[LifelineHealthCheckResult] = field(init=False)
 
-    @property
-    def rating(self) -> int:
-        """Return rating."""
-        return self._rating
-
-    @property
-    def results(self) -> list[LifelineHealthCheckResult]:
-        """Return lifeline health check results."""
-        return self._results
+    def __post_init__(self) -> None:
+        """Post initialize."""
+        self.rating = self.data["rating"]
+        self.results = [
+            LifelineHealthCheckResult(r) for r in self.data.get("results", [])
+        ]
 
 
 class RouteHealthCheckResultDataType(TypedDict, total=False):
@@ -113,67 +89,42 @@ class RouteHealthCheckSummaryDataType(TypedDict):
     rating: int
 
 
+@dataclass
 class RouteHealthCheckResult:
     """Represent a route health check result."""
 
-    def __init__(self, data: RouteHealthCheckResultDataType) -> None:
-        """Initialize route health check result."""
-        self.data = data
+    data: RouteHealthCheckResultDataType
+    num_neighbors: int = field(init=False)
+    rating: int = field(init=False)
+    failed_pings_to_target: int | None = field(init=False)
+    failed_pings_to_source: int | None = field(init=False)
+    min_power_level_source: PowerLevel | None = field(init=False, default=None)
+    min_power_level_target: PowerLevel | None = field(init=False, default=None)
 
-    @property
-    def num_neighbors(self) -> int:
-        """Return number of neighbors."""
-        return self.data["numNeighbors"]
-
-    @property
-    def rating(self) -> int:
-        """Return rating."""
-        return self.data["rating"]
-
-    @property
-    def failed_pings_to_target(self) -> int | None:
-        """Return number of failed pings to target."""
-        return self.data.get("failedPingsToTarget")
-
-    @property
-    def failed_pings_to_source(self) -> int | None:
-        """Return number of failed pings to source."""
-        return self.data.get("failedPingsToSource")
-
-    @property
-    def min_power_level_source(self) -> PowerLevel | None:
-        """Return minimum power level source."""
-        power_level = self.data.get("minPowerlevelSource")
-        if power_level is not None:
-            return PowerLevel(power_level)
-        return None
-
-    @property
-    def min_power_level_target(self) -> PowerLevel | None:
-        """Return minimum power level target."""
-        power_level = self.data.get("minPowerlevelTarget")
-        if power_level is not None:
-            return PowerLevel(power_level)
-        return None
+    def __post_init__(self) -> None:
+        """Post initialize."""
+        self.num_neighbors = self.data["numNeighbors"]
+        self.rating = self.data["rating"]
+        self.failed_pings_to_target = self.data.get("failedPingsToTarget")
+        self.failed_pings_to_source = self.data.get("failedPingsToSource")
+        if (min_power_level_source := self.data.get("minPowerlevelSource")) is not None:
+            self.min_power_level_source = PowerLevel(min_power_level_source)
+        if (min_power_level_target := self.data.get("minPowerlevelTarget")) is not None:
+            self.min_power_level_target = PowerLevel(min_power_level_target)
 
 
+@dataclass
 class RouteHealthCheckSummary:
     """Represent a route health check summary update."""
 
-    def __init__(self, data: RouteHealthCheckSummaryDataType) -> None:
-        """Initialize route health check summary."""
-        self._rating = data["rating"]
-        self._results = [RouteHealthCheckResult(r) for r in data.get("results", [])]
+    data: RouteHealthCheckSummaryDataType
+    rating: int = field(init=False)
+    results: list[RouteHealthCheckResult] = field(init=False)
 
-    @property
-    def rating(self) -> int:
-        """Return rating."""
-        return self._rating
-
-    @property
-    def results(self) -> list[RouteHealthCheckResult]:
-        """Return route health check results."""
-        return self._results
+    def __post_init__(self) -> None:
+        """Post initialize."""
+        self.rating = self.data["rating"]
+        self.results = [RouteHealthCheckResult(r) for r in self.data.get("results", [])]
 
 
 @dataclass

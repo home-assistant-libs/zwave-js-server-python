@@ -1,7 +1,7 @@
 """Provide a model for Z-Wave firmware."""
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from enum import IntEnum
 from typing import TYPE_CHECKING, TypedDict, cast
 
@@ -61,17 +61,16 @@ class NodeFirmwareUpdateCapabilitiesDict(TypedDict, total=False):
     supports_activation: bool | None
 
 
+@dataclass
 class NodeFirmwareUpdateCapabilities:
     """Model for firmware update capabilities."""
 
-    def __init__(self, data: NodeFirmwareUpdateCapabilitiesDataType) -> None:
-        """Initialize class."""
-        self.data = data
+    data: NodeFirmwareUpdateCapabilitiesDataType
+    firmware_upgradable: bool = field(init=False)
 
-    @property
-    def firmware_upgradable(self) -> bool:
-        """Return whether firmware is upgradable."""
-        return self.data["firmwareUpgradable"]
+    def __post_init__(self) -> None:
+        """Post initialize."""
+        self.firmware_upgradable = self.data["firmwareUpgradable"]
 
     @property
     def firmware_targets(self) -> list[int]:
@@ -143,38 +142,25 @@ class NodeFirmwareUpdateProgressDataType(TypedDict):
     progress: float
 
 
+@dataclass
 class NodeFirmwareUpdateProgress:
     """Model for a node firmware update progress data."""
 
-    def __init__(self, node: "Node", data: NodeFirmwareUpdateProgressDataType) -> None:
-        """Initialize."""
-        self.data = data
-        self.node = node
+    node: "Node"
+    data: NodeFirmwareUpdateProgressDataType
+    current_file: int = field(init=False)
+    total_files: int = field(init=False)
+    sent_fragments: int = field(init=False)
+    total_fragments: int = field(init=False)
+    progress: float = field(init=False)
 
-    @property
-    def current_file(self) -> int:
-        """Return current file."""
-        return self.data["currentFile"]
-
-    @property
-    def total_files(self) -> int:
-        """Return total files."""
-        return self.data["totalFiles"]
-
-    @property
-    def sent_fragments(self) -> int:
-        """Return the number of fragments sent to the device so far."""
-        return self.data["sentFragments"]
-
-    @property
-    def total_fragments(self) -> int:
-        """Return the total number of fragments that need to be sent to the device."""
-        return self.data["totalFragments"]
-
-    @property
-    def progress(self) -> float:
-        """Return progress."""
-        return float(self.data["progress"])
+    def __post_init__(self) -> None:
+        """Post initialize."""
+        self.current_file = self.data["currentFile"]
+        self.total_files = self.data["totalFiles"]
+        self.sent_fragments = self.data["sentFragments"]
+        self.total_fragments = self.data["totalFragments"]
+        self.progress = float(self.data["progress"])
 
 
 class NodeFirmwareUpdateResultDataType(TypedDict, total=False):
@@ -186,33 +172,23 @@ class NodeFirmwareUpdateResultDataType(TypedDict, total=False):
     reInterview: bool  # required
 
 
+@dataclass
 class NodeFirmwareUpdateResult:
     """Model for node firmware update result data."""
 
-    def __init__(self, node: "Node", data: NodeFirmwareUpdateResultDataType) -> None:
-        """Initialize."""
-        self.data = data
-        self.node = node
+    node: "Node"
+    data: NodeFirmwareUpdateResultDataType
+    status: NodeFirmwareUpdateStatus = field(init=False)
+    success: bool = field(init=False)
+    wait_time: int | None = field(init=False)
+    reinterview: bool = field(init=False)
 
-    @property
-    def status(self) -> NodeFirmwareUpdateStatus:
-        """Return the firmware update status."""
-        return NodeFirmwareUpdateStatus(self.data["status"])
-
-    @property
-    def success(self) -> bool:
-        """Return whether the firmware update was successful."""
-        return self.data["success"]
-
-    @property
-    def wait_time(self) -> int | None:
-        """Return the wait time in seconds before the device is functional again."""
-        return self.data.get("waitTime")
-
-    @property
-    def reinterview(self) -> bool:
-        """Return whether the node will be re-interviewed."""
-        return self.data["reInterview"]
+    def __post_init__(self) -> None:
+        """Post initialize."""
+        self.status = NodeFirmwareUpdateStatus(self.data["status"])
+        self.success = self.data["success"]
+        self.wait_time = self.data.get("waitTime")
+        self.reinterview = self.data["reInterview"]
 
 
 class NodeFirmwareUpdateFileInfoDataType(TypedDict):

@@ -1,6 +1,7 @@
 """Provide a model for the Z-Wave JS node's statistics."""
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, TypedDict
 
 from zwave_js_server.exceptions import RssiErrorReceived
@@ -27,67 +28,40 @@ class NodeStatisticsDataType(TypedDict, total=False):
     nlwr: RouteStatisticsDataType
 
 
+@dataclass
 class NodeStatistics:
     """Represent a node statistics update."""
 
-    def __init__(self, client: "Client", data: NodeStatisticsDataType | None) -> None:
-        """Initialize node statistics."""
-        self.data = data or NodeStatisticsDataType(
+    client: "Client"
+    data: NodeStatisticsDataType | None = None
+    commands_tx: int = field(init=False)
+    commands_rx: int = field(init=False)
+    commands_dropped_rx: int = field(init=False)
+    commands_dropped_tx: int = field(init=False)
+    timeout_response: int = field(init=False)
+    rtt: int | None = field(init=False)
+    lwr: RouteStatistics | None = field(init=False, default=None)
+    nlwr: RouteStatistics | None = field(init=False, default=None)
+
+    def __post_init__(self) -> None:
+        """Post initialize."""
+        data = self.data or NodeStatisticsDataType(
             commandsDroppedRX=0,
             commandsDroppedTX=0,
             commandsRX=0,
             commandsTX=0,
             timeoutResponse=0,
         )
-        self.client = client
-        self._lwr = None
-        if lwr := self.data.get("lwr"):
-            self._lwr = RouteStatistics(client, lwr)
-        self._nlwr = None
-        if nlwr := self.data.get("nlwr"):
-            self._nlwr = RouteStatistics(client, nlwr)
-
-    @property
-    def commands_tx(self) -> int:
-        """Return number of commands successfully sent to node."""
-        return self.data["commandsTX"]
-
-    @property
-    def commands_rx(self) -> int:
-        """
-        Return number of commands received from node.
-
-        Includes responses to sent commands.
-        """
-        return self.data["commandsRX"]
-
-    @property
-    def commands_dropped_rx(self) -> int:
-        """Return number of commands from node that were dropped by host."""
-        return self.data["commandsDroppedRX"]
-
-    @property
-    def commands_dropped_tx(self) -> int:
-        """
-        Return number of outgoing commands that were dropped.
-
-        These commands could not be sent.
-        """
-        return self.data["commandsDroppedTX"]
-
-    @property
-    def timeout_response(self) -> int:
-        """Return number of Get-type cmds where node's response didn't come in time."""
-        return self.data["timeoutResponse"]
-
-    @property
-    def rtt(self) -> int | None:
-        """
-        Return average round trip time (RTT) to this node in milliseconds.
-
-        Consecutive measurements are combined using an exponential moving average.
-        """
-        return self.data.get("rtt")
+        self.commands_tx = data["commandsTX"]
+        self.commands_rx = data["commandsRX"]
+        self.commands_dropped_rx = data["commandsDroppedRX"]
+        self.commands_dropped_tx = data["commandsDroppedTX"]
+        self.timeout_response = data["timeoutResponse"]
+        self.rtt = data.get("rtt")
+        if lwr := data.get("lwr"):
+            self.lwr = RouteStatistics(self.client, lwr)
+        if nlwr := data.get("nlwr"):
+            self.nlwr = RouteStatistics(self.client, nlwr)
 
     @property
     def rssi(self) -> int | None:
@@ -97,18 +71,8 @@ class NodeStatistics:
         Consecutive non-error measurements are combined using an exponential moving
         average.
         """
-        if (rssi_ := self.data.get("rssi")) is None:
+        if not self.data or (rssi_ := self.data.get("rssi")) is None:
             return None
         if rssi_ in [item.value for item in RssiError]:
             raise RssiErrorReceived(RssiError(rssi_))
         return rssi_
-
-    @property
-    def lwr(self) -> RouteStatistics | None:
-        """Return last working route from the controller to this node."""
-        return self._lwr
-
-    @property
-    def nlwr(self) -> RouteStatistics | None:
-        """Return next to last working route from the controller to this node."""
-        return self._nlwr
