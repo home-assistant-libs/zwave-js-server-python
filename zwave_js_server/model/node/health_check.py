@@ -37,7 +37,7 @@ class LifelineHealthCheckResult:
     num_neighbors: int = field(init=False)
     failed_pings_node: int = field(init=False)
     route_changes: int | None = field(init=False)
-    min_power_level: PowerLevel | None = field(init=False)
+    min_power_level: PowerLevel | None = field(init=False, default=None)
     failed_pings_controller: int | None = field(init=False)
     snr_margin: int | None = field(init=False)
 
@@ -47,11 +47,8 @@ class LifelineHealthCheckResult:
         self.num_neighbors = self.data["numNeighbors"]
         self.failed_pings_node = self.data["failedPingsNode"]
         self.route_changes = self.data.get("routeChanges")
-        self.min_power_level = (
-            PowerLevel(self.data["minPowerlevel"])
-            if "minPowerlevel" in self.data
-            else None
-        )
+        if (min_power_level := self.data.get("minPowerlevel")) is not None:
+            self.min_power_level = PowerLevel(min_power_level)
         self.failed_pings_controller = self.data.get("failedPingsController")
         self.snr_margin = self.data.get("snrMargin")
 
@@ -101,8 +98,8 @@ class RouteHealthCheckResult:
     rating: int = field(init=False)
     failed_pings_to_target: int | None = field(init=False)
     failed_pings_to_source: int | None = field(init=False)
-    min_power_level_source: PowerLevel | None = field(init=False)
-    min_power_level_target: PowerLevel | None = field(init=False)
+    min_power_level_source: PowerLevel | None = field(init=False, default=None)
+    min_power_level_target: PowerLevel | None = field(init=False, default=None)
 
     def __post_init__(self) -> None:
         """Post initialize."""
@@ -110,16 +107,10 @@ class RouteHealthCheckResult:
         self.rating = self.data["rating"]
         self.failed_pings_to_target = self.data.get("failedPingsToTarget")
         self.failed_pings_to_source = self.data.get("failedPingsToSource")
-        self.min_power_level_source = (
-            PowerLevel(self.data["minPowerlevelSource"])
-            if "minPowerlevelSource" in self.data
-            else None
-        )
-        self.min_power_level_target = (
-            PowerLevel(self.data["minPowerlevelTarget"])
-            if "minPowerlevelTarget" in self.data
-            else None
-        )
+        if (min_power_level_source := self.data.get("minPowerlevelSource")) is not None:
+            self.min_power_level_source = PowerLevel(min_power_level_source)
+        if (min_power_level_target := self.data.get("minPowerlevelTarget")) is not None:
+            self.min_power_level_target = PowerLevel(min_power_level_target)
 
 
 @dataclass

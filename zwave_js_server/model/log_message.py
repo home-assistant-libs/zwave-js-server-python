@@ -38,7 +38,7 @@ class LogMessageContext:
     )
     internal: bool | None = field(init=False)
     endpoint: int | None = field(init=False)
-    command_class: CommandClass | None = field(init=False)
+    command_class: CommandClass | None = field(init=False, default=None)
     property_: int | str | None = field(init=False)
     property_key: int | str | None = field(init=False)
 
@@ -52,11 +52,8 @@ class LogMessageContext:
         self.change = self.data.get("change")
         self.internal = self.data.get("internal")
         self.endpoint = self.data.get("endpoint")
-        self.command_class = (
-            CommandClass(self.data["commandClass"])
-            if "commandClass" in self.data
-            else None
-        )
+        if (command_class := self.data.get("commandClass")) is not None:
+            self.command_class = CommandClass(command_class)
         self.property_ = self.data.get("property")
         self.property_key = self.data.get("propertyKey")
 
