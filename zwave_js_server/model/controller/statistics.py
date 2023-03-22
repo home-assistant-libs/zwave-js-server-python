@@ -192,7 +192,7 @@ class ControllerStatistics:
         return self.data["timeoutCallback"]
 
     @property
-    def background_rssi(self) -> Optional[BackgroundRSSIDataType]:
+    def background_rssi(self) -> Optional[BackgroundRSSI]:
         """Return background RSSI data."""
         if not (background_rssi := self.data.get("backgroundRSSI")):
             return None
