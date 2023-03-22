@@ -21,27 +21,15 @@ class ControllerLifelineRoutesDataType(TypedDict):
 class ControllerLifelineRoutes:
     """Represent controller lifeline routes."""
 
-    def __init__(
-        self, client: "Client", data: ControllerLifelineRoutesDataType
-    ) -> None:
-        """Initialize controller lifeline routes."""
-        self.data = data
-        self._lwr = None
-        if lwr := self.data.get("lwr"):
-            self._lwr = RouteStatistics(client, lwr)
-        self._nlwr = None
-        if nlwr := self.data.get("nlwr"):
-            self._nlwr = RouteStatistics(client, nlwr)
+    client: "Client"
+    data: ControllerLifelineRoutesDataType
+    lwr: RouteStatistics | None = field(init=False)
+    nlwr: RouteStatistics | None = field(init=False)
 
-    @property
-    def lwr(self) -> RouteStatistics | None:
-        """Return the last working route from the controller to this node."""
-        return self._lwr
-
-    @property
-    def nlwr(self) -> RouteStatistics | None:
-        """Return the next to last working route from the controller to this node."""
-        return self._nlwr
+    def __post_init__(self) -> None:
+        """Post initialize."""
+        self.lwr = RouteStatistics(self.client, self.data["lwr"])
+        self.nlwr = RouteStatistics(self.client, self.data["nlwr"])
 
 
 class ChannelRSSIDataType(TypedDict):
@@ -112,12 +100,25 @@ class BackgroundRSSI:
         self.channel_2 = ChannelRSSI(channel_2)
 
 
+@dataclass
 class ControllerStatistics:
     """Represent a controller statistics update."""
 
-    def __init__(self, data: ControllerStatisticsDataType | None = None) -> None:
-        """Initialize controller statistics."""
-        self.data = data or ControllerStatisticsDataType(
+    data: ControllerStatisticsDataType | None = None
+    messages_tx: int = field(init=False)
+    messages_rx: int = field(init=False)
+    messages_dropped_rx: int = field(init=False)
+    messages_dropped_tx: int = field(init=False)
+    nak: int = field(init=False)
+    can: int = field(init=False)
+    timeout_ack: int = field(init=False)
+    timeout_response: int = field(init=False)
+    timeout_callback: int = field(init=False)
+    background_rssi: BackgroundRSSI | None = field(init=False)
+
+    def __post_init__(self) -> None:
+        """Post initialize."""
+        data = self.data or ControllerStatisticsDataType(
             CAN=0,
             messagesDroppedRX=0,
             messagesDroppedTX=0,
@@ -128,59 +129,16 @@ class ControllerStatistics:
             timeoutCallback=0,
             timeoutResponse=0,
         )
-
-    @property
-    def messages_tx(self) -> int:
-        """Return number of messages successfully sent to controller."""
-        return self.data["messagesTX"]
-
-    @property
-    def messages_rx(self) -> int:
-        """Return number of messages received by controller."""
-        return self.data["messagesRX"]
-
-    @property
-    def messages_dropped_rx(self) -> int:
-        """Return number of messages from controller that were dropped by host."""
-        return self.data["messagesDroppedRX"]
-
-    @property
-    def messages_dropped_tx(self) -> int:
-        """
-        Return number of outgoing messages that were dropped.
-
-        These messages could not be sent.
-        """
-        return self.data["messagesDroppedTX"]
-
-    @property
-    def nak(self) -> int:
-        """Return number of messages that controller did not accept."""
-        return self.data["NAK"]
-
-    @property
-    def can(self) -> int:
-        """Return number of collisions while sending a message to controller."""
-        return self.data["CAN"]
-
-    @property
-    def timeout_ack(self) -> int:
-        """Return number of transmission attempts without an ACK from controller."""
-        return self.data["timeoutACK"]
-
-    @property
-    def timeout_response(self) -> int:
-        """Return number of transmission attempts where controller response timed out."""
-        return self.data["timeoutResponse"]
-
-    @property
-    def timeout_callback(self) -> int:
-        """Return number of transmission attempts where controller callback timed out."""
-        return self.data["timeoutCallback"]
-
-    @property
-    def background_rssi(self) -> BackgroundRSSI | None:
-        """Return background RSSI data."""
-        if not (background_rssi := self.data.get("backgroundRSSI")):
-            return None
-        return BackgroundRSSI(background_rssi)
+        self.messages_tx = data["messagesTX"]
+        self.messages_rx = data["messagesRX"]
+        self.messages_dropped_rx = data["messagesDroppedRX"]
+        self.messages_dropped_tx = data["messagesDroppedTX"]
+        self.nak = data["NAK"]
+        self.can = data["CAN"]
+        self.timeout_ack = data["timeoutACK"]
+        self.timeout_response = data["timeoutResponse"]
+        self.timeout_callback = data["timeoutCallback"]
+        if not (background_rssi := data.get("backgroundRSSI")):
+            self.background_rssi = None
+            return
+        self.background_rssi = BackgroundRSSI(background_rssi)
