@@ -1,5 +1,7 @@
 """Provide a model for the Z-Wave JS Driver."""
-from typing import TYPE_CHECKING, Any, Literal, Optional, Union, cast
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from pydantic import create_model_from_typeddict
 
@@ -50,7 +52,7 @@ class CheckConfigUpdates:
         """Initialize class."""
         self.installed_version: str = data["installedVersion"]
         self.update_available: bool = data["updateAvailable"]
-        self.new_version: Optional[str] = data.get("newVersion")
+        self.new_version: str | None = data.get("newVersion")
 
 
 class Driver(EventBase):
@@ -88,7 +90,7 @@ class Driver(EventBase):
         self.emit(event.type, event.data)
 
     async def _async_send_command(
-        self, command: str, require_schema: Optional[int] = None, **kwargs: Any
+        self, command: str, require_schema: int | None = None, **kwargs: Any
     ) -> dict:
         """Send a driver command. For internal use only."""
         return await self.client.async_send_command(
@@ -155,7 +157,7 @@ class Driver(EventBase):
         return cast(bool, result["success"])
 
     async def async_set_preferred_scales(
-        self, scales: dict[Union[str, int], Union[str, int]]
+        self, scales: dict[str | int, str | int]
     ) -> None:
         """Send command to set preferred sensor scales."""
         await self._async_send_command(

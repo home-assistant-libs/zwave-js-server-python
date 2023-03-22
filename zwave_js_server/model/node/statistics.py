@@ -1,5 +1,7 @@
 """Provide a model for the Z-Wave JS node's statistics."""
-from typing import TYPE_CHECKING, Optional, TypedDict
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, TypedDict
 
 from zwave_js_server.exceptions import RssiErrorReceived
 
@@ -28,9 +30,7 @@ class NodeStatisticsDataType(TypedDict, total=False):
 class NodeStatistics:
     """Represent a node statistics update."""
 
-    def __init__(
-        self, client: "Client", data: Optional[NodeStatisticsDataType]
-    ) -> None:
+    def __init__(self, client: "Client", data: NodeStatisticsDataType | None) -> None:
         """Initialize node statistics."""
         self.data = data or NodeStatisticsDataType(
             commandsDroppedRX=0,
@@ -81,7 +81,7 @@ class NodeStatistics:
         return self.data["timeoutResponse"]
 
     @property
-    def rtt(self) -> Optional[int]:
+    def rtt(self) -> int | None:
         """
         Return average round trip time (RTT) to this node in milliseconds.
 
@@ -90,7 +90,7 @@ class NodeStatistics:
         return self.data.get("rtt")
 
     @property
-    def rssi(self) -> Optional[int]:
+    def rssi(self) -> int | None:
         """
         Return average RSSI of frames received by this node.
 
@@ -104,11 +104,11 @@ class NodeStatistics:
         return rssi_
 
     @property
-    def lwr(self) -> Optional[RouteStatistics]:
+    def lwr(self) -> RouteStatistics | None:
         """Return last working route from the controller to this node."""
         return self._lwr
 
     @property
-    def nlwr(self) -> Optional[RouteStatistics]:
+    def nlwr(self) -> RouteStatistics | None:
         """Return next to last working route from the controller to this node."""
         return self._nlwr

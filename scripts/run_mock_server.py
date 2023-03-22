@@ -1,11 +1,13 @@
 """Run a mock zwave-js-server instance off of a network state dump."""
+from __future__ import annotations
+
 import argparse
 import asyncio
 import json
 import logging
 from collections import defaultdict
 from collections.abc import Hashable
-from typing import Any, Optional, Union
+from typing import Any
 
 from aiohttp import WSMsgType, web, web_request
 
@@ -58,7 +60,7 @@ class MockZwaveJsServer:
                 web.post("/replay", self.replay_handler),
             ]
         )
-        self.primary_ws_resp: Optional[web.WebSocketResponse] = None
+        self.primary_ws_resp: web.WebSocketResponse | None = None
         self.events_to_replay = events_to_replay
         self.command_results = command_results
 
@@ -77,9 +79,7 @@ class MockZwaveJsServer:
         await self.send_json({**data, "messageId": message_id})
 
     async def send_success_command_result(
-        self,
-        result: Optional[dict],
-        message_id: str,
+        self, result: dict | None, message_id: str
     ) -> None:
         """Send success message."""
         if result is None:
@@ -194,7 +194,7 @@ class MockZwaveJsServer:
         return web.Response(status=200)
 
 
-def _hashable_value(item: Union[dict, list, Hashable]) -> Union[tuple, list, Hashable]:
+def _hashable_value(item: dict | list | Hashable) -> tuple | list | Hashable:
     """Return hashable value from item."""
     if isinstance(item, dict):
         return make_dict_hashable(item)

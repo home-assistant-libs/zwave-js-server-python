@@ -1,6 +1,8 @@
 """Provide a model for the Z-Wave JS node's health checks and power tests."""
+from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import Optional, TypedDict
+from typing import TypedDict
 
 from ...const import PowerLevel
 
@@ -49,12 +51,12 @@ class LifelineHealthCheckResult:
         return self.data["failedPingsNode"]
 
     @property
-    def route_changes(self) -> Optional[int]:
+    def route_changes(self) -> int | None:
         """Return number of route changes."""
         return self.data.get("routeChanges")
 
     @property
-    def min_power_level(self) -> Optional[PowerLevel]:
+    def min_power_level(self) -> PowerLevel | None:
         """Return minimum power level."""
         power_level = self.data.get("minPowerlevel")
         if power_level is not None:
@@ -62,12 +64,12 @@ class LifelineHealthCheckResult:
         return None
 
     @property
-    def failed_pings_controller(self) -> Optional[int]:
+    def failed_pings_controller(self) -> int | None:
         """Return number of failed pings to controller."""
         return self.data.get("failedPingsController")
 
     @property
-    def snr_margin(self) -> Optional[int]:
+    def snr_margin(self) -> int | None:
         """Return SNR margin."""
         return self.data.get("snrMargin")
 
@@ -129,17 +131,17 @@ class RouteHealthCheckResult:
         return self.data["rating"]
 
     @property
-    def failed_pings_to_target(self) -> Optional[int]:
+    def failed_pings_to_target(self) -> int | None:
         """Return number of failed pings to target."""
         return self.data.get("failedPingsToTarget")
 
     @property
-    def failed_pings_to_source(self) -> Optional[int]:
+    def failed_pings_to_source(self) -> int | None:
         """Return number of failed pings to source."""
         return self.data.get("failedPingsToSource")
 
     @property
-    def min_power_level_source(self) -> Optional[PowerLevel]:
+    def min_power_level_source(self) -> PowerLevel | None:
         """Return minimum power level source."""
         power_level = self.data.get("minPowerlevelSource")
         if power_level is not None:
@@ -147,7 +149,7 @@ class RouteHealthCheckResult:
         return None
 
     @property
-    def min_power_level_target(self) -> Optional[PowerLevel]:
+    def min_power_level_target(self) -> PowerLevel | None:
         """Return minimum power level target."""
         power_level = self.data.get("minPowerlevelTarget")
         if power_level is not None:

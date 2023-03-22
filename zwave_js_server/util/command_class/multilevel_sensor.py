@@ -1,4 +1,6 @@
 """Multilevel Sensor Command Class specific utility functions for values."""
+from __future__ import annotations
+
 from ...const import CommandClass
 from ...const.command_class.multilevel_sensor import (
     CC_SPECIFIC_SCALE,

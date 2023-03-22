@@ -1,4 +1,6 @@
 """Constants for the Z-Wave JS python library."""
+from __future__ import annotations
+
 from enum import Enum, IntEnum
 from importlib import metadata
 

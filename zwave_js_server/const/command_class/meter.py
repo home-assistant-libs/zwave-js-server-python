@@ -1,4 +1,6 @@
 """Constants for Meter CC."""
+from __future__ import annotations
+
 from enum import IntEnum
 
 VALUE_PROPERTY = "value"

@@ -3,8 +3,9 @@ Model for a Zwave Node's Notification Event.
 
 https://zwave-js.github.io/node-zwave-js/#/api/node?id=quotnotificationquot
 """
+from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal, Optional, TypedDict, Union
+from typing import TYPE_CHECKING, Any, Literal, TypedDict
 
 from ..const.command_class.multilevel_switch import MultilevelSwitchCommand
 from ..const.command_class.power_level import PowerLevelTestStatus
@@ -30,7 +31,7 @@ class EntryControlNotificationArgsDataType(TypedDict, total=False):
     eventTypeLabel: str  # required
     dataType: int  # required
     dataTypeLabel: str  # required
-    eventData: Union[str, dict[str, Any]]
+    eventData: str | dict[str, Any]
 
 
 class EntryControlNotificationDataType(BaseNotificationDataType):
@@ -78,7 +79,7 @@ class EntryControlNotification:
         return self.data["args"]["dataTypeLabel"]
 
     @property
-    def event_data(self) -> Optional[str]:
+    def event_data(self) -> str | None:
         """Return event data property."""
         if event_data := self.data["args"].get("eventData"):
             return parse_buffer(event_data)
@@ -238,7 +239,7 @@ class MultilevelSwitchNotification:
         return self.data["args"]["eventTypeLabel"]
 
     @property
-    def direction(self) -> Optional[str]:
+    def direction(self) -> str | None:
         """Return direction property."""
         if direction := self.data["args"].get("direction"):
             return direction

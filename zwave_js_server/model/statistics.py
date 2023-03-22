@@ -1,6 +1,8 @@
 """Common models for statistics."""
+from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Optional, TypedDict
+from typing import TYPE_CHECKING, TypedDict
 
 from zwave_js_server.exceptions import RepeaterRssiErrorReceived, RssiErrorReceived
 
@@ -26,9 +28,9 @@ class RouteStatisticsDict(TypedDict):
 
     protocol_data_rate: int
     repeaters: list["Node"]
-    rssi: Optional[int]
+    rssi: int | None
     repeater_rssi: list[int]
-    route_failed_between: Optional[tuple["Node", "Node"]]
+    route_failed_between: tuple["Node", "Node"] | None
 
 
 @dataclass
@@ -55,7 +57,7 @@ class RouteStatistics:
         ]
 
     @property
-    def rssi(self) -> Optional[int]:
+    def rssi(self) -> int | None:
         """Return RSSI."""
         if (rssi := self.data.get("rssi")) is None:
             return None
@@ -74,7 +76,7 @@ class RouteStatistics:
         return repeater_rssi
 
     @property
-    def route_failed_between(self) -> Optional[tuple["Node", "Node"]]:
+    def route_failed_between(self) -> tuple["Node", "Node"] | None:
         """Return route failed between."""
         if (node_ids := self.data.get("routeFailedBetween")) is None:
             return None

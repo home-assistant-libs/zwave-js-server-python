@@ -3,6 +3,7 @@ Model for a Zwave Node's device class.
 
 https://zwave-js.github.io/node-zwave-js/#/api/node?id=deviceclass
 """
+from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import TypedDict

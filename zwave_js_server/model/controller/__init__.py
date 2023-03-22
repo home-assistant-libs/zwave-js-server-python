@@ -1,6 +1,8 @@
 """Provide a model for the Z-Wave JS controller."""
+from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Literal, Optional, Union, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from zwave_js_server.model.node.firmware import (
     NodeFirmwareUpdateFileInfo,
@@ -51,11 +53,9 @@ class Controller(EventBase):
         super().__init__()
         self.client = client
         self.nodes: dict[int, Node] = {}
-        self._heal_network_progress: Optional[dict[int, str]] = None
+        self._heal_network_progress: dict[int, str] | None = None
         self._statistics = ControllerStatistics()
-        self._firmware_update_progress: Optional[
-            ControllerFirmwareUpdateProgress
-        ] = None
+        self._firmware_update_progress: ControllerFirmwareUpdateProgress | None = None
         for node_state in state["nodes"]:
             node = Node(client, node_state)
             self.nodes[node.node_id] = node
@@ -76,81 +76,81 @@ class Controller(EventBase):
         return self.home_id == other.home_id
 
     @property
-    def sdk_version(self) -> Optional[str]:
+    def sdk_version(self) -> str | None:
         """Return sdk_version."""
         return self.data.get("sdkVersion")
 
     @property
-    def controller_type(self) -> Optional[int]:
+    def controller_type(self) -> int | None:
         """Return controller_type."""
         return self.data.get("type")
 
     @property
-    def home_id(self) -> Optional[int]:
+    def home_id(self) -> int | None:
         """Return home_id."""
         return self.data.get("homeId")
 
     @property
-    def own_node_id(self) -> Optional[int]:
+    def own_node_id(self) -> int | None:
         """Return own_node_id."""
         return self.data.get("ownNodeId")
 
     @property
-    def own_node(self) -> Optional[Node]:
+    def own_node(self) -> Node | None:
         """Return own_node."""
         if self.own_node_id is None:
             return None
         return self.nodes.get(self.own_node_id)
 
     @property
-    def is_primary(self) -> Optional[bool]:
+    def is_primary(self) -> bool | None:
         """Return is_primary."""
         return self.data.get("isPrimary")
 
     @property
-    def is_using_home_id_from_other_network(self) -> Optional[bool]:
+    def is_using_home_id_from_other_network(self) -> bool | None:
         """Return is_using_home_id_from_other_network."""
         return self.data.get("isUsingHomeIdFromOtherNetwork")
 
     @property
-    def is_SIS_present(self) -> Optional[bool]:  # pylint: disable=invalid-name
+    def is_SIS_present(self) -> bool | None:  # pylint: disable=invalid-name
         """Return is_SIS_present."""
         return self.data.get("isSISPresent")
 
     @property
-    def was_real_primary(self) -> Optional[bool]:
+    def was_real_primary(self) -> bool | None:
         """Return was_real_primary."""
         return self.data.get("wasRealPrimary")
 
     @property
-    def is_suc(self) -> Optional[bool]:
+    def is_suc(self) -> bool | None:
         """Return is_suc."""
         return self.data.get("isSUC")
 
     @property
-    def node_type(self) -> Optional[NodeType]:
+    def node_type(self) -> NodeType | None:
         """Return node_type."""
         if (node_type := self.data.get("nodeType")) is not None:
             return NodeType(node_type)
         return None
 
     @property
-    def firmware_version(self) -> Optional[str]:
+    def firmware_version(self) -> str | None:
         """Return firmware_version."""
         return self.data.get("firmwareVersion")
 
     @property
-    def manufacturer_id(self) -> Optional[int]:
+    def manufacturer_id(self) -> int | None:
         """Return manufacturer_id."""
         return self.data.get("manufacturerId")
 
     @property
-    def product_type(self) -> Optional[int]:
+    def product_type(self) -> int | None:
         """Return product_type."""
         return self.data.get("productType")
 
     @property
-    def product_id(self) -> Optional[int]:
+    def product_id(self) -> int | None:
         """Return product_id."""
         return self.data.get("productId")
 
@@ -160,17 +160,17 @@ class Controller(EventBase):
         return self.data.get("supportedFunctionTypes", [])
 
     @property
-    def suc_node_id(self) -> Optional[int]:
+    def suc_node_id(self) -> int | None:
         """Return suc_node_id."""
         return self.data.get("sucNodeId")
 
     @property
-    def supports_timers(self) -> Optional[bool]:
+    def supports_timers(self) -> bool | None:
         """Return supports_timers."""
         return self.data.get("supportsTimers")
 
     @property
-    def is_heal_network_active(self) -> Optional[bool]:
+    def is_heal_network_active(self) -> bool | None:
         """Return is_heal_network_active."""
         return self.data.get("isHealNetworkActive")
 
@@ -180,7 +180,7 @@ class Controller(EventBase):
         return self._statistics
 
     @property
-    def heal_network_progress(self) -> Optional[dict[int, str]]:
+    def heal_network_progress(self) -> dict[int, str] | None:
         """Return heal network progress state."""
         return self._heal_network_progress
 
@@ -190,14 +190,14 @@ class Controller(EventBase):
         return InclusionState(self.data["inclusionState"])
 
     @property
-    def rf_region(self) -> Optional[RFRegion]:
+    def rf_region(self) -> RFRegion | None:
         """Return RF region of controller."""
         if (rf_region := self.data.get("rfRegion")) is None:
             return None
         return RFRegion(rf_region)
 
     @property
-    def firmware_update_progress(self) -> Optional[ControllerFirmwareUpdateProgress]:
+    def firmware_update_progress(self) -> ControllerFirmwareUpdateProgress | None:
         """Return firmware update progress."""
         return self._firmware_update_progress
 
@@ -214,11 +214,9 @@ class Controller(EventBase):
             InclusionStrategy.SECURITY_S2,
             InclusionStrategy.INSECURE,
         ],
-        force_security: Optional[bool] = None,
-        provisioning: Optional[
-            Union[str, ProvisioningEntry, QRProvisioningInformation]
-        ] = None,
-        dsk: Optional[str] = None,
+        force_security: bool | None = None,
+        provisioning: str | ProvisioningEntry | QRProvisioningInformation | None = None,
+        dsk: str | None = None,
     ) -> bool:
         """Send beginInclusion command to Controller."""
         # Most functionality was introduced in Schema 8
@@ -289,7 +287,7 @@ class Controller(EventBase):
 
     async def async_provision_smart_start_node(
         self,
-        provisioning_info: Union[ProvisioningEntry, QRProvisioningInformation, str],
+        provisioning_info: ProvisioningEntry | QRProvisioningInformation | str,
     ) -> None:
         """Send provisionSmartStartNode command to Controller."""
         if (
@@ -310,8 +308,7 @@ class Controller(EventBase):
         )
 
     async def async_unprovision_smart_start_node(
-        self,
-        dsk_or_node_id: Union[str, int],
+        self, dsk_or_node_id: int | str
     ) -> None:
         """Send unprovisionSmartStartNode command to Controller."""
         await self.client.async_send_command(
@@ -323,8 +320,8 @@ class Controller(EventBase):
         )
 
     async def async_get_provisioning_entry(
-        self, dsk_or_node_id: Union[str, int]
-    ) -> Optional[ProvisioningEntry]:
+        self, dsk_or_node_id: int | str
+    ) -> ProvisioningEntry | None:
         """Send getProvisioningEntry command to Controller."""
         data = await self.client.async_send_command(
             {
@@ -355,10 +352,10 @@ class Controller(EventBase):
         return cast(bool, data["success"])
 
     async def async_begin_exclusion(
-        self, strategy: Optional[ExclusionStrategy] = None
+        self, strategy: ExclusionStrategy | None = None
     ) -> bool:
         """Send beginExclusion command to Controller."""
-        payload: dict[str, Union[str, ExclusionStrategy]] = {
+        payload: dict[str, str | ExclusionStrategy] = {
             "command": "controller.begin_exclusion"
         }
         if strategy is not None:
@@ -388,10 +385,8 @@ class Controller(EventBase):
             InclusionStrategy.SECURITY_S2,
             InclusionStrategy.INSECURE,
         ],
-        force_security: Optional[bool] = None,
-        provisioning: Optional[
-            Union[str, ProvisioningEntry, QRProvisioningInformation]
-        ] = None,
+        force_security: bool | None = None,
+        provisioning: str | ProvisioningEntry | QRProvisioningInformation | None = None,
     ) -> bool:
         """Send replaceFailedNode command to Controller."""
         # Most functionality was introduced in Schema 8
@@ -646,7 +641,7 @@ class Controller(EventBase):
             }
         )
 
-    async def async_supports_feature(self, feature: ZwaveFeature) -> Optional[bool]:
+    async def async_supports_feature(self, feature: ZwaveFeature) -> bool | None:
         """
         Send supportsFeature command to Controller.
 
@@ -657,7 +652,7 @@ class Controller(EventBase):
             {"command": "controller.supports_feature", "feature": feature.value},
             require_schema=12,
         )
-        return cast(Optional[bool], data.get("supported"))
+        return cast(bool | None, data.get("supported"))
 
     async def async_get_state(self) -> ControllerDataType:
         """Get controller state."""

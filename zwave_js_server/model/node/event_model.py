@@ -1,5 +1,7 @@
 """Provide a model for the Z-Wave JS node's events."""
-from typing import Literal, Optional, Union
+from __future__ import annotations
+
+from typing import Literal
 
 from pydantic import BaseModel
 
@@ -74,8 +76,8 @@ class InterviewFailedEventArgsModel(BaseModel):
 
     errorMessage: str
     isFinal: bool
-    attempt: Optional[int]
-    maxAttempts: Optional[int]
+    attempt: int | None
+    maxAttempts: int | None
 
 
 class InterviewFailedEventModel(BaseNodeEventModel):
@@ -103,11 +105,11 @@ class NotificationEventModel(BaseNodeEventModel):
 
     event: Literal["notification"]
     ccId: CommandClass
-    args: Union[
-        NotificationNotificationArgsDataType,
-        EntryControlNotificationArgsDataType,
-        PowerLevelNotificationArgsDataType,
-    ]
+    args: (
+        NotificationNotificationArgsDataType
+        | EntryControlNotificationArgsDataType
+        | PowerLevelNotificationArgsDataType
+    )
 
 
 class ReadyEventModel(BaseNodeEventModel):

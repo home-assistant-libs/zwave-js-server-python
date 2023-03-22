@@ -1,6 +1,8 @@
 """Firmware update helper."""
+from __future__ import annotations
+
 import asyncio
-from typing import Optional, cast
+from typing import cast
 
 import aiohttp
 
@@ -15,7 +17,7 @@ async def update_firmware(
     node: Node,
     updates: list[NodeFirmwareUpdateData],
     session: aiohttp.ClientSession,
-    additional_user_agent_components: Optional[dict[str, str]] = None,
+    additional_user_agent_components: dict[str, str] | None = None,
 ) -> bool:
     """Send updateFirmware command to Node."""
     client = Client(
@@ -44,7 +46,7 @@ async def controller_firmware_update_otw(
     url: str,
     firmware_file: ControllerFirmwareUpdateData,
     session: aiohttp.ClientSession,
-    additional_user_agent_components: Optional[dict[str, str]] = None,
+    additional_user_agent_components: dict[str, str] | None = None,
 ) -> bool:
     """
     Send firmwareUpdateOTW command to Controller.

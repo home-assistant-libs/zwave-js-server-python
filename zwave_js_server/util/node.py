@@ -1,7 +1,9 @@
 """Utility functions for Z-Wave JS nodes."""
+from __future__ import annotations
+
 import json
 import logging
-from typing import Optional, Union, cast
+from typing import cast
 
 from ..const import CommandClass, CommandStatus, ConfigurationValueType
 from ..exceptions import (
@@ -26,9 +28,9 @@ def partial_param_bit_shift(property_key: int) -> int:
 
 async def async_set_config_parameter(
     node: Node,
-    new_value: Union[int, str],
-    property_or_property_name: Union[int, str],
-    property_key: Optional[Union[int, str]] = None,
+    new_value: int | str,
+    property_or_property_name: int | str,
+    property_key: int | str | None = None,
 ) -> tuple[ConfigurationValue, CommandStatus]:
     """
     Set a value for a config parameter on this node.
@@ -85,9 +87,7 @@ async def async_set_config_parameter(
 
 
 async def async_bulk_set_partial_config_parameters(
-    node: Node,
-    property_: int,
-    new_value: Union[int, dict[Union[int, str], Union[int, str]]],
+    node: Node, property_: int, new_value: int | dict[int | str, int | str]
 ) -> CommandStatus:
     """Bulk set partial configuration values on this node."""
     config_values = node.get_configuration_values()
@@ -159,7 +159,7 @@ async def async_bulk_set_partial_config_parameters(
 
 
 def _validate_and_transform_new_value(
-    zwave_value: ConfigurationValue, new_value: Union[int, str]
+    zwave_value: ConfigurationValue, new_value: int | str
 ) -> int:
     """Validate a new value and return the integer value to set."""
     # Validate that new value for enumerated configuration parameter is a valid state
@@ -228,9 +228,7 @@ def _validate_and_transform_new_value(
 
 
 def _bulk_set_validate_and_transform_new_value(
-    zwave_value: ConfigurationValue,
-    property_key: int,
-    new_partial_value: Union[int, str],
+    zwave_value: ConfigurationValue, property_key: int, new_partial_value: int | str
 ) -> int:
     """
     Validate and transform new value for a bulk set function call.
@@ -250,7 +248,7 @@ def _get_int_from_partials_dict(
     node: Node,
     partial_param_values: dict[str, ConfigurationValue],
     property_: int,
-    new_value: dict[Union[int, str], Union[int, str]],
+    new_value: dict[int | str, int | str],
 ) -> int:
     """Take an input dict for a set of partial values and compute the raw int value."""
     int_value = 0

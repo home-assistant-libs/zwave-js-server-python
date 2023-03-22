@@ -1,5 +1,7 @@
 """Provide a model for the Z-Wave JS value."""
-from typing import TYPE_CHECKING, Any, Optional, TypedDict, Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, TypedDict
 
 from ..const import VALUE_UNKNOWN, CommandClass, ConfigurationValueType
 from ..event import Event
@@ -33,9 +35,9 @@ class ValueDataType(TypedDict, total=False):
     commandClass: int  # required
     commandClassName: str  # required
     endpoint: int
-    property: Union[str, int]  # required
+    property: int | str  # required
     propertyName: str
-    propertyKey: Union[str, int]
+    propertyKey: int | str
     propertyKeyName: str
     value: Any
     newValue: Any
@@ -44,9 +46,7 @@ class ValueDataType(TypedDict, total=False):
     ccVersion: int
 
 
-def _init_value(
-    node: "Node", val: ValueDataType
-) -> Union["Value", "ConfigurationValue"]:
+def _init_value(node: "Node", val: ValueDataType) -> "Value" | "ConfigurationValue":
     """Initialize a Value object from ValueDataType."""
     if val["commandClass"] == CommandClass.CONFIGURATION:
         return ConfigurationValue(node, val)
@@ -67,9 +67,9 @@ def _get_value_id_str_from_dict(node: "Node", val: ValueDataType) -> str:
 def get_value_id_str(
     node: "Node",
     command_class: int,
-    property_: Union[str, int],
-    endpoint: Optional[int] = None,
-    property_key: Optional[Union[str, int]] = None,
+    property_: int | str,
+    endpoint: int | None = None,
+    property_key: int | str | None = None,
 ) -> str:
     """Return string ID of value."""
     # If endpoint is not provided, assume root endpoint
@@ -94,37 +94,37 @@ class ValueMetadata:
         return self.data["type"]
 
     @property
-    def readable(self) -> Optional[bool]:
+    def readable(self) -> bool | None:
         """Return readable."""
         return self.data.get("readable")
 
     @property
-    def writeable(self) -> Optional[bool]:
+    def writeable(self) -> bool | None:
         """Return writeable."""
         return self.data.get("writeable")
 
     @property
-    def label(self) -> Optional[str]:
+    def label(self) -> str | None:
         """Return label."""
         return self.data.get("label")
 
     @property
-    def description(self) -> Optional[str]:
+    def description(self) -> str | None:
         """Return description."""
         return self.data.get("description")
 
     @property
-    def min(self) -> Optional[int]:
+    def min(self) -> int | None:
         """Return min."""
         return self.data.get("min")
 
     @property
-    def max(self) -> Optional[int]:
+    def max(self) -> int | None:
         """Return max."""
         return self.data.get("max")
 
     @property
-    def unit(self) -> Optional[str]:
+    def unit(self) -> str | None:
         """Return unit."""
         return self.data.get("unit")
 
@@ -144,12 +144,12 @@ class ValueMetadata:
         return self.data.get("valueChangeOptions", [])
 
     @property
-    def allow_manual_entry(self) -> Optional[bool]:
+    def allow_manual_entry(self) -> bool | None:
         """Return allowManualEntry."""
         return self.data.get("allowManualEntry")
 
     @property
-    def value_size(self) -> Optional[int]:
+    def value_size(self) -> int | None:
         """Return valueSize."""
         return self.data.get("valueSize")
 
@@ -194,7 +194,7 @@ class Value:
         return self._metadata
 
     @property
-    def value(self) -> Optional[Any]:
+    def value(self) -> Any | None:
         """Return value."""
         # Treat unknown values like they are None
         if self._value == VALUE_UNKNOWN:
@@ -217,12 +217,12 @@ class Value:
         return self.data["ccVersion"]
 
     @property
-    def endpoint(self) -> Optional[int]:
+    def endpoint(self) -> int | None:
         """Return endpoint."""
         return self.data.get("endpoint")
 
     @property
-    def property_(self) -> Union[str, int]:
+    def property_(self) -> int | str:
         """Return property.
 
         Note the underscore in the end of this property name.
@@ -232,17 +232,17 @@ class Value:
         return self.data["property"]
 
     @property
-    def property_key(self) -> Optional[Union[str, int]]:
+    def property_key(self) -> int | str | None:
         """Return propertyKey."""
         return self.data.get("propertyKey")
 
     @property
-    def property_name(self) -> Optional[str]:
+    def property_name(self) -> str | None:
         """Return propertyName."""
         return self.data.get("propertyName")
 
     @property
-    def property_key_name(self) -> Optional[str]:
+    def property_key_name(self) -> str | None:
         """Return propertyKeyName."""
         return self.data.get("propertyKeyName")
 
