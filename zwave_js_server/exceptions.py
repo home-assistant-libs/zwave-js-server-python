@@ -82,7 +82,9 @@ class InvalidServerVersion(BaseZwaveJSServerError):
 class FailedCommand(BaseZwaveJSServerError):
     """When a command has failed."""
 
-    def __init__(self, message_id: str, error_code: str, msg: str | None = None) -> None:
+    def __init__(
+        self, message_id: str, error_code: str, msg: str | None = None
+    ) -> None:
         """Initialize a failed command error."""
         super().__init__(msg or f"Command failed: {error_code}")
         self.message_id = message_id
