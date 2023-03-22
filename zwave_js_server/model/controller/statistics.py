@@ -21,27 +21,17 @@ class ControllerLifelineRoutesDataType(TypedDict):
 class ControllerLifelineRoutes:
     """Represent controller lifeline routes."""
 
-    def __init__(
-        self, client: "Client", data: ControllerLifelineRoutesDataType
-    ) -> None:
-        """Initialize controller lifeline routes."""
-        self.data = data
-        self._lwr = None
+    client: "Client"
+    data: ControllerLifelineRoutesDataType
+    lwr: RouteStatistics | None = field(init=False, default=None)
+    nlwr: RouteStatistics | None = field(init=False, default=None)
+
+    def __post_init__(self) -> None:
+        """Post initialize."""
         if lwr := self.data.get("lwr"):
-            self._lwr = RouteStatistics(client, lwr)
-        self._nlwr = None
+            self.lwr = RouteStatistics(self.client, lwr)
         if nlwr := self.data.get("nlwr"):
-            self._nlwr = RouteStatistics(client, nlwr)
-
-    @property
-    def lwr(self) -> RouteStatistics | None:
-        """Return the last working route from the controller to this node."""
-        return self._lwr
-
-    @property
-    def nlwr(self) -> RouteStatistics | None:
-        """Return the next to last working route from the controller to this node."""
-        return self._nlwr
+            self.nlwr = RouteStatistics(self.client, nlwr)
 
 
 class ControllerStatisticsDataType(TypedDict):

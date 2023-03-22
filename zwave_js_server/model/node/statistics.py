@@ -40,8 +40,8 @@ class NodeStatistics:
     commands_dropped_tx: int = field(init=False)
     timeout_response: int = field(init=False)
     rtt: int | None = field(init=False)
-    lwr: RouteStatistics | None = field(init=False)
-    nlwr: RouteStatistics | None = field(init=False)
+    lwr: RouteStatistics | None = field(init=False, default=None)
+    nlwr: RouteStatistics | None = field(init=False, default=None)
 
     def __post_init__(self) -> None:
         """Post initialize."""
@@ -58,22 +58,10 @@ class NodeStatistics:
         self.commands_dropped_tx = self.data["commandsDroppedTX"]
         self.timeout_response = self.data["timeoutResponse"]
         self.rtt = self.data.get("rtt")
-        self.lwr = (
-            RouteStatistics(self.client, self.data["lwr"])
-            if "lwr" in self.data
-            else None
-        )
-        self.nlwr = (
-            RouteStatistics(self.client, self.data["nlwr"])
-            if "nlwr" in self.data
-            else None
-        )
-        self._lwr = None
         if lwr := self.data.get("lwr"):
-            self._lwr = RouteStatistics(self.client, lwr)
-        self._nlwr = None
+            self.lwr = RouteStatistics(self.client, lwr)
         if nlwr := self.data.get("nlwr"):
-            self._nlwr = RouteStatistics(self.client, nlwr)
+            self.nlwr = RouteStatistics(self.client, nlwr)
 
     @property
     def rssi(self) -> int | None:
