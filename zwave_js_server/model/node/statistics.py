@@ -17,11 +17,11 @@ class NodeStatisticsDataType(TypedDict, total=False):
     """Represent a node statistics data dict type."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/node/NodeStatistics.ts#L21-L33
-    commandsTX: int
-    commandsRX: int
-    commandsDroppedTX: int
-    commandsDroppedRX: int
-    timeoutResponse: int
+    commandsTX: int  # required
+    commandsRX: int  # required
+    commandsDroppedTX: int  # required
+    commandsDroppedRX: int  # required
+    timeoutResponse: int  # required
     rtt: int
     rssi: int
     lwr: RouteStatisticsDataType

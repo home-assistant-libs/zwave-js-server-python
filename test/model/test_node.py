@@ -194,6 +194,11 @@ async def test_device_config(
     assert climate_radio_thermostat_ct100_plus.device_config.metadata.comments == []
 
 
+async def test_endpoint_no_device_class(climate_radio_thermostat_ct100_plus):
+    """Test endpoint without a device class."""
+    assert climate_radio_thermostat_ct100_plus.endpoints[0].device_class is None
+
+
 async def test_unknown_values(cover_qubino_shutter):
     """Test that values that are unknown return as None."""
     node = cover_qubino_shutter
@@ -1598,6 +1603,7 @@ async def test_check_lifeline_health(multisensor_6: node_pkg.Node, uuid4, mock_c
                         latency=1,
                         numNeighbors=2,
                         failedPingsNode=3,
+                        rating=9,
                         routeChanges=4,
                         minPowerlevel=5,
                         failedPingsController=6,
@@ -1613,6 +1619,7 @@ async def test_check_lifeline_health(multisensor_6: node_pkg.Node, uuid4, mock_c
     assert summary.results[0].latency == 1
     assert summary.results[0].num_neighbors == 2
     assert summary.results[0].failed_pings_node == 3
+    assert summary.results[0].rating == 9
     assert summary.results[0].route_changes == 4
     assert summary.results[0].min_power_level == PowerLevel.DBM_MINUS_5
     assert summary.results[0].failed_pings_controller == 6
