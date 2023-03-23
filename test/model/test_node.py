@@ -194,6 +194,11 @@ async def test_device_config(
     assert climate_radio_thermostat_ct100_plus.device_config.metadata.comments == []
 
 
+async def test_endpoint_no_device_class(climate_radio_thermostat_ct100_plus):
+    """Test endpoint without a device class."""
+    assert climate_radio_thermostat_ct100_plus.endpoints[0].device_class is None
+
+
 async def test_unknown_values(cover_qubino_shutter):
     """Test that values that are unknown return as None."""
     node = cover_qubino_shutter
