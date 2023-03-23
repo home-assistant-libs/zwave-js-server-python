@@ -180,6 +180,11 @@ class Driver(EventBase):
         """Send command to soft reset controller."""
         await self._async_send_command("soft_reset", require_schema=25)
 
+    async def async_shutdown(self) -> bool:
+        """Send command to shutdown controller."""
+        data = await self._async_send_command("shutdown", require_schema=27)
+        return cast(bool, data["success"])
+
     def handle_logging(self, event: Event) -> None:
         """Process a driver logging event."""
         event.data["log_message"] = LogMessage(cast(LogMessageDataType, event.data))

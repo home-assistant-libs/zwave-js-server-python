@@ -34,19 +34,72 @@ class ControllerLifelineRoutes:
             self.nlwr = RouteStatistics(self.client, nlwr)
 
 
-class ControllerStatisticsDataType(TypedDict):
+class ChannelRSSIDataType(TypedDict):
+    """Represent a channel RSSI data dict type."""
+
+    average: int
+    current: int
+
+
+class BackgroundRSSIDataType(TypedDict, total=False):
+    """Represent a background RSSI data dict type."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/controller/ControllerStatistics.ts#L40
+    timestamp: int  # required
+    channel0: ChannelRSSIDataType  # required
+    channel1: ChannelRSSIDataType  # required
+    channel2: ChannelRSSIDataType
+
+
+class ControllerStatisticsDataType(TypedDict, total=False):
     """Represent a controller statistics data dict type."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/controller/ControllerStatistics.ts#L20-L39
-    messagesTX: int
-    messagesRX: int
-    messagesDroppedTX: int
-    messagesDroppedRX: int
-    NAK: int
-    CAN: int
-    timeoutACK: int
-    timeoutResponse: int
-    timeoutCallback: int
+    messagesTX: int  # required
+    messagesRX: int  # required
+    messagesDroppedTX: int  # required
+    messagesDroppedRX: int  # required
+    NAK: int  # required
+    CAN: int  # required
+    timeoutACK: int  # required
+    timeoutResponse: int  # required
+    timeoutCallback: int  # required
+    backgroundRSSI: BackgroundRSSIDataType
+
+
+@dataclass
+class ChannelRSSI:
+    """Represent a channel RSSI."""
+
+    data: ChannelRSSIDataType
+    average: int = field(init=False)
+    current: int = field(init=False)
+
+    def __post_init__(self) -> None:
+        """Post initialize."""
+        self.average = self.data["average"]
+        self.current = self.data["current"]
+
+
+@dataclass
+class BackgroundRSSI:
+    """Represent a background RSSI update."""
+
+    data: BackgroundRSSIDataType
+    timestamp: int = field(init=False)
+    channel_0: ChannelRSSI = field(init=False)
+    channel_1: ChannelRSSI = field(init=False)
+    channel_2: ChannelRSSI | None = field(init=False)
+
+    def __post_init__(self) -> None:
+        """Post initialize."""
+        self.timestamp = self.data["timestamp"]
+        self.channel_0 = ChannelRSSI(self.data["channel0"])
+        self.channel_1 = ChannelRSSI(self.data["channel1"])
+        if not (channel_2 := self.data.get("channel2")):
+            self.channel_2 = None
+            return
+        self.channel_2 = ChannelRSSI(channel_2)
 
 
 @dataclass
@@ -63,6 +116,7 @@ class ControllerStatistics:
     timeout_ack: int = field(init=False)
     timeout_response: int = field(init=False)
     timeout_callback: int = field(init=False)
+    background_rssi: BackgroundRSSI | None = field(init=False, default=None)
 
     def __post_init__(self) -> None:
         """Post initialize."""
@@ -86,3 +140,5 @@ class ControllerStatistics:
         self.timeout_ack = data["timeoutACK"]
         self.timeout_response = data["timeoutResponse"]
         self.timeout_callback = data["timeoutCallback"]
+        if background_rssi := data.get("backgroundRSSI"):
+            self.background_rssi = BackgroundRSSI(background_rssi)

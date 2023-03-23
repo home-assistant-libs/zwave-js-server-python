@@ -53,3 +53,17 @@ def test_allow_manual_entry(client, inovelli_switch_state):
     zwave_value = config_values[value_id]
 
     assert zwave_value.configuration_value_type == ConfigurationValueType.ENUMERATED
+
+
+def test_stateful(lock_schlage_be469):
+    """Test the stateful property for a value."""
+    node = lock_schlage_be469
+    zwave_value = node.values["20-112-0-3"]
+    assert not zwave_value.metadata.secret
+
+
+def test_secret(lock_schlage_be469):
+    """Test the secret property for a value."""
+    node = lock_schlage_be469
+    zwave_value = node.values["20-112-0-3"]
+    assert zwave_value.metadata.stateful
