@@ -347,3 +347,18 @@ class ProvisioningEntryStatus(IntEnum):
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/controller/Inclusion.ts#L136
     ACTIVE = 0
     INACTIVE = 1
+
+
+class SecurityBootstrapFailure(IntEnum):
+    """Enum with all security bootstrap failure reasons."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/controller/Inclusion.ts#L16
+    USER_CANCELED = 0
+    NO_KEYS_CONFIGURED = 1
+    S2_NO_USER_CALLBACKS = 2
+    TIMEOUT = 3
+    PARAMETER_MISMATCH = 4
+    NODE_CANCELED = 5
+    S2_INCORRECT_PIN = 6
+    S2_WRONG_SECURITY_LEVEL = 7
+    UNKNOWN = 8

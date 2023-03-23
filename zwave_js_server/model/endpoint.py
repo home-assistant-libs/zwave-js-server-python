@@ -28,7 +28,7 @@ class EndpointDataType(TypedDict, total=False):
     installerIcon: int
     userIcon: int
     endpointLabel: str
-    commandClasses: list[CommandClassInfoDataType]
+    commandClasses: list[CommandClassInfoDataType]  # required
 
 
 class Endpoint(EventBase):
@@ -43,7 +43,7 @@ class Endpoint(EventBase):
         """Initialize."""
         super().__init__()
         self.client = client
-        self.data: EndpointDataType = {}
+        self.data: EndpointDataType = data
         self.values: dict[str, ConfigurationValue | Value] = {}
         self.update(data, values)
 

@@ -14,6 +14,7 @@ class LifelineHealthCheckResultDataType(TypedDict, total=False):
     latency: int  # required
     numNeighbors: int  # required
     failedPingsNode: int  # required
+    rating: int  # required
     routeChanges: int
     minPowerlevel: int
     failedPingsController: int
@@ -23,7 +24,7 @@ class LifelineHealthCheckResultDataType(TypedDict, total=False):
 class LifelineHealthCheckSummaryDataType(TypedDict):
     """Represent a lifeline health check summary data dict type."""
 
-    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/node/Types.ts#L211
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/node/_Types.ts#L254
     results: list[LifelineHealthCheckResultDataType]
     rating: int
 
@@ -36,6 +37,7 @@ class LifelineHealthCheckResult:
     latency: int = field(init=False)
     num_neighbors: int = field(init=False)
     failed_pings_node: int = field(init=False)
+    rating: int = field(init=False)
     route_changes: int | None = field(init=False)
     min_power_level: PowerLevel | None = field(init=False, default=None)
     failed_pings_controller: int | None = field(init=False)
@@ -46,6 +48,7 @@ class LifelineHealthCheckResult:
         self.latency = self.data["latency"]
         self.num_neighbors = self.data["numNeighbors"]
         self.failed_pings_node = self.data["failedPingsNode"]
+        self.rating = self.data["rating"]
         self.route_changes = self.data.get("routeChanges")
         if (min_power_level := self.data.get("minPowerlevel")) is not None:
             self.min_power_level = PowerLevel(min_power_level)
@@ -72,7 +75,7 @@ class LifelineHealthCheckSummary:
 class RouteHealthCheckResultDataType(TypedDict, total=False):
     """Represent a route health check result data dict type."""
 
-    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/node/Types.ts#L242
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/node/_Types.ts#L285
     numNeighbors: int  # required
     rating: int  # required
     failedPingsToTarget: int
@@ -84,7 +87,7 @@ class RouteHealthCheckResultDataType(TypedDict, total=False):
 class RouteHealthCheckSummaryDataType(TypedDict):
     """Represent a route health check summary data dict type."""
 
-    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/node/Types.ts#L274
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/node/_Types.ts#L317
     results: list[RouteHealthCheckResultDataType]
     rating: int
 

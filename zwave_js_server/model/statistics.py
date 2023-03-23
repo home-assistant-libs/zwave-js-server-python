@@ -41,7 +41,7 @@ class RouteStatistics:
     data: RouteStatisticsDataType
     protocol_data_rate: ProtocolDataRate = field(init=False)
     repeaters: list["Node"] = field(init=False)
-    route_failed_between: tuple["Node", "Node"] | None = field(init=False)
+    route_failed_between: tuple["Node", "Node"] | None = field(init=False, default=None)
 
     def __post_init__(self) -> None:
         """Post initialize."""
@@ -51,14 +51,12 @@ class RouteStatistics:
             self.client.driver.controller.nodes[node_id]
             for node_id in self.data["repeaters"]
         ]
-        if (node_ids := self.data.get("routeFailedBetween")) is None:
-            self.route_failed_between = None
-            return
-        assert len(node_ids) == 2
-        self.route_failed_between = (
-            self.client.driver.controller.nodes[node_ids[0]],
-            self.client.driver.controller.nodes[node_ids[1]],
-        )
+        if node_ids := self.data.get("routeFailedBetween"):
+            assert len(node_ids) == 2
+            self.route_failed_between = (
+                self.client.driver.controller.nodes[node_ids[0]],
+                self.client.driver.controller.nodes[node_ids[1]],
+            )
 
     @property
     def rssi(self) -> int | None:

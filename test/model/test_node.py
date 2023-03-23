@@ -1598,6 +1598,7 @@ async def test_check_lifeline_health(multisensor_6: node_pkg.Node, uuid4, mock_c
                         latency=1,
                         numNeighbors=2,
                         failedPingsNode=3,
+                        rating=9,
                         routeChanges=4,
                         minPowerlevel=5,
                         failedPingsController=6,
@@ -1613,6 +1614,7 @@ async def test_check_lifeline_health(multisensor_6: node_pkg.Node, uuid4, mock_c
     assert summary.results[0].latency == 1
     assert summary.results[0].num_neighbors == 2
     assert summary.results[0].failed_pings_node == 3
+    assert summary.results[0].rating == 9
     assert summary.results[0].route_changes == 4
     assert summary.results[0].min_power_level == PowerLevel.DBM_MINUS_5
     assert summary.results[0].failed_pings_controller == 6

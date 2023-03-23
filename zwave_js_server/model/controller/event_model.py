@@ -16,7 +16,8 @@ from .statistics import ControllerStatisticsDataType
 class InclusionResultDataType(TypedDict, total=False):
     """Represent an inclusion result data dict type."""
 
-    lowSecurity: bool
+    lowSecurity: bool  # required
+    lowSecurityReason: int
 
 
 class BaseControllerEventModel(BaseEventModel):
