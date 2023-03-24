@@ -33,7 +33,7 @@ class NodeStatistics:
     """Represent a node statistics update."""
 
     client: "Client"
-    data: NodeStatisticsDataType | None = None
+    data: NodeStatisticsDataType
     commands_tx: int = field(init=False)
     commands_rx: int = field(init=False)
     commands_dropped_rx: int = field(init=False)
@@ -45,22 +45,15 @@ class NodeStatistics:
 
     def __post_init__(self) -> None:
         """Post initialize."""
-        data = self.data or NodeStatisticsDataType(
-            commandsDroppedRX=0,
-            commandsDroppedTX=0,
-            commandsRX=0,
-            commandsTX=0,
-            timeoutResponse=0,
-        )
-        self.commands_tx = data["commandsTX"]
-        self.commands_rx = data["commandsRX"]
-        self.commands_dropped_rx = data["commandsDroppedRX"]
-        self.commands_dropped_tx = data["commandsDroppedTX"]
-        self.timeout_response = data["timeoutResponse"]
-        self.rtt = data.get("rtt")
-        if lwr := data.get("lwr"):
+        self.commands_tx = self.data["commandsTX"]
+        self.commands_rx = self.data["commandsRX"]
+        self.commands_dropped_rx = self.data["commandsDroppedRX"]
+        self.commands_dropped_tx = self.data["commandsDroppedTX"]
+        self.timeout_response = self.data["timeoutResponse"]
+        self.rtt = self.data.get("rtt")
+        if lwr := self.data.get("lwr"):
             self.lwr = RouteStatistics(self.client, lwr)
-        if nlwr := data.get("nlwr"):
+        if nlwr := self.data.get("nlwr"):
             self.nlwr = RouteStatistics(self.client, nlwr)
 
     @property

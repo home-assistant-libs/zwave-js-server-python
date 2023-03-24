@@ -59,13 +59,21 @@ from .health_check import (
     RouteHealthCheckSummary,
     TestPowerLevelProgress,
 )
-from .statistics import NodeStatistics
+from .statistics import NodeStatistics, NodeStatisticsDataType
 
 if TYPE_CHECKING:
     from ...client import Client
 
 
 _LOGGER = logging.getLogger(__package__)
+
+DEFAULT_NODE_STATISTICS = NodeStatisticsDataType(
+    commandsDroppedRX=0,
+    commandsDroppedTX=0,
+    commandsRX=0,
+    commandsTX=0,
+    timeoutResponse=0,
+)
 
 
 def _get_value_id_dict_from_value_data(value_data: ValueDataType) -> dict[str, Any]:
@@ -92,7 +100,7 @@ class Node(EventBase):
         self.client = client
         self.data: NodeDataType = {}
         self._device_config = DeviceConfig({})
-        self._statistics = NodeStatistics(client, data.get("statistics"))
+        self._statistics = NodeStatistics(client, data.get("statistics", DEFAULT_NODE_STATISTICS))
         self._firmware_update_progress: NodeFirmwareUpdateProgress | None = None
         self.values: dict[str, ConfigurationValue | Value] = {}
         self.endpoints: dict[int, Endpoint] = {}
@@ -336,7 +344,7 @@ class Node(EventBase):
         """Update the internal state data."""
         self.data = data
         self._device_config = DeviceConfig(self.data.get("deviceConfig", {}))
-        self._statistics = NodeStatistics(self.client, self.data.get("statistics"))
+        self._statistics = NodeStatistics(self.client, self.data.get("statistics", DEFAULT_NODE_STATISTICS))
 
         # Remove stale values
         value_ids = (_get_value_id_str_from_dict(self, val) for val in data["values"])

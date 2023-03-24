@@ -106,7 +106,7 @@ class BackgroundRSSI:
 class ControllerStatistics:
     """Represent a controller statistics update."""
 
-    data: ControllerStatisticsDataType | None = None
+    data: ControllerStatisticsDataType
     messages_tx: int = field(init=False)
     messages_rx: int = field(init=False)
     messages_dropped_rx: int = field(init=False)
@@ -120,25 +120,14 @@ class ControllerStatistics:
 
     def __post_init__(self) -> None:
         """Post initialize."""
-        data = self.data or ControllerStatisticsDataType(
-            CAN=0,
-            messagesDroppedRX=0,
-            messagesDroppedTX=0,
-            messagesRX=0,
-            messagesTX=0,
-            NAK=0,
-            timeoutACK=0,
-            timeoutCallback=0,
-            timeoutResponse=0,
-        )
-        self.messages_tx = data["messagesTX"]
-        self.messages_rx = data["messagesRX"]
-        self.messages_dropped_rx = data["messagesDroppedRX"]
-        self.messages_dropped_tx = data["messagesDroppedTX"]
-        self.nak = data["NAK"]
-        self.can = data["CAN"]
-        self.timeout_ack = data["timeoutACK"]
-        self.timeout_response = data["timeoutResponse"]
-        self.timeout_callback = data["timeoutCallback"]
-        if background_rssi := data.get("backgroundRSSI"):
+        self.messages_tx = self.data["messagesTX"]
+        self.messages_rx = self.data["messagesRX"]
+        self.messages_dropped_rx = self.data["messagesDroppedRX"]
+        self.messages_dropped_tx = self.data["messagesDroppedTX"]
+        self.nak = self.data["NAK"]
+        self.can = self.data["CAN"]
+        self.timeout_ack = self.data["timeoutACK"]
+        self.timeout_response = self.data["timeoutResponse"]
+        self.timeout_callback = self.data["timeoutCallback"]
+        if background_rssi := self.data.get("backgroundRSSI"):
             self.background_rssi = BackgroundRSSI(background_rssi)
