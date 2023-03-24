@@ -31,10 +31,27 @@ from .inclusion_and_provisioning import (
     ProvisioningEntry,
     QRProvisioningInformation,
 )
-from .statistics import ControllerLifelineRoutes, ControllerStatistics
+from .statistics import (
+    ControllerLifelineRoutes,
+    ControllerStatistics,
+    ControllerStatisticsDataType,
+)
 
 if TYPE_CHECKING:
     from ...client import Client
+
+
+DEFAULT_CONTROLLER_STATISTICS = ControllerStatisticsDataType(
+    messagesTX=0,
+    messagesRX=0,
+    messagesDroppedTX=0,
+    messagesDroppedRX=0,
+    NAK=0,
+    CAN=0,
+    timeoutACK=0,
+    timeoutResponse=0,
+    timeoutCallback=0,
+)
 
 
 @dataclass
@@ -54,7 +71,7 @@ class Controller(EventBase):
         self.client = client
         self.nodes: dict[int, Node] = {}
         self._heal_network_progress: dict[int, str] | None = None
-        self._statistics = ControllerStatistics()
+        self._statistics = ControllerStatistics(DEFAULT_CONTROLLER_STATISTICS)
         self._firmware_update_progress: ControllerFirmwareUpdateProgress | None = None
         for node_state in state["nodes"]:
             node = Node(client, node_state)
@@ -204,7 +221,9 @@ class Controller(EventBase):
     def update(self, data: ControllerDataType) -> None:
         """Update controller data."""
         self.data = data
-        self._statistics = ControllerStatistics(self.data.get("statistics"))
+        self._statistics = ControllerStatistics(
+            self.data.get("statistics", DEFAULT_CONTROLLER_STATISTICS)
+        )
 
     async def async_begin_inclusion(
         self,
