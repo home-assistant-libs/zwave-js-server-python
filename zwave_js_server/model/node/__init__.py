@@ -68,10 +68,10 @@ if TYPE_CHECKING:
 _LOGGER = logging.getLogger(__package__)
 
 DEFAULT_NODE_STATISTICS = NodeStatisticsDataType(
-    commandsDroppedRX=0,
-    commandsDroppedTX=0,
-    commandsRX=0,
     commandsTX=0,
+    commandsRX=0,
+    commandsDroppedTX=0,
+    commandsDroppedRX=0,
     timeoutResponse=0,
 )
 
