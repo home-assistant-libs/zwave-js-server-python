@@ -42,15 +42,15 @@ if TYPE_CHECKING:
 
 
 DEFAULT_CONTROLLER_STATISTICS = ControllerStatisticsDataType(
-    CAN=0,
-    messagesDroppedRX=0,
-    messagesDroppedTX=0,
-    messagesRX=0,
     messagesTX=0,
+    messagesRX=0,
+    messagesDroppedTX=0,
+    messagesDroppedRX=0,
     NAK=0,
+    CAN=0,
     timeoutACK=0,
-    timeoutCallback=0,
     timeoutResponse=0,
+    timeoutCallback=0,
 )
 
 
