@@ -55,7 +55,7 @@ class RouteStatistics:
             for node_id in self.data["repeaters"]
         ]
 
-    @property
+    @cached_property
     def rssi(self) -> int | None:
         """Return RSSI."""
         if (rssi := self.data.get("rssi")) is None:
@@ -64,7 +64,7 @@ class RouteStatistics:
             raise RssiErrorReceived(RssiError(rssi))
         return rssi
 
-    @property
+    @cached_property
     def repeater_rssi(self) -> list[int]:
         """Return repeater RSSI."""
         repeater_rssi = self.data.get("repeaterRSSI", [])
