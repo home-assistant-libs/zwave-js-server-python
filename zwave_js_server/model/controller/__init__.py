@@ -74,7 +74,7 @@ class Controller(EventBase):
         self._statistics = ControllerStatistics(DEFAULT_CONTROLLER_STATISTICS)
         self._firmware_update_progress: ControllerFirmwareUpdateProgress | None = None
         for node_state in state["nodes"]:
-            node = Node(client, node_state)
+            node = Node(client, self, node_state)
             self.nodes[node.node_id] = node
         self.update(state["controller"])
 
@@ -862,7 +862,7 @@ class Controller(EventBase):
 
     def handle_node_added(self, event: Event) -> None:
         """Process a node added event."""
-        node = event.data["node"] = Node(self.client, event.data["node"])
+        node = event.data["node"] = Node(self.client, self, event.data["node"])
         self.nodes[node.node_id] = node
 
     def handle_node_removed(self, event: Event) -> None:
