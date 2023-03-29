@@ -40,17 +40,17 @@ class RouteStatistics:
     client: "Client"
     data: RouteStatisticsDataType
     protocol_data_rate: ProtocolDataRate = field(init=False)
-    repeaters: list["Node"] = field(init=False)
-    route_failed_between: tuple["Node", "Node"] | None = field(init=False, default=None)
+    repeaters: list["Node"] = field(init=False, default_factory=list)
+    route_failed_between: tuple["Node", "Node"] | None = field(init=False, default=tuple)
 
     def __post_init__(self) -> None:
         """Post initialize."""
         self.protocol_data_rate = ProtocolDataRate(self.data["protocolDataRate"])
-        assert self.client.driver
+        if not self.client.driver:
+            return
         self.repeaters = [
             self.client.driver.controller.nodes[node_id]
             for node_id in self.data["repeaters"]
-            if self.client.driver
         ]
         if node_ids := self.data.get("routeFailedBetween"):
             assert len(node_ids) == 2
