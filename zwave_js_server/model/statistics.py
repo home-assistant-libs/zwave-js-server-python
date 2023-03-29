@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from functools import cached_property
 from typing import TYPE_CHECKING, TypedDict
 
 from zwave_js_server.exceptions import RepeaterRssiErrorReceived, RssiErrorReceived
@@ -40,23 +41,19 @@ class RouteStatistics:
     client: "Client"
     data: RouteStatisticsDataType
     protocol_data_rate: ProtocolDataRate = field(init=False)
-    repeaters: list["Node"] = field(init=False)
-    route_failed_between: tuple["Node", "Node"] | None = field(init=False, default=None)
 
     def __post_init__(self) -> None:
         """Post initialize."""
         self.protocol_data_rate = ProtocolDataRate(self.data["protocolDataRate"])
+
+    @cached_property
+    def repeaters(self) -> list["Node"]:
+        """Return repeaters."""
         assert self.client.driver
-        self.repeaters = [
+        return [
             self.client.driver.controller.nodes[node_id]
             for node_id in self.data["repeaters"]
         ]
-        if node_ids := self.data.get("routeFailedBetween"):
-            assert len(node_ids) == 2
-            self.route_failed_between = (
-                self.client.driver.controller.nodes[node_ids[0]],
-                self.client.driver.controller.nodes[node_ids[1]],
-            )
 
     @property
     def rssi(self) -> int | None:
@@ -76,6 +73,18 @@ class RouteStatistics:
             raise RepeaterRssiErrorReceived(repeater_rssi)
 
         return repeater_rssi
+
+    @cached_property
+    def route_failed_between(self) -> tuple["Node", "Node"] | None:
+        """Return route failed between."""
+        if (node_ids := self.data.get("routeFailedBetween")) is None:
+            return None
+        assert self.client.driver
+        assert len(node_ids) == 2
+        return (
+            self.client.driver.controller.nodes[node_ids[0]],
+            self.client.driver.controller.nodes[node_ids[1]],
+        )
 
     def as_dict(self) -> RouteStatisticsDict:
         """Return route statistics as dict."""

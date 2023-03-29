@@ -38,7 +38,6 @@ async def async_multicast_set_value(
     options: dict | None = None,
 ) -> bool:
     """Send a multicast set_value command."""
-    assert client.driver
     # Iterate through nodes specified (if any) and validate that the value exists
     for node in nodes or ():
         # If the value to set is for Basic CC and targetValue property, skip validation
