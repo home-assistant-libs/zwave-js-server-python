@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
+from functools import cached_property
 from enum import IntEnum
 from typing import TYPE_CHECKING, TypedDict, cast
 
@@ -72,14 +73,14 @@ class NodeFirmwareUpdateCapabilities:
         """Post initialize."""
         self.firmware_upgradable = self.data["firmwareUpgradable"]
 
-    @property
+    @cached_property
     def firmware_targets(self) -> list[int]:
         """Return firmware targets."""
         if not self.firmware_upgradable:
             raise TypeError("Firmware is not upgradeable.")
         return self.data["firmwareTargets"]
 
-    @property
+    @cached_property
     def continues_to_function(self) -> bool | None:
         """Return whether node continues to function during update."""
         if not self.firmware_upgradable:
@@ -89,7 +90,7 @@ class NodeFirmwareUpdateCapabilities:
         assert isinstance(val, bool)
         return val
 
-    @property
+    @cached_property
     def supports_activation(self) -> bool | None:
         """Return whether node supports delayed activation of the new firmware."""
         if not self.firmware_upgradable:
