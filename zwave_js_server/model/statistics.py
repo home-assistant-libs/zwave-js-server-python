@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from functools import cached_property
 from typing import TYPE_CHECKING, TypedDict
 
 from zwave_js_server.exceptions import RepeaterRssiErrorReceived, RssiErrorReceived
@@ -54,7 +55,7 @@ class RouteStatistics:
             for node_id in self.data["repeaters"]
         ]
 
-    @property
+    @cached_property
     def rssi(self) -> int | None:
         """Return RSSI."""
         if (rssi := self.data.get("rssi")) is None:
@@ -73,7 +74,7 @@ class RouteStatistics:
 
         return repeater_rssi
 
-    @property
+    @cached_property
     def route_failed_between(self) -> tuple["Node", "Node"] | None:
         """Return route failed between."""
         if (node_ids := self.data.get("routeFailedBetween")) is None:
