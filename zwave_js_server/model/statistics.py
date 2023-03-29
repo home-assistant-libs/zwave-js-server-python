@@ -41,7 +41,7 @@ class RouteStatistics:
     data: RouteStatisticsDataType
     protocol_data_rate: ProtocolDataRate = field(init=False)
     repeaters: list["Node"] = field(init=False, default_factory=list)
-    route_failed_between: tuple["Node", "Node"] | None = field(init=False, default=tuple)
+    route_failed_between: tuple["Node", "Node"] | None = field(init=False, default=None)
 
     def __post_init__(self) -> None:
         """Post initialize."""
