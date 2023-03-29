@@ -50,6 +50,7 @@ class RouteStatistics:
         self.repeaters = [
             self.client.driver.controller.nodes[node_id]
             for node_id in self.data["repeaters"]
+            if self.client.driver
         ]
         if node_ids := self.data.get("routeFailedBetween"):
             assert len(node_ids) == 2
