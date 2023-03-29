@@ -46,7 +46,7 @@ class RouteStatistics:
         """Post initialize."""
         self.protocol_data_rate = ProtocolDataRate(self.data["protocolDataRate"])
 
-    @property
+    @cached_property
     def repeaters(self) -> list["Node"]:
         """Return repeaters."""
         assert self.client.driver
@@ -55,7 +55,7 @@ class RouteStatistics:
             for node_id in self.data["repeaters"]
         ]
 
-    @cached_property
+    @property
     def rssi(self) -> int | None:
         """Return RSSI."""
         if (rssi := self.data.get("rssi")) is None:
