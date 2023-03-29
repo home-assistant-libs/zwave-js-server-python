@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from functools import cached_property
 from typing import TYPE_CHECKING, TypedDict
 
 from zwave_js_server.exceptions import RssiErrorReceived
@@ -57,7 +56,7 @@ class NodeStatistics:
         if nlwr := self.data.get("nlwr"):
             self.nlwr = RouteStatistics(self.client, nlwr)
 
-    @cached_property
+    @property
     def rssi(self) -> int | None:
         """
         Return average RSSI of frames received by this node.
