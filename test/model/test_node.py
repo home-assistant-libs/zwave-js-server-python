@@ -147,7 +147,10 @@ async def test_command_classes(is_secure_unknown):
     """Test command_classes property on endpoint."""
     assert len(is_secure_unknown.endpoints[0].command_classes) == 17
     assert is_secure_unknown.endpoints[0].command_classes[0].id == 38
-    assert is_secure_unknown.endpoints[0].command_classes[0].command_class == CommandClass.SWITCH_MULTILEVEL
+    assert (
+        is_secure_unknown.endpoints[0].command_classes[0].command_class
+        == CommandClass.SWITCH_MULTILEVEL
+    )
 
 
 async def test_device_config(
