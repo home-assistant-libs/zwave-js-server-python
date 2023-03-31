@@ -1,6 +1,7 @@
 """Provide a model for the Z-Wave JS controller's statistics."""
 from __future__ import annotations
 
+from contextlib import suppress
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, TypedDict
 
@@ -29,9 +30,11 @@ class ControllerLifelineRoutes:
     def __post_init__(self) -> None:
         """Post initialize."""
         if lwr := self.data.get("lwr"):
-            self.lwr = RouteStatistics(self.client, lwr)
+            with suppress(ValueError):
+                self.lwr = RouteStatistics(self.client, lwr)
         if nlwr := self.data.get("nlwr"):
-            self.nlwr = RouteStatistics(self.client, nlwr)
+            with suppress(ValueError):
+                self.nlwr = RouteStatistics(self.client, nlwr)
 
 
 class ChannelRSSIDataType(TypedDict):

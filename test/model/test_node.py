@@ -1460,6 +1460,44 @@ async def test_statistics_updated(
     assert node.statistics == event_stats
     assert node.data["statistics"] == statistics_data
 
+    # Test that invalid protocol data rate doesn't raise error
+    event = Event(
+        "statistics updated",
+        {
+            "source": "node",
+            "event": "statistics updated",
+            "nodeId": node.node_id,
+            "statistics": {
+                "commandsTX": 1,
+                "commandsRX": 2,
+                "commandsDroppedTX": 3,
+                "commandsDroppedRX": 4,
+                "timeoutResponse": 5,
+                "rtt": 6,
+                "rssi": 7,
+                "lwr": {
+                    "protocolDataRate": 0,
+                    "repeaters": [],
+                    "repeaterRSSI": [],
+                    "routeFailedBetween": [],
+                },
+                "nlwr": {
+                    "protocolDataRate": 0,
+                    "repeaters": [],
+                    "repeaterRSSI": [],
+                    "routeFailedBetween": [],
+                },
+            },
+        },
+    )
+    node.receive_event(event)
+    # Event should be modified with the NodeStatistics object
+    assert "statistics_updated" in event.data
+    event_stats: NodeStatistics = event.data["statistics_updated"]
+    assert isinstance(event_stats, NodeStatistics)
+    assert not event_stats.lwr
+    assert not event_stats.nlwr
+
 
 async def test_statistics_updated_rssi_error(
     wallmote_central_scene: node_pkg.Node, multisensor_6, ring_keypad

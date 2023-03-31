@@ -1,6 +1,7 @@
 """Provide a model for the Z-Wave JS node's statistics."""
 from __future__ import annotations
 
+from contextlib import suppress
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, TypedDict
 
@@ -52,9 +53,11 @@ class NodeStatistics:
         self.timeout_response = self.data["timeoutResponse"]
         self.rtt = self.data.get("rtt")
         if lwr := self.data.get("lwr"):
-            self.lwr = RouteStatistics(self.client, lwr)
+            with suppress(ValueError):
+                self.lwr = RouteStatistics(self.client, lwr)
         if nlwr := self.data.get("nlwr"):
-            self.nlwr = RouteStatistics(self.client, nlwr)
+            with suppress(ValueError):
+                self.nlwr = RouteStatistics(self.client, nlwr)
 
     @property
     def rssi(self) -> int | None:

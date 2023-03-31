@@ -1708,6 +1708,47 @@ async def test_get_known_lifeline_routes(
     }
 
 
+async def test_get_known_lifeline_routes_bad_protocol_data_rates(
+    multisensor_6, uuid4, mock_command
+):
+    """Test get known lifeline routes with bad protocol data rates."""
+    ack_commands = mock_command(
+        {"command": "controller.get_known_lifeline_routes"},
+        {
+            "routes": {
+                multisensor_6.node_id: {
+                    "lwr": {
+                        "protocolDataRate": 0,
+                        "repeaters": [],
+                        "repeaterRSSI": [],
+                        "routeFailedBetween": [],
+                    },
+                    "nlwr": {
+                        "protocolDataRate": 0,
+                        "repeaters": [],
+                        "rssi": 1,
+                        "repeaterRSSI": [],
+                    },
+                }
+            }
+        },
+    )
+    routes = (
+        await multisensor_6.client.driver.controller.async_get_known_lifeline_routes()
+    )
+    assert len(routes) == 1
+    assert multisensor_6 in routes
+    lifeline_routes = routes[multisensor_6]
+    assert not lifeline_routes.lwr
+    assert not lifeline_routes.nlwr
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_known_lifeline_routes",
+        "messageId": uuid4,
+    }
+
+
 async def test_is_any_ota_firmware_update_in_progress(
     multisensor_6, uuid4, mock_command
 ):
