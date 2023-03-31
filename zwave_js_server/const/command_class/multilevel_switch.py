@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from enum import IntEnum
 
+SET_TO_PREVIOUS_VALUE = 255
+
 COVER_OPEN_PROPERTY = "Open"
 COVER_UP_PROPERTY = "Up"
 COVER_ON_PROPERTY = "On"
