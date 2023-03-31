@@ -4,6 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, TypedDict
 
+from ...const import ProtocolDataRate
 from ..statistics import RouteStatistics, RouteStatisticsDataType
 
 if TYPE_CHECKING:
@@ -28,9 +29,13 @@ class ControllerLifelineRoutes:
 
     def __post_init__(self) -> None:
         """Post initialize."""
-        if lwr := self.data.get("lwr"):
+        if (lwr := self.data.get("lwr")) and lwr["protocolDataRate"] in list(
+            map(int, ProtocolDataRate)
+        ):
             self.lwr = RouteStatistics(self.client, lwr)
-        if nlwr := self.data.get("nlwr"):
+        if (nlwr := self.data.get("nlwr")) and nlwr["protocolDataRate"] in list(
+            map(int, ProtocolDataRate)
+        ):
             self.nlwr = RouteStatistics(self.client, nlwr)
 
 
