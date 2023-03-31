@@ -52,10 +52,10 @@ class NodeStatistics:
         self.commands_dropped_tx = self.data["commandsDroppedTX"]
         self.timeout_response = self.data["timeoutResponse"]
         self.rtt = self.data.get("rtt")
-        if (lwr := self.data.get("lwr")):
+        if lwr := self.data.get("lwr"):
             with suppress(ValueError):
                 self.lwr = RouteStatistics(self.client, lwr)
-        if (nlwr := self.data.get("nlwr")):
+        if nlwr := self.data.get("nlwr"):
             with suppress(ValueError):
                 self.nlwr = RouteStatistics(self.client, nlwr)
 

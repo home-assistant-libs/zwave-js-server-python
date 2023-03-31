@@ -29,10 +29,10 @@ class ControllerLifelineRoutes:
 
     def __post_init__(self) -> None:
         """Post initialize."""
-        if (lwr := self.data.get("lwr")):
+        if lwr := self.data.get("lwr"):
             with suppress(ValueError):
                 self.lwr = RouteStatistics(self.client, lwr)
-        if (nlwr := self.data.get("nlwr")):
+        if nlwr := self.data.get("nlwr"):
             with suppress(ValueError):
                 self.nlwr = RouteStatistics(self.client, nlwr)
 
