@@ -1479,15 +1479,13 @@ async def test_statistics_updated(
                     "protocolDataRate": 0,
                     "repeaters": [],
                     "repeaterRSSI": [],
-                    "routeFailedBetween": [
-                    ],
+                    "routeFailedBetween": [],
                 },
                 "nlwr": {
                     "protocolDataRate": 0,
                     "repeaters": [],
                     "repeaterRSSI": [],
-                    "routeFailedBetween": [
-                    ],
+                    "routeFailedBetween": [],
                 },
             },
         },
