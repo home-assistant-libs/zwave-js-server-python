@@ -27,9 +27,14 @@ class CommandClassInfo:
         self.data = data
 
     @property
-    def id(self) -> CommandClass:
+    def id(self) -> int:
         """Return CommandClass ID."""
-        return CommandClass(self.data["id"])
+        return self.data["id"]
+
+    @property
+    def command_class(self) -> CommandClass:
+        """Return CommandClass."""
+        return CommandClass(self.id)
 
     @property
     def name(self) -> str:
