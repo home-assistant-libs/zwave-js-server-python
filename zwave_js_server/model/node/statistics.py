@@ -1,12 +1,13 @@
 """Provide a model for the Z-Wave JS node's statistics."""
 from __future__ import annotations
 
+from contextlib import suppress
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, TypedDict
 
 from zwave_js_server.exceptions import RssiErrorReceived
 
-from ...const import ProtocolDataRate, RssiError
+from ...const import RssiError
 from ..statistics import RouteStatistics, RouteStatisticsDataType
 
 if TYPE_CHECKING:
@@ -51,14 +52,12 @@ class NodeStatistics:
         self.commands_dropped_tx = self.data["commandsDroppedTX"]
         self.timeout_response = self.data["timeoutResponse"]
         self.rtt = self.data.get("rtt")
-        if (lwr := self.data.get("lwr")) and lwr["protocolDataRate"] in list(
-            map(int, ProtocolDataRate)
-        ):
-            self.lwr = RouteStatistics(self.client, lwr)
-        if (nlwr := self.data.get("nlwr")) and nlwr["protocolDataRate"] in list(
-            map(int, ProtocolDataRate)
-        ):
-            self.nlwr = RouteStatistics(self.client, nlwr)
+        if (lwr := self.data.get("lwr")) and lwr["protocolDataRate"]:
+            with suppress(ValueError):
+                self.lwr = RouteStatistics(self.client, lwr)
+        if (nlwr := self.data.get("nlwr")):
+            with suppress(ValueError):
+                self.nlwr = RouteStatistics(self.client, nlwr)
 
     @property
     def rssi(self) -> int | None:
