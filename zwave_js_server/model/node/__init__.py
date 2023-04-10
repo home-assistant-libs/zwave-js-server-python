@@ -1,6 +1,7 @@
 """Provide a model for the Z-Wave JS node."""
 from __future__ import annotations
 
+from datetime import date, datetime, time
 import logging
 from typing import TYPE_CHECKING, Any, cast
 
@@ -782,6 +783,40 @@ class Node(EventBase):
         )
         assert data
         return cast(int, data["timestamp"])
+
+    async def async_manually_idle_notification_value(self, val: Value | str) -> None:
+        """Send manuallyIdleNotificationValue command to Node for given value (or value_id)."""
+        # a value may be specified as value_id or the value itself
+        if not isinstance(val, Value):
+            val = self.values[val]
+        if val.command_class != CommandClass.NOTIFICATION:
+            raise ValueError(
+                "Value must be of CommandClass.NOTIFICATION to manually idle it"
+            )
+        await self.async_send_command(
+            "manually_idle_notification_value",
+            notificationType=val.metadata.cc_specific["notificationType"],
+            prevValue=val.value,
+            endpointIndex=val.endpoint,
+            require_schema=28,
+            wait_for_result=False,
+        )
+
+    async def async_set_date_and_time(
+        self, datetime_: datetime | date | time | None = None
+    ) -> bool:
+        """Send setDateAndTime command to Node."""
+        args = {}
+        if datetime_:
+            args["date"] = datetime_.isoformat()
+        data = await self.async_send_command(
+            "set_date_and_time",
+            **args,
+            require_schema=28,
+            wait_for_result=True,
+        )
+        assert data
+        return cast(bool, data["success"])
 
     def handle_test_powerlevel_progress(self, event: Event) -> None:
         """Process a test power level progress event."""
