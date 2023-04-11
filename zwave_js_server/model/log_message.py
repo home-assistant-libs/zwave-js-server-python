@@ -2,9 +2,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Literal, TypedDict
+from typing import Literal
 
-from ..const import CommandClass
+from ..const import USE_TYPING_EXTENSIONS, CommandClass
+
+if USE_TYPING_EXTENSIONS:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 
 class LogMessageContextDataType(TypedDict, total=False):

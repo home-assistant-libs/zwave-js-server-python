@@ -3,15 +3,18 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal, cast
 
+from pydantic import TypeAdapter
+
+from ..const import USE_TYPING_EXTENSIONS
 from ..event import BaseEventModel, Event, EventBase
 from .controller import Controller
 from .log_config import LogConfig, LogConfigDataType
 from .log_message import LogMessage, LogMessageDataType
 
-try:
-    from pydantic.v1 import create_model_from_typeddict
-except ImportError:
-    from pydantic import create_model_from_typeddict
+if USE_TYPING_EXTENSIONS:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 if TYPE_CHECKING:
     from ..client import Client
@@ -36,15 +39,10 @@ class AllNodesReadyEventModel(BaseDriverEventModel):
     event: Literal["all nodes ready"]
 
 
-LoggingEventModel = create_model_from_typeddict(
-    LogMessageDataType, __base__=BaseDriverEventModel
-)
-
-
-DRIVER_EVENT_MODEL_MAP: dict[str, type["BaseDriverEventModel"]] = {
+DRIVER_EVENT_MODEL_MAP: dict[str, type["BaseDriverEventModel"] | TypedDict] = {
     "all nodes ready": AllNodesReadyEventModel,
     "log config updated": LogConfigUpdatedEventModel,
-    "logging": LoggingEventModel,
+    "logging": LogMessageDataType,
 }
 
 
@@ -86,7 +84,7 @@ class Driver(EventBase):
             self.controller.receive_event(event)
             return
 
-        DRIVER_EVENT_MODEL_MAP[event.type](**event.data)
+        TypeAdapter(DRIVER_EVENT_MODEL_MAP[event.type]).validate_python(event.data)
 
         self._handle_event_protocol(event)
 

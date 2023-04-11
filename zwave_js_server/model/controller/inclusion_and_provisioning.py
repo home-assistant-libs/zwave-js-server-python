@@ -2,9 +2,20 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, TypedDict
+from typing import Any
 
-from ...const import Protocols, ProvisioningEntryStatus, QRCodeVersion, SecurityClass
+from ...const import (
+    USE_TYPING_EXTENSIONS,
+    Protocols,
+    ProvisioningEntryStatus,
+    QRCodeVersion,
+    SecurityClass,
+)
+
+if USE_TYPING_EXTENSIONS:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 
 class InclusionGrantDataType(TypedDict):

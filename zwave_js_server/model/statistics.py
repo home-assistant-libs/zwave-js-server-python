@@ -3,11 +3,16 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from functools import cached_property
-from typing import TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING
 
 from zwave_js_server.exceptions import RepeaterRssiErrorReceived, RssiErrorReceived
 
-from ..const import ProtocolDataRate, RssiError
+from ..const import USE_TYPING_EXTENSIONS, ProtocolDataRate, RssiError
+
+if USE_TYPING_EXTENSIONS:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 if TYPE_CHECKING:
     from ..client import Client

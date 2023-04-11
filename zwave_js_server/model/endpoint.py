@@ -5,14 +5,19 @@ https://zwave-js.github.io/node-zwave-js/#/api/endpoint?id=endpoint-properties
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, TypedDict, cast
+from typing import TYPE_CHECKING, Any, cast
 
-from ..const import NodeStatus
+from ..const import USE_TYPING_EXTENSIONS, NodeStatus
 from ..event import EventBase
 from ..exceptions import FailedCommand, NotFoundError
 from .command_class import CommandClass, CommandClassInfo, CommandClassInfoDataType
 from .device_class import DeviceClass, DeviceClassDataType
 from .value import ConfigurationValue, Value
+
+if USE_TYPING_EXTENSIONS:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 if TYPE_CHECKING:
     from ..client import Client

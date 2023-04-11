@@ -1,9 +1,13 @@
 """Data model for a Z-Wave JS controller."""
 from __future__ import annotations
 
-from typing import TypedDict
-
+from ...const import USE_TYPING_EXTENSIONS
 from .statistics import ControllerStatisticsDataType
+
+if USE_TYPING_EXTENSIONS:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 
 class ControllerDataType(TypedDict, total=False):

@@ -3,9 +3,15 @@ from __future__ import annotations
 
 from contextlib import suppress
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING
 
+from ...const import USE_TYPING_EXTENSIONS
 from ..statistics import RouteStatistics, RouteStatisticsDataType
+
+if USE_TYPING_EXTENSIONS:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 if TYPE_CHECKING:
     from ...client import Client

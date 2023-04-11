@@ -3,10 +3,15 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
 from enum import IntEnum
-from typing import TYPE_CHECKING, TypedDict, cast
+from typing import TYPE_CHECKING, cast
 
-from ...const import VALUE_UNKNOWN
+from ...const import USE_TYPING_EXTENSIONS, VALUE_UNKNOWN
 from ...util.helpers import convert_bytes_to_base64
+
+if USE_TYPING_EXTENSIONS:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 if TYPE_CHECKING:
     from . import Node

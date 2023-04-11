@@ -1,9 +1,9 @@
 """Provide a model for the Z-Wave JS controller's events."""
 from __future__ import annotations
 
-from typing import Literal, TypedDict
+from typing import Literal
 
-from ...const import RemoveNodeReason
+from ...const import USE_TYPING_EXTENSIONS, RemoveNodeReason
 from ...event import BaseEventModel
 from ..node.data_model import FoundNodeDataType, NodeDataType
 from .firmware import (
@@ -12,6 +12,11 @@ from .firmware import (
 )
 from .inclusion_and_provisioning import InclusionGrantDataType
 from .statistics import ControllerStatisticsDataType
+
+if USE_TYPING_EXTENSIONS:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 
 class InclusionResultDataType(TypedDict, total=False):

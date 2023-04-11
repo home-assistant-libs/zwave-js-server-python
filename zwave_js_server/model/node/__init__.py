@@ -6,6 +6,8 @@ import logging
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, cast
 
+from pydantic import TypeAdapter
+
 from ...const import (
     INTERVIEW_FAILED,
     NOT_INTERVIEWED,
@@ -434,7 +436,7 @@ class Node(EventBase):
 
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
-        NODE_EVENT_MODEL_MAP[event.type](**event.data)
+        TypeAdapter(NODE_EVENT_MODEL_MAP[event.type]).validate_python(event.data)
 
         self._handle_event_protocol(event)
         event.data["node"] = self

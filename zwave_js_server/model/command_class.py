@@ -5,9 +5,12 @@ https://zwave-js.github.io/node-zwave-js/#/api/endpoint?id=commandclasses
 """
 from __future__ import annotations
 
-from typing import TypedDict
+from ..const import USE_TYPING_EXTENSIONS, CommandClass
 
-from ..const import CommandClass
+if USE_TYPING_EXTENSIONS:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 
 class CommandClassInfoDataType(TypedDict):

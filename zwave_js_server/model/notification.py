@@ -5,11 +5,17 @@ https://zwave-js.github.io/node-zwave-js/#/api/node?id=quotnotificationquot
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal, TypedDict
+from typing import TYPE_CHECKING, Any, Literal
 
+from ..const import USE_TYPING_EXTENSIONS
 from ..const.command_class.multilevel_switch import MultilevelSwitchCommand
 from ..const.command_class.power_level import PowerLevelTestStatus
 from ..util.helpers import parse_buffer
+
+if USE_TYPING_EXTENSIONS:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 if TYPE_CHECKING:
     from .node import Node

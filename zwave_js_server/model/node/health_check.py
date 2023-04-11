@@ -2,9 +2,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TypedDict
 
-from ...const import PowerLevel
+from ...const import USE_TYPING_EXTENSIONS, PowerLevel
+
+if USE_TYPING_EXTENSIONS:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 
 class LifelineHealthCheckResultDataType(TypedDict, total=False):

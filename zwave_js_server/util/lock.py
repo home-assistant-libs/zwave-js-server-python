@@ -1,9 +1,9 @@
 """Utility functions for Z-Wave JS locks."""
 from __future__ import annotations
 
-from typing import TypedDict, cast
+from typing import cast
 
-from ..const import CommandClass
+from ..const import USE_TYPING_EXTENSIONS, CommandClass
 from ..const.command_class.lock import (
     ATTR_CODE_SLOT,
     ATTR_IN_USE,
@@ -16,6 +16,11 @@ from ..const.command_class.lock import (
 from ..exceptions import NotFoundError
 from ..model.node import Node
 from ..model.value import SetValueResult, Value, get_value_id_str
+
+if USE_TYPING_EXTENSIONS:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 
 def get_code_slot_value(node: Node, code_slot: int, property_name: str) -> Value:

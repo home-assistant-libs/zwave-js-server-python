@@ -3,9 +3,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import IntEnum
-from typing import TypedDict
 
+from ...const import USE_TYPING_EXTENSIONS
 from ...util.helpers import convert_bytes_to_base64
+
+if USE_TYPING_EXTENSIONS:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 
 class ControllerFirmwareUpdateDataDataType(TypedDict, total=False):

@@ -4,12 +4,17 @@ from __future__ import annotations
 from contextlib import suppress
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING
 
 from zwave_js_server.exceptions import RssiErrorReceived
 
-from ...const import RssiError
+from ...const import USE_TYPING_EXTENSIONS, RssiError
 from ..statistics import RouteStatistics, RouteStatisticsDataType
+
+if USE_TYPING_EXTENSIONS:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 if TYPE_CHECKING:
     from ...client import Client
@@ -24,7 +29,7 @@ class NodeStatisticsDataType(TypedDict, total=False):
     commandsDroppedTX: int  # required
     commandsDroppedRX: int  # required
     timeoutResponse: int  # required
-    rtt: int
+    rtt: int | float
     rssi: int
     lwr: RouteStatisticsDataType
     nlwr: RouteStatisticsDataType
@@ -42,7 +47,7 @@ class NodeStatistics:
     commands_dropped_rx: int = field(init=False)
     commands_dropped_tx: int = field(init=False)
     timeout_response: int = field(init=False)
-    rtt: int | None = field(init=False)
+    rtt: int | float | None = field(init=False)
     lwr: RouteStatistics | None = field(init=False, default=None)
     nlwr: RouteStatistics | None = field(init=False, default=None)
     last_seen: datetime | None = field(init=False, default=None)

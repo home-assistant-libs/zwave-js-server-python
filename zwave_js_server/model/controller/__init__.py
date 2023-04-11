@@ -4,10 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal, cast
 
-from zwave_js_server.model.node.firmware import (
-    NodeFirmwareUpdateFileInfo,
-    NodeFirmwareUpdateInfo,
-)
+from pydantic import TypeAdapter
 
 from ...const import (
     MINIMUM_QR_STRING_LENGTH,
@@ -24,7 +21,11 @@ from ...event import Event, EventBase
 from ...util.helpers import convert_base64_to_bytes, convert_bytes_to_base64
 from ..association import AssociationAddress, AssociationGroup
 from ..node import Node
-from ..node.firmware import NodeFirmwareUpdateResult
+from ..node.firmware import (
+    NodeFirmwareUpdateFileInfo,
+    NodeFirmwareUpdateInfo,
+    NodeFirmwareUpdateResult,
+)
 from .data_model import ControllerDataType
 from .event_model import CONTROLLER_EVENT_MODEL_MAP
 from .firmware import ControllerFirmwareUpdateProgress, ControllerFirmwareUpdateResult
@@ -821,7 +822,7 @@ class Controller(EventBase):
                 f"Controller doesn't know how to handle/forward this event: {event.data}"
             )
 
-        CONTROLLER_EVENT_MODEL_MAP[event.type](**event.data)
+        TypeAdapter(CONTROLLER_EVENT_MODEL_MAP[event.type]).validate_python(event.data)
 
         self._handle_event_protocol(event)
 

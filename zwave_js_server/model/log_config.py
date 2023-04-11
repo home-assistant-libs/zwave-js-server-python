@@ -2,9 +2,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TypedDict, cast
+from typing import cast
 
-from ..const import LogLevel
+from ..const import USE_TYPING_EXTENSIONS, LogLevel
+
+if USE_TYPING_EXTENSIONS:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 
 class LogConfigDataType(TypedDict, total=False):

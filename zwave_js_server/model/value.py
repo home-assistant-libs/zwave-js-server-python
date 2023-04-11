@@ -3,12 +3,23 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import StrEnum
-from typing import TYPE_CHECKING, Any, TypedDict
+from typing import TYPE_CHECKING, Any
 
-from ..const import VALUE_UNKNOWN, CommandClass, ConfigurationValueType, SetValueStatus
+from ..const import (
+    USE_TYPING_EXTENSIONS,
+    VALUE_UNKNOWN,
+    CommandClass,
+    ConfigurationValueType,
+    SetValueStatus,
+)
 from ..event import Event
 from ..util.helpers import parse_buffer
 from .duration import Duration, DurationDataType
+
+if USE_TYPING_EXTENSIONS:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 if TYPE_CHECKING:
     from .node import Node
@@ -41,6 +52,9 @@ class MetaDataType(TypedDict, total=False):
     valueSize: int
     stateful: bool
     secret: bool
+    default: int | bool | str | float
+    isFromConfig: int
+    format: int
 
 
 class ValueDataType(TypedDict, total=False):

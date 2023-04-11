@@ -1,13 +1,19 @@
 """Data model for a Z-Wave JS node."""
 from __future__ import annotations
 
-from typing import Literal, TypedDict
+from typing import Literal
 
+from ...const import USE_TYPING_EXTENSIONS
 from ..device_class import DeviceClassDataType
 from ..device_config import DeviceConfigDataType
 from ..endpoint import EndpointDataType
 from ..value import ValueDataType
 from .statistics import NodeStatisticsDataType
+
+if USE_TYPING_EXTENSIONS:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 
 class FoundNodeDataType(TypedDict, total=False):
