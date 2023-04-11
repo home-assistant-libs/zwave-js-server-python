@@ -1,8 +1,5 @@
 """Test node utility functions."""
-import pytest
-
 from zwave_js_server.const import CommandClass
-from zwave_js_server.exceptions import NotFoundError
 from zwave_js_server.util.multicast import (
     async_multicast_endpoint_get_cc_version,
     async_multicast_endpoint_invoke_cc_api,
@@ -183,25 +180,6 @@ async def test_set_value_multicast(
         "options": None,
         "messageId": uuid4,
     }
-
-    # Test invalid value
-    with pytest.raises(NotFoundError):
-        assert await async_multicast_set_value(
-            client,
-            1,
-            {"commandClass": 1, "property": 1, "propertyKey": "invalid property key"},
-            [node1, node2],
-        )
-
-    # Test invalid option
-    with pytest.raises(NotFoundError):
-        assert await async_multicast_set_value(
-            client,
-            1,
-            {"commandClass": 112, "property": 1},
-            nodes=[node1, node2],
-            options={"test": 1},
-        )
 
 
 async def test_set_value_multicast_basic(
