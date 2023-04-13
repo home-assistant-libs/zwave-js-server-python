@@ -795,9 +795,7 @@ class Node(EventBase):
             )
         await self.async_send_command(
             "manually_idle_notification_value",
-            notificationType=val.metadata.cc_specific["notificationType"],
-            prevValue=val.value,
-            endpointIndex=val.endpoint,
+            valueId=_get_value_id_dict_from_value_data(val.data),
             require_schema=28,
             wait_for_result=False,
         )

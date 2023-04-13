@@ -2082,9 +2082,12 @@ async def test_manually_idle_notification_value(
     assert ack_commands[0] == {
         "command": "node.manually_idle_notification_value",
         "nodeId": node.node_id,
-        "notificationType": 7,
-        "prevValue": 0,
-        "endpointIndex": 0,
+        "valueId": {
+            "commandClass": 113,
+            "endpoint": 0,
+            "property": "Home Security",
+            "propertyKey": "Cover status",
+        },
         "messageId": uuid4,
     }
 
