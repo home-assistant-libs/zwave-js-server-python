@@ -1,7 +1,7 @@
 """Provide a model for the Z-Wave JS node."""
 from __future__ import annotations
 
-from datetime import date, datetime, time
+from datetime import datetime
 import logging
 from typing import TYPE_CHECKING, Any, cast
 
@@ -801,7 +801,7 @@ class Node(EventBase):
         )
 
     async def async_set_date_and_time(
-        self, datetime_: datetime | date | time | None = None
+        self, datetime_: datetime | None = None
     ) -> bool:
         """Send setDateAndTime command to Node."""
         args = {}
