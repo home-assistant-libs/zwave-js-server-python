@@ -800,9 +800,7 @@ class Node(EventBase):
             wait_for_result=False,
         )
 
-    async def async_set_date_and_time(
-        self, datetime_: datetime | None = None
-    ) -> bool:
+    async def async_set_date_and_time(self, datetime_: datetime | None = None) -> bool:
         """Send setDateAndTime command to Node."""
         args = {}
         if datetime_:
