@@ -4,10 +4,9 @@ from __future__ import annotations
 from typing import Any, cast
 
 from ..client import Client
-from ..const import TARGET_VALUE_PROPERTY, CommandClass
-from ..exceptions import NotFoundError
+from ..const import CommandClass
 from ..model.node import Node, _get_value_id_dict_from_value_data
-from ..model.value import ValueDataType, _get_value_id_str_from_dict
+from ..model.value import ValueDataType
 
 
 async def _async_send_command(
@@ -38,25 +37,6 @@ async def async_multicast_set_value(
     options: dict | None = None,
 ) -> bool:
     """Send a multicast set_value command."""
-    # Iterate through nodes specified (if any) and validate that the value exists
-    for node in nodes or ():
-        # If the value to set is for Basic CC and targetValue property, skip validation
-        if (
-            value_data["commandClass"] == CommandClass.BASIC
-            and value_data["property"] == TARGET_VALUE_PROPERTY
-        ):
-            break
-        value_id = _get_value_id_str_from_dict(node, value_data)
-        # Check that the value exists on the node
-        if value_id not in node.values:
-            raise NotFoundError(f"Node {node} doesn't have value {value_id}")
-        # Check that the option is valid for the value
-        for option in options or {}:
-            if option not in node.values[value_id].metadata.value_change_options:
-                raise NotFoundError(
-                    f"Node {node} value {value_id} doesn't support option {option}"
-                )
-
     result = await _async_send_command(
         client,
         "set_value",
