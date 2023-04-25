@@ -1,6 +1,7 @@
 """Test the node model."""
 import json
 from copy import deepcopy
+from datetime import datetime
 from unittest.mock import patch
 
 import pytest
@@ -2061,6 +2062,61 @@ async def test_interview(multisensor_6: node_pkg.Node, uuid4, mock_command):
         "nodeId": node.node_id,
         "messageId": uuid4,
     }
+
+
+async def test_manually_idle_notification_value(
+    multisensor_6: node_pkg.Node, uuid4, mock_command
+):
+    """Test node.manually_idle_notification_value command."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.manually_idle_notification_value", "nodeId": node.node_id},
+        {},
+    )
+
+    await node.async_manually_idle_notification_value(
+        f"{node.node_id}-113-0-Home Security-Cover status"
+    )
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.manually_idle_notification_value",
+        "nodeId": node.node_id,
+        "valueId": {
+            "commandClass": 113,
+            "endpoint": 0,
+            "property": "Home Security",
+            "propertyKey": "Cover status",
+        },
+        "messageId": uuid4,
+    }
+
+    # Raise ValueError if the value is not for the right CommandClass
+    with pytest.raises(ValueError):
+        await node.async_manually_idle_notification_value(f"{node.node_id}-112-0-255")
+
+
+async def test_set_date_and_time(multisensor_6: node_pkg.Node, uuid4, mock_command):
+    """Test node.set_date_and_time command."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.set_date_and_time", "nodeId": node.node_id},
+        {"success": True},
+    )
+
+    assert await node.async_set_date_and_time(datetime(2020, 1, 1, 12, 0, 0))
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.set_date_and_time",
+        "nodeId": node.node_id,
+        "date": "2020-01-01T12:00:00",
+        "messageId": uuid4,
+    }
+
+    # Raise ValueError if the value is not for the right CommandClass
+    with pytest.raises(ValueError):
+        await node.async_manually_idle_notification_value(f"{node.node_id}-112-0-255")
 
 
 async def test_get_value_timestamp(multisensor_6: node_pkg.Node, uuid4, mock_command):
