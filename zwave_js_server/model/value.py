@@ -296,17 +296,14 @@ class ConfigurationValue(Value):
     @property
     def configuration_value_type(self) -> ConfigurationValueType:
         """Return configuration value type."""
+        min_ = self.metadata.min
+        max_ = self.metadata.max
         if self.metadata.type == "number":
-            if (
-                self.metadata.allow_manual_entry
-                and not self.metadata.max == self.metadata.min == 0
-            ):
+            if self.metadata.allow_manual_entry and not max_ == min_ == 0:
                 return ConfigurationValueType.MANUAL_ENTRY
             if self.metadata.states:
                 return ConfigurationValueType.ENUMERATED
-            if (
-                self.metadata.max is not None or self.metadata.min is not None
-            ) and not self.metadata.max == self.metadata.min == 0:
+            if (max_ is not None or min_ is not None) and not max_ == min_ == 0:
                 return ConfigurationValueType.RANGE
 
         return ConfigurationValueType.UNDEFINED

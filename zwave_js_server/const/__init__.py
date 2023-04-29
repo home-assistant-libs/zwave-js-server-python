@@ -201,6 +201,7 @@ class NodeStatus(IntEnum):
 class ConfigurationValueType(str, Enum):
     """Enum for configuration value types."""
 
+    BITFIELD = "bitfield"
     ENUMERATED = "enumerated"
     MANUAL_ENTRY = "manual_entry"
     RANGE = "range"
