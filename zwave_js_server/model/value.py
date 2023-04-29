@@ -305,5 +305,7 @@ class ConfigurationValue(Value):
                 return ConfigurationValueType.ENUMERATED
             if (max_ is not None or min_ is not None) and not max_ == min_ == 0:
                 return ConfigurationValueType.RANGE
+        elif self.metadata.type == "number[]":
+            return ConfigurationValueType.BITFIELD
 
         return ConfigurationValueType.UNDEFINED
