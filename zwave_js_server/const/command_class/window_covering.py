@@ -3,8 +3,6 @@ from __future__ import annotations
 
 from enum import Enum, IntEnum
 
-from .multilevel_switch import CoverStates
-
 
 class WindowCoveringPropertyKey(str, Enum):
     """Enum of all known Window Covering CC property keys."""
