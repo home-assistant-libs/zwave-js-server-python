@@ -7,6 +7,7 @@ from enum import Enum, IntEnum
 class WindowCoveringPropertyKey(str, Enum):
     """Enum of all known Window Covering CC property keys."""
 
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/cc/src/lib/_Types.ts#L1588
     HORIZONTAL_SLATS_ANGLE = "Horizontal Slats Angle"
     HORIZONTAL_SLATS_ANGLE_NO_POSITION = "Horizontal Slats Angle (no position)"
     INBOUND_BOTTOM = "Inbound Bottom"
