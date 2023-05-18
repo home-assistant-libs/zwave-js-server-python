@@ -13,6 +13,13 @@ COVER_DOWN_PROPERTY = "Down"
 COVER_OFF_PROPERTY = "Off"
 
 
+class CoverStates(IntEnum):
+    """Enum with all (known/used) Z-Wave Cover States."""
+
+    CLOSED = 0
+    OPEN = 99
+
+
 class MultilevelSwitchCommand(IntEnum):
     """Enum for known multilevel switch notifications."""
 
