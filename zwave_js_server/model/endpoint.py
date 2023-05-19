@@ -24,7 +24,7 @@ class EndpointDataType(TypedDict, total=False):
 
     nodeId: int  # required
     index: int  # required
-    deviceClass: DeviceClassDataType
+    deviceClass: DeviceClassDataType | None
     installerIcon: int
     userIcon: int
     endpointLabel: str
@@ -80,7 +80,7 @@ class Endpoint(EventBase):
         """Return the device_class."""
         if "deviceClass" not in self.data:
             return None
-        return DeviceClass(self.data["deviceClass"])
+        return DeviceClass(self.data.get("deviceClass"))
 
     @property
     def installer_icon(self) -> int | None:

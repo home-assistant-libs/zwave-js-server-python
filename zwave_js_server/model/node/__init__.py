@@ -138,7 +138,7 @@ class Node(EventBase):
     @property
     def device_class(self) -> DeviceClass:
         """Return the device_class."""
-        return DeviceClass(self.data["deviceClass"])
+        return DeviceClass(self.data.get("deviceClass"))
 
     @property
     def installer_icon(self) -> int | None:

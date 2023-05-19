@@ -24,7 +24,7 @@ class NodeDataType(TypedDict, total=False):
 
     nodeId: int  # required
     index: int  # required
-    deviceClass: DeviceClassDataType  # required
+    deviceClass: DeviceClassDataType | None
     installerIcon: int
     userIcon: int
     name: str
