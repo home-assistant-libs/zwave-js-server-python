@@ -22,7 +22,7 @@ class MetaDataType(TypedDict, total=False):
     min: int
     max: int
     unit: str
-    states: dict[int, str]
+    states: dict[str, str]
     ccSpecific: dict[str, Any]
     valueChangeOptions: list[str]
     allowManualEntry: bool
