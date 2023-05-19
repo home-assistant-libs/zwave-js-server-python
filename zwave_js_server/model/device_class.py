@@ -42,26 +42,32 @@ class DeviceClass:
         self.data = data
 
     @property
-    def basic(self) -> DeviceClassItem:
+    def basic(self) -> DeviceClassItem | None:
         """Return basic DeviceClass."""
-        return DeviceClassItem(**self.data["basic"])
+        if "basic" in self.data:
+            return DeviceClassItem(**self.data["basic"])
+        return None
 
     @property
-    def generic(self) -> DeviceClassItem:
+    def generic(self) -> DeviceClassItem | None:
         """Return generic DeviceClass."""
-        return DeviceClassItem(**self.data["generic"])
+        if "generic" in self.data:
+            return DeviceClassItem(**self.data["generic"])
+        return None
 
     @property
-    def specific(self) -> DeviceClassItem:
+    def specific(self) -> DeviceClassItem | None:
         """Return specific DeviceClass."""
-        return DeviceClassItem(**self.data["specific"])
+        if "specific" in self.data:
+            return DeviceClassItem(**self.data["specific"])
+        return None
 
     @property
     def mandatory_supported_ccs(self) -> list[int]:
         """Return list of mandatory Supported CC id's."""
-        return self.data["mandatorySupportedCCs"]
+        return self.data.get("mandatorySupportedCCs", [])
 
     @property
     def mandatory_controlled_ccs(self) -> list[int]:
         """Return list of mandatory Controlled CC id's."""
-        return self.data["mandatoryControlledCCs"]
+        return self.data.get("mandatoryControlledCCs", [])
