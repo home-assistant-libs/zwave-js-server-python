@@ -78,9 +78,9 @@ class Endpoint(EventBase):
     @property
     def device_class(self) -> DeviceClass | None:
         """Return the device_class."""
-        if "deviceClass" in self.data:
-            return DeviceClass(self.data["deviceClass"])
-        return None
+        if(device_class := self.data.get("deviceClass")) is None:
+            return None
+        return DeviceClass(device_class)
 
     @property
     def installer_icon(self) -> int | None:
