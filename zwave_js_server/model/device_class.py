@@ -37,41 +37,31 @@ class DeviceClassItem:
 class DeviceClass:
     """Model for a Zwave Node's device class."""
 
-    def __init__(self, data: DeviceClassDataType | None) -> None:
+    def __init__(self, data: DeviceClassDataType) -> None:
         """Initialize."""
         self.data = data
 
     @property
-    def basic(self) -> DeviceClassItem | None:
+    def basic(self) -> DeviceClassItem:
         """Return basic DeviceClass."""
-        if self.data and "basic" in self.data:
-            return DeviceClassItem(**self.data["basic"])
-        return None
+        return DeviceClassItem(**self.data["basic"])
 
     @property
     def generic(self) -> DeviceClassItem | None:
         """Return generic DeviceClass."""
-        if self.data and "generic" in self.data:
-            return DeviceClassItem(**self.data["generic"])
-        return None
+        return DeviceClassItem(**self.data["generic"])
 
     @property
     def specific(self) -> DeviceClassItem | None:
         """Return specific DeviceClass."""
-        if self.data and "specific" in self.data:
-            return DeviceClassItem(**self.data["specific"])
-        return None
+        return DeviceClassItem(**self.data["specific"])
 
     @property
     def mandatory_supported_ccs(self) -> list[int]:
         """Return list of mandatory Supported CC id's."""
-        if self.data and "mandatorySupportedCCs" in self.data:
-            return self.data["mandatorySupportedCCs"]
-        return []
+        return self.data["mandatorySupportedCCs"]
 
     @property
     def mandatory_controlled_ccs(self) -> list[int]:
         """Return list of mandatory Controlled CC id's."""
-        if self.data and "mandatoryControlledCCs" in self.data:
-            return self.data["mandatoryControlledCCs"]
-        return []
+        return self.data["mandatoryControlledCCs"]
