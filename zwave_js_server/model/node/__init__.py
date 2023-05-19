@@ -136,7 +136,7 @@ class Node(EventBase):
         return self.data["index"]
 
     @property
-    def device_class(self) -> DeviceClass | None:
+    def device_class(self) -> DeviceClass:
         """Return the device_class."""
         if "deviceClass" in self.data:
             return DeviceClass(self.data["deviceClass"])

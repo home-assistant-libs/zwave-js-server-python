@@ -47,12 +47,12 @@ class DeviceClass:
         return DeviceClassItem(**self.data["basic"])
 
     @property
-    def generic(self) -> DeviceClassItem | None:
+    def generic(self) -> DeviceClassItem:
         """Return generic DeviceClass."""
         return DeviceClassItem(**self.data["generic"])
 
     @property
-    def specific(self) -> DeviceClassItem | None:
+    def specific(self) -> DeviceClassItem:
         """Return specific DeviceClass."""
         return DeviceClassItem(**self.data["specific"])
 
