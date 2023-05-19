@@ -78,7 +78,7 @@ class Endpoint(EventBase):
     @property
     def device_class(self) -> DeviceClass | None:
         """Return the device_class."""
-        if(device_class := self.data.get("deviceClass")) is None:
+        if (device_class := self.data.get("deviceClass")) is None:
             return None
         return DeviceClass(device_class)
 
