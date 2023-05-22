@@ -81,14 +81,6 @@ def invalid_multilevel_sensor_type_state_fixture():
     return json.loads(load_fixture("invalid_multilevel_sensor_type_state.json"))
 
 
-@pytest.fixture(name="client_session")
-def client_session_fixture(ws_client):
-    """Mock an aiohttp client session."""
-    client_session = AsyncMock(spec_set=ClientSession)
-    client_session.ws_connect.side_effect = AsyncMock(return_value=ws_client)
-    return client_session
-
-
 @pytest.fixture(name="inovelli_switch_state", scope="session")
 def inovelli_switch_state_fixture():
     """Load the bad string meta data node state fixture data."""
@@ -105,6 +97,20 @@ def ring_keypad_state_fixture():
 def is_secure_unknown_state_fixture():
     """Load the isSecure = `unknown` node state fixture data."""
     return json.loads(load_fixture("is_secure_unknown_state.json"))
+
+
+@pytest.fixture(name="switch_enbrighten_zw3010_state", scope="session")
+def switch_enbrighten_zw3010_state_fixture():
+    """Load the enbrighten zw3010 switch node state fixture data."""
+    return json.loads(load_fixture("switch_enbrighten_zw3010_state.json"))
+
+
+@pytest.fixture(name="client_session")
+def client_session_fixture(ws_client):
+    """Mock an aiohttp client session."""
+    client_session = AsyncMock(spec_set=ClientSession)
+    client_session.ws_connect.side_effect = AsyncMock(return_value=ws_client)
+    return client_session
 
 
 def create_ws_message(result):
@@ -426,5 +432,13 @@ def invalid_multilevel_sensor_type_fixture(
 def is_secure_unknown_fixture(driver, is_secure_unknown_state):
     """Mock a node that has inSecure = `unknown`."""
     node = Node(driver.client, deepcopy(is_secure_unknown_state))
+    driver.controller.nodes[node.node_id] = node
+    return node
+
+
+@pytest.fixture(name="switch_enbrighten_zw3010")
+def switch_enbrighten_zw3010_fixture(driver, switch_enbrighten_zw3010_state):
+    """Mock an Enbrighten ZW3010 switch node."""
+    node = Node(driver.client, deepcopy(switch_enbrighten_zw3010_state))
     driver.controller.nodes[node.node_id] = node
     return node
