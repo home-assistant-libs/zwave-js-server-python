@@ -516,6 +516,35 @@ def test_node_inclusion(multisensor_6_state):
     assert len(node.values) > 0
 
 
+def test_node_ready_event(switch_enbrighten_zw3010_state):
+    """Emulate a node ready event."""
+    # when a node node is added, it has minimal info first
+    node = node_pkg.Node(
+        None, {"nodeId": 2, "status": 1, "ready": False, "values": [], "endpoints": []}
+    )
+    assert node.node_id == 2
+    assert node.status == 1
+    assert not node.ready
+    assert len(node.values) == 0
+    assert node.device_config.manufacturer is None
+
+    # the ready event contains a full (and complete) dump of the node, including values
+    event = Event(
+        "ready",
+        {
+            "event": "ready",
+            "source": "node",
+            "nodeId": node.node_id,
+            "nodeState": switch_enbrighten_zw3010_state,
+            "result": [],
+        },
+    )
+    # This will fail if the schema is invalid
+    node.receive_event(event)
+
+    assert len(node.values) > 0
+
+
 async def test_node_status_events(multisensor_6):
     """Test Node status events."""
     node = multisensor_6

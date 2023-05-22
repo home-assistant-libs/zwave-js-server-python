@@ -19,10 +19,10 @@ class MetaDataType(TypedDict, total=False):
     writeable: bool  # required
     description: str
     label: str
-    min: int
-    max: int
+    min: int | None
+    max: int | None
     unit: str
-    states: dict[int, str]
+    states: dict[str, str]
     ccSpecific: dict[str, Any]
     valueChangeOptions: list[str]
     allowManualEntry: bool
