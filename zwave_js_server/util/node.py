@@ -142,7 +142,7 @@ async def async_bulk_set_partial_config_parameters(
     # If new_value is a dictionary, we need to calculate the full value to send
     if isinstance(new_value, dict):
         new_value = _get_int_from_partials_dict(
-            node, partial_param_values, property_, new_value
+            node, partial_param_values, property_, new_value, endpoint=endpoint
         )
     else:
         _validate_raw_int(partial_param_values, new_value)
@@ -151,6 +151,7 @@ async def async_bulk_set_partial_config_parameters(
         "set_value",
         valueId={
             "commandClass": CommandClass.CONFIGURATION.value,
+            "endpoint": endpoint,
             "property": property_,
         },
         value=new_value,
