@@ -35,7 +35,10 @@ async def test_configuration_parameter_values(
     # Put all config parameters on endpoint we are testing
     for state in (node_state, node_2_state):
         for value in state["values"]:
-            if value["commandClass"] == CommandClass.CONFIGURATION:
+            if (
+                value["commandClass"] == CommandClass.CONFIGURATION
+                and value["endpoint"] == 0
+            ):
                 value["endpoint"] = endpoint
 
     node: Node = Node(client, node_state)
@@ -164,7 +167,10 @@ async def test_bulk_set_partial_config_parameters(
     node_state = copy.deepcopy(multisensor_6_state)
     # Put all config parameters on endpoint we are testing
     for value in node_state["values"]:
-        if value["commandClass"] == CommandClass.CONFIGURATION:
+        if (
+            value["commandClass"] == CommandClass.CONFIGURATION
+            and value["endpoint"] == 0
+        ):
             value["endpoint"] = endpoint
     node: Node = Node(client, node_state)
     ack_commands = mock_command(
@@ -293,7 +299,10 @@ async def test_bulk_set_with_full_and_partial_parameters(
     node_state = copy.deepcopy(partial_and_full_parameter_state)
     # Put all config parameters on endpoint we are testing
     for value in node_state["values"]:
-        if value["commandClass"] == CommandClass.CONFIGURATION:
+        if (
+            value["commandClass"] == CommandClass.CONFIGURATION
+            and value["endpoint"] == 0
+        ):
             value["endpoint"] = endpoint
     node: Node = Node(client, node_state)
     ack_commands = mock_command(
@@ -326,7 +335,10 @@ async def test_failures(endpoint, client, multisensor_6_state, mock_command):
     node_state = copy.deepcopy(multisensor_6_state)
     # Put all config parameters on endpoint we are testing
     for value in node_state["values"]:
-        if value["commandClass"] == CommandClass.CONFIGURATION:
+        if (
+            value["commandClass"] == CommandClass.CONFIGURATION
+            and value["endpoint"] == 0
+        ):
             value["endpoint"] = endpoint
     node: Node = Node(client, node_state)
     # We need the node to be alive so we wait for a response
@@ -352,7 +364,10 @@ async def test_returned_values(endpoint, client, multisensor_6_state, mock_comma
     node_state = copy.deepcopy(multisensor_6_state)
     # Put all config parameters on endpoint we are testing
     for value in node_state["values"]:
-        if value["commandClass"] == CommandClass.CONFIGURATION:
+        if (
+            value["commandClass"] == CommandClass.CONFIGURATION
+            and value["endpoint"] == 0
+        ):
             value["endpoint"] = endpoint
     node: Node = Node(client, node_state)
     # We need the node to be alive so we wait for a response
