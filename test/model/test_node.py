@@ -33,8 +33,8 @@ from zwave_js_server.exceptions import (
 from zwave_js_server.model import endpoint as endpoint_pkg
 from zwave_js_server.model import node as node_pkg
 from zwave_js_server.model.node.firmware import (
-    NodeFirmwareUpdateStatus,
     NodeFirmwareUpdateInfo,
+    NodeFirmwareUpdateStatus,
 )
 from zwave_js_server.model.node.health_check import (
     LifelineHealthCheckResultDataType,

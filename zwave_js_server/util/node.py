@@ -31,6 +31,7 @@ async def async_set_config_parameter(
     new_value: int | str,
     property_or_property_name: int | str,
     property_key: int | str | None = None,
+    endpoint: int = 0,
 ) -> tuple[ConfigurationValue, CommandStatus]:
     """
     Set a value for a config parameter on this node.
@@ -48,18 +49,20 @@ async def async_set_config_parameter(
                 config_value
                 for config_value in config_values.values()
                 if config_value.property_name == property_or_property_name
+                and config_value.endpoint == endpoint
             )
         except StopIteration:
             raise NotFoundError(
                 "Configuration parameter with parameter name "
-                f"{property_or_property_name} could not be found"
+                f"{property_or_property_name} on node {node} endpoint {endpoint} "
+                "could not be found"
             ) from None
     else:
         value_id = get_value_id_str(
             node,
             CommandClass.CONFIGURATION,
             property_or_property_name,
-            endpoint=0,
+            endpoint=endpoint,
             property_key=property_key,
         )
 
@@ -87,21 +90,28 @@ async def async_set_config_parameter(
 
 
 async def async_bulk_set_partial_config_parameters(
-    node: Node, property_: int, new_value: int | dict[int | str, int | str]
+    node: Node,
+    property_: int,
+    new_value: int | dict[int | str, int | str],
+    endpoint: int = 0,
 ) -> CommandStatus:
     """Bulk set partial configuration values on this node."""
     config_values = node.get_configuration_values()
     partial_param_values = {
         value_id: value
         for value_id, value in config_values.items()
-        if value.property_ == property_ and value.property_key is not None
+        if value.property_ == property_
+        and value.endpoint == endpoint
+        and value.property_key is not None
     }
 
     if not partial_param_values:
         # If we find a value with this property_, we know this value isn't split
         # into partial params
         if (
-            get_value_id_str(node, CommandClass.CONFIGURATION, property_)
+            get_value_id_str(
+                node, CommandClass.CONFIGURATION, property_, endpoint=endpoint
+            )
             in config_values
         ):
             # If the new value is provided as a dict, we don't have enough information
@@ -109,7 +119,7 @@ async def async_bulk_set_partial_config_parameters(
             if isinstance(new_value, dict):
                 raise ValueTypeError(
                     f"Configuration parameter {property_} for node {node.node_id} "
-                    "does not have partials"
+                    f"endpoint {endpoint} does not have partials"
                 )
             # If the new value is provided as an int, we may as well try to set it
             # using the standard utility function
@@ -117,19 +127,22 @@ async def async_bulk_set_partial_config_parameters(
                 "Falling back to async_set_config_parameter because no partials "
                 "were found"
             )
-            _, cmd_status = await async_set_config_parameter(node, new_value, property_)
+            _, cmd_status = await async_set_config_parameter(
+                node, new_value, property_, endpoint=endpoint
+            )
             return cmd_status
 
         # Otherwise if we can't find any values with this property, this config
         # parameter does not exist
         raise NotFoundError(
-            f"Configuration parameter {property_} for node {node.node_id} not found"
+            f"Configuration parameter {property_} for node {node.node_id} endpoint "
+            f"{endpoint} not found"
         )
 
     # If new_value is a dictionary, we need to calculate the full value to send
     if isinstance(new_value, dict):
         new_value = _get_int_from_partials_dict(
-            node, partial_param_values, property_, new_value
+            node, partial_param_values, property_, new_value, endpoint=endpoint
         )
     else:
         _validate_raw_int(partial_param_values, new_value)
@@ -138,6 +151,7 @@ async def async_bulk_set_partial_config_parameters(
         "set_value",
         valueId={
             "commandClass": CommandClass.CONFIGURATION.value,
+            "endpoint": endpoint,
             "property": property_,
         },
         value=new_value,
@@ -239,7 +253,7 @@ def _bulk_set_validate_and_transform_new_value(
         return _validate_and_transform_new_value(zwave_value, new_partial_value)
     except (InvalidNewValue, NotImplementedError) as err:
         raise BulkSetConfigParameterFailed(
-            f"Config parameter {zwave_value.property_} failed validation on partial "
+            f"Config parameter {zwave_value.value_id} failed validation on partial "
             f"parameter {property_key}"
         ) from err
 
@@ -249,6 +263,7 @@ def _get_int_from_partials_dict(
     partial_param_values: dict[str, ConfigurationValue],
     property_: int,
     new_value: dict[int | str, int | str],
+    endpoint: int = 0,
 ) -> int:
     """Take an input dict for a set of partial values and compute the raw int value."""
     int_value = 0
@@ -264,11 +279,13 @@ def _get_int_from_partials_dict(
                 CommandClass.CONFIGURATION,
                 property_,
                 property_key=property_key_or_name,
+                endpoint=endpoint,
             )
             if value_id not in partial_param_values:
                 raise NotFoundError(
                     f"Bitmask {property_key_or_name} ({hex(property_key_or_name)}) "
-                    f"not found for parameter {property_}"
+                    f"not found for parameter {property_} on node {node} endpoint "
+                    f"{endpoint}"
                 )
             zwave_value = partial_param_values[value_id]
         # If the dict key is a property name, we have to find the value from the list
@@ -279,11 +296,13 @@ def _get_int_from_partials_dict(
                     value
                     for value in partial_param_values.values()
                     if value.property_name == property_key_or_name
+                    and value.endpoint == endpoint
                 )
             except StopIteration:
                 raise NotFoundError(
                     f"Partial parameter with label '{property_key_or_name}'"
-                    f"not found for parameter {property_}"
+                    f"not found for parameter {property_} on node {node} endpoint "
+                    f"{endpoint}"
                 ) from None
 
         provided_partial_values.append(zwave_value)
