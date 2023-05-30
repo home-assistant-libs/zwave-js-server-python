@@ -105,6 +105,12 @@ def switch_enbrighten_zw3010_state_fixture():
     return json.loads(load_fixture("switch_enbrighten_zw3010_state.json"))
 
 
+@pytest.fixture(name="energy_production_state", scope="session")
+def energy_production_state_fixture():
+    """Load a mock node with energy production CC state fixture data."""
+    return json.loads(load_fixture("energy_production_state.json"))
+
+
 @pytest.fixture(name="client_session")
 def client_session_fixture(ws_client):
     """Mock an aiohttp client session."""
@@ -440,5 +446,13 @@ def is_secure_unknown_fixture(driver, is_secure_unknown_state):
 def switch_enbrighten_zw3010_fixture(driver, switch_enbrighten_zw3010_state):
     """Mock an Enbrighten ZW3010 switch node."""
     node = Node(driver.client, deepcopy(switch_enbrighten_zw3010_state))
+    driver.controller.nodes[node.node_id] = node
+    return node
+
+
+@pytest.fixture(name="energy_production")
+def energy_prodution_fixture(driver, energy_production_state):
+    """Mock a mock node with Energy Production CC."""
+    node = Node(driver.client, deepcopy(energy_production_state))
     driver.controller.nodes[node.node_id] = node
     return node
