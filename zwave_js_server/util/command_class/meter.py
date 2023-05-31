@@ -20,9 +20,9 @@ def get_meter_type(value: Value) -> MeterType:
     try:
         return MeterType(value.metadata.cc_specific[CC_SPECIFIC_METER_TYPE])
     except ValueError:
-        raise UnknownValueData(  # pylint: disable=raise-missing-from
+        raise UnknownValueData(
             value, f"metadata.cc_specific.{CC_SPECIFIC_METER_TYPE}"
-        )
+        ) from None
 
 
 def get_meter_scale_type(value: Value) -> MeterScaleType:
@@ -32,6 +32,6 @@ def get_meter_scale_type(value: Value) -> MeterScaleType:
     try:
         return scale_enum(value.metadata.cc_specific[CC_SPECIFIC_SCALE])
     except ValueError:
-        raise UnknownValueData(  # pylint: disable=raise-missing-from
+        raise UnknownValueData(
             value, f"metadata.cc_specific.{CC_SPECIFIC_SCALE}"
-        )
+        ) from None

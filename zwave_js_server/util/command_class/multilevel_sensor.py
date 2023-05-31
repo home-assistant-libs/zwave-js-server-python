@@ -20,9 +20,9 @@ def get_multilevel_sensor_type(value: Value) -> MultilevelSensorType:
     try:
         return MultilevelSensorType(value.metadata.cc_specific[CC_SPECIFIC_SENSOR_TYPE])
     except ValueError:
-        raise UnknownValueData(  # pylint: disable=raise-missing-from
+        raise UnknownValueData(
             value, f"metadata.cc_specific.{CC_SPECIFIC_SENSOR_TYPE}"
-        )
+        ) from None
 
 
 def get_multilevel_sensor_scale_type(value: Value) -> MultilevelSensorScaleType:
@@ -32,6 +32,6 @@ def get_multilevel_sensor_scale_type(value: Value) -> MultilevelSensorScaleType:
     try:
         return scale_enum(value.metadata.cc_specific[CC_SPECIFIC_SCALE])
     except ValueError:
-        raise UnknownValueData(  # pylint: disable=raise-missing-from
+        raise UnknownValueData(
             value, f"metadata.cc_specific.{CC_SPECIFIC_SCALE}"
-        )
+        ) from None
