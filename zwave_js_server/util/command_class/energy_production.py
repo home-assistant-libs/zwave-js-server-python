@@ -22,9 +22,9 @@ def get_energy_production_parameter(value: Value) -> EnergyProductionParameter:
             value.metadata.cc_specific[CC_SPECIFIC_PARAMETER]
         )
     except ValueError:
-        raise UnknownValueData(  # pylint: disable=raise-missing-from
+        raise UnknownValueData(
             value, f"metadata.cc_specific.{CC_SPECIFIC_PARAMETER}"
-        )
+        ) from None
 
 
 def get_energy_production_scale_type(value: Value) -> EnergyProductionScaleType:
@@ -34,6 +34,6 @@ def get_energy_production_scale_type(value: Value) -> EnergyProductionScaleType:
     try:
         return scale_enum(value.metadata.cc_specific[CC_SPECIFIC_SCALE])
     except ValueError:
-        raise UnknownValueData(  # pylint: disable=raise-missing-from
+        raise UnknownValueData(
             value, f"metadata.cc_specific.{CC_SPECIFIC_SCALE}"
-        )
+        ) from None
