@@ -5,7 +5,7 @@ import json
 import logging
 from typing import cast
 
-from ..const import CommandClass, CommandStatus, ConfigurationValueType
+from ..const import CommandClass, CommandStatus, ConfigurationValueType, SetValueStatus
 from ..exceptions import (
     BulkSetConfigParameterFailed,
     InvalidNewValue,
@@ -14,7 +14,7 @@ from ..exceptions import (
     ValueTypeError,
 )
 from ..model.node import Node
-from ..model.value import ConfigurationValue, get_value_id_str
+from ..model.value import ConfigurationValue, SetValueResult, get_value_id_str
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -76,15 +76,15 @@ async def async_set_config_parameter(
     new_value = _validate_and_transform_new_value(zwave_value, new_value)
 
     # Finally attempt to set the value and return the Value object if successful
-    success = await node.async_set_value(zwave_value, new_value)
-    if success is False:
-        raise SetValueFailed(
-            "Unable to set value, refer to "
-            "https://zwave-js.github.io/node-zwave-js/#/api/node?id=setvalue for "
-            "possible reasons"
-        )
+    result = await node.async_set_value(zwave_value, new_value)
+    if result and result.status not in (
+        SetValueStatus.WORKING,
+        SetValueStatus.SUCCESS,
+        SetValueStatus.SUCCESS_UNSUPERVISED,
+    ):
+        raise SetValueFailed(str(result))
 
-    status = CommandStatus.ACCEPTED if success else CommandStatus.QUEUED
+    status = CommandStatus.ACCEPTED if result is not None else CommandStatus.QUEUED
 
     return zwave_value, status
 
@@ -161,14 +161,15 @@ async def async_bulk_set_partial_config_parameters(
     if cmd_response is None:
         return CommandStatus.QUEUED
 
-    if not cast(bool, cmd_response["success"]):
-        raise SetValueFailed(
-            "Unable to set value, refer to "
-            "https://zwave-js.github.io/node-zwave-js/#/api/node?id=setvalue for "
-            "possible reasons"
-        )
+    result = SetValueResult(cmd_response["result"])
 
-    # If we received a response that is not false, the command was successful
+    if result.status not in (
+        SetValueStatus.WORKING,
+        SetValueStatus.SUCCESS,
+        SetValueStatus.SUCCESS_UNSUPERVISED,
+    ):
+        raise SetValueFailed(str(result))
+
     return CommandStatus.ACCEPTED
 
 

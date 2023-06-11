@@ -15,7 +15,7 @@ from ..const.command_class.lock import (
 )
 from ..exceptions import NotFoundError
 from ..model.node import Node
-from ..model.value import Value, get_value_id_str
+from ..model.value import SetValueResult, Value, get_value_id_str
 
 
 def get_code_slot_value(node: Node, code_slot: int, property_name: str) -> Value:
@@ -114,17 +114,17 @@ async def get_usercode_from_node(node: Node, code_slot: int) -> dict[str, str | 
     }
 
 
-async def set_usercode(node: Node, code_slot: int, usercode: str) -> None:
+async def set_usercode(node: Node, code_slot: int, usercode: str) -> SetValueResult:
     """Set the usercode to index X on the lock."""
     value = get_code_slot_value(node, code_slot, LOCK_USERCODE_PROPERTY)
 
     if len(str(usercode)) < 4:
         raise ValueError("User code must be at least 4 digits")
 
-    await node.async_set_value(value, usercode)
+    return await node.async_set_value(value, usercode)
 
 
-async def clear_usercode(node: Node, code_slot: int) -> None:
+async def clear_usercode(node: Node, code_slot: int) -> SetValueResult:
     """Clear a code slot on the lock."""
     value = get_code_slot_value(node, code_slot, LOCK_USERCODE_STATUS_PROPERTY)
-    await node.async_set_value(value, CodeSlotStatus.AVAILABLE.value)
+    return await node.async_set_value(value, CodeSlotStatus.AVAILABLE.value)

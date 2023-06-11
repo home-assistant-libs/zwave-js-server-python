@@ -1811,9 +1811,9 @@ async def test_begin_ota_firmware_update(multisensor_6, uuid4, mock_command):
     """Test get available firmware updates."""
     ack_commands = mock_command(
         {"command": "controller.firmware_update_ota"},
-        {"success": True},
+        {"result": {"status": 255, "success": True, "reInterview": False}},
     )
-    assert await multisensor_6.client.driver.controller.async_firmware_update_ota(
+    result = await multisensor_6.client.driver.controller.async_firmware_update_ota(
         multisensor_6,
         [
             NodeFirmwareUpdateFileInfo(
@@ -1821,6 +1821,9 @@ async def test_begin_ota_firmware_update(multisensor_6, uuid4, mock_command):
             )
         ],
     )
+    assert result.status == 255
+    assert result.success
+    assert not result.reinterview
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {

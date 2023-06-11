@@ -1,11 +1,13 @@
 """Provide a model for the Z-Wave JS value."""
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, TypedDict
 
-from ..const import VALUE_UNKNOWN, CommandClass, ConfigurationValueType
+from ..const import VALUE_UNKNOWN, CommandClass, ConfigurationValueType, SetValueStatus
 from ..event import Event
 from ..util.helpers import parse_buffer
+from .duration import Duration, DurationDataType
 
 if TYPE_CHECKING:
     from .node import Node
@@ -38,14 +40,14 @@ class ValueDataType(TypedDict, total=False):
     commandClassName: str  # required
     endpoint: int
     property: int | str  # required
-    propertyName: str
+    propertyName: str  # required
     propertyKey: int | str
     propertyKeyName: str
     value: Any
     newValue: Any
     prevValue: Any
-    metadata: MetaDataType
-    ccVersion: int
+    metadata: MetaDataType  # required
+    ccVersion: int  # required
 
 
 def _init_value(node: "Node", val: ValueDataType) -> "Value" | "ConfigurationValue":
@@ -309,4 +311,57 @@ class ConfigurationValue(Value):
             ) and not self.metadata.max == self.metadata.min == 0:
                 return ConfigurationValueType.RANGE
 
+        if self.metadata.type == "boolean":
+            if self.metadata.allow_manual_entry and not (
+                self.metadata.max == 1 and self.metadata.min == 0
+            ):
+                return ConfigurationValueType.MANUAL_ENTRY
+            if self.metadata.states:
+                return ConfigurationValueType.ENUMERATED
+            return ConfigurationValueType.BOOLEAN
+
         return ConfigurationValueType.UNDEFINED
+
+
+class SetValueResultDataType(TypedDict, total=False):
+    """Represent a setValue result data dict type."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/v11-dev/packages/cc/src/lib/API.ts#L103
+    status: int  # required
+    remainingDuration: DurationDataType
+    message: str
+
+
+@dataclass
+class SetValueResult:
+    """Result from setValue command."""
+
+    data: SetValueResultDataType
+    status: SetValueStatus = field(init=False)
+    remaining_duration: Duration | None = field(init=False)
+    message: str | None = field(init=False)
+
+    def __post_init__(self) -> None:
+        """Post init."""
+        self.status = SetValueStatus(self.data["status"])
+        self.remaining_duration = (
+            Duration(duration_data)
+            if (duration_data := self.data.get("remainingDuration"))
+            else None
+        )
+        self.message = self.data.get("message")
+
+    def __repr__(self) -> str:
+        """Return the representationt."""
+        status = self.status.name.replace("_", " ").title()
+        if self.status == SetValueStatus.WORKING:
+            assert self.remaining_duration
+            return f"{status} ({self.remaining_duration})"
+        if self.status in (
+            SetValueStatus.ENDPOINT_NOT_FOUND,
+            SetValueStatus.INVALID_VALUE,
+            SetValueStatus.NOT_IMPLEMENTED,
+        ):
+            assert self.message
+            return f"{status}: {self.message}"
+        return status

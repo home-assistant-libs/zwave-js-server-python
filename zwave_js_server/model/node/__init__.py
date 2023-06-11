@@ -37,6 +37,7 @@ from ..notification import (
 from ..value import (
     ConfigurationValue,
     MetaDataType,
+    SetValueResult,
     Value,
     ValueDataType,
     ValueMetadata,
@@ -456,7 +457,7 @@ class Node(EventBase):
         new_value: Any,
         options: dict | None = None,
         wait_for_result: bool | None = None,
-    ) -> bool | None:
+    ) -> SetValueResult | None:
         """Send setValue command to Node for given value (or value_id)."""
         # a value may be specified as value_id or the value itself
         if not isinstance(val, Value):
@@ -494,7 +495,7 @@ class Node(EventBase):
         if result is None:
             return None
 
-        return cast(bool, result["success"])
+        return SetValueResult(result["result"])
 
     async def async_refresh_info(self) -> None:
         """Send refreshInfo command to Node."""

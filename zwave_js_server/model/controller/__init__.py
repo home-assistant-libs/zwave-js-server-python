@@ -23,6 +23,7 @@ from ...event import Event, EventBase
 from ...util.helpers import convert_base64_to_bytes, convert_bytes_to_base64
 from ..association import AssociationAddress, AssociationGroup
 from ..node import Node
+from ..node.firmware import NodeFirmwareUpdateResult
 from .data_model import ControllerDataType
 from .event_model import CONTROLLER_EVENT_MODEL_MAP
 from .firmware import ControllerFirmwareUpdateProgress, ControllerFirmwareUpdateResult
@@ -783,7 +784,7 @@ class Controller(EventBase):
 
     async def async_firmware_update_ota(
         self, node: Node, updates: list[NodeFirmwareUpdateFileInfo]
-    ) -> bool:
+    ) -> NodeFirmwareUpdateResult:
         """Send firmwareUpdateOTA command to Controller."""
         data = await self.client.async_send_command(
             {
@@ -793,7 +794,7 @@ class Controller(EventBase):
             },
             require_schema=24,
         )
-        return cast(bool, data["success"])
+        return NodeFirmwareUpdateResult(node, data["result"])
 
     async def async_is_firmware_update_in_progress(self) -> bool:
         """Send isFirmwareUpdateInProgress command to Controller."""
