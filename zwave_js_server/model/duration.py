@@ -27,7 +27,7 @@ class Duration:
         self.value = self.data.get("value")
 
     def __repr__(self) -> str:
-        """Return the representationt."""
+        """Return the representation."""
         if self.value:
             return f"{self.value} {self.unit}"
         return f"{self.unit} duration"
