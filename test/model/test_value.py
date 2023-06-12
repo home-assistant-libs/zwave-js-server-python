@@ -89,7 +89,7 @@ def test_configuration_value_type(inovelli_switch_state):
                 max=2,
                 min=0,
                 allowManualEntry=True,
-                statues={True: "On", False: "Off"},
+                states={True: "On", False: "Off"},
             ),
         ),
     )
@@ -142,7 +142,7 @@ def test_configuration_value_type(inovelli_switch_state):
                 max=2,
                 min=0,
                 allowManualEntry=True,
-                statues={0: "On", 1: "Off"},
+                states={0: "On", 1: "Off"},
             ),
         ),
     )

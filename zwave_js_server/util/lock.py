@@ -114,7 +114,9 @@ async def get_usercode_from_node(node: Node, code_slot: int) -> dict[str, str | 
     }
 
 
-async def set_usercode(node: Node, code_slot: int, usercode: str) -> SetValueResult:
+async def set_usercode(
+    node: Node, code_slot: int, usercode: str
+) -> SetValueResult | None:
     """Set the usercode to index X on the lock."""
     value = get_code_slot_value(node, code_slot, LOCK_USERCODE_PROPERTY)
 
@@ -124,7 +126,7 @@ async def set_usercode(node: Node, code_slot: int, usercode: str) -> SetValueRes
     return await node.async_set_value(value, usercode)
 
 
-async def clear_usercode(node: Node, code_slot: int) -> SetValueResult:
+async def clear_usercode(node: Node, code_slot: int) -> SetValueResult | None:
     """Clear a code slot on the lock."""
     value = get_code_slot_value(node, code_slot, LOCK_USERCODE_STATUS_PROPERTY)
     return await node.async_set_value(value, CodeSlotStatus.AVAILABLE.value)

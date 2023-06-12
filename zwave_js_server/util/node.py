@@ -223,6 +223,7 @@ def _validate_and_transform_new_value(
     max_ = zwave_value.metadata.max
     min_ = zwave_value.metadata.min
     check_ = zwave_value.configuration_value_type in (
+        ConfigurationValueType.BOOLEAN,
         ConfigurationValueType.RANGE,
         ConfigurationValueType.MANUAL_ENTRY,
     )
