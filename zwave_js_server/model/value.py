@@ -351,7 +351,7 @@ class SetValueResult:
         self.message = self.data.get("message")
 
     def __repr__(self) -> str:
-        """Return the representationt."""
+        """Return the representation."""
         status = self.status.name.replace("_", " ").title()
         if self.status == SetValueStatus.WORKING:
             assert self.remaining_duration
