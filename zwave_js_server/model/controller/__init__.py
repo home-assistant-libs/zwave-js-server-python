@@ -379,7 +379,7 @@ class Controller(EventBase):
             "command": "controller.begin_exclusion"
         }
         if strategy is not None:
-            payload["strategy"] = strategy
+            payload["options"] = {"strategy": strategy}
         data = await self.client.async_send_command(payload, require_schema=22)
         return cast(bool, data["success"])
 

@@ -683,7 +683,7 @@ async def test_begin_exclusion_unprovision(controller, uuid4, mock_command):
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.begin_exclusion",
-        "strategy": ExclusionStrategy.EXCLUDE_ONLY,
+        "options": {"strategy": ExclusionStrategy.EXCLUDE_ONLY},
         "messageId": uuid4,
     }
 
