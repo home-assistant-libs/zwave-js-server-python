@@ -792,7 +792,7 @@ class Controller(EventBase):
                 "nodeId": node.node_id,
                 "updates": [update.to_dict() for update in updates],
             },
-            require_schema=24,
+            require_schema=29,
         )
         return NodeFirmwareUpdateResult(node, data["result"])
 

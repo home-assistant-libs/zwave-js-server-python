@@ -36,7 +36,7 @@ async def update_firmware(
         "updates": [update.to_dict() for update in updates],
     }
 
-    data = await client.async_send_command(cmd, require_schema=24)
+    data = await client.async_send_command(cmd, require_schema=29)
     await client.disconnect()
     if not receive_task.done():
         receive_task.cancel()
@@ -70,7 +70,7 @@ async def controller_firmware_update_otw(
             "command": "controller.firmware_update_otw",
             **firmware_file.to_dict(),
         },
-        require_schema=25,
+        require_schema=29,
     )
     await client.disconnect()
     if not receive_task.done():
