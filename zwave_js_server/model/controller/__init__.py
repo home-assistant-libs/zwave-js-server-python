@@ -375,7 +375,7 @@ class Controller(EventBase):
         self, strategy: ExclusionStrategy | None = None
     ) -> bool:
         """Send beginExclusion command to Controller."""
-        payload: dict[str, str | ExclusionStrategy] = {
+        payload: dict[str, str | dict[str, ExclusionStrategy]] = {
             "command": "controller.begin_exclusion"
         }
         if strategy is not None:
