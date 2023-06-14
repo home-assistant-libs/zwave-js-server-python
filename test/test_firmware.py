@@ -45,7 +45,7 @@ async def test_update_firmware_guess_format(url, client_session, multisensor_6):
                     }
                 ],
             },
-            require_schema=24,
+            require_schema=29,
         )
         disconnect_mock.assert_called_once()
 
@@ -90,7 +90,7 @@ async def test_update_firmware_known_format_and_target(
                     }
                 ],
             },
-            require_schema=24,
+            require_schema=29,
         )
         disconnect_mock.assert_called_once()
 
@@ -119,7 +119,7 @@ async def test_controller_firmware_update_otw_guess_format(url, client_session):
                 "filename": "test",
                 "file": "AAAAAAAAAAAAAA==",
             },
-            require_schema=25,
+            require_schema=29,
         )
         disconnect_mock.assert_called_once()
 
@@ -153,6 +153,6 @@ async def test_controller_firmware_update_otw_known_format_and_target(
                 "file": "AAAAAAAAAAAAAA==",
                 "fileFormat": "test",
             },
-            require_schema=25,
+            require_schema=29,
         )
         disconnect_mock.assert_called_once()
