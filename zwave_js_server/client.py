@@ -157,7 +157,7 @@ class Client:
 
         # basic check for server schema version compatibility
         if (
-            self.version.min_schema_version > MIN_SERVER_SCHEMA_VERSION
+            self.version.min_schema_version > MAX_SERVER_SCHEMA_VERSION
             or self.version.max_schema_version < MIN_SERVER_SCHEMA_VERSION
         ):
             await self._client.close()
