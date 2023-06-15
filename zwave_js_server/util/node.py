@@ -155,6 +155,7 @@ async def async_bulk_set_partial_config_parameters(
             "property": property_,
         },
         value=new_value,
+        require_schema=29,
     )
 
     # If we didn't wait for a response, we assume the command has been queued
