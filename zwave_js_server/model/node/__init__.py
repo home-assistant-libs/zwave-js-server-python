@@ -489,7 +489,7 @@ class Node(EventBase):
 
         # the value object needs to be send to the server
         result = await self.async_send_command(
-            "set_value", **cmd_args, wait_for_result=wait_for_result
+            "set_value", **cmd_args, require_schema=29, wait_for_result=wait_for_result
         )
 
         if result is None:

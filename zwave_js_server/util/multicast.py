@@ -44,7 +44,7 @@ async def async_multicast_set_value(
         valueId=_get_value_id_dict_from_value_data(value_data),
         value=new_value,
         options=options,
-        require_schema=5,
+        require_schema=29,
     )
     return SetValueResult(result["result"])
 
