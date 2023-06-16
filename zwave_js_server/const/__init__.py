@@ -387,6 +387,13 @@ class SetValueStatus(IntEnum):
     SUCCESS = 255
 
 
+SET_VALUE_SUCCESS = (
+    SetValueStatus.SUCCESS,
+    SetValueStatus.SUCCESS_UNSUPERVISED,
+    SetValueStatus.WORKING,
+)
+
+
 class RemoveNodeReason(IntEnum):
     """Enum for all known reasons why a node was removed."""
 
