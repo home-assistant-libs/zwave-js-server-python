@@ -368,7 +368,7 @@ class SecurityBootstrapFailure(IntEnum):
 class SetValueStatus(IntEnum):
     """Enum for all known setValue statuses."""
 
-    # https://github.com/zwave-js/node-zwave-js/blob/v11-dev/packages/cc/src/lib/API.ts#L83
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/cc/src/lib/API.ts#L83
     # The device reports no support for this command
     NO_DEVICE_SUPPORT = 0
     # The device has accepted the command and is working on it
@@ -385,3 +385,23 @@ class SetValueStatus(IntEnum):
     SUCCESS_UNSUPERVISED = 254
     # The device has executed the command successfully
     SUCCESS = 255
+
+
+class RemoveNodeReason(IntEnum):
+    """Enum for all known reasons why a node was removed."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/controller/Inclusion.ts#L266
+    # The node was excluded by the user or an inclusion controller
+    EXCLUDED = 0
+    # The node was excluded by an inclusion controller
+    PROXY_EXCLUDED = 1
+    # The node was removed using the "remove failed node" feature
+    REMOVE_FAILED = 2
+    # The node was replaced using the "replace failed node" feature
+    REPLACED = 3
+    # The node was replaced by an inclusion controller
+    PROXY_REPLACED = 4
+    # The node was reset locally and was auto-removed
+    RESET = 5
+    # SmartStart inclusion failed, and the node was auto-removed as a result.
+    SMART_START_FAILED = 6

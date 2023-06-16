@@ -1981,7 +1981,7 @@ async def test_node_removed(client, multisensor_6, multisensor_6_state):
             "source": "controller",
             "event": "node removed",
             "node": multisensor_6_state,
-            "replaced": False,
+            "reason": 0,
         },
     )
     client.driver.controller.receive_event(event)

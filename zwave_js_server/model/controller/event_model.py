@@ -124,7 +124,7 @@ class NodeRemovedEventModel(BaseControllerEventModel):
 
     event: Literal["node removed"]
     node: NodeDataType
-    replaced: bool
+    reason: int
 
 
 class NVMBackupAndConvertProgressEventModel(BaseControllerEventModel):
