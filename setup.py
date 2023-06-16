@@ -5,7 +5,7 @@ from setuptools import find_packages, setup
 
 PROJECT_DIR = Path(__file__).parent.resolve()
 README_FILE = PROJECT_DIR / "README.md"
-VERSION = "0.49.0"
+VERSION = "0.50.0"
 
 
 setup(
