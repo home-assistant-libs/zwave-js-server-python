@@ -869,7 +869,6 @@ class Controller(EventBase):
 
     def handle_node_removed(self, event: Event) -> None:
         """Process a node removed event."""
-        event.data["reason"] = RemoveNodeReason(event.data["reason"])
         event.data["node"] = self.nodes.pop(event.data["node"]["nodeId"])
         # Remove client from node since it's no longer connected to the controller
         event.data["node"].client = None
