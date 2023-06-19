@@ -8,9 +8,9 @@ PACKAGE_NAME = "zwave-js-server-python"
 __version__ = metadata.version(PACKAGE_NAME)
 
 # minimal server schema version we can handle
-MIN_SERVER_SCHEMA_VERSION = 28
+MIN_SERVER_SCHEMA_VERSION = 29
 # max server schema version we can handle (and our code is compatible with)
-MAX_SERVER_SCHEMA_VERSION = 28
+MAX_SERVER_SCHEMA_VERSION = 29
 
 VALUE_UNKNOWN = "unknown"
 
@@ -201,6 +201,7 @@ class NodeStatus(IntEnum):
 class ConfigurationValueType(str, Enum):
     """Enum for configuration value types."""
 
+    BOOLEAN = "boolean"
     ENUMERATED = "enumerated"
     MANUAL_ENTRY = "manual_entry"
     RANGE = "range"
@@ -362,3 +363,52 @@ class SecurityBootstrapFailure(IntEnum):
     S2_INCORRECT_PIN = 6
     S2_WRONG_SECURITY_LEVEL = 7
     UNKNOWN = 8
+
+
+class SetValueStatus(IntEnum):
+    """Enum for all known setValue statuses."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/cc/src/lib/API.ts#L83
+    # The device reports no support for this command
+    NO_DEVICE_SUPPORT = 0
+    # The device has accepted the command and is working on it
+    WORKING = 1
+    # The device has rejected the command
+    FAIL = 2
+    # The endpoint specified in the value ID does not exist
+    ENDPOINT_NOT_FOUND = 3
+    # The given CC or its API is not implemented (yet) or it has no `setValue` implementation
+    NOT_IMPLEMENTED = 4
+    # The value to set (or a related value) is invalid
+    INVALID_VALUE = 5
+    # The command was sent successfully, but it is unknown whether it was executed
+    SUCCESS_UNSUPERVISED = 254
+    # The device has executed the command successfully
+    SUCCESS = 255
+
+
+SET_VALUE_SUCCESS = (
+    SetValueStatus.SUCCESS,
+    SetValueStatus.SUCCESS_UNSUPERVISED,
+    SetValueStatus.WORKING,
+)
+
+
+class RemoveNodeReason(IntEnum):
+    """Enum for all known reasons why a node was removed."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/controller/Inclusion.ts#L266
+    # The node was excluded by the user or an inclusion controller
+    EXCLUDED = 0
+    # The node was excluded by an inclusion controller
+    PROXY_EXCLUDED = 1
+    # The node was removed using the "remove failed node" feature
+    REMOVE_FAILED = 2
+    # The node was replaced using the "replace failed node" feature
+    REPLACED = 3
+    # The node was replaced by an inclusion controller
+    PROXY_REPLACED = 4
+    # The node was reset locally and was auto-removed
+    RESET = 5
+    # SmartStart inclusion failed, and the node was auto-removed as a result.
+    SMART_START_FAILED = 6

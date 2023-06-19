@@ -339,6 +339,7 @@ async def test_command_error_handling(client, mock_command):
 
 async def test_record_messages(wallmote_central_scene, mock_command, uuid4):
     """Test recording messages."""
+    # pylint: disable=protected-access
     client = wallmote_central_scene.client
     assert not client.recording_messages
     assert not client._recorded_commands
@@ -437,6 +438,7 @@ async def test_record_messages(wallmote_central_scene, mock_command, uuid4):
 
 async def test_additional_user_agent_components(client_session, url):
     """Test additionalUserAgentComponents parameter."""
+    # pylint: disable=protected-access
     client = Client(
         url, client_session, additional_user_agent_components={"foo": "bar"}
     )
@@ -452,7 +454,7 @@ async def test_additional_user_agent_components(client_session, url):
             {
                 "command": "initialize",
                 "messageId": "initialize",
-                "schemaVersion": 28,
+                "schemaVersion": 29,
                 "additionalUserAgentComponents": {
                     "zwave-js-server-python": __version__,
                     "foo": "bar",

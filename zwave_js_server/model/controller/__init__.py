@@ -16,6 +16,7 @@ from ...const import (
     InclusionStrategy,
     NodeType,
     QRCodeVersion,
+    RemoveNodeReason,
     RFRegion,
     ZwaveFeature,
 )
@@ -23,6 +24,7 @@ from ...event import Event, EventBase
 from ...util.helpers import convert_base64_to_bytes, convert_bytes_to_base64
 from ..association import AssociationAddress, AssociationGroup
 from ..node import Node
+from ..node.firmware import NodeFirmwareUpdateResult
 from .data_model import ControllerDataType
 from .event_model import CONTROLLER_EVENT_MODEL_MAP
 from .firmware import ControllerFirmwareUpdateProgress, ControllerFirmwareUpdateResult
@@ -374,11 +376,11 @@ class Controller(EventBase):
         self, strategy: ExclusionStrategy | None = None
     ) -> bool:
         """Send beginExclusion command to Controller."""
-        payload: dict[str, str | ExclusionStrategy] = {
+        payload: dict[str, str | dict[str, ExclusionStrategy]] = {
             "command": "controller.begin_exclusion"
         }
         if strategy is not None:
-            payload["strategy"] = strategy
+            payload["options"] = {"strategy": strategy}
         data = await self.client.async_send_command(payload, require_schema=22)
         return cast(bool, data["success"])
 
@@ -783,7 +785,7 @@ class Controller(EventBase):
 
     async def async_firmware_update_ota(
         self, node: Node, updates: list[NodeFirmwareUpdateFileInfo]
-    ) -> bool:
+    ) -> NodeFirmwareUpdateResult:
         """Send firmwareUpdateOTA command to Controller."""
         data = await self.client.async_send_command(
             {
@@ -791,9 +793,9 @@ class Controller(EventBase):
                 "nodeId": node.node_id,
                 "updates": [update.to_dict() for update in updates],
             },
-            require_schema=24,
+            require_schema=29,
         )
-        return cast(bool, data["success"])
+        return NodeFirmwareUpdateResult(node, data["result"])
 
     async def async_is_firmware_update_in_progress(self) -> bool:
         """Send isFirmwareUpdateInProgress command to Controller."""
@@ -867,6 +869,7 @@ class Controller(EventBase):
 
     def handle_node_removed(self, event: Event) -> None:
         """Process a node removed event."""
+        event.data["reason"] = RemoveNodeReason(event.data["reason"])
         event.data["node"] = self.nodes.pop(event.data["node"]["nodeId"])
         # Remove client from node since it's no longer connected to the controller
         event.data["node"].client = None

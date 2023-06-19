@@ -2,14 +2,16 @@
 from __future__ import annotations
 
 import asyncio
-from typing import cast
 
 import aiohttp
 
 from .client import Client
-from .model.controller.firmware import ControllerFirmwareUpdateData
+from .model.controller.firmware import (
+    ControllerFirmwareUpdateData,
+    ControllerFirmwareUpdateResult,
+)
 from .model.node import Node
-from .model.node.firmware import NodeFirmwareUpdateData
+from .model.node.firmware import NodeFirmwareUpdateData, NodeFirmwareUpdateResult
 
 
 async def update_firmware(
@@ -18,7 +20,7 @@ async def update_firmware(
     updates: list[NodeFirmwareUpdateData],
     session: aiohttp.ClientSession,
     additional_user_agent_components: dict[str, str] | None = None,
-) -> bool:
+) -> NodeFirmwareUpdateResult:
     """Send updateFirmware command to Node."""
     client = Client(
         url, session, additional_user_agent_components=additional_user_agent_components
@@ -34,12 +36,12 @@ async def update_firmware(
         "updates": [update.to_dict() for update in updates],
     }
 
-    data = await client.async_send_command(cmd, require_schema=24)
+    data = await client.async_send_command(cmd, require_schema=29)
     await client.disconnect()
     if not receive_task.done():
         receive_task.cancel()
 
-    return cast(bool, data["success"])
+    return NodeFirmwareUpdateResult(node, data["result"])
 
 
 async def controller_firmware_update_otw(
@@ -47,7 +49,7 @@ async def controller_firmware_update_otw(
     firmware_file: ControllerFirmwareUpdateData,
     session: aiohttp.ClientSession,
     additional_user_agent_components: dict[str, str] | None = None,
-) -> bool:
+) -> ControllerFirmwareUpdateResult:
     """
     Send firmwareUpdateOTW command to Controller.
 
@@ -68,10 +70,10 @@ async def controller_firmware_update_otw(
             "command": "controller.firmware_update_otw",
             **firmware_file.to_dict(),
         },
-        require_schema=25,
+        require_schema=29,
     )
     await client.disconnect()
     if not receive_task.done():
         receive_task.cancel()
 
-    return cast(bool, data["success"])
+    return ControllerFirmwareUpdateResult(data["result"])

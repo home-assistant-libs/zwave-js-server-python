@@ -45,7 +45,7 @@ async def test_configuration_parameter_values(
     node_2: Node = Node(client, node_2_state)
     ack_commands = mock_command(
         {"command": "node.set_value", "nodeId": node.node_id},
-        {"success": True},
+        {"result": {"status": 255}},
     )
 
     assert node.node_id == 13
@@ -70,7 +70,7 @@ async def test_configuration_parameter_values(
     # Test setting a manual entry configuration parameter with a valid value
     ack_commands_2 = mock_command(
         {"command": "node.set_value", "nodeId": node_2.node_id},
-        {"success": True},
+        {"result": {"status": 255}},
     )
 
     zwave_value, cmd_status = await async_set_config_parameter(
@@ -175,7 +175,7 @@ async def test_bulk_set_partial_config_parameters(
     node: Node = Node(client, node_state)
     ack_commands = mock_command(
         {"command": "node.set_value", "nodeId": node.node_id},
-        {"success": True},
+        {"result": {"status": 255}},
     )
     cmd_status = await async_bulk_set_partial_config_parameters(
         node, 101, 241, endpoint=endpoint
@@ -307,7 +307,7 @@ async def test_bulk_set_with_full_and_partial_parameters(
     node: Node = Node(client, node_state)
     ack_commands = mock_command(
         {"command": "node.set_value", "nodeId": node.node_id},
-        {"success": True},
+        {"result": {"status": 255}},
     )
 
     cmd_status = await async_bulk_set_partial_config_parameters(
@@ -346,7 +346,7 @@ async def test_failures(endpoint, client, multisensor_6_state, mock_command):
 
     mock_command(
         {"command": "node.set_value", "nodeId": node.node_id},
-        {"success": False},
+        {"result": {"status": 0}},
     )
 
     with pytest.raises(SetValueFailed):
@@ -375,7 +375,7 @@ async def test_returned_values(endpoint, client, multisensor_6_state, mock_comma
 
     mock_command(
         {"command": "node.set_value", "nodeId": node.node_id},
-        {"success": True},
+        {"result": {"status": 255}},
     )
 
     cmd_status = await async_bulk_set_partial_config_parameters(

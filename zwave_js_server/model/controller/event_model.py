@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from typing import Literal, TypedDict
 
+from ...const import RemoveNodeReason
 from ...event import BaseEventModel
 from ..node.data_model import FoundNodeDataType, NodeDataType
 from .firmware import (
@@ -124,7 +125,7 @@ class NodeRemovedEventModel(BaseControllerEventModel):
 
     event: Literal["node removed"]
     node: NodeDataType
-    replaced: bool
+    reason: RemoveNodeReason
 
 
 class NVMBackupAndConvertProgressEventModel(BaseControllerEventModel):

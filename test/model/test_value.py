@@ -1,9 +1,15 @@
 """Test value model."""
 from copy import deepcopy
 
-from zwave_js_server.const import ConfigurationValueType
+from zwave_js_server.const import ConfigurationValueType, SetValueStatus
 from zwave_js_server.model.node import Node
-from zwave_js_server.model.value import get_value_id_str
+from zwave_js_server.model.value import (
+    ConfigurationValue,
+    MetaDataType,
+    SetValueResult,
+    ValueDataType,
+    get_value_id_str,
+)
 
 
 def test_value_size(lock_schlage_be469):
@@ -67,3 +73,148 @@ def test_secret(lock_schlage_be469):
     node = lock_schlage_be469
     zwave_value = node.values["20-112-0-3"]
     assert zwave_value.metadata.stateful
+
+
+def test_configuration_value_type(inovelli_switch_state):
+    """Test configuration value types."""
+    value = ConfigurationValue(
+        inovelli_switch_state,
+        ValueDataType(
+            commandClass=112,
+            property=8,
+            propertyName="8",
+            endpoint=0,
+            metadata=MetaDataType(
+                type="boolean",
+                max=2,
+                min=0,
+                allowManualEntry=True,
+                states={True: "On", False: "Off"},
+            ),
+        ),
+    )
+    assert value.configuration_value_type == ConfigurationValueType.MANUAL_ENTRY
+
+    value = ConfigurationValue(
+        inovelli_switch_state,
+        ValueDataType(
+            commandClass=112,
+            property=8,
+            propertyName="8",
+            endpoint=0,
+            metadata=MetaDataType(
+                type="boolean",
+                max=1,
+                min=0,
+                allowManualEntry=False,
+                states={True: "On", False: "Off"},
+            ),
+        ),
+    )
+    assert value.configuration_value_type == ConfigurationValueType.ENUMERATED
+
+    value = ConfigurationValue(
+        inovelli_switch_state,
+        ValueDataType(
+            commandClass=112,
+            property=8,
+            propertyName="8",
+            endpoint=0,
+            metadata=MetaDataType(
+                type="boolean",
+                max=1,
+                min=0,
+                allowManualEntry=False,
+            ),
+        ),
+    )
+    assert value.configuration_value_type == ConfigurationValueType.BOOLEAN
+
+    value = ConfigurationValue(
+        inovelli_switch_state,
+        ValueDataType(
+            commandClass=112,
+            property=8,
+            propertyName="8",
+            endpoint=0,
+            metadata=MetaDataType(
+                type="number",
+                max=2,
+                min=0,
+                allowManualEntry=True,
+                states={0: "On", 1: "Off"},
+            ),
+        ),
+    )
+    assert value.configuration_value_type == ConfigurationValueType.MANUAL_ENTRY
+
+    value = ConfigurationValue(
+        inovelli_switch_state,
+        ValueDataType(
+            commandClass=112,
+            property=8,
+            propertyName="8",
+            endpoint=0,
+            metadata=MetaDataType(
+                type="number",
+                max=1,
+                min=0,
+                allowManualEntry=False,
+                states={"1": "On", "0": "Off"},
+            ),
+        ),
+    )
+    assert value.configuration_value_type == ConfigurationValueType.ENUMERATED
+
+    value = ConfigurationValue(
+        inovelli_switch_state,
+        ValueDataType(
+            commandClass=112,
+            property=8,
+            propertyName="8",
+            endpoint=0,
+            metadata=MetaDataType(
+                type="number",
+                max=2,
+                min=0,
+                allowManualEntry=False,
+            ),
+        ),
+    )
+    assert value.configuration_value_type == ConfigurationValueType.RANGE
+
+    value = ConfigurationValue(
+        inovelli_switch_state,
+        ValueDataType(
+            commandClass=112,
+            property=8,
+            propertyName="8",
+            endpoint=0,
+            metadata=MetaDataType(
+                type="number",
+                allowManualEntry=False,
+            ),
+        ),
+    )
+    assert value.configuration_value_type == ConfigurationValueType.UNDEFINED
+
+
+def test_set_value_result_str():
+    """Test SetValueResult str."""
+    result = SetValueResult({"status": 255})
+    assert result.status == SetValueStatus.SUCCESS
+    assert str(result) == "Success"
+
+    result = SetValueResult({"status": 1, "remainingDuration": {"unit": "default"}})
+    assert result.status == SetValueStatus.WORKING
+    assert str(result) == "Working (default duration)"
+
+    result = SetValueResult(
+        {"status": 1, "remainingDuration": {"unit": "seconds", "value": 1}}
+    )
+    assert result.status == SetValueStatus.WORKING
+    assert str(result) == "Working (1 seconds)"
+
+    result = SetValueResult({"status": 3, "message": "test"})
+    assert result.status == SetValueStatus.ENDPOINT_NOT_FOUND
+    assert str(result) == "Endpoint Not Found: test"

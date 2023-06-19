@@ -6,7 +6,7 @@ from typing import Any, cast
 from ..client import Client
 from ..const import CommandClass
 from ..model.node import Node, _get_value_id_dict_from_value_data
-from ..model.value import ValueDataType
+from ..model.value import SetValueResult, ValueDataType
 
 
 async def _async_send_command(
@@ -35,7 +35,7 @@ async def async_multicast_set_value(
     value_data: ValueDataType,
     nodes: list[Node] | None = None,
     options: dict | None = None,
-) -> bool:
+) -> SetValueResult:
     """Send a multicast set_value command."""
     result = await _async_send_command(
         client,
@@ -44,9 +44,9 @@ async def async_multicast_set_value(
         valueId=_get_value_id_dict_from_value_data(value_data),
         value=new_value,
         options=options,
-        require_schema=5,
+        require_schema=29,
     )
-    return cast(bool, result["success"])
+    return SetValueResult(result["result"])
 
 
 async def async_multicast_get_endpoint_count(

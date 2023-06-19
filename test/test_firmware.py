@@ -2,8 +2,14 @@
 from unittest.mock import patch
 
 from zwave_js_server.firmware import controller_firmware_update_otw, update_firmware
-from zwave_js_server.model.controller.firmware import ControllerFirmwareUpdateData
-from zwave_js_server.model.node.firmware import NodeFirmwareUpdateData
+from zwave_js_server.model.controller.firmware import (
+    ControllerFirmwareUpdateData,
+    ControllerFirmwareUpdateStatus,
+)
+from zwave_js_server.model.node.firmware import (
+    NodeFirmwareUpdateData,
+    NodeFirmwareUpdateStatus,
+)
 
 
 async def test_update_firmware_guess_format(url, client_session, multisensor_6):
@@ -16,10 +22,15 @@ async def test_update_firmware_guess_format(url, client_session, multisensor_6):
         "zwave_js_server.firmware.Client.disconnect"
     ) as disconnect_mock:
         node = multisensor_6
-        cmd_mock.return_value = {"success": True}
-        assert await update_firmware(
+        cmd_mock.return_value = {
+            "result": {"status": 255, "success": True, "reInterview": False}
+        }
+        result = await update_firmware(
             url, node, [NodeFirmwareUpdateData("test", bytes(10))], client_session
         )
+        assert result.status == NodeFirmwareUpdateStatus.OK_RESTART_PENDING
+        assert result.success
+        assert not result.reinterview
 
         connect_mock.assert_called_once()
         initialize_mock.assert_called_once()
@@ -34,7 +45,7 @@ async def test_update_firmware_guess_format(url, client_session, multisensor_6):
                     }
                 ],
             },
-            require_schema=24,
+            require_schema=29,
         )
         disconnect_mock.assert_called_once()
 
@@ -51,13 +62,18 @@ async def test_update_firmware_known_format_and_target(
         "zwave_js_server.firmware.Client.disconnect"
     ) as disconnect_mock:
         node = multisensor_6
-        cmd_mock.return_value = {"success": True}
-        assert await update_firmware(
+        cmd_mock.return_value = {
+            "result": {"status": 255, "success": True, "reInterview": False}
+        }
+        result = await update_firmware(
             url=url,
             node=node,
             updates=[NodeFirmwareUpdateData("test", bytes(10), "test", 1)],
             session=client_session,
         )
+        assert result.status == NodeFirmwareUpdateStatus.OK_RESTART_PENDING
+        assert result.success
+        assert not result.reinterview
 
         connect_mock.assert_called_once()
         initialize_mock.assert_called_once()
@@ -74,7 +90,7 @@ async def test_update_firmware_known_format_and_target(
                     }
                 ],
             },
-            require_schema=24,
+            require_schema=29,
         )
         disconnect_mock.assert_called_once()
 
@@ -88,10 +104,12 @@ async def test_controller_firmware_update_otw_guess_format(url, client_session):
     ) as cmd_mock, patch(
         "zwave_js_server.firmware.Client.disconnect"
     ) as disconnect_mock:
-        cmd_mock.return_value = {"success": True}
-        assert await controller_firmware_update_otw(
+        cmd_mock.return_value = {"result": {"status": 255, "success": True}}
+        result = await controller_firmware_update_otw(
             url, ControllerFirmwareUpdateData("test", bytes(10)), client_session
         )
+        assert result.status == ControllerFirmwareUpdateStatus.OK
+        assert result.success
 
         connect_mock.assert_called_once()
         initialize_mock.assert_called_once()
@@ -101,7 +119,7 @@ async def test_controller_firmware_update_otw_guess_format(url, client_session):
                 "filename": "test",
                 "file": "AAAAAAAAAAAAAA==",
             },
-            require_schema=25,
+            require_schema=29,
         )
         disconnect_mock.assert_called_once()
 
@@ -117,12 +135,14 @@ async def test_controller_firmware_update_otw_known_format_and_target(
     ) as cmd_mock, patch(
         "zwave_js_server.firmware.Client.disconnect"
     ) as disconnect_mock:
-        cmd_mock.return_value = {"success": True}
-        assert await controller_firmware_update_otw(
+        cmd_mock.return_value = {"result": {"status": 255, "success": True}}
+        result = await controller_firmware_update_otw(
             url=url,
             firmware_file=ControllerFirmwareUpdateData("test", bytes(10), "test"),
             session=client_session,
         )
+        assert result.status == ControllerFirmwareUpdateStatus.OK
+        assert result.success
 
         connect_mock.assert_called_once()
         initialize_mock.assert_called_once()
@@ -133,6 +153,6 @@ async def test_controller_firmware_update_otw_known_format_and_target(
                 "file": "AAAAAAAAAAAAAA==",
                 "fileFormat": "test",
             },
-            require_schema=25,
+            require_schema=29,
         )
         disconnect_mock.assert_called_once()

@@ -1,5 +1,5 @@
 """Test node utility functions."""
-from zwave_js_server.const import CommandClass
+from zwave_js_server.const import CommandClass, SetValueStatus
 from zwave_js_server.util.multicast import (
     async_multicast_endpoint_get_cc_version,
     async_multicast_endpoint_invoke_cc_api,
@@ -141,12 +141,13 @@ async def test_set_value_broadcast(client, driver, uuid4, mock_command):
     """Test broadcast_node.set_value command."""
     ack_commands = mock_command(
         {"command": "broadcast_node.set_value"},
-        {"success": True},
+        {"result": {"status": 255}},
     )
 
-    assert await async_multicast_set_value(
+    result = await async_multicast_set_value(
         client, 1, {"commandClass": 1, "property": 1}
     )
+    assert result.status == SetValueStatus.SUCCESS
 
     assert ack_commands[0] == {
         "command": "broadcast_node.set_value",
@@ -165,12 +166,13 @@ async def test_set_value_multicast(
     node2 = inovelli_switch
     ack_commands = mock_command(
         {"command": "multicast_group.set_value"},
-        {"success": True},
+        {"result": {"status": 255}},
     )
 
-    assert await async_multicast_set_value(
+    result = await async_multicast_set_value(
         client, 1, {"commandClass": 112, "property": 1}, [node1, node2]
     )
+    assert result.status == SetValueStatus.SUCCESS
 
     assert ack_commands[0] == {
         "command": "multicast_group.set_value",
@@ -190,12 +192,13 @@ async def test_set_value_multicast_basic(
     node2 = inovelli_switch
     ack_commands = mock_command(
         {"command": "multicast_group.set_value"},
-        {"success": True},
+        {"result": {"status": 255}},
     )
 
-    assert await async_multicast_set_value(
+    result = await async_multicast_set_value(
         client, 1, {"commandClass": 32, "property": "targetValue"}, [node1, node2]
     )
+    assert result.status == SetValueStatus.SUCCESS
 
     assert ack_commands[0] == {
         "command": "multicast_group.set_value",
@@ -305,12 +308,13 @@ async def test_set_value_broadcast_missing_value(
     """Test multicast_group.set_value command with value missing from a node."""
     ack_commands = mock_command(
         {"command": "broadcast_node.set_value"},
-        {"success": True},
+        {"result": {"status": 255}},
     )
 
-    assert await async_multicast_set_value(
+    result = await async_multicast_set_value(
         client, 1, {"commandClass": 67, "property": "blah"}
     )
+    assert result.status == SetValueStatus.SUCCESS
 
     assert ack_commands[0] == {
         "command": "broadcast_node.set_value",

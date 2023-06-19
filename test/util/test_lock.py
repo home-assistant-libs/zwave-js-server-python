@@ -54,7 +54,7 @@ async def test_set_usercode(lock_schlage_be469, mock_command, uuid4):
     node = lock_schlage_be469
     ack_commands = mock_command(
         {"command": "node.set_value", "nodeId": node.node_id},
-        {"success": True},
+        {"result": {"status": 255}},
     )
 
     # Test valid code
@@ -93,7 +93,7 @@ async def test_clear_usercode(lock_schlage_be469, mock_command, uuid4):
     node = lock_schlage_be469
     ack_commands = mock_command(
         {"command": "node.set_value", "nodeId": node.node_id},
-        {"success": True},
+        {"result": {"status": 255}},
     )
 
     # Test valid code

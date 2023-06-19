@@ -5,8 +5,7 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-from zwave_js_server.const import CommandClass
-
+from ...const import CommandClass
 from ...event import BaseEventModel
 from ..notification import (
     EntryControlNotificationArgsDataType,
