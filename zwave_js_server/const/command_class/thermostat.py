@@ -88,6 +88,8 @@ THERMOSTAT_MODES = [
     ThermostatMode.COOL,
     ThermostatMode.AUTO,
     ThermostatMode.AUTO_CHANGE_OVER,
+    ThermostatMode.FAN,
+    ThermostatMode.DRY,
 ]
 
 THERMOSTAT_MODE_SETPOINT_MAP: dict[int, list[ThermostatSetpointType]] = {
