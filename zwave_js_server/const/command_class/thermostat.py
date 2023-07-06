@@ -78,3 +78,26 @@ class ThermostatSetpointType(IntEnum):
     AWAY_HEATING = 13
     AWAY_COOLING = 14
     FULL_POWER = 15
+
+
+THERMOSTAT_MODE_SETPOINT_MAP: dict[int, list[ThermostatSetpointType]] = {
+    ThermostatMode.OFF: [],
+    ThermostatMode.HEAT: [ThermostatSetpointType.HEATING],
+    ThermostatMode.COOL: [ThermostatSetpointType.COOLING],
+    ThermostatMode.AUTO: [
+        ThermostatSetpointType.HEATING,
+        ThermostatSetpointType.COOLING,
+    ],
+    ThermostatMode.AUXILIARY: [ThermostatSetpointType.HEATING],
+    ThermostatMode.FURNACE: [ThermostatSetpointType.FURNACE],
+    ThermostatMode.DRY: [ThermostatSetpointType.DRY_AIR],
+    ThermostatMode.MOIST: [ThermostatSetpointType.MOIST_AIR],
+    ThermostatMode.AUTO_CHANGE_OVER: [ThermostatSetpointType.AUTO_CHANGEOVER],
+    ThermostatMode.HEATING_ECON: [ThermostatSetpointType.ENERGY_SAVE_HEATING],
+    ThermostatMode.COOLING_ECON: [ThermostatSetpointType.ENERGY_SAVE_COOLING],
+    ThermostatMode.AWAY: [
+        ThermostatSetpointType.AWAY_HEATING,
+        ThermostatSetpointType.AWAY_COOLING,
+    ],
+    ThermostatMode.FULL_POWER: [ThermostatSetpointType.FULL_POWER],
+}
