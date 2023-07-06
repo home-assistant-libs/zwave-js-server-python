@@ -80,16 +80,6 @@ class ThermostatSetpointType(IntEnum):
     FULL_POWER = 15
 
 
-# In Z-Wave the modes and presets are both in ThermostatMode.
-# This list contains thermostat modes we should consider a mode only
-THERMOSTAT_MODES = [
-    ThermostatMode.OFF,
-    ThermostatMode.HEAT,
-    ThermostatMode.COOL,
-    ThermostatMode.AUTO,
-    ThermostatMode.AUTO_CHANGE_OVER,
-]
-
 THERMOSTAT_MODE_SETPOINT_MAP: dict[int, list[ThermostatSetpointType]] = {
     ThermostatMode.OFF: [],
     ThermostatMode.HEAT: [ThermostatSetpointType.HEATING],
