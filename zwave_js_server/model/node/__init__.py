@@ -131,7 +131,7 @@ class Node(EventBase):
     def data(self) -> NodeDataType:
         """Return node data."""
         return {
-            **self._data,
+            **self._data,  # type: ignore[misc]
             "endpoints": {
                 idx: endpoint.data for idx, endpoint in self.endpoints.items()
             },
