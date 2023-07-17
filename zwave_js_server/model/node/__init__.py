@@ -1,6 +1,7 @@
 """Provide a model for the Z-Wave JS node."""
 from __future__ import annotations
 
+import copy
 import logging
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, cast
@@ -100,7 +101,7 @@ class Node(EventBase):
         """Initialize the node."""
         super().__init__()
         self.client = client
-        self.data: NodeDataType = {}
+        self._data: NodeDataType = {}
         self._device_config = DeviceConfig({})
         self._statistics = NodeStatistics(
             client, data.get("statistics", DEFAULT_NODE_STATISTICS)
@@ -127,133 +128,144 @@ class Node(EventBase):
         )
 
     @property
+    def data(self) -> NodeDataType:
+        """Return node data."""
+        return {
+            **self._data,
+            "endpoints": {
+                idx: endpoint.data for idx, endpoint in self.endpoints.items()
+            },
+            "values": {value_id: value.data for value_id, value in self.values.items()},
+        }
+
+    @property
     def node_id(self) -> int:
         """Return node ID property."""
-        return self.data["nodeId"]
+        return self._data["nodeId"]
 
     @property
     def index(self) -> int:
         """Return index property."""
-        return self.data["index"]
+        return self._data["index"]
 
     @property
     def device_class(self) -> DeviceClass | None:
         """Return the device_class."""
-        if (device_class := self.data.get("deviceClass")) is None:
+        if (device_class := self._data.get("deviceClass")) is None:
             return None
         return DeviceClass(device_class)
 
     @property
     def installer_icon(self) -> int | None:
         """Return installer icon property."""
-        return self.data.get("installerIcon")
+        return self._data.get("installerIcon")
 
     @property
     def user_icon(self) -> int | None:
         """Return user icon property."""
-        return self.data.get("userIcon")
+        return self._data.get("userIcon")
 
     @property
     def status(self) -> NodeStatus:
         """Return the status."""
-        return NodeStatus(self.data["status"])
+        return NodeStatus(self._data["status"])
 
     @property
     def ready(self) -> bool | None:
         """Return the ready."""
-        return self.data.get("ready")
+        return self._data.get("ready")
 
     @property
     def is_listening(self) -> bool | None:
         """Return the is_listening."""
-        return self.data.get("isListening")
+        return self._data.get("isListening")
 
     @property
     def is_frequent_listening(self) -> bool | str | None:
         """Return the is_frequent_listening."""
-        return self.data.get("isFrequentListening")
+        return self._data.get("isFrequentListening")
 
     @property
     def is_routing(self) -> bool | None:
         """Return the is_routing."""
-        return self.data.get("isRouting")
+        return self._data.get("isRouting")
 
     @property
     def max_data_rate(self) -> int | None:
         """Return the max_data_rate."""
-        return self.data.get("maxDataRate")
+        return self._data.get("maxDataRate")
 
     @property
     def supported_data_rates(self) -> list[int]:
         """Return the supported_data_rates."""
-        return self.data.get("supportedDataRates", [])
+        return self._data.get("supportedDataRates", [])
 
     @property
     def is_secure(self) -> bool | None:
         """Return the is_secure."""
-        if (is_secure := self.data.get("isSecure")) == "unknown":
+        if (is_secure := self._data.get("isSecure")) == "unknown":
             return None
         return is_secure
 
     @property
     def protocol_version(self) -> int | None:
         """Return the protocol_version."""
-        return self.data.get("protocolVersion")
+        return self._data.get("protocolVersion")
 
     @property
     def supports_beaming(self) -> bool | None:
         """Return the supports_beaming."""
-        return self.data.get("supportsBeaming")
+        return self._data.get("supportsBeaming")
 
     @property
     def supports_security(self) -> bool | None:
         """Return the supports_security."""
-        return self.data.get("supportsSecurity")
+        return self._data.get("supportsSecurity")
 
     @property
     def manufacturer_id(self) -> int | None:
         """Return the manufacturer_id."""
-        return self.data.get("manufacturerId")
+        return self._data.get("manufacturerId")
 
     @property
     def product_id(self) -> int | None:
         """Return the product_id."""
-        return self.data.get("productId")
+        return self._data.get("productId")
 
     @property
     def product_type(self) -> int | None:
         """Return the product_type."""
-        return self.data.get("productType")
+        return self._data.get("productType")
 
     @property
     def firmware_version(self) -> str | None:
         """Return the firmware_version."""
-        return self.data.get("firmwareVersion")
+        return self._data.get("firmwareVersion")
 
     @property
     def zwave_plus_version(self) -> int | None:
         """Return the zwave_plus_version."""
-        return self.data.get("zwavePlusVersion")
+        return self._data.get("zwavePlusVersion")
 
     @property
     def zwave_plus_node_type(self) -> int | None:
         """Return the zwave_plus_node_type."""
-        return self.data.get("zwavePlusNodeType")
+        return self._data.get("zwavePlusNodeType")
 
     @property
     def zwave_plus_role_type(self) -> int | None:
         """Return the zwave_plus_role_type."""
-        return self.data.get("zwavePlusRoleType")
+        return self._data.get("zwavePlusRoleType")
 
     @property
     def name(self) -> str | None:
         """Return the name."""
-        return self.data.get("name")
+        return self._data.get("name")
 
     @property
     def location(self) -> str | None:
         """Return the location."""
-        return self.data.get("location")
+        return self._data.get("location")
 
     @property
     def device_config(self) -> DeviceConfig:
@@ -263,42 +275,42 @@ class Node(EventBase):
     @property
     def label(self) -> str | None:
         """Return the label."""
-        return self.data.get("label")
+        return self._data.get("label")
 
     @property
     def device_database_url(self) -> str | None:
         """Return the device database URL."""
-        return self.data.get("deviceDatabaseUrl")
+        return self._data.get("deviceDatabaseUrl")
 
     @property
     def endpoint_count_is_dynamic(self) -> bool | None:
         """Return the endpoint_count_is_dynamic."""
-        return self.data.get("endpointCountIsDynamic")
+        return self._data.get("endpointCountIsDynamic")
 
     @property
     def endpoints_have_identical_capabilities(self) -> bool | None:
         """Return the endpoints_have_identical_capabilities."""
-        return self.data.get("endpointsHaveIdenticalCapabilities")
+        return self._data.get("endpointsHaveIdenticalCapabilities")
 
     @property
     def individual_endpoint_count(self) -> int | None:
         """Return the individual_endpoint_count."""
-        return self.data.get("individualEndpointCount")
+        return self._data.get("individualEndpointCount")
 
     @property
     def aggregated_endpoint_count(self) -> int | None:
         """Return the aggregated_endpoint_count."""
-        return self.data.get("aggregatedEndpointCount")
+        return self._data.get("aggregatedEndpointCount")
 
     @property
     def interview_attempts(self) -> int | None:
         """Return the interview_attempts."""
-        return self.data.get("interviewAttempts")
+        return self._data.get("interviewAttempts")
 
     @property
     def interview_stage(self) -> int | str | None:
         """Return the interview_stage."""
-        return self.data.get("interviewStage")
+        return self._data.get("interviewStage")
 
     @property
     def in_interview(self) -> bool:
@@ -332,40 +344,44 @@ class Node(EventBase):
     @property
     def highest_security_class(self) -> SecurityClass | None:
         """Return highest security class configured on the node."""
-        if (security_class := self.data.get("highestSecurityClass")) is None:
+        if (security_class := self._data.get("highestSecurityClass")) is None:
             return None
         return SecurityClass(security_class)
 
     @property
     def is_controller_node(self) -> bool:
         """Return whether the node is a controller node."""
-        return self.data["isControllerNode"]
+        return self._data["isControllerNode"]
 
     @property
     def keep_awake(self) -> bool:
         """Return whether the node is set to keep awake."""
-        return self.data["keepAwake"]
+        return self._data["keepAwake"]
 
     def update(self, data: NodeDataType) -> None:
         """Update the internal state data."""
-        self.data = data
-        self._device_config = DeviceConfig(self.data.get("deviceConfig", {}))
+        self._data = copy.deepcopy(data)
+        self._device_config = DeviceConfig(self._data.get("deviceConfig", {}))
         self._statistics = NodeStatistics(
-            self.client, self.data.get("statistics", DEFAULT_NODE_STATISTICS)
+            self.client, self._data.get("statistics", DEFAULT_NODE_STATISTICS)
         )
 
-        # Remove stale values
-        value_ids = (_get_value_id_str_from_dict(self, val) for val in data["values"])
-        self.values = {
-            value_id: val
-            for value_id, val in self.values.items()
-            if value_id in value_ids
+        new_values_data = {
+            _get_value_id_str_from_dict(self, val): val
+            for val in self._data.pop("values")
         }
+        stale_value_ids = list(set(self.values) - set(new_values_data))
+        remaining_value_ids = list(set(new_values_data) - set(stale_value_ids))
 
-        # Populate new values
-        for val in data["values"]:
+        # Remove stale values
+        for value_id in stale_value_ids:
+            self.values.pop(value_id)
+
+        # Updating existing values and populate new values
+        for value_id in remaining_value_ids:
+            val = new_values_data[value_id]
             try:
-                if (value_id := _get_value_id_str_from_dict(self, val)) in self.values:
+                if value_id in self.values:
                     self.values[value_id].update(val)
                 else:
                     self.values[value_id] = _init_value(self, val)
@@ -373,29 +389,30 @@ class Node(EventBase):
                 # If we can't parse the value, don't store it
                 pass
 
-        # Remove stale endpoints
-        self.endpoints = {
-            idx: endpoint
-            for idx, endpoint in self.endpoints.items()
-            if idx in (endpoint["index"] for endpoint in self.data["endpoints"])
+        new_endpoints_data = {
+            endpoint["index"]: endpoint for endpoint in self._data.pop("endpoints")
         }
+        stale_endpoint_idxs = list(set(self.endpoints) - set(new_endpoints_data))
+        remaining_endpoint_idxs = list(
+            set(new_endpoints_data) - set(stale_endpoint_idxs)
+        )
+
+        # Remove stale endpoints
+        for endpoint_idx in stale_endpoint_idxs:
+            self.endpoints.pop(endpoint_idx)
 
         # Add new endpoints or update existing ones
-        for endpoint in self.data["endpoints"]:
-            idx = endpoint["index"]
+        for endpoint_idx in remaining_endpoint_idxs:
+            endpoint = new_endpoints_data[endpoint_idx]
             values = {
                 value_id: value
                 for value_id, value in self.values.items()
                 if self.index == value.endpoint
             }
-            if idx in self.endpoints:
-                self.endpoints[idx].update(endpoint, values)
+            if endpoint_idx in self.endpoints:
+                self.endpoints[endpoint_idx].update(endpoint, values)
             else:
-                self.endpoints[idx] = Endpoint(
-                    self.client,
-                    endpoint,
-                    values,
-                )
+                self.endpoints[endpoint_idx] = Endpoint(self.client, endpoint, values)
 
     def get_command_class_values(
         self, command_class: CommandClass, endpoint: int | None = None
@@ -721,7 +738,7 @@ class Node(EventBase):
             wait_for_result=wait_for_result,
             require_schema=14,
         )
-        self.data["name"] = name
+        self._data["name"] = name
 
     async def async_set_location(
         self,
@@ -741,7 +758,7 @@ class Node(EventBase):
             wait_for_result=wait_for_result,
             require_schema=14,
         )
-        self.data["location"] = location
+        self._data["location"] = location
 
     async def async_is_firmware_update_in_progress(self) -> bool:
         """
@@ -763,7 +780,7 @@ class Node(EventBase):
             wait_for_result=True,
             require_schema=14,
         )
-        self.data["keepAwake"] = keep_awake
+        self._data["keepAwake"] = keep_awake
 
     async def async_interview(self) -> None:
         """Interview node."""
@@ -838,42 +855,42 @@ class Node(EventBase):
     def handle_wake_up(self, event: Event) -> None:
         """Process a node wake up event."""
         # pylint: disable=unused-argument
-        self.data["status"] = NodeStatus.AWAKE
+        self._data["status"] = NodeStatus.AWAKE
 
     def handle_sleep(self, event: Event) -> None:
         """Process a node sleep event."""
         # pylint: disable=unused-argument
-        self.data["status"] = NodeStatus.ASLEEP
+        self._data["status"] = NodeStatus.ASLEEP
 
     def handle_dead(self, event: Event) -> None:
         """Process a node dead event."""
         # pylint: disable=unused-argument
-        self.data["status"] = NodeStatus.DEAD
+        self._data["status"] = NodeStatus.DEAD
 
     def handle_alive(self, event: Event) -> None:
         """Process a node alive event."""
         # pylint: disable=unused-argument
-        self.data["status"] = NodeStatus.ALIVE
+        self._data["status"] = NodeStatus.ALIVE
 
     def handle_interview_started(self, event: Event) -> None:
         """Process a node interview started event."""
         # pylint: disable=unused-argument
-        self.data["ready"] = False
-        self.data["interviewStage"] = None
+        self._data["ready"] = False
+        self._data["interviewStage"] = None
 
     def handle_interview_stage_completed(self, event: Event) -> None:
         """Process a node interview stage completed event."""
-        self.data["interviewStage"] = event.data["stageName"]
+        self._data["interviewStage"] = event.data["stageName"]
 
     def handle_interview_failed(self, event: Event) -> None:
         """Process a node interview failed event."""
         # pylint: disable=unused-argument
-        self.data["interviewStage"] = INTERVIEW_FAILED
+        self._data["interviewStage"] = INTERVIEW_FAILED
 
     def handle_interview_completed(self, event: Event) -> None:
         """Process a node interview completed event."""
         # pylint: disable=unused-argument
-        self.data["ready"] = True
+        self._data["ready"] = True
 
     def handle_ready(self, event: Event) -> None:
         """Process a node ready event."""
@@ -884,15 +901,6 @@ class Node(EventBase):
         """Process a node value added event."""
         self.handle_value_updated(event)
 
-    def value_data_idx(self, value_id: str) -> int:
-        """Get the index for the given value ID in the node's value data."""
-        values = self.data["values"]
-        return next(
-            idx
-            for idx in range(len(values))
-            if _get_value_id_str_from_dict(self, values[idx]) == value_id
-        )
-
     def handle_value_updated(self, event: Event) -> None:
         """Process a node value updated event."""
         evt_val_data: ValueDataType = event.data["args"]
@@ -901,24 +909,14 @@ class Node(EventBase):
         if value is None:
             value = _init_value(self, evt_val_data)
             self.values[value.value_id] = event.data["value"] = value
-            self.data["values"].append(evt_val_data)
         else:
             value.receive_event(event)
             event.data["value"] = value
-            self.data["values"][self.value_data_idx(value_id)].update(evt_val_data)
-
-        node_val_data = self.data["values"][self.value_data_idx(value_id)]
-        if "newValue" in evt_val_data:
-            node_val_data["value"] = evt_val_data["newValue"]
-
-        node_val_data.pop("newValue", None)
-        node_val_data.pop("prevValue", None)
 
     def handle_value_removed(self, event: Event) -> None:
         """Process a node value removed event."""
         value_id = _get_value_id_str_from_dict(self, event.data["args"])
         event.data["value"] = self.values.pop(value_id)
-        self.data["values"].pop(self.value_data_idx(value_id))
 
     def handle_value_notification(self, event: Event) -> None:
         """Process a node value notification event."""
@@ -980,7 +978,7 @@ class Node(EventBase):
 
     def handle_statistics_updated(self, event: Event) -> None:
         """Process a statistics updated event."""
-        self.data["statistics"] = statistics = event.data["statistics"]
+        self._data["statistics"] = statistics = event.data["statistics"]
         event.data["statistics_updated"] = self._statistics = NodeStatistics(
             self.client, statistics
         )
