@@ -3,12 +3,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal, cast
 
-from pydantic import create_model_from_typeddict
-
 from ..event import BaseEventModel, Event, EventBase
 from .controller import Controller
 from .log_config import LogConfig, LogConfigDataType
 from .log_message import LogMessage, LogMessageDataType
+
+try:
+    from pydantic.v1 import create_model_from_typeddict
+except ImportError:
+    from pydantic import create_model_from_typeddict
 
 if TYPE_CHECKING:
     from ..client import Client
