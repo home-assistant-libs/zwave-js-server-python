@@ -5,16 +5,10 @@ from typing import TYPE_CHECKING, Any, Literal, cast
 
 from pydantic import TypeAdapter
 
-from ..const import USE_TYPING_EXTENSIONS
 from ..event import BaseEventModel, Event, EventBase
 from .controller import Controller
 from .log_config import LogConfig, LogConfigDataType
 from .log_message import LogMessage, LogMessageDataType
-
-if USE_TYPING_EXTENSIONS:
-    from typing_extensions import TypedDict
-else:
-    from typing import TypedDict
 
 if TYPE_CHECKING:
     from ..client import Client
