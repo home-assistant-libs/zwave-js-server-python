@@ -39,7 +39,7 @@ class AllNodesReadyEventModel(BaseDriverEventModel):
     event: Literal["all nodes ready"]
 
 
-DRIVER_EVENT_MODEL_MAP: dict[str, type["BaseDriverEventModel"] | TypedDict] = {
+DRIVER_EVENT_MODEL_MAP: dict[str, type["BaseDriverEventModel"] | type[LogMessageDataType]] = {
     "all nodes ready": AllNodesReadyEventModel,
     "log config updated": LogConfigUpdatedEventModel,
     "logging": LogMessageDataType,
