@@ -21,7 +21,7 @@ setup(
     packages=find_packages(exclude=["test.*", "test"]),
     package_data={"zwave_js_server": ["py.typed"]},
     python_requires=">=3.10",
-    install_requires=["aiohttp>3", "pydantic>=1.9.0"],
+    install_requires=["aiohttp>3", "pydantic>=1.10.0"],
     entry_points={
         "console_scripts": ["zwave-js-server-python = zwave_js_server.__main__:main"]
     },

@@ -5,7 +5,10 @@ import logging
 from dataclasses import dataclass, field
 from typing import Callable, Literal
 
-from pydantic import BaseModel
+try:
+    from pydantic.v1 import BaseModel
+except ImportError:
+    from pydantic import BaseModel
 
 LOGGER = logging.getLogger(__package__)
 
