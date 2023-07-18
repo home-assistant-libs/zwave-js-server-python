@@ -1,7 +1,7 @@
 """Test the node model."""
 import json
 from copy import deepcopy
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest.mock import patch
 
 import pytest
@@ -136,6 +136,26 @@ def test_from_state(client):
     )
     assert node.endpoints[0] != node.endpoints[0].index
     assert hash(node.endpoints[0]) == hash((client.driver, node.node_id, 0))
+    assert node.last_seen is None
+    event = Event(
+        "statistics updated",
+        {
+            "source": "node",
+            "event": "statistics updated",
+            "nodeId": node.node_id,
+            "statistics": {
+                "commandsTX": 1,
+                "commandsRX": 2,
+                "commandsDroppedTX": 3,
+                "commandsDroppedRX": 4,
+                "timeoutResponse": 5,
+                "rssi": 7,
+                "lastSeen": "2023-07-18T15:42:34.701Z",
+            },
+        },
+    )
+    node.receive_event(event)
+    assert node.last_seen == datetime(2023, 7, 18, 15, 42, 34, 701000, timezone.utc)
 
 
 async def test_highest_security_value(lock_schlage_be469, ring_keypad):
