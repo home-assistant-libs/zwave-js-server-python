@@ -277,7 +277,7 @@ class Value:
         self._value = self.data.get("value")
 
         # Handle buffer dict and json string in value.
-        if self.metadata.type == "buffer":
+        if self._value is not None and self.metadata.type == "buffer":
             self._value = parse_buffer(self._value)
 
 
