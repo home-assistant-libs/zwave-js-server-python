@@ -266,6 +266,7 @@ class Value:
 
     def update(self, data: ValueDataType) -> None:
         """Update data."""
+        data.pop("prevValue", None)
         self.data.update(data)
         if (new_value := self.data.pop("newValue", None)) is not None:
             self._value = self.data["value"] = new_value
@@ -273,7 +274,7 @@ class Value:
         if "metadata" in data:
             self._metadata.update(data["metadata"])
 
-        self._value = self.data["value"]
+        self._value = self.data.get("value")
 
         # Handle buffer dict and json string in value.
         if self.metadata.type == "buffer":

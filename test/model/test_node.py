@@ -572,7 +572,7 @@ async def test_value_added_events(multisensor_6):
     node = multisensor_6
     value_id = "52-112-0-6"
     # Validate that the value doesn't exist in the node state data
-    assert value_id not in node.data["values"]
+    assert value_id not in node.values
     event = Event(
         type="value added",
         data={
@@ -608,7 +608,7 @@ async def test_value_added_events(multisensor_6):
     assert isinstance(event.data["value"], ConfigurationValue)
     assert isinstance(node.values[value_id], ConfigurationValue)
     # ensure that the value was added to the node's state data
-    assert value_id in node.data["values"]
+    assert value_id in node.values
 
 
 async def test_value_updated_events(multisensor_6):
@@ -616,9 +616,9 @@ async def test_value_updated_events(multisensor_6):
     node = multisensor_6
     value_id = "52-112-0-2"
     # ensure that the value is in the node's state data
-    assert value_id in node.data["values"]
+    assert value_id in node.values
     # assert the old value of the ZwaveValue
-    assert (value_data := node.data["values"][value_id]) is not None
+    assert (value_data := node.values[value_id].data) is not None
     assert value_data["value"] == node.values[value_id].value == 0
     event = Event(
         type="value updated",
@@ -642,9 +642,9 @@ async def test_value_updated_events(multisensor_6):
     assert isinstance(event.data["value"], ConfigurationValue)
     assert isinstance(node.values[value_id], ConfigurationValue)
     # ensure that the value is in to the node's state data
-    assert value_id in node.data["values"]
+    assert value_id in node.values
     # ensure that the node's state data was updated and that old keys were removed
-    assert (value_data := node.data["values"][value_id]) is not None
+    assert (value_data := node.values[value_id].data) is not None
     assert value_data["metadata"]
     assert value_data["value"] == 1
     assert "newValue" not in value_data
@@ -682,7 +682,7 @@ async def test_value_removed_events(multisensor_6):
     # ensure that the value was removed from the nodes value's dict
     assert node.values.get(value_id) is None
     # ensure that the value was removed from the node's state data
-    assert value_id not in node.data["values"]
+    assert value_id not in node.values
 
 
 async def test_value_notification(wallmote_central_scene: node_pkg.Node):
