@@ -361,15 +361,13 @@ class Node(EventBase):
         }
         new_value_ids = set(new_values_data)
         existing_value_ids = set(self.values)
-        stale_value_ids = existing_value_ids - new_value_ids
-        remaining_value_ids = new_value_ids - stale_value_ids
 
         # Remove stale values
-        for value_id in stale_value_ids:
+        for value_id in (stale_value_ids := existing_value_ids - new_value_ids):
             self.values.pop(value_id)
 
         # Updating existing values and populate new values
-        for value_id in remaining_value_ids:
+        for value_id in new_value_ids - stale_value_ids:
             val = new_values_data[value_id]
             try:
                 if value_id in self.values:
@@ -385,15 +383,15 @@ class Node(EventBase):
         }
         new_endpoint_idxs = set(new_endpoints_data)
         existing_endpoint_idxs = set(self.endpoints)
-        stale_endpoint_idxs = existing_endpoint_idxs - new_endpoint_idxs
-        remaining_endpoint_idxs = new_endpoint_idxs - stale_endpoint_idxs
 
         # Remove stale endpoints
-        for endpoint_idx in stale_endpoint_idxs:
+        for endpoint_idx in (
+            stale_endpoint_idxs := existing_endpoint_idxs - new_endpoint_idxs
+        ):
             self.endpoints.pop(endpoint_idx)
 
         # Add new endpoints or update existing ones
-        for endpoint_idx in remaining_endpoint_idxs:
+        for endpoint_idx in new_endpoint_idxs - stale_endpoint_idxs:
             endpoint = new_endpoints_data[endpoint_idx]
             values = {
                 value_id: value
