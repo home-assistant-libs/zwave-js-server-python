@@ -360,9 +360,10 @@ class Node(EventBase):
             for val in self.data.pop("values")
         }
         new_value_ids = set(new_values_data)
+        stale_value_ids = set(self.values) - new_value_ids
 
         # Remove stale values
-        for value_id in (stale_value_ids := set(self.values) - new_value_ids):
+        for value_id in stale_value_ids:
             self.values.pop(value_id)
 
         # Updating existing values and populate new values
@@ -381,11 +382,10 @@ class Node(EventBase):
             endpoint["index"]: endpoint for endpoint in self.data.pop("endpoints")
         }
         new_endpoint_idxs = set(new_endpoints_data)
+        stale_endpoint_idxs = set(self.endpoints) - new_endpoint_idxs
 
         # Remove stale endpoints
-        for endpoint_idx in (
-            stale_endpoint_idxs := set(self.endpoints) - new_endpoint_idxs
-        ):
+        for endpoint_idx in stale_endpoint_idxs:
             self.endpoints.pop(endpoint_idx)
 
         # Add new endpoints or update existing ones
