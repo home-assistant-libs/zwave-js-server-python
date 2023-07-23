@@ -1,3 +1,2 @@
 aiohttp==3.8.5
 pydantic==2.0.3
-backports-datetime-fromisoformat==2.0.0
