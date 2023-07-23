@@ -20,7 +20,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def dump_node_state(node: Node) -> dict:
-    """get state from a node."""
+    """Get state from a node."""
     return {
         **node.data,
         "values": {value_id: value.data for value_id, value in node.values.items()},
