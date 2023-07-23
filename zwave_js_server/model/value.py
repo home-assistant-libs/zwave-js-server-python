@@ -269,7 +269,7 @@ class Value:
         data.pop("prevValue", None)
         self.data.update(data)
         if (new_value := self.data.pop("newValue", None)) is not None:
-            self._value = self.data["value"] = new_value
+            self.data["value"] = new_value
 
         if "metadata" in data:
             self._metadata.update(data["metadata"])
