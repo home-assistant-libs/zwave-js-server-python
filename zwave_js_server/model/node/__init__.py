@@ -1,6 +1,7 @@
 """Provide a model for the Z-Wave JS node."""
 from __future__ import annotations
 
+import copy
 import logging
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, cast
@@ -348,24 +349,28 @@ class Node(EventBase):
 
     def update(self, data: NodeDataType) -> None:
         """Update the internal state data."""
-        self.data = data
+        self.data = copy.deepcopy(data)
         self._device_config = DeviceConfig(self.data.get("deviceConfig", {}))
         self._statistics = NodeStatistics(
             self.client, self.data.get("statistics", DEFAULT_NODE_STATISTICS)
         )
 
-        # Remove stale values
-        value_ids = (_get_value_id_str_from_dict(self, val) for val in data["values"])
-        self.values = {
-            value_id: val
-            for value_id, val in self.values.items()
-            if value_id in value_ids
+        new_values_data = {
+            _get_value_id_str_from_dict(self, val): val
+            for val in self.data.pop("values")
         }
+        new_value_ids = set(new_values_data)
+        stale_value_ids = set(self.values) - new_value_ids
 
-        # Populate new values
-        for val in data["values"]:
+        # Remove stale values
+        for value_id in stale_value_ids:
+            self.values.pop(value_id)
+
+        # Updating existing values and populate new values
+        for value_id in new_value_ids - stale_value_ids:
+            val = new_values_data[value_id]
             try:
-                if (value_id := _get_value_id_str_from_dict(self, val)) in self.values:
+                if value_id in self.values:
                     self.values[value_id].update(val)
                 else:
                     self.values[value_id] = _init_value(self, val)
@@ -373,29 +378,28 @@ class Node(EventBase):
                 # If we can't parse the value, don't store it
                 pass
 
-        # Remove stale endpoints
-        self.endpoints = {
-            idx: endpoint
-            for idx, endpoint in self.endpoints.items()
-            if idx in (endpoint["index"] for endpoint in self.data["endpoints"])
+        new_endpoints_data = {
+            endpoint["index"]: endpoint for endpoint in self.data.pop("endpoints")
         }
+        new_endpoint_idxs = set(new_endpoints_data)
+        stale_endpoint_idxs = set(self.endpoints) - new_endpoint_idxs
+
+        # Remove stale endpoints
+        for endpoint_idx in stale_endpoint_idxs:
+            self.endpoints.pop(endpoint_idx)
 
         # Add new endpoints or update existing ones
-        for endpoint in self.data["endpoints"]:
-            idx = endpoint["index"]
+        for endpoint_idx in new_endpoint_idxs - stale_endpoint_idxs:
+            endpoint = new_endpoints_data[endpoint_idx]
             values = {
                 value_id: value
                 for value_id, value in self.values.items()
                 if self.index == value.endpoint
             }
-            if idx in self.endpoints:
-                self.endpoints[idx].update(endpoint, values)
+            if endpoint_idx in self.endpoints:
+                self.endpoints[endpoint_idx].update(endpoint, values)
             else:
-                self.endpoints[idx] = Endpoint(
-                    self.client,
-                    endpoint,
-                    values,
-                )
+                self.endpoints[endpoint_idx] = Endpoint(self.client, endpoint, values)
 
     def get_command_class_values(
         self, command_class: CommandClass, endpoint: int | None = None
@@ -884,15 +888,6 @@ class Node(EventBase):
         """Process a node value added event."""
         self.handle_value_updated(event)
 
-    def value_data_idx(self, value_id: str) -> int:
-        """Get the index for the given value ID in the node's value data."""
-        values = self.data["values"]
-        return next(
-            idx
-            for idx in range(len(values))
-            if _get_value_id_str_from_dict(self, values[idx]) == value_id
-        )
-
     def handle_value_updated(self, event: Event) -> None:
         """Process a node value updated event."""
         evt_val_data: ValueDataType = event.data["args"]
@@ -901,24 +896,14 @@ class Node(EventBase):
         if value is None:
             value = _init_value(self, evt_val_data)
             self.values[value.value_id] = event.data["value"] = value
-            self.data["values"].append(evt_val_data)
         else:
             value.receive_event(event)
             event.data["value"] = value
-            self.data["values"][self.value_data_idx(value_id)].update(evt_val_data)
-
-        node_val_data = self.data["values"][self.value_data_idx(value_id)]
-        if "newValue" in evt_val_data:
-            node_val_data["value"] = evt_val_data["newValue"]
-
-        node_val_data.pop("newValue", None)
-        node_val_data.pop("prevValue", None)
 
     def handle_value_removed(self, event: Event) -> None:
         """Process a node value removed event."""
         value_id = _get_value_id_str_from_dict(self, event.data["args"])
         event.data["value"] = self.values.pop(value_id)
-        self.data["values"].pop(self.value_data_idx(value_id))
 
     def handle_value_notification(self, event: Event) -> None:
         """Process a node value notification event."""
