@@ -17,6 +17,7 @@ from zwave_js_server.model.value import ConfigurationValue
 from zwave_js_server.util.node import (
     async_bulk_set_partial_config_parameters,
     async_set_config_parameter,
+    dump_node_state,
 )
 
 
@@ -388,3 +389,15 @@ async def test_returned_values(endpoint, client, multisensor_6_state, mock_comma
     )
     assert isinstance(zwave_value, ConfigurationValue)
     assert cmd_status == CommandStatus.ACCEPTED
+
+
+async def test_dump_node_state(inovelli_switch, inovelli_switch_state):
+    """Test dumping the node state."""
+    assert inovelli_switch_state != inovelli_switch.data
+    assert "values" not in inovelli_switch.data
+    assert "endpoints" not in inovelli_switch.data
+    dump_state = dump_node_state(inovelli_switch)
+    for val in dump_state["values"].values():
+        assert val in inovelli_switch_state["values"]
+    for endpoint in dump_state["endpoints"].values():
+        assert endpoint in inovelli_switch_state["endpoints"]
