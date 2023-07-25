@@ -91,10 +91,27 @@ def get_usercodes(node: Node) -> list[CodeSlot]:
     return _get_code_slots(node, True)
 
 
-def get_usercode(node: Node, code_slot: int) -> str | None:
+def get_usercode(node: Node, code_slot: int) -> CodeSlot:
     """Get usercode from slot X on the lock."""
     value = get_code_slot_value(node, code_slot, LOCK_USERCODE_PROPERTY)
-    return value.value
+    status_value = get_code_slot_value(node, code_slot, LOCK_USERCODE_STATUS_PROPERTY)
+
+    code_slot = int(value.property_key)  # type: ignore
+    in_use = (
+        None
+        if status_value.value is None
+        else status_value.value == CodeSlotStatus.ENABLED
+    )
+
+    return cast(
+        CodeSlot,
+        {
+            ATTR_CODE_SLOT: code_slot,
+            ATTR_NAME: value.metadata.label,
+            ATTR_IN_USE: in_use,
+            ATTR_USERCODE: value.value,
+        },
+    )
 
 
 async def get_usercode_from_node(node: Node, code_slot: int) -> dict[str, str | bool]:
@@ -109,6 +126,7 @@ async def get_usercode_from_node(node: Node, code_slot: int) -> dict[str, str | 
         CommandClass.USER_CODE, "get", code_slot, wait_for_result=True
     )
     return {
+        ATTR_CODE_SLOT: code_slot,
         ATTR_IN_USE: resp["userIdStatus"] == CodeSlotStatus.ENABLED,
         ATTR_USERCODE: resp["userCode"],
     }
