@@ -4,6 +4,7 @@ import pytest
 from zwave_js_server.const.command_class.lock import (
     ATTR_CODE_SLOT,
     ATTR_IN_USE,
+    ATTR_NAME,
     ATTR_USERCODE,
 )
 from zwave_js_server.exceptions import NotFoundError
@@ -134,6 +135,7 @@ async def test_get_usercode_from_node(lock_schlage_be469, mock_command, uuid4):
 
     # Test valid code
     assert await get_usercode_from_node(node, 1) == {
+        ATTR_NAME: "User Code (1)",
         ATTR_CODE_SLOT: 1,
         ATTR_IN_USE: True,
         ATTR_USERCODE: "**********",
