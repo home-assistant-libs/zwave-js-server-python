@@ -114,7 +114,7 @@ def get_usercode(node: Node, code_slot: int) -> CodeSlot:
     )
 
 
-async def get_usercode_from_node(node: Node, code_slot: int) -> dict[str, str | bool]:
+async def get_usercode_from_node(node: Node, code_slot: int) -> CodeSlot:
     """
     Fetch a usercode directly from a node.
 
@@ -122,14 +122,10 @@ async def get_usercode_from_node(node: Node, code_slot: int) -> dict[str, str | 
     This call will populate the ValueDB and trigger value update events from the
     driver.
     """
-    resp = await node.async_invoke_cc_api(
+    await node.async_invoke_cc_api(
         CommandClass.USER_CODE, "get", code_slot, wait_for_result=True
     )
-    return {
-        ATTR_CODE_SLOT: code_slot,
-        ATTR_IN_USE: resp["userIdStatus"] == CodeSlotStatus.ENABLED,
-        ATTR_USERCODE: resp["userCode"],
-    }
+    return get_usercode(node, code_slot)
 
 
 async def set_usercode(
