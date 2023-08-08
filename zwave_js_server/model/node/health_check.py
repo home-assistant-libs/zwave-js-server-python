@@ -145,3 +145,4 @@ class CheckHealthProgress:
     rounds: int
     total_rounds: int
     last_rating: int
+    last_result: LifelineHealthCheckResultDataType | RouteHealthCheckResultDataType

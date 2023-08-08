@@ -1,16 +1,18 @@
 """Constants for the Z-Wave JS python library."""
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from enum import Enum, IntEnum
 from importlib import metadata
+from typing import TypedDict
 
 PACKAGE_NAME = "zwave-js-server-python"
 __version__ = metadata.version(PACKAGE_NAME)
 
 # minimal server schema version we can handle
-MIN_SERVER_SCHEMA_VERSION = 30
+MIN_SERVER_SCHEMA_VERSION = 31
 # max server schema version we can handle (and our code is compatible with)
-MAX_SERVER_SCHEMA_VERSION = 30
+MAX_SERVER_SCHEMA_VERSION = 31
 
 VALUE_UNKNOWN = "unknown"
 
@@ -412,3 +414,59 @@ class RemoveNodeReason(IntEnum):
     RESET = 5
     # SmartStart inclusion failed, and the node was auto-removed as a result.
     SMART_START_FAILED = 6
+
+
+class Weekday(IntEnum):
+    """Enum for all known weekdays."""
+
+    UNKNOWN = 0
+    MONDAY = 1
+    TUESDAY = 2
+    WEDNESDAY = 3
+    THURSDAY = 4
+    FRIDAY = 5
+    SATURDAY = 6
+    SUNDAY = 7
+
+
+class DateAndTimeDataType(TypedDict, total=False):
+    """Represent a date and time data type."""
+
+    hour: int
+    minute: int
+    weekday: int
+    second: int
+    year: int
+    month: int
+    day: int
+    dstOffset: int
+    standardOffset: int
+
+
+@dataclass
+class DateAndTime:
+    """Represent a date and time."""
+
+    data: DateAndTimeDataType
+    hour: int | None = field(init=False)
+    minute: int | None = field(init=False)
+    weekday: Weekday | None = field(default=None, init=False)
+    second: int | None = field(init=False)
+    year: int | None = field(init=False)
+    month: int | None = field(init=False)
+    day: int | None = field(init=False)
+    dst_offset: int | None = field(init=False)
+    standard_offset: int | None = field(init=False)
+
+    def __post_init__(self) -> None:
+        """Post initialization."""
+        self.hour = self.data.get("hour")
+        self.minute = self.data.get("minute")
+        if weekday := self.data.get("weekday"):
+            self.weekday = Weekday(weekday)
+        self.second = self.data.get("second")
+        self.year = self.data.get("year")
+        self.month = self.data.get("month")
+        self.day = self.data.get("day")
+        self.dst_offset = self.data.get("dstOffset")
+        self.standard_offset = self.data.get("standardOffset")

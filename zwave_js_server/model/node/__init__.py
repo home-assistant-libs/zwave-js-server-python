@@ -10,6 +10,7 @@ from ...const import (
     INTERVIEW_FAILED,
     NOT_INTERVIEWED,
     CommandClass,
+    DateAndTime,
     NodeStatus,
     PowerLevel,
     SecurityClass,
@@ -58,7 +59,9 @@ from .firmware import (
 )
 from .health_check import (
     CheckHealthProgress,
+    LifelineHealthCheckResult,
     LifelineHealthCheckSummary,
+    RouteHealthCheckResult,
     RouteHealthCheckSummary,
     TestPowerLevelProgress,
 )
@@ -828,6 +831,34 @@ class Node(EventBase):
         assert data
         return cast(bool, data["success"])
 
+    async def async_get_date_and_time(self) -> DateAndTime:
+        """Send getDateAndTime command to Node."""
+        data = await self.async_send_command(
+            "get_date_and_time",
+            require_schema=31,
+            wait_for_result=True,
+        )
+        assert data
+        return DateAndTime(data["dateAndTime"])
+
+    async def async_is_health_check_in_progress(self) -> bool:
+        """Send isHealthCheckInProgress command to Node."""
+        data = await self.async_send_command(
+            "is_health_check_in_progress",
+            require_schema=31,
+            wait_for_result=True,
+        )
+        assert data
+        return cast(bool, data["inProgress"])
+
+    async def async_abort_health_check(self) -> None:
+        """Send abortHealthCheck command to Node."""
+        await self.async_send_command(
+            "abort_health_check",
+            require_schema=31,
+            wait_for_result=True,
+        )
+
     def handle_test_powerlevel_progress(self, event: Event) -> None:
         """Process a test power level progress event."""
         event.data["test_power_level_progress"] = TestPowerLevelProgress(
@@ -837,13 +868,19 @@ class Node(EventBase):
     def handle_check_lifeline_health_progress(self, event: Event) -> None:
         """Process a check lifeline health progress event."""
         event.data["check_lifeline_health_progress"] = CheckHealthProgress(
-            event.data["rounds"], event.data["totalRounds"], event.data["lastRating"]
+            event.data["rounds"],
+            event.data["totalRounds"],
+            event.data["lastRating"],
+            LifelineHealthCheckResult(event.data["lastResult"]),
         )
 
     def handle_check_route_health_progress(self, event: Event) -> None:
         """Process a check route health progress event."""
         event.data["check_route_health_progress"] = CheckHealthProgress(
-            event.data["rounds"], event.data["totalRounds"], event.data["lastRating"]
+            event.data["rounds"],
+            event.data["totalRounds"],
+            event.data["lastRating"],
+            RouteHealthCheckResult(event.data["lastResult"]),
         )
 
     def handle_wake_up(self, event: Event) -> None:
