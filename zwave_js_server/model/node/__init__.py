@@ -71,6 +71,7 @@ if TYPE_CHECKING:
     from ...client import Client
 
 
+# pylint: disable=too-many-lines
 _LOGGER = logging.getLogger(__package__)
 
 DEFAULT_NODE_STATISTICS = NodeStatisticsDataType(

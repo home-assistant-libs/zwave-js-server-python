@@ -2238,7 +2238,9 @@ async def test_get_value_timestamp(multisensor_6: node_pkg.Node, uuid4, mock_com
     }
 
 
-async def test_is_health_check_in_progress(multisensor_6: node_pkg.Node, uuid4, mock_command):
+async def test_is_health_check_in_progress(
+    multisensor_6: node_pkg.Node, uuid4, mock_command
+):
     """Test node.is_health_check_in_progress command."""
     node = multisensor_6
     ack_commands = mock_command(
