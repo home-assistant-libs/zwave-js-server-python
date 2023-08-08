@@ -266,10 +266,10 @@ class Value:
 
     def update(self, data: ValueDataType) -> None:
         """Update data."""
-        data.pop("prevValue", None)
         self.data.update(data)
-        if (new_value := self.data.pop("newValue", None)) is not None:
-            self.data["value"] = new_value
+        self.data.pop("prevValue", None)
+        if "newValue" in self.data:
+            self.data["value"] = self.data.pop("newValue")
 
         if "metadata" in data:
             self._metadata.update(data["metadata"])

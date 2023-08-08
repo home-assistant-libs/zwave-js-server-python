@@ -373,8 +373,14 @@ class Node(EventBase):
         for value_id in stale_value_ids:
             self.values.pop(value_id)
 
-        # Updating existing values and populate new values
-        for value_id in new_value_ids - stale_value_ids:
+        # Updating existing values and populate new values. Preserve value order if
+        # initializing values for the node for the first time by using the key order
+        # which is deterministic
+        for value_id in (
+            new_value_ids - stale_value_ids
+            if stale_value_ids
+            else list(new_values_data)
+        ):
             val = new_values_data[value_id]
             try:
                 if value_id in self.values:
