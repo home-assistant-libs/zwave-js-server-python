@@ -1,7 +1,12 @@
 """Test lock utility functions."""
 import pytest
 
-from zwave_js_server.const.command_class.lock import ATTR_IN_USE, ATTR_USERCODE
+from zwave_js_server.const.command_class.lock import (
+    ATTR_CODE_SLOT,
+    ATTR_IN_USE,
+    ATTR_NAME,
+    ATTR_USERCODE,
+)
 from zwave_js_server.exceptions import NotFoundError
 from zwave_js_server.util.lock import (
     clear_usercode,
@@ -29,14 +34,14 @@ def test_get_usercode(lock_schlage_be469):
     node = lock_schlage_be469
 
     # Test in use slot
-    user_code = get_usercode(node, 1)
-    assert all(char == "*" for char in user_code)
+    slot = get_usercode(node, 1)
+    assert all(char == "*" for char in slot[ATTR_USERCODE])
 
     # Test unused slot
-    assert get_usercode(node, 29) == ""
+    assert get_usercode(node, 29)[ATTR_USERCODE] == ""
 
     # Test unknown slot
-    assert get_usercode(node, 30) is None
+    assert get_usercode(node, 30)[ATTR_USERCODE] is None
 
     # Test invalid slot
     with pytest.raises(NotFoundError):
@@ -130,6 +135,8 @@ async def test_get_usercode_from_node(lock_schlage_be469, mock_command, uuid4):
 
     # Test valid code
     assert await get_usercode_from_node(node, 1) == {
+        ATTR_NAME: "User Code (1)",
+        ATTR_CODE_SLOT: 1,
         ATTR_IN_USE: True,
         ATTR_USERCODE: "**********",
     }
