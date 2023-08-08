@@ -347,6 +347,13 @@ class Node(EventBase):
         """Return whether the node is set to keep awake."""
         return self.data["keepAwake"]
 
+    @property
+    def last_seen(self) -> datetime | None:
+        """Return when the node was last seen."""
+        if last_seen := self.data.get("lastSeen"):
+            return datetime.fromisoformat(last_seen)
+        return None
+
     def update(self, data: NodeDataType) -> None:
         """Update the internal state data."""
         self.data = copy.deepcopy(data)
@@ -969,3 +976,5 @@ class Node(EventBase):
         event.data["statistics_updated"] = self._statistics = NodeStatistics(
             self.client, statistics
         )
+        if last_seen := statistics.get("lastSeen"):
+            self.data["lastSeen"] = last_seen

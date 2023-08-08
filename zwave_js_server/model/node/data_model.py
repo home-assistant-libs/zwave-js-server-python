@@ -62,3 +62,4 @@ class NodeDataType(TypedDict, total=False):
     statistics: NodeStatisticsDataType
     highestSecurityClass: int
     isControllerNode: bool
+    lastSeen: str

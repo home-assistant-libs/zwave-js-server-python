@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from contextlib import suppress
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import TYPE_CHECKING, TypedDict
 
 from zwave_js_server.exceptions import RssiErrorReceived
@@ -27,6 +28,7 @@ class NodeStatisticsDataType(TypedDict, total=False):
     rssi: int
     lwr: RouteStatisticsDataType
     nlwr: RouteStatisticsDataType
+    lastSeen: str
 
 
 @dataclass
@@ -43,6 +45,7 @@ class NodeStatistics:
     rtt: int | None = field(init=False)
     lwr: RouteStatistics | None = field(init=False, default=None)
     nlwr: RouteStatistics | None = field(init=False, default=None)
+    last_seen: datetime | None = field(init=False, default=None)
 
     def __post_init__(self) -> None:
         """Post initialize."""
@@ -52,6 +55,8 @@ class NodeStatistics:
         self.commands_dropped_tx = self.data["commandsDroppedTX"]
         self.timeout_response = self.data["timeoutResponse"]
         self.rtt = self.data.get("rtt")
+        if last_seen := self.data.get("lastSeen"):
+            self.last_seen = datetime.fromisoformat(last_seen)
         if lwr := self.data.get("lwr"):
             with suppress(ValueError):
                 self.lwr = RouteStatistics(self.client, lwr)
