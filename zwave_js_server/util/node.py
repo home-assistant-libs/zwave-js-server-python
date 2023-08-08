@@ -19,6 +19,15 @@ from ..model.value import ConfigurationValue, SetValueResult, get_value_id_str
 _LOGGER = logging.getLogger(__name__)
 
 
+def dump_node_state(node: Node) -> dict:
+    """Get state from a node."""
+    return {
+        **node.data,
+        "values": {value_id: value.data for value_id, value in node.values.items()},
+        "endpoints": {idx: endpoint.data for idx, endpoint in node.endpoints.items()},
+    }
+
+
 def partial_param_bit_shift(property_key: int) -> int:
     """Get the number of bits to shift the value for a given property key."""
     # We can get the binary representation of the property key, reverse it,
