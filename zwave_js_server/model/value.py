@@ -313,9 +313,7 @@ class ConfigurationValue(Value):
         allow_manual_entry = self.metadata.allow_manual_entry
         type_ = self.metadata.type
 
-        if (
-            (max_ == 1 and min_ == 0) or type_ == ValueType.BOOLEAN
-        ) and not states:
+        if ((max_ == 1 and min_ == 0) or type_ == ValueType.BOOLEAN) and not states:
             return ConfigurationValueType.BOOLEAN
 
         if (
