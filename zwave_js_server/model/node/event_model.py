@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from typing import Literal
 
+from pydantic import BaseModel
+
 from ...const import CommandClass
 from ...event import BaseEventModel
 from ..notification import (
@@ -17,11 +19,6 @@ from .firmware import (
     NodeFirmwareUpdateResultDataType,
 )
 from .statistics import NodeStatisticsDataType
-
-try:
-    from pydantic.v1 import BaseModel
-except ImportError:
-    from pydantic import BaseModel
 
 
 class BaseNodeEventModel(BaseEventModel):
@@ -75,6 +72,8 @@ class InterviewCompletedEventModel(BaseNodeEventModel):
 
 class InterviewFailedEventArgsModel(BaseModel):
     """Model for `interview failed` event args."""
+
+    model_config = {"arbitrary_types_allowed": True}
 
     errorMessage: str
     isFinal: bool

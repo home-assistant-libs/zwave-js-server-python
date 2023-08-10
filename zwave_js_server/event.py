@@ -5,16 +5,15 @@ import logging
 from dataclasses import dataclass, field
 from typing import Callable, Literal
 
-try:
-    from pydantic.v1 import BaseModel
-except ImportError:
-    from pydantic import BaseModel
+from pydantic import BaseModel
 
 LOGGER = logging.getLogger(__package__)
 
 
 class BaseEventModel(BaseModel):
     """Base model for an event."""
+
+    model_config = {"arbitrary_types_allowed": True}
 
     source: Literal["controller", "driver", "node"]
     event: str
