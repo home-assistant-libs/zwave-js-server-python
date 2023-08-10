@@ -2089,3 +2089,13 @@ async def test_additional_events(controller):
         {"source": "controller", "event": "validate dsk and enter pin", "dsk": "1234"},
     )
     controller.receive_event(event)
+
+
+async def test_identify(client, multisensor_6):
+    """Test identify event."""
+    event = Event(
+        "identify",
+        {"source": "controller", "event": "identify", "nodeId": multisensor_6.node_id},
+    )
+    client.driver.controller.receive_event(event)
+    assert event.data["node"] == multisensor_6
