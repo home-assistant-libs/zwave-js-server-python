@@ -64,10 +64,6 @@ async def test_configuration_parameter_values(
     with pytest.raises(NotImplementedError):
         await async_set_config_parameter(node, 1, 2, endpoint=endpoint)
 
-    # Test setting a manual entry configuration parameter with an invalid value
-    with pytest.raises(InvalidNewValue):
-        await async_set_config_parameter(node_2, "Purple", 8, 255, endpoint=endpoint)
-
     # Test setting a manual entry configuration parameter with a valid value
     ack_commands_2 = mock_command(
         {"command": "node.set_value", "nodeId": node_2.node_id},
@@ -115,14 +111,6 @@ async def test_configuration_parameter_values(
         "value": 170,
         "messageId": uuid4,
     }
-
-    # Test setting an enumerated configuration parameter with an invalid value
-    with pytest.raises(InvalidNewValue):
-        await async_set_config_parameter(node, 5, 1, endpoint=endpoint)
-
-    # Test setting a range configuration parameter with an out of bounds value
-    with pytest.raises(InvalidNewValue):
-        await async_set_config_parameter(node, 200, 10, endpoint=endpoint)
 
     # Test configuration parameter not found when using an invalid property name
     with pytest.raises(NotFoundError):
@@ -272,10 +260,10 @@ async def test_bulk_set_partial_config_parameters(
             node, 101, {"Invalid property name": 1}, endpoint=endpoint
         )
 
-    # use an invalid bitmask
+    # use an invalid state value
     with pytest.raises(BulkSetConfigParameterFailed):
         await async_bulk_set_partial_config_parameters(
-            node, 101, {128: 1, 64: 1, 32: 1, 16: 1, 1: 99999}, endpoint=endpoint
+            node, 101, {128: "fake state", 64: 1, 32: 1, 16: 1, 1: 1}, endpoint=endpoint
         )
 
     # Try to bulkset a property that isn't broken into partials with a dictionary

@@ -1,7 +1,6 @@
 """Utility functions for Z-Wave JS nodes."""
 from __future__ import annotations
 
-import json
 import logging
 from typing import cast
 
@@ -187,68 +186,25 @@ def _validate_and_transform_new_value(
     zwave_value: ConfigurationValue, new_value: int | str
 ) -> int:
     """Validate a new value and return the integer value to set."""
-    # Validate that new value for enumerated configuration parameter is a valid state
-    # key or label
-    if (
-        zwave_value.configuration_value_type == ConfigurationValueType.ENUMERATED
-        and str(new_value)
-        not in [
-            *zwave_value.metadata.states,
-            *zwave_value.metadata.states.values(),
-        ]
-    ):
-        raise InvalidNewValue(
-            f"Must provide a value for {zwave_value.value_id} that represents a valid "
-            f"state key or label from {json.dumps(zwave_value.metadata.states)}"
-        )
-
-    # Validate that new value for manual entry configuration parameter is a valid state
-    # key or label
-    if (
-        isinstance(new_value, str)
-        and zwave_value.configuration_value_type == ConfigurationValueType.MANUAL_ENTRY
-        and str(new_value) not in zwave_value.metadata.states.values()
-    ):
-        raise InvalidNewValue(
-            f"Must provide a value for {zwave_value.value_id} that represents a valid "
-            f"state from {list(zwave_value.metadata.states.values())}"
-        )
-
     # If needed, convert a state label to its key. We know the state exists because
     # of the validation above.
     if isinstance(new_value, str):
-        new_value = int(
-            next(
-                key
-                for key, label in zwave_value.metadata.states.items()
-                if label == new_value
+        try:
+            new_value = int(
+                next(
+                    key
+                    for key, label in zwave_value.metadata.states.items()
+                    if label == new_value
+                )
             )
-        )
+        except StopIteration:
+            raise InvalidNewValue(
+                f"State '{new_value}' not found for parameter {zwave_value.value_id}"
+            ) from None
 
     if zwave_value.configuration_value_type == ConfigurationValueType.UNDEFINED:
         # We need to use the Configuration CC API to set the value for this type
         raise NotImplementedError("Configuration values of undefined type can't be set")
-
-    # Validate that new value for range configuration parameter is within bounds
-    max_ = zwave_value.metadata.max
-    min_ = zwave_value.metadata.min
-    check_ = zwave_value.configuration_value_type in (
-        ConfigurationValueType.BOOLEAN,
-        ConfigurationValueType.RANGE,
-        ConfigurationValueType.MANUAL_ENTRY,
-    )
-    if check_ and (
-        (max_ is not None and new_value > max_)
-        or (min_ is not None and new_value < min_)
-    ):
-        bounds = []
-        if min_ is not None:
-            bounds.append(f"Min: {min_}")
-        if max_ is not None:
-            bounds.append(f"Max: {max_}")
-        raise InvalidNewValue(
-            f"Must provide a value within the target range ({', '.join(bounds)})"
-        )
 
     return new_value
 
