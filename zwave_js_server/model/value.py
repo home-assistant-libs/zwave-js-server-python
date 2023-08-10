@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from enum import StrEnum
 from typing import TYPE_CHECKING, Any, TypedDict
 
 from ..const import VALUE_UNKNOWN, CommandClass, ConfigurationValueType, SetValueStatus
@@ -11,6 +12,15 @@ from .duration import Duration, DurationDataType
 
 if TYPE_CHECKING:
     from .node import Node
+
+
+class ValueType(StrEnum):
+    """Enum with all value types."""
+
+    ANY = "any"
+    BOOLEAN = "boolean"
+    NUMBER = "number"
+    STRING = "string"
 
 
 class MetaDataType(TypedDict, total=False):
@@ -301,8 +311,9 @@ class ConfigurationValue(Value):
         max_ = self.metadata.max
         states = self.metadata.states
         allow_manual_entry = self.metadata.allow_manual_entry
+        type_ = self.metadata.type
 
-        if max_ == 1 and min_ == 0 and not states:
+        if (max_ == 1 and min_ == 0 or type_ == ValueType.BOOLEAN) and not states:
             return ConfigurationValueType.BOOLEAN
 
         if (
