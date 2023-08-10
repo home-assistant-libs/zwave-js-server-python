@@ -850,7 +850,7 @@ class Node(EventBase):
             wait_for_result=True,
         )
         assert data
-        return cast(bool, data["inProgress"])
+        return cast(bool, data["progress"])
 
     async def async_abort_health_check(self) -> None:
         """Send abortHealthCheck command to Node."""

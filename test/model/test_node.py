@@ -2245,7 +2245,7 @@ async def test_is_health_check_in_progress(
     node = multisensor_6
     ack_commands = mock_command(
         {"command": "node.is_health_check_in_progress", "nodeId": node.node_id},
-        {"inProgress": True},
+        {"progress": True},
     )
 
     assert await node.async_is_health_check_in_progress()
