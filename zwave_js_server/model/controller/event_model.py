@@ -169,6 +169,13 @@ class ValidateDSKAndEnterPINEventModel(BaseControllerEventModel):
     dsk: str
 
 
+class IdentifyEventModel(BaseControllerEventModel):
+    """Model for `identify` event data."""
+
+    event: Literal["identify"]
+    nodeId: int
+
+
 CONTROLLER_EVENT_MODEL_MAP: dict[str, type["BaseControllerEventModel"]] = {
     "exclusion failed": ExclusionFailedEventModel,
     "exclusion started": ExclusionStartedEventModel,
@@ -178,6 +185,7 @@ CONTROLLER_EVENT_MODEL_MAP: dict[str, type["BaseControllerEventModel"]] = {
     "grant security classes": GrantSecurityClassesEventModel,
     "heal network done": HealNetworkDoneEventModel,
     "heal network progress": HealNetworkProgressEventModel,
+    "identify": IdentifyEventModel,
     "inclusion aborted": InclusionAbortedEventModel,
     "inclusion failed": InclusionFailedEventModel,
     "inclusion started": InclusionStartedEventModel,

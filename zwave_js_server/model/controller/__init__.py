@@ -921,3 +921,9 @@ class Controller(EventBase):
         event.data["nvm_restore_progress"] = NVMProgress(
             event.data["bytesWritten"], event.data["total"]
         )
+
+    def handle_identify(self, event: Event) -> None:
+        """Process an identify event."""
+        # TODO handle event for unknown node
+        if node := self.nodes.get(event.data["nodeId"]):
+            event.data["node"] = node
