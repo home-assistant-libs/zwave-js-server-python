@@ -14,6 +14,7 @@ from zwave_js_server.const import (
     ProtocolDataRate,
     ProtocolVersion,
     SecurityClass,
+    Weekday,
 )
 from zwave_js_server.const.command_class.entry_control import (
     EntryControlDataType,
@@ -1743,6 +1744,16 @@ async def test_check_lifeline_health_progress_event(
             "rounds": 1,
             "totalRounds": 2,
             "lastRating": 10,
+            "lastResult": LifelineHealthCheckResultDataType(
+                latency=1,
+                numNeighbors=2,
+                failedPingsNode=3,
+                rating=9,
+                routeChanges=4,
+                minPowerlevel=5,
+                failedPingsController=6,
+                snrMargin=7,
+            ),
         },
     )
     multisensor_6.receive_event(event)
@@ -1750,6 +1761,7 @@ async def test_check_lifeline_health_progress_event(
     assert event.data["check_lifeline_health_progress"].rounds == 1
     assert event.data["check_lifeline_health_progress"].total_rounds == 2
     assert event.data["check_lifeline_health_progress"].last_rating == 10
+    assert event.data["check_lifeline_health_progress"].last_result.latency == 1
 
 
 async def test_check_route_health(
@@ -1811,6 +1823,14 @@ async def test_check_route_health_progress_event(
             "rounds": 1,
             "totalRounds": 2,
             "lastRating": 10,
+            "lastResult": RouteHealthCheckResultDataType(
+                numNeighbors=1,
+                rating=10,
+                failedPingsToSource=2,
+                failedPingsToTarget=3,
+                minPowerlevelSource=4,
+                minPowerlevelTarget=5,
+            ),
         },
     )
     multisensor_6.receive_event(event)
@@ -1818,6 +1838,7 @@ async def test_check_route_health_progress_event(
     assert event.data["check_route_health_progress"].rounds == 1
     assert event.data["check_route_health_progress"].total_rounds == 2
     assert event.data["check_route_health_progress"].last_rating == 10
+    assert event.data["check_route_health_progress"].last_result.num_neighbors == 1
 
 
 async def test_get_state(
@@ -2166,6 +2187,27 @@ async def test_set_date_and_time(multisensor_6: node_pkg.Node, uuid4, mock_comma
         await node.async_manually_idle_notification_value(f"{node.node_id}-112-0-255")
 
 
+async def test_get_date_and_time(multisensor_6: node_pkg.Node, uuid4, mock_command):
+    """Test node.get_date_and_time command."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.get_date_and_time", "nodeId": node.node_id},
+        {"dateAndTime": {"hour": 1, "minute": 2, "weekday": 5}},
+    )
+
+    date_and_time = await node.async_get_date_and_time()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.get_date_and_time",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }
+    assert date_and_time.hour == 1
+    assert date_and_time.minute == 2
+    assert date_and_time.weekday == Weekday.FRIDAY
+
+
 async def test_get_value_timestamp(multisensor_6: node_pkg.Node, uuid4, mock_command):
     """Test node.get_value_timestamp command."""
     node = multisensor_6
@@ -2192,6 +2234,44 @@ async def test_get_value_timestamp(multisensor_6: node_pkg.Node, uuid4, mock_com
         "command": "node.get_value_timestamp",
         "nodeId": node.node_id,
         "valueId": {"commandClass": 112, "endpoint": 0, "property": 2},
+        "messageId": uuid4,
+    }
+
+
+async def test_is_health_check_in_progress(
+    multisensor_6: node_pkg.Node, uuid4, mock_command
+):
+    """Test node.is_health_check_in_progress command."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.is_health_check_in_progress", "nodeId": node.node_id},
+        {"progress": True},
+    )
+
+    assert await node.async_is_health_check_in_progress()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.is_health_check_in_progress",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }
+
+
+async def test_abort_health_check(multisensor_6: node_pkg.Node, uuid4, mock_command):
+    """Test node.abort_health_check command."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.abort_health_check", "nodeId": node.node_id},
+        {},
+    )
+
+    await node.async_abort_health_check()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.abort_health_check",
+        "nodeId": node.node_id,
         "messageId": uuid4,
     }
 
