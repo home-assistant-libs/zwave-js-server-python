@@ -114,7 +114,7 @@ class Node(EventBase):
         self._firmware_update_progress: NodeFirmwareUpdateProgress | None = None
         self.values: dict[str, ConfigurationValue | Value] = {}
         self.endpoints: dict[int, Endpoint] = {}
-        self._status_lock = asyncio.Lock()
+        self._status_event = asyncio.Event()
         self.update(data)
 
     def __repr__(self) -> str:
@@ -472,10 +472,10 @@ class Node(EventBase):
                 self.client.async_send_command(message, **kwargs)
             )
             await asyncio.wait(
-                [result_task, self._status_lock.acquire()],
+                [result_task, self._status_event.wait()],
                 return_when=asyncio.FIRST_COMPLETED,
             )
-            if not self._status_lock.locked() and not result_task.done():
+            if self._status_event.is_set() and not result_task.done():
                 result_task.cancel()
                 return None
             return result_task.result()
@@ -904,23 +904,25 @@ class Node(EventBase):
     def handle_wake_up(self, event: Event) -> None:
         """Process a node wake up event."""
         # pylint: disable=unused-argument
+        self._status_event.set()
         self.data["status"] = NodeStatus.AWAKE
 
     def handle_sleep(self, event: Event) -> None:
         """Process a node sleep event."""
         # pylint: disable=unused-argument
-        self._status_lock.release()
+        self._status_event.release()
         self.data["status"] = NodeStatus.ASLEEP
 
     def handle_dead(self, event: Event) -> None:
         """Process a node dead event."""
         # pylint: disable=unused-argument
-        self._status_lock.release()
+        self._status_event.release()
         self.data["status"] = NodeStatus.DEAD
 
     def handle_alive(self, event: Event) -> None:
         """Process a node alive event."""
         # pylint: disable=unused-argument
+        self._status_event.set()
         self.data["status"] = NodeStatus.ALIVE
 
     def handle_interview_started(self, event: Event) -> None:
