@@ -475,11 +475,13 @@ class Node(EventBase):
                 [result_task, self._status_event.wait()],
                 return_when=asyncio.FIRST_COMPLETED,
             )
-            if self._status_event.is_set() and not result_task.done():
+            try:
+                if self._status_event.is_set() and not result_task.done():
+                    result_task.cancel()
+                    return None
+                return result_task.result()
+            finally:
                 self._status_event.clear()
-                result_task.cancel()
-                return None
-            return result_task.result()
 
         await self.client.async_send_command_no_wait(message, **kwargs)
         return None
