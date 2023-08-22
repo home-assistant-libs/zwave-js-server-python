@@ -476,6 +476,7 @@ class Node(EventBase):
                 return_when=asyncio.FIRST_COMPLETED,
             )
             if self._status_event.is_set() and not result_task.done():
+                self._status_event.clear()
                 result_task.cancel()
                 return None
             return result_task.result()
@@ -904,25 +905,25 @@ class Node(EventBase):
     def handle_wake_up(self, event: Event) -> None:
         """Process a node wake up event."""
         # pylint: disable=unused-argument
-        self._status_event.set()
+        self._status_event.release()
         self.data["status"] = NodeStatus.AWAKE
 
     def handle_sleep(self, event: Event) -> None:
         """Process a node sleep event."""
         # pylint: disable=unused-argument
-        self._status_event.release()
+        self._status_event.set()
         self.data["status"] = NodeStatus.ASLEEP
 
     def handle_dead(self, event: Event) -> None:
         """Process a node dead event."""
         # pylint: disable=unused-argument
-        self._status_event.release()
+        self._status_event.set()
         self.data["status"] = NodeStatus.DEAD
 
     def handle_alive(self, event: Event) -> None:
         """Process a node alive event."""
         # pylint: disable=unused-argument
-        self._status_event.set()
+        self._status_event.release()
         self.data["status"] = NodeStatus.ALIVE
 
     def handle_interview_started(self, event: Event) -> None:
