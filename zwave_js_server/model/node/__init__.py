@@ -466,7 +466,8 @@ class Node(EventBase):
             kwargs["require_schema"] = require_schema
 
         if wait_for_result or (
-            wait_for_result is None and self.status != NodeStatus.ASLEEP
+            wait_for_result is None
+            and self.status not in (NodeStatus.ASLEEP, NodeStatus.DEAD)
         ):
             result_task = asyncio.create_task(
                 self.client.async_send_command(message, **kwargs)
@@ -907,7 +908,7 @@ class Node(EventBase):
     def handle_wake_up(self, event: Event) -> None:
         """Process a node wake up event."""
         # pylint: disable=unused-argument
-        self._status_event.release()
+        self._status_event.clear()
         self.data["status"] = NodeStatus.AWAKE
 
     def handle_sleep(self, event: Event) -> None:
@@ -925,7 +926,7 @@ class Node(EventBase):
     def handle_alive(self, event: Event) -> None:
         """Process a node alive event."""
         # pylint: disable=unused-argument
-        self._status_event.release()
+        self._status_event.clear()
         self.data["status"] = NodeStatus.ALIVE
 
     def handle_interview_started(self, event: Event) -> None:
