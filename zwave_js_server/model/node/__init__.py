@@ -478,7 +478,7 @@ class Node(EventBase):
             if not self._status_lock.locked() and not result_task.done():
                 result_task.cancel()
                 return None
-            return await result_task.result()
+            return result_task.result()
 
         await self.client.async_send_command_no_wait(message, **kwargs)
         return None
