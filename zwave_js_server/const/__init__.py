@@ -470,3 +470,15 @@ class DateAndTime:
         self.day = self.data.get("day")
         self.dst_offset = self.data.get("dstOffset")
         self.standard_offset = self.data.get("standardOffset")
+
+
+class ControllerStatus(IntEnum):
+    """Enum for all known controller statuses."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/consts/ControllerStatus.TS
+    # The controller is ready to accept commands and transmit
+    READY = 0
+    # The controller is unresponsive
+    UNRESPONSIVE = 1
+    # The controller is unable to transmit
+    JAMMED = 2

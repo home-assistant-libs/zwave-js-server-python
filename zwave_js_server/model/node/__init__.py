@@ -883,6 +883,39 @@ class Node(EventBase):
             wait_for_result=True,
         )
 
+    async def async_set_default_volume(
+        self, default_volume: int | float | None
+    ) -> None:
+        """Send setDefaultVolume command to Node."""
+        cmd_kwargs = {}
+        if default_volume is not None:
+            cmd_kwargs["defaultVolume"] = default_volume
+        await self.async_send_command(
+            "set_default_volume",
+            require_schema=31,
+            **cmd_kwargs,
+        )
+
+    async def async_set_default_transition_duration(
+        self, default_duration_transition: str | None
+    ) -> None:
+        """Send setDefaultTransitionDuration command to Node."""
+        cmd_kwargs = {}
+        if default_duration_transition is not None:
+            cmd_kwargs["defaultDurationTransition"] = default_duration_transition
+        await self.async_send_command(
+            "set_default_transition_duration", require_schema=31, **cmd_kwargs
+        )
+
+    async def async_has_device_config_changed(self) -> bool:
+        """Send hasDeviceConfigChanged command to Node."""
+        data = await self.async_send_command(
+            "has_device_config_changed",
+            require_schema=31,
+            wait_for_result=True,
+        )
+        return cast(bool, data["changed"])
+
     def handle_test_powerlevel_progress(self, event: Event) -> None:
         """Process a test power level progress event."""
         event.data["test_power_level_progress"] = TestPowerLevelProgress(

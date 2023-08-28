@@ -30,3 +30,4 @@ class ControllerDataType(TypedDict, total=False):
     statistics: ControllerStatisticsDataType
     inclusionState: int
     rfRegion: int
+    status: int
