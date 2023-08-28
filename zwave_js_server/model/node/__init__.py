@@ -468,9 +468,9 @@ class Node(EventBase):
         if wait_for_result:
             result = await self.client.async_send_command(message, **kwargs)
             return result
-        if (
-            wait_for_result is None
-            and self.status not in (NodeStatus.ASLEEP, NodeStatus.DEAD)
+        if wait_for_result is None and self.status not in (
+            NodeStatus.ASLEEP,
+            NodeStatus.DEAD,
         ):
             result_task = asyncio.create_task(
                 self.client.async_send_command(message, **kwargs)
