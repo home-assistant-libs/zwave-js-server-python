@@ -163,7 +163,7 @@ def test_controller_mods():
 
 
 def test_controller_status():
-    """"Test controller status functionality."""
+    """ "Test controller status functionality."""
     state = json.loads(load_fixture("basic_dump.txt").split("\n")[0])["result"]["state"]
     state["controller"]["status"] = 0
 
