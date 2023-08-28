@@ -893,6 +893,7 @@ class Node(EventBase):
         await self.async_send_command(
             "set_default_volume",
             require_schema=31,
+            wait_for_result=None,
             **cmd_kwargs,
         )
 
@@ -904,7 +905,10 @@ class Node(EventBase):
         if default_duration_transition is not None:
             cmd_kwargs["defaultDurationTransition"] = default_duration_transition
         await self.async_send_command(
-            "set_default_transition_duration", require_schema=31, **cmd_kwargs
+            "set_default_transition_duration",
+            require_schema=31,
+            wait_for_result=None,
+            **cmd_kwargs,
         )
 
     async def async_has_device_config_changed(self) -> bool:
@@ -914,6 +918,7 @@ class Node(EventBase):
             require_schema=31,
             wait_for_result=True,
         )
+        assert data
         return cast(bool, data["changed"])
 
     def handle_test_powerlevel_progress(self, event: Event) -> None:
