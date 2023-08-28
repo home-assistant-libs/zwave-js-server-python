@@ -936,4 +936,5 @@ class Controller(EventBase):
 
     def handle_status_changed(self, event: Event) -> None:
         """Process a status changed event."""
+        self.data["status"] = event.data["status"]
         event.data["status"] = ControllerStatus(event.data["status"])
