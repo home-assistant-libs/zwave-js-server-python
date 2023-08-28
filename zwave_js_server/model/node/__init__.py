@@ -909,7 +909,7 @@ class Node(EventBase):
         )
 
     async def async_set_default_transition_duration(
-        self, default_duration_transition: str | None
+        self, default_duration_transition: int | float | None
     ) -> None:
         """Send setDefaultTransitionDuration command to Node."""
         cmd_kwargs = {}

@@ -63,5 +63,5 @@ class NodeDataType(TypedDict, total=False):
     highestSecurityClass: int
     isControllerNode: bool
     lastSeen: str
-    defaultVolume: int | float
-    defaultTransitionDuration: int | float
+    defaultVolume: int | float | None
+    defaultTransitionDuration: int | float | None
