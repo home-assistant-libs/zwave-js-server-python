@@ -115,14 +115,6 @@ class Driver(EventBase):
         result = await self._async_send_command("get_log_config", require_schema=4)
         return LogConfig.from_dict(result["config"])
 
-    async def async_start_listening_logs(self) -> None:
-        """Send command to start listening to log events."""
-        await self._async_send_command("start_listening_logs", require_schema=4)
-
-    async def async_stop_listening_logs(self) -> None:
-        """Send command to stop listening to log events."""
-        await self._async_send_command("stop_listening_logs", require_schema=4)
-
     async def async_enable_statistics(
         self, application_name: str, application_version: str
     ) -> None:
