@@ -359,6 +359,16 @@ class Node(EventBase):
         if last_seen := self.data.get("lastSeen"):
             return datetime.fromisoformat(last_seen)
         return None
+    
+    @property
+    def default_volume(self) -> int | float | None:
+        """Return the default volume."""
+        return self.data.get("defaultVolume")
+    
+    @property
+    def default_transition_duration(self) -> int | float | None:
+        """Return the default transition duration."""
+        return self.data.get("defaultTransitionDuration")
 
     def update(self, data: NodeDataType) -> None:
         """Update the internal state data."""
@@ -888,6 +898,7 @@ class Node(EventBase):
     ) -> None:
         """Send setDefaultVolume command to Node."""
         cmd_kwargs = {}
+        self.data["defaultVolume"] = default_volume
         if default_volume is not None:
             cmd_kwargs["defaultVolume"] = default_volume
         await self.async_send_command(
@@ -902,6 +913,7 @@ class Node(EventBase):
     ) -> None:
         """Send setDefaultTransitionDuration command to Node."""
         cmd_kwargs = {}
+        self.data["defaultTransitionDuration"] = default_duration_transition
         if default_duration_transition is not None:
             cmd_kwargs["defaultDurationTransition"] = default_duration_transition
         await self.async_send_command(
