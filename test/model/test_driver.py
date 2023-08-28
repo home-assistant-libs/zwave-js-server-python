@@ -124,31 +124,31 @@ async def test_get_log_config(driver, uuid4, mock_command):
     assert log_config.force_console is False
 
 
-async def test_listening_logs(driver, uuid4, mock_command):
+async def test_listening_logs(client, driver, uuid4, mock_command):
     """Test listening to logs helpers."""
     # Test that start listening to logs command is sent
     ack_commands = mock_command(
-        {"command": "driver.start_listening_logs"},
+        {"command": "start_listening_logs"},
         {"success": True},
     )
-    await driver.async_start_listening_logs()
+    await client.async_start_listening_logs()
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
-        "command": "driver.start_listening_logs",
+        "command": "start_listening_logs",
         "messageId": uuid4,
     }
 
     # Test that stop listening to logs command is sent
     ack_commands = mock_command(
-        {"command": "driver.stop_listening_logs"},
+        {"command": "stop_listening_logs"},
         {"success": True},
     )
-    await driver.async_stop_listening_logs()
+    await client.async_stop_listening_logs()
 
     assert len(ack_commands) == 2
     assert ack_commands[1] == {
-        "command": "driver.stop_listening_logs",
+        "command": "stop_listening_logs",
         "messageId": uuid4,
     }
 

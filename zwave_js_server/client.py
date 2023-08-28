@@ -439,6 +439,18 @@ class Client:
 
         await self._client.send_json(message)
 
+    async def async_start_listening_logs(self) -> None:
+        """Send command to start listening to log events."""
+        await self.async_send_command(
+            {"command": "start_listening_logs"}, require_schema=31
+        )
+
+    async def async_stop_listening_logs(self) -> None:
+        """Send command to stop listening to log events."""
+        await self.async_send_command(
+            {"command": "stop_listening_logs"}, require_schema=31
+        )
+
     async def __aenter__(self) -> "Client":
         """Connect to the websocket."""
         await self.connect()
