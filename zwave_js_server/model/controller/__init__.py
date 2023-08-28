@@ -11,6 +11,7 @@ from zwave_js_server.model.node.firmware import (
 
 from ...const import (
     MINIMUM_QR_STRING_LENGTH,
+    ControllerStatus,
     ExclusionStrategy,
     InclusionState,
     InclusionStrategy,
@@ -219,6 +220,11 @@ class Controller(EventBase):
     def firmware_update_progress(self) -> ControllerFirmwareUpdateProgress | None:
         """Return firmware update progress."""
         return self._firmware_update_progress
+
+    @property
+    def status(self) -> ControllerStatus:
+        """Return status."""
+        return ControllerStatus(self.data["status"])
 
     def update(self, data: ControllerDataType) -> None:
         """Update controller data."""
@@ -927,3 +933,8 @@ class Controller(EventBase):
         # TODO handle event for unknown node
         if node := self.nodes.get(event.data["nodeId"]):
             event.data["node"] = node
+
+    def handle_status_changed(self, event: Event) -> None:
+        """Process a status changed event."""
+        self.data["status"] = event.data["status"]
+        event.data["status"] = ControllerStatus(event.data["status"])

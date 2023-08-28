@@ -6,6 +6,7 @@ from unittest.mock import patch
 import pytest
 
 from zwave_js_server.const import (
+    ControllerStatus,
     ExclusionStrategy,
     InclusionState,
     InclusionStrategy,
@@ -152,11 +153,28 @@ def test_controller_mods():
     state = json.loads(load_fixture("basic_dump.txt").split("\n")[0])["result"]["state"]
     state["controller"].pop("ownNodeId")
     state["controller"]["rfRegion"] = 0
+    state["controller"]["status"] = 0
 
     ctrl = controller_pkg.Controller(None, state)
     assert ctrl.own_node_id is None
     assert ctrl.own_node is None
     assert ctrl.rf_region == RFRegion.EUROPE
+    assert ctrl.status == ControllerStatus.READY
+
+
+def test_controller_status():
+    """ "Test controller status functionality."""
+    state = json.loads(load_fixture("basic_dump.txt").split("\n")[0])["result"]["state"]
+    state["controller"]["status"] = 0
+
+    ctrl = controller_pkg.Controller(None, state)
+    assert ctrl.status == ControllerStatus.READY
+    event = Event(
+        "status changed",
+        {"source": "controller", "event": "status changed", "status": 1},
+    )
+    ctrl.receive_event(event)
+    assert ctrl.status == ControllerStatus.UNRESPONSIVE
 
 
 async def test_begin_inclusion(controller, uuid4, mock_command):

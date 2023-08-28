@@ -2320,3 +2320,61 @@ async def test_unknown_event(multisensor_6: node_pkg.Node):
 async def test_is_secure_unknown(is_secure_unknown: node_pkg.Node):
     """Test that a node with isSecure = `unknown` gets handled appropriately."""
     assert not is_secure_unknown.is_secure
+
+
+async def test_default_volume(multisensor_6: node_pkg.Node, uuid4, mock_command):
+    """Test default volume."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.set_default_volume", "nodeId": node.node_id},
+        {},
+    )
+    assert node.default_volume is None
+    await node.async_set_default_volume(10)
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.set_default_volume",
+        "defaultVolume": 10,
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }
+    assert node.default_volume == 10
+
+
+async def test_default_transition_duration(
+    multisensor_6: node_pkg.Node, uuid4, mock_command
+):
+    """Test default transition duration."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.set_default_transition_duration", "nodeId": node.node_id},
+        {},
+    )
+    assert node.default_transition_duration is None
+    await node.async_set_default_transition_duration(10)
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.set_default_transition_duration",
+        "defaultTransitionDuration": 10,
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }
+    assert node.default_transition_duration == 10
+
+
+async def test_has_device_config_changed(
+    multisensor_6: node_pkg.Node, uuid4, mock_command
+):
+    """Test has device config changed."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.has_device_config_changed", "nodeId": node.node_id},
+        {"changed": True},
+    )
+    assert await node.async_has_device_config_changed()
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.has_device_config_changed",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }

@@ -360,6 +360,16 @@ class Node(EventBase):
             return datetime.fromisoformat(last_seen)
         return None
 
+    @property
+    def default_volume(self) -> int | float | None:
+        """Return the default volume."""
+        return self.data.get("defaultVolume")
+
+    @property
+    def default_transition_duration(self) -> int | float | None:
+        """Return the default transition duration."""
+        return self.data.get("defaultTransitionDuration")
+
     def update(self, data: NodeDataType) -> None:
         """Update the internal state data."""
         self.data = copy.deepcopy(data)
@@ -882,6 +892,46 @@ class Node(EventBase):
             require_schema=31,
             wait_for_result=True,
         )
+
+    async def async_set_default_volume(
+        self, default_volume: int | float | None
+    ) -> None:
+        """Send setDefaultVolume command to Node."""
+        cmd_kwargs = {}
+        self.data["defaultVolume"] = default_volume
+        if default_volume is not None:
+            cmd_kwargs["defaultVolume"] = default_volume
+        await self.async_send_command(
+            "set_default_volume",
+            require_schema=31,
+            wait_for_result=None,
+            **cmd_kwargs,
+        )
+
+    async def async_set_default_transition_duration(
+        self, default_duration_transition: int | float | None
+    ) -> None:
+        """Send setDefaultTransitionDuration command to Node."""
+        cmd_kwargs = {}
+        self.data["defaultTransitionDuration"] = default_duration_transition
+        if default_duration_transition is not None:
+            cmd_kwargs["defaultTransitionDuration"] = default_duration_transition
+        await self.async_send_command(
+            "set_default_transition_duration",
+            require_schema=31,
+            wait_for_result=None,
+            **cmd_kwargs,
+        )
+
+    async def async_has_device_config_changed(self) -> bool:
+        """Send hasDeviceConfigChanged command to Node."""
+        data = await self.async_send_command(
+            "has_device_config_changed",
+            require_schema=31,
+            wait_for_result=True,
+        )
+        assert data
+        return cast(bool, data["changed"])
 
     def handle_test_powerlevel_progress(self, event: Event) -> None:
         """Process a test power level progress event."""
