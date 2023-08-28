@@ -1,8 +1,10 @@
 """Test the node model."""
+import asyncio
 import json
 from copy import deepcopy
 from datetime import datetime, timezone
-from unittest.mock import patch
+from typing import Any
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
@@ -45,6 +47,8 @@ from zwave_js_server.model.node.statistics import NodeStatistics
 from zwave_js_server.model.value import ConfigurationValue, get_value_id_str
 
 from .. import load_fixture
+
+# pylint: disable=unused-argument
 
 FIRMWARE_UPDATE_INFO = {
     "version": "1.0.0",
@@ -315,6 +319,37 @@ async def test_set_value(multisensor_6, uuid4, mock_command):
     # Use invalid value
     with pytest.raises(NotFoundError):
         await node.async_set_value(f"{value_id}_fake_value", 42)
+
+
+async def test_set_value_node_status_change(multisensor_6_state):
+    """Test set value when node status changes."""
+
+    async def async_send_command(
+        message: dict[str, Any], require_schema: int | None = None
+    ) -> dict:
+        """Return a mock response."""
+        block_event = asyncio.Event()
+        await block_event.wait()
+
+    with patch("zwave_js_server.client.Client", autospec=True) as client_class:
+        client = client_class.return_value
+
+    client.async_send_command = AsyncMock(side_effect=async_send_command)
+    node = node_pkg.Node(client, multisensor_6_state)
+    # wake up node
+    event = Event(type="wake up")
+    node.handle_wake_up(event)
+    task = asyncio.create_task(node.async_send_command("mock_cmd"))
+    await asyncio.sleep(0.01)
+    # we are waiting for the response
+    assert not task.done()
+    # node goes to sleep
+    event = Event(type="sleep")
+    node.handle_sleep(event)
+    await asyncio.sleep(0.01)
+    # we are no longer waiting for the response
+    assert task.done()
+    assert task.result() is None
 
 
 async def test_poll_value(multisensor_6, uuid4, mock_command):
