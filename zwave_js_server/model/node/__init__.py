@@ -915,7 +915,7 @@ class Node(EventBase):
         cmd_kwargs = {}
         self.data["defaultTransitionDuration"] = default_duration_transition
         if default_duration_transition is not None:
-            cmd_kwargs["defaultDurationTransition"] = default_duration_transition
+            cmd_kwargs["defaultTransitionDuration"] = default_duration_transition
         await self.async_send_command(
             "set_default_transition_duration",
             require_schema=31,

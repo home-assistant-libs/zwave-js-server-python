@@ -176,6 +176,13 @@ class IdentifyEventModel(BaseControllerEventModel):
     nodeId: int
 
 
+class StatusChangedEventModel(BaseControllerEventModel):
+    """Model for `status changed` event data."""
+
+    event: Literal["status changed"]
+    status: int
+
+
 CONTROLLER_EVENT_MODEL_MAP: dict[str, type["BaseControllerEventModel"]] = {
     "exclusion failed": ExclusionFailedEventModel,
     "exclusion started": ExclusionStartedEventModel,
@@ -197,5 +204,6 @@ CONTROLLER_EVENT_MODEL_MAP: dict[str, type["BaseControllerEventModel"]] = {
     "nvm convert progress": NVMConvertProgressEventModel,
     "nvm restore progress": NVMRestoreProgressEventModel,
     "statistics updated": StatisticsUpdatedEventModel,
+    "status changed": StatusChangedEventModel,
     "validate dsk and enter pin": ValidateDSKAndEnterPINEventModel,
 }
