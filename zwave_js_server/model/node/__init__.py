@@ -359,12 +359,12 @@ class Node(EventBase):
         if last_seen := self.data.get("lastSeen"):
             return datetime.fromisoformat(last_seen)
         return None
-    
+
     @property
     def default_volume(self) -> int | float | None:
         """Return the default volume."""
         return self.data.get("defaultVolume")
-    
+
     @property
     def default_transition_duration(self) -> int | float | None:
         """Return the default transition duration."""
