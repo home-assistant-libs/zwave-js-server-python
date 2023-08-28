@@ -327,7 +327,7 @@ async def test_set_value_node_status_change(multisensor_6_state):
     async def async_send_command(
         message: dict[str, Any], require_schema: int | None = None
     ) -> dict:
-        """Return a mock response."""
+        """Send a mock command that never returns."""
         block_event = asyncio.Event()
         await block_event.wait()
 
