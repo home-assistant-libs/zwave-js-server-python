@@ -363,8 +363,8 @@ class Client:
         if msg["type"] == "result":
             future = self._result_futures.get(msg["messageId"])
 
-            if future is None:
-                # no listener for this result
+            if future is None or future.cancelled():
+                # no listener for this result or the future was canceled
                 return
 
             if self._record_messages and msg["messageId"] not in LISTEN_MESSAGE_IDS:
