@@ -1,6 +1,7 @@
 """Constants for the Z-Wave JS python library."""
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum
 from importlib import metadata
@@ -50,6 +51,17 @@ class LogLevel(str, Enum):
     VERBOSE = "verbose"
     DEBUG = "debug"
     SILLY = "silly"
+
+
+LOG_LEVEL_MAP: dict[LogLevel, int] = {
+    LogLevel.ERROR: logging.ERROR,
+    LogLevel.WARN: logging.WARN,
+    LogLevel.INFO: logging.INFO,
+    LogLevel.HTTP: logging.INFO,
+    LogLevel.VERBOSE: logging.DEBUG,
+    LogLevel.DEBUG: logging.DEBUG,
+    LogLevel.SILLY: logging.DEBUG,
+}
 
 
 class CommandClass(IntEnum):

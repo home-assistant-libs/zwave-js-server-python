@@ -6,6 +6,7 @@ import logging
 import pprint
 import uuid
 from collections import defaultdict
+from collections.abc import Callable
 from copy import deepcopy
 from datetime import datetime
 from operator import itemgetter
@@ -15,9 +16,11 @@ from typing import Any, cast
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, client_exceptions
 
 from .const import (
+    LOG_LEVEL_MAP,
     MAX_SERVER_SCHEMA_VERSION,
     MIN_SERVER_SCHEMA_VERSION,
     PACKAGE_NAME,
+    LogLevel,
     __version__,
 )
 from .event import Event
@@ -33,6 +36,7 @@ from .exceptions import (
     NotConnected,
 )
 from .model.driver import Driver
+from .model.log_message import LogMessage
 from .model.version import VersionInfo, VersionInfoDataType
 
 SIZE_PARSE_JSON_EXECUTOR = 8192
@@ -77,6 +81,10 @@ class Client:
         self._loop = asyncio.get_running_loop()
         self._result_futures: dict[str, asyncio.Future] = {}
         self._shutdown_complete_event: asyncio.Event | None = None
+
+        self._server_logger_unsubs: Callable[[], None] | None = None
+        self._server_logging_enabled: bool = False
+
         self._record_messages = record_messages
         self._recorded_commands: defaultdict[str, dict] = defaultdict(dict)
         self._recorded_events: list[dict] = []
@@ -296,6 +304,18 @@ class Client:
         self._shutdown_complete_event = None
         self.driver = None
 
+    async def async_start_listening_logs(self) -> None:
+        """Send command to start listening to log events."""
+        await self.async_send_command(
+            {"command": "start_listening_logs"}, require_schema=31
+        )
+
+    async def async_stop_listening_logs(self) -> None:
+        """Send command to stop listening to log events."""
+        await self.async_send_command(
+            {"command": "stop_listening_logs"}, require_schema=31
+        )
+
     def begin_recording_messages(self) -> None:
         """Begin recording messages for replay later."""
         if self._record_messages:
@@ -318,6 +338,81 @@ class Client:
         self._recorded_events.clear()
 
         return list(data)
+
+    @property
+    def server_logging_enabled(self) -> bool:
+        """Return whether server logging is currently enabled."""
+        return self._server_logging_enabled
+
+    async def enable_server_logging(self) -> None:
+        """
+        Enable logging from the server.
+
+        Embeds server logs in the library's logs.
+        """
+        if not self.connected or not self.driver:
+            raise InvalidState(
+                "Can't enable server logging when not connected to server"
+            )
+        if (log_level := self.driver.log_config.level) and (
+            level := LOG_LEVEL_MAP[log_level]
+        ) < self._logger.level:
+            self._logger.info(
+                (
+                    "Server logging is currently more verbose than library logging so "
+                    "setting library log level to match."
+                )
+            )
+            self._logger.setLevel(level)
+
+        self._server_logging_enabled = True
+
+        def handle_server_logs(event: dict) -> None:
+            """Handle driver `logging` event."""
+            log_msg: LogMessage = event["log_message"]
+            log_level = LogLevel(log_msg.level)
+            logging.getLogger(f"{__package__}.server").log(
+                LOG_LEVEL_MAP[log_level],
+                "%s:\n%s",
+                log_msg.timestamp,
+                "\n".join(log_msg.formatted_message),
+            )
+
+        def handle_log_config_updates(event: dict) -> None:
+            """Handle driver `log config updated` events."""
+            if (log_level := event["level"]) and (
+                level := LOG_LEVEL_MAP[log_level]
+            ) < self._logger.level:
+                self._logger.info(
+                    (
+                        "Server logging is currently more verbose than library logging so "
+                        "setting library log level to match."
+                    )
+                )
+                self._logger.setLevel(level)
+
+        self._server_logger_unsubs = [
+            self.driver.on("logging", handle_server_logs),
+            self.driver.on("log config updated", handle_log_config_updates),
+        ]
+
+        await self.async_start_listening_logs()
+
+    async def disable_server_logging(self) -> None:
+        """Disable logging from the server."""
+        if not self.connected or not self.driver:
+            raise InvalidState(
+                "Can't disable server logging when not connected to server"
+            )
+        if not self._server_logging_enabled:
+            raise InvalidState("Server logging is already disabled")
+        if not self._server_logger_unsubs:
+            raise InvalidState("There is no logging event listener to unsubscribe")
+
+        for unsub in self._server_logger_unsubs.copy():
+            unsub()
+        self._server_logger_unsubs.clear()
+        self._server_logging_enabled = False
 
     async def receive_until_closed(self) -> None:
         """Receive messages until client is closed."""
@@ -438,18 +533,6 @@ class Client:
             )
 
         await self._client.send_json(message)
-
-    async def async_start_listening_logs(self) -> None:
-        """Send command to start listening to log events."""
-        await self.async_send_command(
-            {"command": "start_listening_logs"}, require_schema=31
-        )
-
-    async def async_stop_listening_logs(self) -> None:
-        """Send command to stop listening to log events."""
-        await self.async_send_command(
-            {"command": "stop_listening_logs"}, require_schema=31
-        )
 
     async def __aenter__(self) -> "Client":
         """Connect to the websocket."""
