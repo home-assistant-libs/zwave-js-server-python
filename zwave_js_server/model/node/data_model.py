@@ -38,7 +38,7 @@ class NodeDataType(TypedDict, total=False):
     isRouting: bool
     maxDataRate: int
     supportedDataRates: list[int]
-    isSecure: bool | Literal["unknown"]
+    isSecure: bool
     supportsBeaming: bool
     supportsSecurity: bool
     protocolVersion: int
