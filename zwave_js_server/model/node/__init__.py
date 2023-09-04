@@ -934,8 +934,9 @@ class Node(EventBase):
             require_schema=31,
             wait_for_result=True,
         )
-        assert data
-        return cast(bool | None, data.get("changed"))
+        if data:
+            return cast(bool | None, data.get("changed"))
+        return None
 
     def handle_test_powerlevel_progress(self, event: Event) -> None:
         """Process a test power level progress event."""
