@@ -923,7 +923,7 @@ class Node(EventBase):
             **cmd_kwargs,
         )
 
-    async def async_has_device_config_changed(self) -> bool:
+    async def async_has_device_config_changed(self) -> bool | None:
         """Send hasDeviceConfigChanged command to Node."""
         data = await self.async_send_command(
             "has_device_config_changed",
@@ -931,7 +931,7 @@ class Node(EventBase):
             wait_for_result=True,
         )
         assert data
-        return cast(bool, data["changed"])
+        return cast(bool | None, data.get("changed"))
 
     def handle_test_powerlevel_progress(self, event: Event) -> None:
         """Process a test power level progress event."""
