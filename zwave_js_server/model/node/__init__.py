@@ -621,7 +621,7 @@ class Node(EventBase):
 
     async def async_abort_firmware_update(self) -> None:
         """Send abortFirmwareUpdate command to Node."""
-        await self.async_send_command("abort_firmware_update", wait_for_result=True)
+        await self.async_send_command("abort_firmware_update", wait_for_result=False)
 
     async def async_poll_value(self, val: Value | str) -> None:
         """Send pollValue command to Node for given value (or value_id)."""
@@ -851,7 +851,9 @@ class Node(EventBase):
             wait_for_result=False,
         )
 
-    async def async_set_date_and_time(self, datetime_: datetime | None = None) -> bool:
+    async def async_set_date_and_time(
+        self, datetime_: datetime | None = None, wait_for_result: bool | None = None
+    ) -> bool | None:
         """Send setDateAndTime command to Node."""
         args = {}
         if datetime_:
@@ -860,10 +862,11 @@ class Node(EventBase):
             "set_date_and_time",
             **args,
             require_schema=28,
-            wait_for_result=True,
+            wait_for_result=wait_for_result,
         )
-        assert data
-        return cast(bool, data["success"])
+        if data:
+            return cast(bool, data["success"])
+        return None
 
     async def async_get_date_and_time(self) -> DateAndTime:
         """Send getDateAndTime command to Node."""
@@ -890,7 +893,7 @@ class Node(EventBase):
         await self.async_send_command(
             "abort_health_check",
             require_schema=31,
-            wait_for_result=True,
+            wait_for_result=False,
         )
 
     async def async_set_default_volume(
