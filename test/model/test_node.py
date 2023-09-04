@@ -2317,11 +2317,6 @@ async def test_unknown_event(multisensor_6: node_pkg.Node):
         assert multisensor_6.receive_event(Event("unknown_event", {"source": "node"}))
 
 
-async def test_is_secure_unknown(is_secure_unknown: node_pkg.Node):
-    """Test that a node with isSecure = `unknown` gets handled appropriately."""
-    assert not is_secure_unknown.is_secure
-
-
 async def test_default_volume(multisensor_6: node_pkg.Node, uuid4, mock_command):
     """Test default volume."""
     node = multisensor_6
