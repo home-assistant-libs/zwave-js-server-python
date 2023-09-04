@@ -2207,7 +2207,7 @@ async def test_set_date_and_time(multisensor_6: node_pkg.Node, uuid4, mock_comma
         {"success": True},
     )
 
-    assert await node.async_set_date_and_time(datetime(2020, 1, 1, 12, 0, 0))
+    assert await node.async_set_date_and_time(datetime(2020, 1, 1, 12, 0, 0)) is None
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
