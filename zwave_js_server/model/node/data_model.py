@@ -1,7 +1,7 @@
 """Data model for a Z-Wave JS node."""
 from __future__ import annotations
 
-from typing import Literal, TypedDict
+from typing import TypedDict
 
 from ..device_class import DeviceClassDataType
 from ..device_config import DeviceConfigDataType
