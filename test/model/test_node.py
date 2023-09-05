@@ -1651,6 +1651,26 @@ async def test_has_security_class(multisensor_6: node_pkg.Node, uuid4, mock_comm
     }
 
 
+async def test_has_security_class_undefined(
+    multisensor_6: node_pkg.Node, uuid4, mock_command
+):
+    """Test node.has_security_class command response is undefined."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.has_security_class", "nodeId": node.node_id},
+        {},
+    )
+    assert await node.async_has_security_class(SecurityClass.S2_AUTHENTICATED) is None
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.has_security_class",
+        "nodeId": node.node_id,
+        "securityClass": SecurityClass.S2_AUTHENTICATED.value,
+        "messageId": uuid4,
+    }
+
+
 async def test_get_highest_security_class(
     multisensor_6: node_pkg.Node, uuid4, mock_command
 ):
@@ -1663,6 +1683,25 @@ async def test_get_highest_security_class(
     assert (
         await node.async_get_highest_security_class() == SecurityClass.S2_AUTHENTICATED
     )
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.get_highest_security_class",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_highest_security_class_undefined(
+    multisensor_6: node_pkg.Node, uuid4, mock_command
+):
+    """Test node.get_highest_security_class command response is undefined."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.get_highest_security_class", "nodeId": node.node_id},
+        {},
+    )
+    assert await node.async_get_highest_security_class() is None
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
@@ -2373,3 +2412,29 @@ async def test_has_device_config_changed(
         "nodeId": node.node_id,
         "messageId": uuid4,
     }
+
+
+async def test_has_device_config_changed_undefined(
+    multisensor_6: node_pkg.Node, uuid4, mock_command
+):
+    """Test has device config changed returns undefined."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.has_device_config_changed", "nodeId": node.node_id},
+        {},
+    )
+    assert await node.async_has_device_config_changed() is None
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.has_device_config_changed",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }
+
+
+async def test_is_secure_none(client, multisensor_6_state):
+    """Test is_secure when it's not included in the dump."""
+    node_state = deepcopy(multisensor_6_state)
+    node_state.pop("isSecure")
+    node = node_pkg.Node(client, node_state)
+    assert node.is_secure is None
