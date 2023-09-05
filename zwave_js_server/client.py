@@ -385,8 +385,8 @@ class Client:
             ) < self._logger.level:
                 self._logger.info(
                     (
-                        "Server logging is currently more verbose than library logging so "
-                        "setting library log level to match."
+                        "Server logging is currently more verbose than library "
+                        "logging so setting library log level to match."
                     )
                 )
                 self._logger.setLevel(level)
