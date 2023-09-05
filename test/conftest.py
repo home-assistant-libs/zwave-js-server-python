@@ -435,7 +435,9 @@ def invalid_multilevel_sensor_type_fixture(
 
 
 @pytest.fixture(name="endpoints_with_command_classes")
-def endpoints_with_command_classes_fixture(driver, endpoints_with_command_classes_state):
+def endpoints_with_command_classes_fixture(
+    driver, endpoints_with_command_classes_state
+):
     """Mock a node with command classes on an endpoint."""
     node = Node(driver.client, deepcopy(endpoints_with_command_classes_state))
     driver.controller.nodes[node.node_id] = node
