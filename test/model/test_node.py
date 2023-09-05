@@ -169,12 +169,12 @@ async def test_highest_security_value(lock_schlage_be469, ring_keypad):
     assert ring_keypad.highest_security_class is None
 
 
-async def test_command_classes(is_secure_unknown):
+async def test_command_classes(endpoints_with_command_classes):
     """Test command_classes property on endpoint."""
-    assert len(is_secure_unknown.endpoints[0].command_classes) == 17
-    assert is_secure_unknown.endpoints[0].command_classes[0].id == 38
+    assert len(endpoints_with_command_classes.endpoints[0].command_classes) == 17
+    assert endpoints_with_command_classes.endpoints[0].command_classes[0].id == 38
     assert (
-        is_secure_unknown.endpoints[0].command_classes[0].command_class
+        endpoints_with_command_classes.endpoints[0].command_classes[0].command_class
         == CommandClass.SWITCH_MULTILEVEL
     )
 
