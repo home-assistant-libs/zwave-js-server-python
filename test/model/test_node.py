@@ -169,12 +169,12 @@ async def test_highest_security_value(lock_schlage_be469, ring_keypad):
     assert ring_keypad.highest_security_class is None
 
 
-async def test_command_classes(is_secure_unknown):
+async def test_command_classes(endpoints_with_command_classes):
     """Test command_classes property on endpoint."""
-    assert len(is_secure_unknown.endpoints[0].command_classes) == 17
-    assert is_secure_unknown.endpoints[0].command_classes[0].id == 38
+    assert len(endpoints_with_command_classes.endpoints[0].command_classes) == 17
+    assert endpoints_with_command_classes.endpoints[0].command_classes[0].id == 38
     assert (
-        is_secure_unknown.endpoints[0].command_classes[0].command_class
+        endpoints_with_command_classes.endpoints[0].command_classes[0].command_class
         == CommandClass.SWITCH_MULTILEVEL
     )
 
@@ -2315,11 +2315,6 @@ async def test_unknown_event(multisensor_6: node_pkg.Node):
     """Test that an unknown event type causes an exception."""
     with pytest.raises(KeyError):
         assert multisensor_6.receive_event(Event("unknown_event", {"source": "node"}))
-
-
-async def test_is_secure_unknown(is_secure_unknown: node_pkg.Node):
-    """Test that a node with isSecure = `unknown` gets handled appropriately."""
-    assert not is_secure_unknown.is_secure
 
 
 async def test_default_volume(multisensor_6: node_pkg.Node, uuid4, mock_command):
