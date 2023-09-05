@@ -2199,7 +2199,9 @@ async def test_manually_idle_notification_value(
         await node.async_manually_idle_notification_value(f"{node.node_id}-112-0-255")
 
 
-async def test_set_date_and_time_no_wait(multisensor_6: node_pkg.Node, uuid4, mock_command):
+async def test_set_date_and_time_no_wait(
+    multisensor_6: node_pkg.Node, uuid4, mock_command
+):
     """Test node.set_date_and_time command without waiting."""
     node = multisensor_6
     ack_commands = mock_command(
@@ -2217,12 +2219,10 @@ async def test_set_date_and_time_no_wait(multisensor_6: node_pkg.Node, uuid4, mo
         "messageId": uuid4,
     }
 
-    # Raise ValueError if the value is not for the right CommandClass
-    with pytest.raises(ValueError):
-        await node.async_manually_idle_notification_value(f"{node.node_id}-112-0-255")
 
-
-async def test_set_date_and_time(climate_radio_thermostat_ct100_plus: node_pkg.Node, uuid4, mock_command):
+async def test_set_date_and_time(
+    climate_radio_thermostat_ct100_plus: node_pkg.Node, uuid4, mock_command
+):
     """Test node.set_date_and_time command while waiting for response."""
     node = climate_radio_thermostat_ct100_plus
     ack_commands = mock_command(
@@ -2239,10 +2239,6 @@ async def test_set_date_and_time(climate_radio_thermostat_ct100_plus: node_pkg.N
         "date": "2020-01-01T12:00:00",
         "messageId": uuid4,
     }
-
-    # Raise ValueError if the value is not for the right CommandClass
-    with pytest.raises(ValueError):
-        await node.async_manually_idle_notification_value(f"{node.node_id}-112-0-255")
 
 
 async def test_get_date_and_time(multisensor_6: node_pkg.Node, uuid4, mock_command):
