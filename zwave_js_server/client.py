@@ -52,6 +52,9 @@ LISTEN_MESSAGE_IDS = (
     START_LISTENING_MESSAGE_ID,
 )
 
+LOGGER = logging.getLogger(__package__)
+SERVER_LOGGER = logging.getLogger(f"{__package__}.server")
+
 
 class Client:
     """Class to manage the IoT connection."""
@@ -77,12 +80,11 @@ class Client:
             PACKAGE_NAME: __version__,
             **(additional_user_agent_components or {}),
         }
-        self._logger = logging.getLogger(__package__)
         self._loop = asyncio.get_running_loop()
         self._result_futures: dict[str, asyncio.Future] = {}
         self._shutdown_complete_event: asyncio.Event | None = None
 
-        self._server_logger_unsubs: Callable[[], None] | None = None
+        self._server_logger_unsubs: list[Callable[[], None]] = []
         self._server_logging_enabled: bool = False
 
         self._record_messages = record_messages
@@ -145,7 +147,7 @@ class Client:
         if self.driver is not None:
             raise InvalidState("Re-connected with existing driver")
 
-        self._logger.debug("Trying to connect")
+        LOGGER.debug("Trying to connect")
         try:
             self._client = await self.aiohttp_session.ws_connect(
                 self.ws_server_url,
@@ -184,7 +186,7 @@ class Client:
         if self.version.max_schema_version < MAX_SERVER_SCHEMA_VERSION:
             self.schema_version = self.version.max_schema_version
 
-        self._logger.info(
+        LOGGER.info(
             "Connected to Home %s (Server %s, Driver %s, Using Schema %s)",
             version.home_id,
             version.server_version,
@@ -262,7 +264,7 @@ class Client:
 
             driver_ready.set()
 
-            self._logger.info(
+            LOGGER.info(
                 "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
             )
 
@@ -271,7 +273,7 @@ class Client:
             pass
 
         finally:
-            self._logger.debug("Listen completed. Cleaning up")
+            LOGGER.debug("Listen completed. Cleaning up")
 
             for future in self._result_futures.values():
                 future.cancel()
@@ -285,7 +287,7 @@ class Client:
 
     async def disconnect(self) -> None:
         """Disconnect the client."""
-        self._logger.debug("Closing client connection")
+        LOGGER.debug("Closing client connection")
 
         if not self.connected:
             return
@@ -356,14 +358,14 @@ class Client:
             )
         if (log_level := self.driver.log_config.level) and (
             level := LOG_LEVEL_MAP[log_level]
-        ) < self._logger.level:
-            self._logger.info(
+        ) < LOGGER.level:
+            LOGGER.info(
                 (
                     "Server logging is currently more verbose than library logging so "
                     "setting library log level to match."
                 )
             )
-            self._logger.setLevel(level)
+            LOGGER.setLevel(level)
 
         if self._server_logging_enabled:
             return
@@ -374,7 +376,7 @@ class Client:
             """Handle driver `logging` event."""
             log_msg: LogMessage = event["log_message"]
             log_level = LogLevel(log_msg.level)
-            logging.getLogger(f"{__package__}.server").log(
+            SERVER_LOGGER.log(
                 LOG_LEVEL_MAP[log_level],
                 "%s:\n%s",
                 log_msg.timestamp,
@@ -385,14 +387,14 @@ class Client:
             """Handle driver `log config updated` events."""
             if (log_level := event["level"]) and (
                 level := LOG_LEVEL_MAP[log_level]
-            ) < self._logger.level:
-                self._logger.info(
+            ) < LOGGER.level:
+                LOGGER.info(
                     (
                         "Server logging is currently more verbose than library "
                         "logging so setting library log level to match."
                     )
                 )
-                self._logger.setLevel(level)
+                LOGGER.setLevel(level)
 
         self._server_logger_unsubs = [
             self.driver.on("logging", handle_server_logs),
@@ -408,7 +410,7 @@ class Client:
                 "Can't disable server logging when not connected to server"
             )
         if not self._server_logging_enabled or not self._server_logger_unsubs:
-            self._logger.warning("Server logging is already disabled")
+            LOGGER.warning("Server logging is already disabled")
             return
 
         for unsub in self._server_logger_unsubs:
@@ -447,8 +449,8 @@ class Client:
         except ValueError as err:
             raise InvalidMessage("Received invalid JSON.") from err
 
-        if self._logger.isEnabledFor(logging.DEBUG):
-            self._logger.debug("Received message:\n%s\n", pprint.pformat(msg))
+        if LOGGER.isEnabledFor(logging.DEBUG):
+            LOGGER.debug("Received message:\n%s\n", pprint.pformat(msg))
 
         return data
 
@@ -488,7 +490,7 @@ class Client:
 
         if msg["type"] != "event":
             # Can't handle
-            self._logger.debug(
+            LOGGER.debug(
                 "Received message with unknown type '%s': %s",
                 msg["type"],
                 msg,
@@ -516,8 +518,8 @@ class Client:
         if not self.connected:
             raise NotConnected
 
-        if self._logger.isEnabledFor(logging.DEBUG):
-            self._logger.debug("Publishing message:\n%s\n", pprint.pformat(message))
+        if LOGGER.isEnabledFor(logging.DEBUG):
+            LOGGER.debug("Publishing message:\n%s\n", pprint.pformat(message))
 
         assert self._client
         assert "messageId" in message
