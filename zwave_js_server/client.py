@@ -161,7 +161,7 @@ class Client:
         ) as err:
             raise CannotConnect(err) from err
 
-        self.version = version = VersionInfo.from_message(
+        self.version = VersionInfo.from_message(
             cast(VersionInfoDataType, await self._receive_json_or_raise())
         )
 
@@ -188,9 +188,9 @@ class Client:
 
         LOGGER.info(
             "Connected to Home %s (Server %s, Driver %s, Using Schema %s)",
-            version.home_id,
-            version.server_version,
-            version.driver_version,
+            self.version.home_id,
+            self.version.server_version,
+            self.version.driver_version,
             self.schema_version,
         )
 
@@ -359,7 +359,7 @@ class Client:
         if (log_level := self.driver.log_config.level) and (
             level := LOG_LEVEL_MAP[log_level]
         ) < LOGGER.level:
-            LOGGER.info(
+            LOGGER.warning(
                 (
                     "Server logging is currently more verbose than library logging, "
                     "setting library log level to %s to match."
@@ -389,14 +389,14 @@ class Client:
             if (log_level := event["config"]["level"].lower()) and (
                 level := LOG_LEVEL_MAP[log_level]
             ) < LOGGER.level:
-                LOGGER.info(
+                LOGGER.warning(
                     (
                         "Server logging is currently more verbose than library "
                         "logging, setting library log level to %s to match."
                     ),
                     logging.getLevelName(level),
                 )
-                LOGGER.setLevel(level)
+            LOGGER.setLevel(level)
 
         self._server_logger_unsubs = [
             self.driver.on("logging", handle_server_logs),
