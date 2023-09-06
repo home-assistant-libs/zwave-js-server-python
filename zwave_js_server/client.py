@@ -161,21 +161,21 @@ class Client:
         ) as err:
             raise CannotConnect(err) from err
 
-        self.version = VersionInfo.from_message(
+        self.version = version = VersionInfo.from_message(
             cast(VersionInfoDataType, await self._receive_json_or_raise())
         )
 
         # basic check for server schema version compatibility
         if (
-            self.version.min_schema_version > MAX_SERVER_SCHEMA_VERSION
-            or self.version.max_schema_version < MIN_SERVER_SCHEMA_VERSION
+            version.min_schema_version > MAX_SERVER_SCHEMA_VERSION
+            or version.max_schema_version < MIN_SERVER_SCHEMA_VERSION
         ):
             await self._client.close()
-            assert self.version
+            assert version
             raise InvalidServerVersion(
-                self.version,
+                version,
                 MIN_SERVER_SCHEMA_VERSION,
-                f"Z-Wave JS Server version ({self.version.server_version}) is "
+                f"Z-Wave JS Server version ({version.server_version}) is "
                 "incompatible. Update the Z-Wave JS Server to a version that supports "
                 f"at least api schema {MIN_SERVER_SCHEMA_VERSION}",
             )
@@ -183,14 +183,14 @@ class Client:
         # this is a bit future proof as we might decide to use a pinned version at some point
         # for now we just negotiate the highest available schema version and
         # guard incompatibility with the MIN_SERVER_SCHEMA_VERSION
-        if self.version.max_schema_version < MAX_SERVER_SCHEMA_VERSION:
-            self.schema_version = self.version.max_schema_version
+        if version.max_schema_version < MAX_SERVER_SCHEMA_VERSION:
+            self.schema_version = version.max_schema_version
 
         LOGGER.info(
             "Connected to Home %s (Server %s, Driver %s, Using Schema %s)",
-            self.version.home_id,
-            self.version.server_version,
-            self.version.driver_version,
+            version.home_id,
+            version.server_version,
+            version.driver_version,
             self.schema_version,
         )
 
