@@ -361,9 +361,10 @@ class Client:
         ) < LOGGER.level:
             LOGGER.info(
                 (
-                    "Server logging is currently more verbose than library logging so "
-                    "setting library log level to match."
-                )
+                    "Server logging is currently more verbose than library logging, "
+                    "setting library log level to %s to match."
+                ),
+                logging.getLevelName(level),
             )
             LOGGER.setLevel(level)
 
@@ -385,14 +386,15 @@ class Client:
 
         def handle_log_config_updates(event: dict) -> None:
             """Handle driver `log config updated` events."""
-            if (log_level := event["level"]) and (
+            if (log_level := event["config"]["level"].lower()) and (
                 level := LOG_LEVEL_MAP[log_level]
             ) < LOGGER.level:
                 LOGGER.info(
                     (
                         "Server logging is currently more verbose than library "
-                        "logging so setting library log level to match."
-                    )
+                        "logging, setting library log level to %s to match."
+                    ),
+                    logging.getLevelName(level),
                 )
                 LOGGER.setLevel(level)
 

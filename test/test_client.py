@@ -9,8 +9,9 @@ from aiohttp.client_exceptions import ClientError, WSServerHandshakeError
 from aiohttp.client_reqrep import ClientResponse, RequestInfo
 from aiohttp.http_websocket import WSMsgType
 
-from zwave_js_server.client import Client
-from zwave_js_server.const import MAX_SERVER_SCHEMA_VERSION, __version__
+from zwave_js_server.client import LOGGER, Client
+from zwave_js_server.const import MAX_SERVER_SCHEMA_VERSION, LogLevel, __version__
+from zwave_js_server.event import Event
 from zwave_js_server.exceptions import (
     CannotConnect,
     ConnectionFailed,
@@ -21,6 +22,7 @@ from zwave_js_server.exceptions import (
     InvalidState,
     NotConnected,
 )
+from zwave_js_server.model.log_config import LogConfig
 
 
 async def test_connect_disconnect(client_session, url):
@@ -337,10 +339,9 @@ async def test_command_error_handling(client, mock_command):
     assert raised.value.zwave_error_message == "Node 5 is dead"
 
 
-async def test_record_messages(wallmote_central_scene, mock_command, uuid4):
+async def test_record_messages(client, wallmote_central_scene, mock_command, uuid4):
     """Test recording messages."""
     # pylint: disable=protected-access
-    client = wallmote_central_scene.client
     assert not client.recording_messages
     assert not client._recorded_commands
     assert not client._recorded_events
@@ -461,3 +462,97 @@ async def test_additional_user_agent_components(client_session, url):
                 },
             }
         )
+
+
+async def test_log_server(
+    client: Client, driver, caplog: pytest.LogCaptureFixture, mock_command, uuid4
+):
+    """Test logging from server."""
+    assert client.connected
+    mock_command(
+        {"command": "start_listening_logs"},
+        {},
+    )
+    # Set log levels to force the lib to change log levels
+    LOGGER.setLevel(logging.INFO)
+    client.driver.log_config = LogConfig(True, LogLevel.DEBUG, False, None, None)
+    await client.enable_server_logging()
+    assert client.server_logging_enabled
+    assert len(caplog.records) == 2
+    assert "logging is currently more verbose" in caplog.records[0].message
+    assert caplog.records[0].name == "zwave_js_server"
+
+    # Test that enabling again is a no-op
+    await client.enable_server_logging()
+    assert client.server_logging_enabled
+    assert len(caplog.records) == 2
+
+    LOGGER.setLevel(logging.INFO)
+    event = Event(
+        "log config updated",
+        data={
+            "source": "driver",
+            "event": "log config updated",
+            "config": {"level": "silly"},
+        },
+    )
+    driver.receive_event(event)
+
+    assert len(caplog.records) == 3
+    assert "logging is currently more verbose" in caplog.records[2].message
+    assert caplog.records[2].name == "zwave_js_server"
+
+    event = Event(
+        type="logging",
+        data={
+            "source": "driver",
+            "event": "logging",
+            "formattedMessage": [
+                "2021-04-18T18:03:34.051Z CNTRLR   [Node 005] [~] \n",
+                "test",
+            ],
+            "level": "debug",
+            "primaryTags": "[Node 005] [~] [Notification]",
+            "secondaryTags": "[Endpoint 0]",
+            "message": "Home Security[Motion sensor status]\n: 8 => 0",
+            "direction": "  ",
+            "label": "CNTRLR",
+            "timestamp": "2021-04-18T18:03:34.051Z",
+            "multiline": True,
+            "secondaryTagPadding": -1,
+            "context": {
+                "source": "controller",
+                "type": "node",
+                "nodeId": 5,
+                "header": "Notification",
+                "direction": "none",
+                "change": "notification",
+                "endpoint": 0,
+            },
+        },
+    )
+    driver.receive_event(event)
+    assert len(caplog.records) == 4
+    assert "Node 005" in caplog.records[3].message
+    assert caplog.records[3].levelno == logging.DEBUG
+    assert caplog.records[3].name == "zwave_js_server.server"
+
+    # First time we disable should be clean
+    await client.disable_server_logging()
+    assert not client.server_logging_enabled
+    assert len(caplog.records) == 4
+
+    # Second time we should log a warning
+    await client.disable_server_logging()
+    assert not client.server_logging_enabled
+    assert len(caplog.records) == 5
+
+    # Test that both functions raise errors when client is not connected
+    client.driver = None
+    client._client = None
+
+    with pytest.raises(InvalidState):
+        await client.enable_server_logging()
+
+    with pytest.raises(InvalidState):
+        await client.disable_server_logging()
