@@ -465,12 +465,17 @@ async def test_additional_user_agent_components(client_session, url):
 
 
 async def test_log_server(
-    client: Client, driver, caplog: pytest.LogCaptureFixture, mock_command, uuid4
+    client: Client, driver, caplog: pytest.LogCaptureFixture, mock_command
 ):
     """Test logging from server."""
+    # pylint: disable=protected-access
     assert client.connected
     mock_command(
         {"command": "start_listening_logs"},
+        {},
+    )
+    mock_command(
+        {"command": "stop_listening_logs"},
         {},
     )
     # Set log levels to force the lib to change log levels
