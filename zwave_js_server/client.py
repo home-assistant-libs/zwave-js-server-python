@@ -365,6 +365,9 @@ class Client:
             )
             self._logger.setLevel(level)
 
+        if self._server_logging_enabled:
+            return
+
         self._server_logging_enabled = True
 
         def handle_server_logs(event: dict) -> None:
@@ -404,12 +407,11 @@ class Client:
             raise InvalidState(
                 "Can't disable server logging when not connected to server"
             )
-        if not self._server_logging_enabled:
-            raise InvalidState("Server logging is already disabled")
-        if not self._server_logger_unsubs:
-            raise InvalidState("There is no logging event listener to unsubscribe")
+        if not self._server_logging_enabled or not self._server_logger_unsubs:
+            self._logger.warning("Server logging is already disabled")
+            return
 
-        for unsub in self._server_logger_unsubs.copy():
+        for unsub in self._server_logger_unsubs:
             unsub()
         self._server_logger_unsubs.clear()
         self._server_logging_enabled = False
