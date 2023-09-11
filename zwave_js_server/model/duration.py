@@ -5,6 +5,10 @@ from dataclasses import dataclass, field
 from typing import Literal, TypedDict
 
 
+UNKNOWN = "unknown"
+DEFAULT = "default"
+
+
 class DurationDataType(TypedDict, total=False):
     """Represent a Duration data dict type."""
 
@@ -17,12 +21,16 @@ class DurationDataType(TypedDict, total=False):
 class Duration:
     """Duration class."""
 
-    data: DurationDataType
+    data: DurationDataType | Literal["unknown", "default"]
     unit: Literal["seconds", "minutes", "unknown", "default"] = field(init=False)
     value: int | float | None = field(init=False)
 
     def __post_init__(self) -> None:
         """Post init."""
+        if isinstance(self.data, str):
+            self.unit = self.data
+            self.value = None
+            return
         self.unit = self.data["unit"]
         self.value = self.data.get("value")
 
