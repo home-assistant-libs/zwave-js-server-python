@@ -5,10 +5,6 @@ from dataclasses import dataclass, field
 from typing import Literal, TypedDict
 
 
-UNKNOWN = "unknown"
-DEFAULT = "default"
-
-
 class DurationDataType(TypedDict, total=False):
     """Represent a Duration data dict type."""
 
