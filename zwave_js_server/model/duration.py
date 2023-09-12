@@ -18,7 +18,7 @@ class Duration:
     """Duration class."""
 
     data: DurationDataType | Literal["unknown", "default"]
-    unit: Literal["seconds", "minutes"] = field(init=False)
+    unit: Literal["seconds", "minutes", "unknown", "default"] = field(init=False)
     value: int | float | None = field(init=False)
 
     def __post_init__(self) -> None:
