@@ -219,8 +219,6 @@ def test_set_value_result_str():
     assert result.status == SetValueStatus.ENDPOINT_NOT_FOUND
     assert str(result) == "Endpoint Not Found: test"
 
-    result = SetValueResult(
-        {"status": 1, "remainingDuration": "unknown"}
-    )
+    result = SetValueResult({"status": 1, "remainingDuration": "unknown"})
     assert result.status == SetValueStatus.WORKING
     assert str(result) == "Working (unknown duration)"
