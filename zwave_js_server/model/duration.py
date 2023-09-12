@@ -9,7 +9,7 @@ class DurationDataType(TypedDict, total=False):
     """Represent a Duration data dict type."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/v11-dev/packages/core/src/values/Duration.ts#L11
-    unit: Literal["seconds", "minutes", "unknown", "default"]  # required
+    unit: Literal["seconds", "minutes"]  # required
     value: int | float
 
 
@@ -18,7 +18,7 @@ class Duration:
     """Duration class."""
 
     data: DurationDataType | Literal["unknown", "default"]
-    unit: Literal["seconds", "minutes", "unknown", "default"] = field(init=False)
+    unit: Literal["seconds", "minutes"] = field(init=False)
     value: int | float | None = field(init=False)
 
     def __post_init__(self) -> None:
