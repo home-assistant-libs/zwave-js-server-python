@@ -15,6 +15,7 @@ from zwave_js_server.const import (
     PowerLevel,
     ProtocolDataRate,
     ProtocolVersion,
+    RFRegion,
     SecurityClass,
     Weekday,
 )
@@ -53,7 +54,17 @@ from .. import load_fixture
 FIRMWARE_UPDATE_INFO = {
     "version": "1.0.0",
     "changelog": "changelog",
+    "channel": "stable",
     "files": [{"target": 0, "url": "http://example.com", "integrity": "test"}],
+    "downgrade": True,
+    "normalizedVersion": "1.0.0",
+    "device": {
+        "manufacturerId": 1,
+        "productType": 2,
+        "productId": 3,
+        "firmwareVersion": "0.4.4",
+        "rfRegion": 1,
+    },
 }
 
 
@@ -62,10 +73,18 @@ def test_firmware():
     firmware_update_info = NodeFirmwareUpdateInfo.from_dict(FIRMWARE_UPDATE_INFO)
     assert firmware_update_info.version == "1.0.0"
     assert firmware_update_info.changelog == "changelog"
+    assert firmware_update_info.channel == "stable"
     assert len(firmware_update_info.files) == 1
     assert firmware_update_info.files[0].target == 0
     assert firmware_update_info.files[0].url == "http://example.com"
     assert firmware_update_info.files[0].integrity == "test"
+    assert firmware_update_info.downgrade
+    assert firmware_update_info.normalized_version == "1.0.0"
+    assert firmware_update_info.device.manufacturer_id == 1
+    assert firmware_update_info.device.product_type == 2
+    assert firmware_update_info.device.product_id == 3
+    assert firmware_update_info.device.firmware_version == "0.4.4"
+    assert firmware_update_info.device.rf_region == RFRegion.USA
     assert firmware_update_info.to_dict() == FIRMWARE_UPDATE_INFO
 
 

@@ -26,9 +26,26 @@ from zwave_js_server.model import controller as controller_pkg
 from zwave_js_server.model.controller.firmware import ControllerFirmwareUpdateStatus
 from zwave_js_server.model.controller.statistics import ControllerStatistics
 from zwave_js_server.model.node import Node
-from zwave_js_server.model.node.firmware import NodeFirmwareUpdateFileInfo
+from zwave_js_server.model.node.firmware import NodeFirmwareUpdateInfo
 
 from .. import load_fixture
+
+
+FIRMWARE_UPDATE_INFO = {
+    "version": "1.0.0",
+    "changelog": "changelog",
+    "channel": "stable",
+    "files": [{"target": 0, "url": "http://example.com", "integrity": "test"}],
+    "downgrade": True,
+    "normalizedVersion": "1.0.0",
+    "device": {
+        "manufacturerId": 1,
+        "productType": 2,
+        "productId": 3,
+        "firmwareVersion": "0.4.4",
+        "rfRegion": 1,
+    },
+}
 
 
 def test_from_state():
@@ -130,7 +147,7 @@ def test_from_state():
     ]
     assert ctrl.suc_node_id == 1
     assert ctrl.supports_timers is False
-    assert ctrl.is_heal_network_active is False
+    assert ctrl.is_rebuilding_routes is False
     assert ctrl.inclusion_state == InclusionState.IDLE
     stats = ctrl.statistics
     assert (
@@ -979,66 +996,66 @@ async def test_replace_failed_node_errors(controller, multisensor_6):
         )
 
 
-async def test_heal_node(controller, multisensor_6, uuid4, mock_command):
-    """Test heal node."""
+async def test_rebuild_node_routes(controller, multisensor_6, uuid4, mock_command):
+    """Test rebuild node routes."""
     ack_commands = mock_command(
-        {"command": "controller.heal_node"},
+        {"command": "controller.rebuild_node_routes"},
         {"success": True},
     )
 
-    assert await controller.async_heal_node(multisensor_6)
+    assert await controller.async_rebuild_node_routes(multisensor_6)
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
-        "command": "controller.heal_node",
+        "command": "controller.rebuild_node_routes",
         "messageId": uuid4,
         "nodeId": multisensor_6.node_id,
     }
 
 
-async def test_begin_healing_network(controller, uuid4, mock_command):
-    """Test begin healing network."""
+async def test_begin_rebuilding_routes(controller, uuid4, mock_command):
+    """Test begin rebuilding routes."""
     ack_commands = mock_command(
-        {"command": "controller.begin_healing_network"},
+        {"command": "controller.begin_rebuilding_routes"},
         {"success": True},
     )
 
-    assert await controller.async_begin_healing_network()
+    assert await controller.async_begin_rebuilding_routes()
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
-        "command": "controller.begin_healing_network",
+        "command": "controller.begin_rebuilding_routes",
         "messageId": uuid4,
     }
 
 
-async def test_stop_healing_network(controller, uuid4, mock_command):
-    """Test stop healing network."""
+async def test_stop_rebuilding_routes(controller, uuid4, mock_command):
+    """Test stop rebuilding routes."""
     ack_commands = mock_command(
-        {"command": "controller.stop_healing_network"},
+        {"command": "controller.stop_rebuilding_routes"},
         {"success": True},
     )
 
     event = Event(
-        "heal network progress",
+        "rebuild routes progress",
         {
             "source": "controller",
-            "event": "heal network progress",
+            "event": "rebuild routes progress",
             "progress": {52: "pending"},
         },
     )
     controller.receive_event(event)
 
-    assert controller.heal_network_progress == {52: "pending"}
-    assert await controller.async_stop_healing_network()
+    assert controller.rebuild_routes_progress == {52: "pending"}
+    assert await controller.async_stop_rebuilding_routes()
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
-        "command": "controller.stop_healing_network",
+        "command": "controller.stop_rebuilding_routes",
         "messageId": uuid4,
     }
-    # Verify that controller.heal_network_progress is cleared
-    assert controller.heal_network_progress is None
+    # Verify that controller.rebuild_routes_progress is cleared
+    assert controller.rebuild_routes_progress is None
 
 
 async def test_is_failed_node(controller, multisensor_6, uuid4, mock_command):
@@ -1339,32 +1356,32 @@ async def test_get_node_neighbors(controller, multisensor_6, uuid4, mock_command
     }
 
 
-async def test_heal_network_active(client, controller):
-    """Test that is_heal_network_active changes on events."""
-    assert controller.is_heal_network_active is False
-    assert controller.heal_network_progress is None
+async def test_heal_network_active(controller):
+    """Test that is_rebuilding_routes changes on events."""
+    assert controller.is_rebuilding_routes is False
+    assert controller.rebuild_routes_progress is None
     event = Event(
-        "heal network progress",
+        "rebuild routes progress",
         {
             "source": "controller",
-            "event": "heal network progress",
+            "event": "rebuild routes progress",
             "progress": {52: "pending"},
         },
     )
     controller.receive_event(event)
-    assert controller.heal_network_progress == {52: "pending"}
-    assert controller.is_heal_network_active
+    assert controller.rebuild_routes_progress == {52: "pending"}
+    assert controller.is_rebuilding_routes
     event = Event(
-        "heal network done",
+        "rebuild routes done",
         {
             "source": "controller",
-            "event": "heal network done",
+            "event": "rebuild routes done",
             "result": {52: "failed"},
         },
     )
     controller.receive_event(event)
-    assert controller.heal_network_progress is None
-    assert controller.is_heal_network_active is False
+    assert controller.rebuild_routes_progress is None
+    assert controller.is_rebuilding_routes is False
 
 
 async def test_statistics_updated(controller):
@@ -1789,31 +1806,28 @@ async def test_get_available_firmware_updates(multisensor_6, uuid4, mock_command
     """Test get available firmware updates."""
     ack_commands = mock_command(
         {"command": "controller.get_available_firmware_updates"},
-        {
-            "updates": [
-                {
-                    "version": "1.0.0",
-                    "changelog": "changelog",
-                    "files": [
-                        {"target": 0, "url": "http://example.com", "integrity": "test"}
-                    ],
-                }
-            ]
-        },
+        {"updates": [FIRMWARE_UPDATE_INFO]},
     )
     updates = await multisensor_6.client.driver.controller.async_get_available_firmware_updates(
         multisensor_6, "test"
     )
-
     assert len(updates) == 1
     update = updates[0]
     assert update.version == "1.0.0"
     assert update.changelog == "changelog"
+    assert update.channel == "stable"
     assert len(update.files) == 1
     file = update.files[0]
     assert file.target == 0
     assert file.url == "http://example.com"
     assert file.integrity == "test"
+    assert update.downgrade
+    assert update.normalized_version == "1.0.0"
+    assert update.device.manufacturer_id == 1
+    assert update.device.product_type == 2
+    assert update.device.product_id == 3
+    assert update.device.firmware_version == "0.4.4"
+    assert update.device.rf_region == RFRegion.USA
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
@@ -1832,12 +1846,7 @@ async def test_begin_ota_firmware_update(multisensor_6, uuid4, mock_command):
         {"result": {"status": 255, "success": True, "reInterview": False}},
     )
     result = await multisensor_6.client.driver.controller.async_firmware_update_ota(
-        multisensor_6,
-        [
-            NodeFirmwareUpdateFileInfo(
-                target=0, url="http://example.com", integrity="test"
-            )
-        ],
+        multisensor_6, [NodeFirmwareUpdateInfo.from_dict(FIRMWARE_UPDATE_INFO)]
     )
     assert result.status == 255
     assert result.success
@@ -1847,7 +1856,7 @@ async def test_begin_ota_firmware_update(multisensor_6, uuid4, mock_command):
     assert ack_commands[0] == {
         "command": "controller.firmware_update_ota",
         "nodeId": multisensor_6.node_id,
-        "updates": [{"target": 0, "url": "http://example.com", "integrity": "test"}],
+        "updateInfo": [FIRMWARE_UPDATE_INFO],
         "messageId": uuid4,
     }
 
@@ -1993,6 +2002,8 @@ async def test_node_added(controller, multisensor_6_state):
 
 async def test_node_removed(client, multisensor_6, multisensor_6_state):
     """Test node removed event."""
+    assert 52 in client.driver.controller.nodes
+    assert client.driver.controller.nodes[52] == multisensor_6
     event = Event(
         "node removed",
         {

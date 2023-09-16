@@ -26,7 +26,7 @@ class ControllerDataType(TypedDict, total=False):
     supportedFunctionTypes: list[int]
     sucNodeId: int
     supportsTimers: bool
-    isHealNetworkActive: bool
+    isRebuildingRoutes: bool
     statistics: ControllerStatisticsDataType
     inclusionState: int
     rfRegion: int
