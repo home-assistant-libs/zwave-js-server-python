@@ -31,7 +31,11 @@ from .inclusion_and_provisioning import (
     ProvisioningEntry,
     QRProvisioningInformation,
 )
-from .rebuild_routes import RebuildRoutesOptions, RebuildRoutesStatus
+from .rebuild_routes import (
+    RebuildRoutesOptions,
+    RebuildRoutesOptionsDataType,
+    RebuildRoutesStatus,
+)
 from .statistics import (
     ControllerLifelineRoutes,
     ControllerStatistics,
@@ -477,7 +481,9 @@ class Controller(EventBase):
         self, options: RebuildRoutesOptions | None = None
     ) -> bool:
         """Send beginRebuildingRoutes command to Controller."""
-        msg = {"command": "controller.begin_rebuilding_routes"}
+        msg: dict[str, str | RebuildRoutesOptionsDataType] = {
+            "command": "controller.begin_rebuilding_routes"
+        }
         if options:
             msg["options"] = options.to_dict()
         data = await self.client.async_send_command(msg, require_schema=32)
