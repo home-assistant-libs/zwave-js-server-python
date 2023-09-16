@@ -461,3 +461,16 @@ async def test_additional_user_agent_components(client_session, url):
                 },
             }
         )
+
+
+async def test_pop_future_none(client_session, url, driver_ready):
+    """Test when a future has been cleared from futures dict, popping still works."""
+    client = Client(url, client_session)
+    await client.connect()
+
+    assert client.connected
+
+    asyncio.create_task(client.listen(driver_ready))
+
+    with pytest.raises(asyncio.CancelledError):
+        await client.async_send_command({"command": "some_command"})
