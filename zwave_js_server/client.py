@@ -115,7 +115,7 @@ class Client:
         try:
             return await future
         finally:
-            self._result_futures.pop(message_id)
+            self._result_futures.pop(message_id, None)
 
     async def async_send_command_no_wait(
         self, message: dict[str, Any], require_schema: int | None = None
