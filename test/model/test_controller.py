@@ -24,12 +24,15 @@ from zwave_js_server.exceptions import RepeaterRssiErrorReceived, RssiErrorRecei
 from zwave_js_server.model import association as association_pkg
 from zwave_js_server.model import controller as controller_pkg
 from zwave_js_server.model.controller.firmware import ControllerFirmwareUpdateStatus
+from zwave_js_server.model.controller.rebuild_routes import (
+    RebuildRoutesOptions,
+    RebuildRoutesStatus,
+)
 from zwave_js_server.model.controller.statistics import ControllerStatistics
 from zwave_js_server.model.node import Node
 from zwave_js_server.model.node.firmware import NodeFirmwareUpdateInfo
 
 from .. import load_fixture
-
 
 FIRMWARE_UPDATE_INFO = {
     "version": "1.0.0",
@@ -1028,9 +1031,19 @@ async def test_begin_rebuilding_routes(controller, uuid4, mock_command):
         "messageId": uuid4,
     }
 
+    assert await controller.async_begin_rebuilding_routes(RebuildRoutesOptions(True))
 
-async def test_stop_rebuilding_routes(controller, uuid4, mock_command):
+    assert len(ack_commands) == 2
+    assert ack_commands[1] == {
+        "command": "controller.begin_rebuilding_routes",
+        "options": {"includeSleeping": True},
+        "messageId": uuid4,
+    }
+
+
+async def test_stop_rebuilding_routes(client, multisensor_6, uuid4, mock_command):
     """Test stop rebuilding routes."""
+    controller = client.driver.controller
     ack_commands = mock_command(
         {"command": "controller.stop_rebuilding_routes"},
         {"success": True},
@@ -1046,7 +1059,9 @@ async def test_stop_rebuilding_routes(controller, uuid4, mock_command):
     )
     controller.receive_event(event)
 
-    assert controller.rebuild_routes_progress == {52: "pending"}
+    assert controller.rebuild_routes_progress == {
+        multisensor_6: RebuildRoutesStatus.PENDING
+    }
     assert await controller.async_stop_rebuilding_routes()
 
     assert len(ack_commands) == 1
@@ -1356,8 +1371,9 @@ async def test_get_node_neighbors(controller, multisensor_6, uuid4, mock_command
     }
 
 
-async def test_heal_network_active(controller):
+async def test_rebuild_routes_active(client, multisensor_6):
     """Test that is_rebuilding_routes changes on events."""
+    controller = client.driver.controller
     assert controller.is_rebuilding_routes is False
     assert controller.rebuild_routes_progress is None
     event = Event(
@@ -1369,7 +1385,10 @@ async def test_heal_network_active(controller):
         },
     )
     controller.receive_event(event)
-    assert controller.rebuild_routes_progress == {52: "pending"}
+    assert controller.rebuild_routes_progress == {
+        multisensor_6: RebuildRoutesStatus.PENDING
+    }
+    assert controller.last_rebuild_routes_result is None
     assert controller.is_rebuilding_routes
     event = Event(
         "rebuild routes done",
@@ -1381,6 +1400,9 @@ async def test_heal_network_active(controller):
     )
     controller.receive_event(event)
     assert controller.rebuild_routes_progress is None
+    assert controller.last_rebuild_routes_result == {
+        multisensor_6: RebuildRoutesStatus.FAILED
+    }
     assert controller.is_rebuilding_routes is False
 
 

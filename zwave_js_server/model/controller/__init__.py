@@ -31,6 +31,7 @@ from .inclusion_and_provisioning import (
     ProvisioningEntry,
     QRProvisioningInformation,
 )
+from .rebuild_routes import RebuildRoutesOptions, RebuildRoutesStatus
 from .statistics import (
     ControllerLifelineRoutes,
     ControllerStatistics,
@@ -70,7 +71,8 @@ class Controller(EventBase):
         super().__init__()
         self.client = client
         self.nodes: dict[int, Node] = {}
-        self._rebuild_routes_progress: dict[int, str] | None = None
+        self._rebuild_routes_progress: dict[Node, RebuildRoutesStatus] | None = None
+        self._last_rebuild_routes_result: dict[Node, RebuildRoutesStatus] | None = None
         self._statistics = ControllerStatistics(DEFAULT_CONTROLLER_STATISTICS)
         self._firmware_update_progress: ControllerFirmwareUpdateProgress | None = None
         for node_state in state["nodes"]:
@@ -197,9 +199,14 @@ class Controller(EventBase):
         return self._statistics
 
     @property
-    def rebuild_routes_progress(self) -> dict[int, str] | None:
+    def rebuild_routes_progress(self) -> dict[Node, RebuildRoutesStatus] | None:
         """Return rebuild routes progress state."""
         return self._rebuild_routes_progress
+
+    @property
+    def last_rebuild_routes_result(self) -> dict[Node, RebuildRoutesStatus] | None:
+        """Return the last rebuild routes result."""
+        return self._last_rebuild_routes_result
 
     @property
     def inclusion_state(self) -> InclusionState:
@@ -466,11 +473,14 @@ class Controller(EventBase):
         )
         return cast(bool, data["success"])
 
-    async def async_begin_rebuilding_routes(self) -> bool:
+    async def async_begin_rebuilding_routes(
+        self, options: RebuildRoutesOptions | None = None
+    ) -> bool:
         """Send beginRebuildingRoutes command to Controller."""
-        data = await self.client.async_send_command(
-            {"command": "controller.begin_rebuilding_routes"}, require_schema=32
-        )
+        msg = {"command": "controller.begin_rebuilding_routes"}
+        if options:
+            msg["options"] = options.to_dict()
+        data = await self.client.async_send_command(msg, require_schema=32)
         return cast(bool, data["success"])
 
     async def async_stop_rebuilding_routes(self) -> bool:
@@ -880,12 +890,18 @@ class Controller(EventBase):
 
     def handle_rebuild_routes_progress(self, event: Event) -> None:
         """Process a rebuild routes progress event."""
-        self._rebuild_routes_progress = event.data["progress"].copy()
+        self._rebuild_routes_progress = {
+            self.nodes[node_id]: RebuildRoutesStatus(status)
+            for node_id, status in event.data["progress"].items()
+        }
         self.data["isRebuildingRoutes"] = True
 
     def handle_rebuild_routes_done(self, event: Event) -> None:
         """Process a rebuild routes done event."""
-        # pylint: disable=unused-argument
+        self._last_rebuild_routes_result = {
+            self.nodes[node_id]: RebuildRoutesStatus(status)
+            for node_id, status in event.data["result"].items()
+        }
         self._rebuild_routes_progress = None
         self.data["isRebuildingRoutes"] = False
 
