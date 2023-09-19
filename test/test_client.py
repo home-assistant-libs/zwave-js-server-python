@@ -474,5 +474,5 @@ async def test_pop_future_none(client_session, url, driver_ready):
 
     await driver_ready.wait()
 
-    with pytest.raises(NotConnected):
+    with pytest.raises(asyncio.CancelledError):
         await client.async_send_command({"command": "some_command"})
