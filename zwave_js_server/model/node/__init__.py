@@ -1058,25 +1058,25 @@ class Node(EventBase):
 
     def handle_notification(self, event: Event) -> None:
         """Process a node notification event."""
-        command_class = CommandClass(event.data["ccId"])
-        if command_class == CommandClass.NOTIFICATION:
-            event.data["notification"] = NotificationNotification(
-                self, cast(NotificationNotificationDataType, event.data)
-            )
-        elif command_class == CommandClass.SWITCH_MULTILEVEL:
-            event.data["notification"] = MultilevelSwitchNotification(
-                self, cast(MultilevelSwitchNotificationDataType, event.data)
-            )
-        elif command_class == CommandClass.ENTRY_CONTROL:
-            event.data["notification"] = EntryControlNotification(
-                self, cast(EntryControlNotificationDataType, event.data)
-            )
-        elif command_class == CommandClass.POWERLEVEL:
-            event.data["notification"] = PowerLevelNotification(
-                self, cast(PowerLevelNotificationDataType, event.data)
-            )
-        else:
-            _LOGGER.info("Unhandled notification command class: %s", command_class.name)
+        match command_class := CommandClass(event.data["ccId"]):
+            case CommandClass.NOTIFICATION:
+                event.data["notification"] = NotificationNotification(
+                    self, cast(NotificationNotificationDataType, event.data)
+                )
+            case CommandClass.SWITCH_MULTILEVEL:
+                event.data["notification"] = MultilevelSwitchNotification(
+                    self, cast(MultilevelSwitchNotificationDataType, event.data)
+                )
+            case CommandClass.ENTRY_CONTROL:
+                event.data["notification"] = EntryControlNotification(
+                    self, cast(EntryControlNotificationDataType, event.data)
+                )
+            case CommandClass.POWERLEVEL:
+                event.data["notification"] = PowerLevelNotification(
+                    self, cast(PowerLevelNotificationDataType, event.data)
+                )
+            case _:
+                _LOGGER.info("Unhandled notification command class: %s", command_class.name)
 
     def handle_firmware_update_progress(self, event: Event) -> None:
         """Process a node firmware update progress event."""

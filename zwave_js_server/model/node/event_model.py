@@ -7,6 +7,7 @@ from ...const import CommandClass
 from ...event import BaseEventModel
 from ..notification import (
     EntryControlNotificationArgsDataType,
+    MultilevelSwitchNotificationArgsDataType,
     NotificationNotificationArgsDataType,
     PowerLevelNotificationArgsDataType,
 )
@@ -106,11 +107,13 @@ class NotificationEventModel(BaseNodeEventModel):
     """Model for `notification` event data."""
 
     event: Literal["notification"]
+    nodeId: int
     ccId: CommandClass
     args: (
         NotificationNotificationArgsDataType
         | EntryControlNotificationArgsDataType
         | PowerLevelNotificationArgsDataType
+        | MultilevelSwitchNotificationArgsDataType
     )
 
 
