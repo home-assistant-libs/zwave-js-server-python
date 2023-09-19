@@ -1031,7 +1031,8 @@ async def test_begin_rebuilding_routes(controller, uuid4, mock_command):
         "messageId": uuid4,
     }
 
-    assert await controller.async_begin_rebuilding_routes(RebuildRoutesOptions(True))
+    options_include_sleeping = RebuildRoutesOptions(True)
+    assert await controller.async_begin_rebuilding_routes(options_include_sleeping)
 
     assert len(ack_commands) == 2
     assert ack_commands[1] == {
@@ -1039,6 +1040,20 @@ async def test_begin_rebuilding_routes(controller, uuid4, mock_command):
         "options": {"includeSleeping": True},
         "messageId": uuid4,
     }
+
+    assert await controller.async_begin_rebuilding_routes(RebuildRoutesOptions())
+
+    assert len(ack_commands) == 3
+    assert ack_commands[2] == {
+        "command": "controller.begin_rebuilding_routes",
+        "options": {},
+        "messageId": uuid4,
+    }
+
+    assert (
+        RebuildRoutesOptions.from_dict({"includeSleeping": True})
+        == options_include_sleeping
+    )
 
 
 async def test_stop_rebuilding_routes(client, multisensor_6, uuid4, mock_command):
