@@ -963,7 +963,7 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
             "event": "notification",
             "nodeId": 23,
             "ccId": CommandClass.SWITCH_MULTILEVEL.value,
-            "args": {"eventType": 4},
+            "args": {"eventType": 4, "eventTypeLabel": "c"},
         },
     )
 
@@ -975,6 +975,7 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
         event.data["notification"].event_type
         == MultilevelSwitchCommand.START_LEVEL_CHANGE
     )
+    assert event.data["notification"].event_type_label == "c"
 
 
 async def test_notification_unknown(lock_schlage_be469: node_pkg.Node, caplog):
@@ -1008,15 +1009,23 @@ async def test_entry_control_notification(ring_keypad):
             "event": "notification",
             "nodeId": 10,
             "ccId": 111,
-            "args": {"eventType": 5, "dataType": 2, "eventData": "555"},
+            "args": {
+                "eventType": 5,
+                "eventTypeLabel": "foo",
+                "dataType": 2,
+                "dataTypeLabel": "bar",
+                "eventData": "cat",
+            },
         },
     )
     node.handle_notification(event)
     assert event.data["notification"].command_class == CommandClass.ENTRY_CONTROL
     assert event.data["notification"].node_id == 10
     assert event.data["notification"].event_type == EntryControlEventType.ARM_AWAY
+    assert event.data["notification"].event_type_label == "foo"
     assert event.data["notification"].data_type == EntryControlDataType.ASCII
-    assert event.data["notification"].event_data == "555"
+    assert event.data["notification"].data_type_label == "bar"
+    assert event.data["notification"].event_data == "cat"
 
 
 async def test_interview_events(multisensor_6):
