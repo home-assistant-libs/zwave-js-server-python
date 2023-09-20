@@ -33,11 +33,13 @@ class BaseNotification:
     node: Node
     data: BaseNotificationDataType
     node_id: int = field(init=False)
+    endpoint_idx: int = field(init=False)
     command_class: int = field(init=False)
 
     def __post_init__(self) -> None:
         """Post initialization."""
         self.node_id = self.data["nodeId"]
+        self.endpoint_idx = self.data["endpointIndex"]
         self.command_class = self.data["ccId"]
 
 
@@ -68,7 +70,6 @@ class EntryControlNotification(BaseNotification):
     data_type_label: str = field(init=False)
     event_data: str | dict[str, Any] | None = field(init=False, default=None)
 
-<<<<<<< HEAD
     def __post_init__(self) -> None:
         """Post initialize."""
         super().__post_init__()
@@ -76,46 +77,6 @@ class EntryControlNotification(BaseNotification):
         self.event_type_label = self.data["args"]["eventTypeLabel"]
         self.data_type = self.data["args"]["dataType"]
         self.data_type_label = self.data["args"]["dataTypeLabel"]
-=======
-    @property
-    def node_id(self) -> int:
-        """Return node ID property."""
-        return self.data["nodeId"]
-
-    @property
-    def endpoint_index(self) -> int:
-        """Return endpoint index property."""
-        return self.data["endpointIndex"]
-
-    @property
-    def command_class(self) -> int:
-        """Return command class."""
-        return self.data["ccId"]
-
-    @property
-    def event_type(self) -> int:
-        """Return event type property."""
-        return self.data["args"]["eventType"]
-
-    @property
-    def event_type_label(self) -> str:
-        """Return event type label property."""
-        return self.data["args"]["eventTypeLabel"]
-
-    @property
-    def data_type(self) -> int:
-        """Return data type property."""
-        return self.data["args"]["dataType"]
-
-    @property
-    def data_type_label(self) -> str:
-        """Return data type label property."""
-        return self.data["args"]["dataTypeLabel"]
-
-    @property
-    def event_data(self) -> str | None:
-        """Return event data property."""
->>>>>>> a2fb93a (Add support for zwave-js 12.0 and schema 32)
         if event_data := self.data["args"].get("eventData"):
             self.event_data = parse_buffer(event_data)
 
@@ -147,7 +108,6 @@ class NotificationNotification(BaseNotification):
     event_label: str = field(init=False)
     parameters: dict[str, Any] = field(init=False)
 
-<<<<<<< HEAD
     def __post_init__(self) -> None:
         """Post initialize."""
         super().__post_init__()
@@ -156,47 +116,6 @@ class NotificationNotification(BaseNotification):
         self.event = self.data["args"]["event"]
         self.event_label = self.data["args"]["eventLabel"]
         self.parameters = self.data["args"].get("parameters", {})
-=======
-    @property
-    def node_id(self) -> int:
-        """Return node ID property."""
-        return self.data["nodeId"]
-
-    @property
-    def endpoint_index(self) -> int:
-        """Return endpoint index property."""
-        return self.data["endpointIndex"]
-
-    @property
-    def command_class(self) -> int:
-        """Return command class."""
-        return self.data["ccId"]
-
-    @property
-    def type_(self) -> int:
-        """Return type property."""
-        return self.data["args"]["type"]
-
-    @property
-    def label(self) -> str:
-        """Return label property."""
-        return self.data["args"]["label"]
-
-    @property
-    def event(self) -> int:
-        """Return event property."""
-        return self.data["args"]["event"]
-
-    @property
-    def event_label(self) -> str:
-        """Return notification label property."""
-        return self.data["args"]["eventLabel"]
-
-    @property
-    def parameters(self) -> dict[str, Any]:
-        """Return installer icon property."""
-        return self.data["args"].get("parameters", {})
->>>>>>> a2fb93a (Add support for zwave-js 12.0 and schema 32)
 
 
 class PowerLevelNotificationArgsDataType(TypedDict):
@@ -222,44 +141,12 @@ class PowerLevelNotification(BaseNotification):
     status: PowerLevelTestStatus = field(init=False)
     acknowledged_frames: int = field(init=False)
 
-<<<<<<< HEAD
     def __post_init__(self) -> None:
         """Post initialize."""
         super().__post_init__()
         self.test_node_id = self.data["args"]["testNodeId"]
         self.status = PowerLevelTestStatus(self.data["args"]["status"])
         self.acknowledged_frames = self.data["args"]["acknowledgedFrames"]
-=======
-    @property
-    def node_id(self) -> int:
-        """Return node ID property."""
-        return self.data["nodeId"]
-
-    @property
-    def endpoint_index(self) -> int:
-        """Return endpoint index property."""
-        return self.data["endpointIndex"]
-
-    @property
-    def command_class(self) -> int:
-        """Return command class."""
-        return self.data["ccId"]
-
-    @property
-    def test_node_id(self) -> int:
-        """Return test node ID property."""
-        return self.data["args"]["testNodeId"]
-
-    @property
-    def status(self) -> PowerLevelTestStatus:
-        """Return status."""
-        return PowerLevelTestStatus(self.data["args"]["status"])
-
-    @property
-    def acknowledged_frames(self) -> int:
-        """Return acknowledged frames property."""
-        return self.data["args"]["acknowledgedFrames"]
->>>>>>> a2fb93a (Add support for zwave-js 12.0 and schema 32)
 
 
 class MultilevelSwitchNotificationArgsDataType(TypedDict, total=False):

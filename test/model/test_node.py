@@ -887,6 +887,7 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
             "event": "notification",
             "nodeId": 23,
             "ccId": 111,
+            "endpointIndex": 0,
             "args": {
                 "eventType": 0,
                 "eventTypeLabel": "a",
@@ -900,6 +901,7 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
     node.handle_notification(event)
     assert event.data["notification"].command_class == CommandClass.ENTRY_CONTROL
     assert event.data["notification"].node_id == 23
+    assert event.data["notification"].endpoint_idx == 0
     assert event.data["notification"].event_type == EntryControlEventType.CACHING
     assert event.data["notification"].event_type_label == "a"
     assert event.data["notification"].data_type == EntryControlDataType.NONE
@@ -913,6 +915,7 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
             "source": "node",
             "event": "notification",
             "nodeId": 23,
+            "endpointIndex": 0,
             "ccId": 113,
             "args": {
                 "type": 6,
@@ -927,6 +930,7 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
     node.handle_notification(event)
     assert event.data["notification"].command_class == CommandClass.NOTIFICATION
     assert event.data["notification"].node_id == 23
+    assert event.data["notification"].endpoint_idx == 0
     assert event.data["notification"].type_ == 6
     assert event.data["notification"].event == 5
     assert event.data["notification"].label == "Access Control"
@@ -940,6 +944,7 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
             "source": "node",
             "event": "notification",
             "nodeId": 23,
+            "endpointIndex": 0,
             "ccId": CommandClass.POWERLEVEL.value,
             "args": {"testNodeId": 1, "status": 0, "acknowledgedFrames": 2},
         },
@@ -948,6 +953,7 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
     node.handle_notification(event)
     assert event.data["notification"].command_class == CommandClass.POWERLEVEL
     assert event.data["notification"].node_id == 23
+    assert event.data["notification"].endpoint_idx == 0
     assert event.data["notification"].test_node_id == 1
     assert event.data["notification"].status == PowerLevelTestStatus.FAILED
     assert event.data["notification"].acknowledged_frames == 2
@@ -959,6 +965,7 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
             "source": "node",
             "event": "notification",
             "nodeId": 23,
+            "endpointIndex": 0,
             "ccId": CommandClass.SWITCH_MULTILEVEL.value,
             "args": {"direction": "up", "eventType": 4, "eventTypeLabel": "c"},
         },
@@ -967,6 +974,7 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
     node.handle_notification(event)
     assert event.data["notification"].command_class == CommandClass.SWITCH_MULTILEVEL
     assert event.data["notification"].node_id == 23
+    assert event.data["notification"].endpoint_idx == 0
     assert event.data["notification"].direction == "up"
     assert (
         event.data["notification"].event_type
@@ -981,6 +989,7 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
             "source": "node",
             "event": "notification",
             "nodeId": 23,
+            "endpointIndex": 0,
             "ccId": CommandClass.SWITCH_MULTILEVEL.value,
             "args": {"eventType": 4, "eventTypeLabel": "c"},
         },
@@ -989,6 +998,7 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
     node.handle_notification(event)
     assert event.data["notification"].command_class == CommandClass.SWITCH_MULTILEVEL
     assert event.data["notification"].node_id == 23
+    assert event.data["notification"].endpoint_idx == 0
     assert event.data["notification"].direction is None
     assert (
         event.data["notification"].event_type
@@ -1027,6 +1037,7 @@ async def test_entry_control_notification(ring_keypad):
             "source": "node",
             "event": "notification",
             "nodeId": 10,
+            "endpointIndex": 0,
             "ccId": 111,
             "args": {
                 "eventType": 5,
@@ -1040,6 +1051,7 @@ async def test_entry_control_notification(ring_keypad):
     node.handle_notification(event)
     assert event.data["notification"].command_class == CommandClass.ENTRY_CONTROL
     assert event.data["notification"].node_id == 10
+    assert event.data["notification"].endpoint_idx == 0
     assert event.data["notification"].event_type == EntryControlEventType.ARM_AWAY
     assert event.data["notification"].event_type_label == "foo"
     assert event.data["notification"].data_type == EntryControlDataType.ASCII
