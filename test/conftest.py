@@ -161,9 +161,11 @@ async def ws_client_fixture(
         """Return a websocket message."""
         await asyncio.sleep(0)
 
-        message = messages.popleft()
-        if not messages:
+        try:
+            message = messages.popleft()
+        except IndexError:
             ws_client.closed = True
+            return WSMessage(WSMsgType.CLOSED, None, None)
 
         return message
 
