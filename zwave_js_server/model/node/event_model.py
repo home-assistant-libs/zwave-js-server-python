@@ -108,7 +108,7 @@ class NotificationEventModel(BaseNodeEventModel):
 
     event: Literal["notification"]
     nodeId: int
-    endpoint: int
+    endpointIndex: int
     ccId: CommandClass
     args: (
         NotificationNotificationArgsDataType
