@@ -313,10 +313,7 @@ async def test_command_error_handling(client, mock_command):
     """Test error handling."""
     mock_command(
         {"command": "some_command"},
-        {
-            "errorCode": "unknown_command",
-            "message": "test"
-        },
+        {"errorCode": "unknown_command", "message": "test"},
         False,
     )
 
