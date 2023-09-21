@@ -86,7 +86,7 @@ class FailedCommand(BaseZwaveJSServerError):
         self, message_id: str, error_code: str, msg: str | None = None
     ) -> None:
         """Initialize a failed command error."""
-        super().__init__(msg or f"Command failed: {error_code}")
+        super().__init__(f"{error_code}: {msg}" or f"Command failed: {error_code}")
         self.message_id = message_id
         self.error_code = error_code
 

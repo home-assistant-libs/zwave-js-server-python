@@ -213,7 +213,11 @@ class Client:
         if not set_api_msg["success"]:
             # this should not happen, but just in case
             await self._client.close()
-            raise FailedCommand(set_api_msg["messageId"], set_api_msg["errorCode"])
+            raise FailedCommand(
+                set_api_msg["messageId"],
+                set_api_msg["errorCode"],
+                set_api_msg["message"],
+            )
 
     async def listen(self, driver_ready: asyncio.Event) -> None:
         """Start listening to the websocket."""
@@ -237,7 +241,9 @@ class Client:
             # this should not happen, but just in case
             if not log_msg["success"]:
                 await self._client.close()
-                raise FailedCommand(log_msg["messageId"], log_msg["errorCode"])
+                raise FailedCommand(
+                    log_msg["messageId"], log_msg["errorCode"], log_msg["message"]
+                )
 
             # send start_listening command to the server
             # we will receive a full state dump and from now on get events
@@ -249,7 +255,9 @@ class Client:
 
             if not state_msg["success"]:
                 await self._client.close()
-                raise FailedCommand(state_msg["messageId"], state_msg["errorCode"])
+                raise FailedCommand(
+                    state_msg["messageId"], state_msg["errorCode"], state_msg["message"]
+                )
 
             self.driver = cast(
                 Driver,
@@ -481,7 +489,7 @@ class Client:
                 return
 
             if msg["errorCode"] != "zwave_error":
-                err = FailedCommand(msg["messageId"], msg["errorCode"])
+                err = FailedCommand(msg["messageId"], msg["errorCode"], msg["message"])
             else:
                 err = FailedZWaveCommand(
                     msg["messageId"], msg["zwaveErrorCode"], msg["zwaveErrorMessage"]
