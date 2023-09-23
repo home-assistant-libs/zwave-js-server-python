@@ -198,9 +198,9 @@ class Node(EventBase):
     @property
     def is_secure(self) -> bool | None:
         """Return the is_secure."""
-        if (is_secure := self.data.get("isSecure")) == "unknown":
-            return None
-        return is_secure
+        if (is_secure := self.data.get("isSecure")) is not None:
+            return is_secure
+        return None
 
     @property
     def protocol_version(self) -> int | None:
@@ -621,7 +621,7 @@ class Node(EventBase):
 
     async def async_abort_firmware_update(self) -> None:
         """Send abortFirmwareUpdate command to Node."""
-        await self.async_send_command("abort_firmware_update", wait_for_result=True)
+        await self.async_send_command("abort_firmware_update", wait_for_result=False)
 
     async def async_poll_value(self, val: Value | str) -> None:
         """Send pollValue command to Node for given value (or value_id)."""
@@ -680,7 +680,9 @@ class Node(EventBase):
         """Call endpoint.get_node_unsafe command."""
         return await self.endpoints[0].async_get_node_unsafe()
 
-    async def async_has_security_class(self, security_class: SecurityClass) -> bool:
+    async def async_has_security_class(
+        self, security_class: SecurityClass
+    ) -> bool | None:
         """Return whether node has the given security class."""
         data = await self.async_send_command(
             "has_security_class",
@@ -688,16 +690,18 @@ class Node(EventBase):
             require_schema=8,
             wait_for_result=True,
         )
-        assert data
-        return cast(bool, data["hasSecurityClass"])
+        if data and (has_security_class := data.get("hasSecurityClass")) is not None:
+            return cast(bool, has_security_class)
+        return None
 
-    async def async_get_highest_security_class(self) -> SecurityClass:
+    async def async_get_highest_security_class(self) -> SecurityClass | None:
         """Get the highest security class that a node supports."""
         data = await self.async_send_command(
             "get_highest_security_class", require_schema=8, wait_for_result=True
         )
-        assert data
-        return SecurityClass(data["highestSecurityClass"])
+        if data and (security_class := data.get("highestSecurityClass")) is not None:
+            return SecurityClass(security_class)
+        return None
 
     async def async_test_power_level(
         self, test_node: "Node", power_level: PowerLevel, test_frame_count: int
@@ -851,7 +855,9 @@ class Node(EventBase):
             wait_for_result=False,
         )
 
-    async def async_set_date_and_time(self, datetime_: datetime | None = None) -> bool:
+    async def async_set_date_and_time(
+        self, datetime_: datetime | None = None, wait_for_result: bool | None = None
+    ) -> bool | None:
         """Send setDateAndTime command to Node."""
         args = {}
         if datetime_:
@@ -860,10 +866,11 @@ class Node(EventBase):
             "set_date_and_time",
             **args,
             require_schema=28,
-            wait_for_result=True,
+            wait_for_result=wait_for_result,
         )
-        assert data
-        return cast(bool, data["success"])
+        if data:
+            return cast(bool, data["success"])
+        return None
 
     async def async_get_date_and_time(self) -> DateAndTime:
         """Send getDateAndTime command to Node."""
@@ -890,7 +897,7 @@ class Node(EventBase):
         await self.async_send_command(
             "abort_health_check",
             require_schema=31,
-            wait_for_result=True,
+            wait_for_result=False,
         )
 
     async def async_set_default_volume(
@@ -923,15 +930,16 @@ class Node(EventBase):
             **cmd_kwargs,
         )
 
-    async def async_has_device_config_changed(self) -> bool:
+    async def async_has_device_config_changed(self) -> bool | None:
         """Send hasDeviceConfigChanged command to Node."""
         data = await self.async_send_command(
             "has_device_config_changed",
             require_schema=31,
             wait_for_result=True,
         )
-        assert data
-        return cast(bool, data["changed"])
+        if data and (changed := data.get("changed")) is not None:
+            return cast(bool, changed)
+        return None
 
     def handle_test_powerlevel_progress(self, event: Event) -> None:
         """Process a test power level progress event."""
@@ -1050,25 +1058,27 @@ class Node(EventBase):
 
     def handle_notification(self, event: Event) -> None:
         """Process a node notification event."""
-        command_class = CommandClass(event.data["ccId"])
-        if command_class == CommandClass.NOTIFICATION:
-            event.data["notification"] = NotificationNotification(
-                self, cast(NotificationNotificationDataType, event.data)
-            )
-        elif command_class == CommandClass.SWITCH_MULTILEVEL:
-            event.data["notification"] = MultilevelSwitchNotification(
-                self, cast(MultilevelSwitchNotificationDataType, event.data)
-            )
-        elif command_class == CommandClass.ENTRY_CONTROL:
-            event.data["notification"] = EntryControlNotification(
-                self, cast(EntryControlNotificationDataType, event.data)
-            )
-        elif command_class == CommandClass.POWERLEVEL:
-            event.data["notification"] = PowerLevelNotification(
-                self, cast(PowerLevelNotificationDataType, event.data)
-            )
-        else:
-            _LOGGER.info("Unhandled notification command class: %s", command_class.name)
+        match command_class := CommandClass(event.data["ccId"]):
+            case CommandClass.NOTIFICATION:
+                event.data["notification"] = NotificationNotification(
+                    self, cast(NotificationNotificationDataType, event.data)
+                )
+            case CommandClass.SWITCH_MULTILEVEL:
+                event.data["notification"] = MultilevelSwitchNotification(
+                    self, cast(MultilevelSwitchNotificationDataType, event.data)
+                )
+            case CommandClass.ENTRY_CONTROL:
+                event.data["notification"] = EntryControlNotification(
+                    self, cast(EntryControlNotificationDataType, event.data)
+                )
+            case CommandClass.POWERLEVEL:
+                event.data["notification"] = PowerLevelNotification(
+                    self, cast(PowerLevelNotificationDataType, event.data)
+                )
+            case _:
+                _LOGGER.info(
+                    "Unhandled notification command class: %s", command_class.name
+                )
 
     def handle_firmware_update_progress(self, event: Event) -> None:
         """Process a node firmware update progress event."""

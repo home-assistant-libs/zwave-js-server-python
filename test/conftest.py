@@ -93,10 +93,10 @@ def ring_keypad_state_fixture():
     return json.loads(load_fixture("ring_keypad_state.json"))
 
 
-@pytest.fixture(name="is_secure_unknown_state", scope="session")
-def is_secure_unknown_state_fixture():
-    """Load the isSecure = `unknown` node state fixture data."""
-    return json.loads(load_fixture("is_secure_unknown_state.json"))
+@pytest.fixture(name="endpoints_with_command_classes_state", scope="session")
+def endpoints_with_command_classes_state_fixture():
+    """Load the node state fixture data with command classes on the endpoint."""
+    return json.loads(load_fixture("endpoints_with_command_classes_state.json"))
 
 
 @pytest.fixture(name="switch_enbrighten_zw3010_state", scope="session")
@@ -161,9 +161,11 @@ async def ws_client_fixture(
         """Return a websocket message."""
         await asyncio.sleep(0)
 
-        message = messages.popleft()
-        if not messages:
+        try:
+            message = messages.popleft()
+        except IndexError:
             ws_client.closed = True
+            return WSMessage(WSMsgType.CLOSED, None, None)
 
         return message
 
@@ -434,10 +436,12 @@ def invalid_multilevel_sensor_type_fixture(
     return node
 
 
-@pytest.fixture(name="is_secure_unknown")
-def is_secure_unknown_fixture(driver, is_secure_unknown_state):
-    """Mock a node that has inSecure = `unknown`."""
-    node = Node(driver.client, deepcopy(is_secure_unknown_state))
+@pytest.fixture(name="endpoints_with_command_classes")
+def endpoints_with_command_classes_fixture(
+    driver, endpoints_with_command_classes_state
+):
+    """Mock a node with command classes on an endpoint."""
+    node = Node(driver.client, deepcopy(endpoints_with_command_classes_state))
     driver.controller.nodes[node.node_id] = node
     return node
 

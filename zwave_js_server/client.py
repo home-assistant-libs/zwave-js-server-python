@@ -125,7 +125,7 @@ class Client:
         try:
             return await future
         finally:
-            self._result_futures.pop(message_id)
+            self._result_futures.pop(message_id, None)
 
     async def async_send_command_no_wait(
         self, message: dict[str, Any], require_schema: int | None = None
@@ -464,8 +464,8 @@ class Client:
         if msg["type"] == "result":
             future = self._result_futures.get(msg["messageId"])
 
-            if future is None:
-                # no listener for this result
+            if future is None or future.cancelled():
+                # no listener for this result or the future was canceled
                 return
 
             if self._record_messages and msg["messageId"] not in LISTEN_MESSAGE_IDS:

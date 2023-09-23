@@ -169,12 +169,12 @@ async def test_highest_security_value(lock_schlage_be469, ring_keypad):
     assert ring_keypad.highest_security_class is None
 
 
-async def test_command_classes(is_secure_unknown):
+async def test_command_classes(endpoints_with_command_classes):
     """Test command_classes property on endpoint."""
-    assert len(is_secure_unknown.endpoints[0].command_classes) == 17
-    assert is_secure_unknown.endpoints[0].command_classes[0].id == 38
+    assert len(endpoints_with_command_classes.endpoints[0].command_classes) == 17
+    assert endpoints_with_command_classes.endpoints[0].command_classes[0].id == 38
     assert (
-        is_secure_unknown.endpoints[0].command_classes[0].command_class
+        endpoints_with_command_classes.endpoints[0].command_classes[0].command_class
         == CommandClass.SWITCH_MULTILEVEL
     )
 
@@ -963,7 +963,7 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
             "event": "notification",
             "nodeId": 23,
             "ccId": CommandClass.SWITCH_MULTILEVEL.value,
-            "args": {"eventType": 4},
+            "args": {"eventType": 4, "eventTypeLabel": "c"},
         },
     )
 
@@ -975,6 +975,7 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
         event.data["notification"].event_type
         == MultilevelSwitchCommand.START_LEVEL_CHANGE
     )
+    assert event.data["notification"].event_type_label == "c"
 
 
 async def test_notification_unknown(lock_schlage_be469: node_pkg.Node, caplog):
@@ -1008,15 +1009,23 @@ async def test_entry_control_notification(ring_keypad):
             "event": "notification",
             "nodeId": 10,
             "ccId": 111,
-            "args": {"eventType": 5, "dataType": 2, "eventData": "555"},
+            "args": {
+                "eventType": 5,
+                "eventTypeLabel": "foo",
+                "dataType": 2,
+                "dataTypeLabel": "bar",
+                "eventData": "cat",
+            },
         },
     )
     node.handle_notification(event)
     assert event.data["notification"].command_class == CommandClass.ENTRY_CONTROL
     assert event.data["notification"].node_id == 10
     assert event.data["notification"].event_type == EntryControlEventType.ARM_AWAY
+    assert event.data["notification"].event_type_label == "foo"
     assert event.data["notification"].data_type == EntryControlDataType.ASCII
-    assert event.data["notification"].event_data == "555"
+    assert event.data["notification"].data_type_label == "bar"
+    assert event.data["notification"].event_data == "cat"
 
 
 async def test_interview_events(multisensor_6):
@@ -1651,6 +1660,26 @@ async def test_has_security_class(multisensor_6: node_pkg.Node, uuid4, mock_comm
     }
 
 
+async def test_has_security_class_undefined(
+    multisensor_6: node_pkg.Node, uuid4, mock_command
+):
+    """Test node.has_security_class command response is undefined."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.has_security_class", "nodeId": node.node_id},
+        {},
+    )
+    assert await node.async_has_security_class(SecurityClass.S2_AUTHENTICATED) is None
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.has_security_class",
+        "nodeId": node.node_id,
+        "securityClass": SecurityClass.S2_AUTHENTICATED.value,
+        "messageId": uuid4,
+    }
+
+
 async def test_get_highest_security_class(
     multisensor_6: node_pkg.Node, uuid4, mock_command
 ):
@@ -1663,6 +1692,25 @@ async def test_get_highest_security_class(
     assert (
         await node.async_get_highest_security_class() == SecurityClass.S2_AUTHENTICATED
     )
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.get_highest_security_class",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_highest_security_class_undefined(
+    multisensor_6: node_pkg.Node, uuid4, mock_command
+):
+    """Test node.get_highest_security_class command response is undefined."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.get_highest_security_class", "nodeId": node.node_id},
+        {},
+    )
+    assert await node.async_get_highest_security_class() is None
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
@@ -2199,9 +2247,32 @@ async def test_manually_idle_notification_value(
         await node.async_manually_idle_notification_value(f"{node.node_id}-112-0-255")
 
 
-async def test_set_date_and_time(multisensor_6: node_pkg.Node, uuid4, mock_command):
-    """Test node.set_date_and_time command."""
+async def test_set_date_and_time_no_wait(
+    multisensor_6: node_pkg.Node, uuid4, mock_command
+):
+    """Test node.set_date_and_time command without waiting."""
     node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.set_date_and_time", "nodeId": node.node_id},
+        {"success": True},
+    )
+
+    assert await node.async_set_date_and_time(datetime(2020, 1, 1, 12, 0, 0)) is None
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.set_date_and_time",
+        "nodeId": node.node_id,
+        "date": "2020-01-01T12:00:00",
+        "messageId": uuid4,
+    }
+
+
+async def test_set_date_and_time(
+    climate_radio_thermostat_ct100_plus: node_pkg.Node, uuid4, mock_command
+):
+    """Test node.set_date_and_time command while waiting for response."""
+    node = climate_radio_thermostat_ct100_plus
     ack_commands = mock_command(
         {"command": "node.set_date_and_time", "nodeId": node.node_id},
         {"success": True},
@@ -2216,10 +2287,6 @@ async def test_set_date_and_time(multisensor_6: node_pkg.Node, uuid4, mock_comma
         "date": "2020-01-01T12:00:00",
         "messageId": uuid4,
     }
-
-    # Raise ValueError if the value is not for the right CommandClass
-    with pytest.raises(ValueError):
-        await node.async_manually_idle_notification_value(f"{node.node_id}-112-0-255")
 
 
 async def test_get_date_and_time(multisensor_6: node_pkg.Node, uuid4, mock_command):
@@ -2317,11 +2384,6 @@ async def test_unknown_event(multisensor_6: node_pkg.Node):
         assert multisensor_6.receive_event(Event("unknown_event", {"source": "node"}))
 
 
-async def test_is_secure_unknown(is_secure_unknown: node_pkg.Node):
-    """Test that a node with isSecure = `unknown` gets handled appropriately."""
-    assert not is_secure_unknown.is_secure
-
-
 async def test_default_volume(multisensor_6: node_pkg.Node, uuid4, mock_command):
     """Test default volume."""
     node = multisensor_6
@@ -2378,3 +2440,29 @@ async def test_has_device_config_changed(
         "nodeId": node.node_id,
         "messageId": uuid4,
     }
+
+
+async def test_has_device_config_changed_undefined(
+    multisensor_6: node_pkg.Node, uuid4, mock_command
+):
+    """Test has device config changed returns undefined."""
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.has_device_config_changed", "nodeId": node.node_id},
+        {},
+    )
+    assert await node.async_has_device_config_changed() is None
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.has_device_config_changed",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }
+
+
+async def test_is_secure_none(client, multisensor_6_state):
+    """Test is_secure when it's not included in the dump."""
+    node_state = deepcopy(multisensor_6_state)
+    node_state.pop("isSecure")
+    node = node_pkg.Node(client, node_state)
+    assert node.is_secure is None
