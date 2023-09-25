@@ -1893,7 +1893,7 @@ async def test_begin_ota_firmware_update(multisensor_6, uuid4, mock_command):
     assert ack_commands[0] == {
         "command": "controller.firmware_update_ota",
         "nodeId": multisensor_6.node_id,
-        "updateInfo": [FIRMWARE_UPDATE_INFO],
+        "updateInfo": FIRMWARE_UPDATE_INFO,
         "messageId": uuid4,
     }
 
