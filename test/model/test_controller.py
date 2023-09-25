@@ -1883,7 +1883,7 @@ async def test_begin_ota_firmware_update(multisensor_6, uuid4, mock_command):
         {"result": {"status": 255, "success": True, "reInterview": False}},
     )
     result = await multisensor_6.client.driver.controller.async_firmware_update_ota(
-        multisensor_6, [NodeFirmwareUpdateInfo.from_dict(FIRMWARE_UPDATE_INFO)]
+        multisensor_6, NodeFirmwareUpdateInfo.from_dict(FIRMWARE_UPDATE_INFO)
     )
     assert result.status == 255
     assert result.success

@@ -804,14 +804,14 @@ class Controller(EventBase):
         return [NodeFirmwareUpdateInfo.from_dict(update) for update in data["updates"]]
 
     async def async_firmware_update_ota(
-        self, node: Node, update_info: list[NodeFirmwareUpdateInfo]
+        self, node: Node, update_info: NodeFirmwareUpdateInfo
     ) -> NodeFirmwareUpdateResult:
         """Send firmwareUpdateOTA command to Controller."""
         data = await self.client.async_send_command(
             {
                 "command": "controller.firmware_update_ota",
                 "nodeId": node.node_id,
-                "updateInfo": [update.to_dict() for update in update_info],
+                "updateInfo": update_info.to_dict(),
             },
             require_schema=32,
         )
