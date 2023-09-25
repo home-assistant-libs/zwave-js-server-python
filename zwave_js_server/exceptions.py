@@ -103,7 +103,7 @@ class FailedZWaveCommand(FailedCommand):
         super().__init__(
             message_id,
             "zwave_error",
-            f"Z-Wave error {zwave_error_code}: {zwave_error_message}",
+            f"Z-Wave error {zwave_error_code} - {zwave_error_message}",
         )
         self.zwave_error_code = zwave_error_code
         self.zwave_error_message = zwave_error_message
