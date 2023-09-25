@@ -1,2 +1,2 @@
 aiohttp==3.8.5
-pydantic==2.3.0
+pydantic==2.4.0
