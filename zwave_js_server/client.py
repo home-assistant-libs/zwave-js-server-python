@@ -6,6 +6,7 @@ import logging
 import pprint
 import uuid
 from collections import defaultdict
+from collections.abc import Callable
 from copy import deepcopy
 from datetime import datetime
 from operator import itemgetter
@@ -15,9 +16,11 @@ from typing import Any, cast
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, client_exceptions
 
 from .const import (
+    LOG_LEVEL_MAP,
     MAX_SERVER_SCHEMA_VERSION,
     MIN_SERVER_SCHEMA_VERSION,
     PACKAGE_NAME,
+    LogLevel,
     __version__,
 )
 from .event import Event
@@ -33,6 +36,7 @@ from .exceptions import (
     NotConnected,
 )
 from .model.driver import Driver
+from .model.log_message import LogMessage
 from .model.version import VersionInfo, VersionInfoDataType
 
 SIZE_PARSE_JSON_EXECUTOR = 8192
@@ -47,6 +51,9 @@ LISTEN_MESSAGE_IDS = (
     INITIALIZE_MESSAGE_ID,
     START_LISTENING_MESSAGE_ID,
 )
+
+LOGGER = logging.getLogger(__package__)
+SERVER_LOGGER = logging.getLogger(f"{__package__}.server")
 
 
 class Client:
@@ -73,10 +80,13 @@ class Client:
             PACKAGE_NAME: __version__,
             **(additional_user_agent_components or {}),
         }
-        self._logger = logging.getLogger(__package__)
         self._loop = asyncio.get_running_loop()
         self._result_futures: dict[str, asyncio.Future] = {}
         self._shutdown_complete_event: asyncio.Event | None = None
+
+        self._server_logger_unsubs: list[Callable[[], None]] = []
+        self._server_logging_enabled: bool = False
+
         self._record_messages = record_messages
         self._recorded_commands: defaultdict[str, dict] = defaultdict(dict)
         self._recorded_events: list[dict] = []
@@ -137,7 +147,7 @@ class Client:
         if self.driver is not None:
             raise InvalidState("Re-connected with existing driver")
 
-        self._logger.debug("Trying to connect")
+        LOGGER.debug("Trying to connect")
         try:
             self._client = await self.aiohttp_session.ws_connect(
                 self.ws_server_url,
@@ -157,15 +167,15 @@ class Client:
 
         # basic check for server schema version compatibility
         if (
-            self.version.min_schema_version > MAX_SERVER_SCHEMA_VERSION
-            or self.version.max_schema_version < MIN_SERVER_SCHEMA_VERSION
+            version.min_schema_version > MAX_SERVER_SCHEMA_VERSION
+            or version.max_schema_version < MIN_SERVER_SCHEMA_VERSION
         ):
             await self._client.close()
-            assert self.version
+            assert version
             raise InvalidServerVersion(
-                self.version,
+                version,
                 MIN_SERVER_SCHEMA_VERSION,
-                f"Z-Wave JS Server version ({self.version.server_version}) is "
+                f"Z-Wave JS Server version ({version.server_version}) is "
                 "incompatible. Update the Z-Wave JS Server to a version that supports "
                 f"at least api schema {MIN_SERVER_SCHEMA_VERSION}",
             )
@@ -173,10 +183,10 @@ class Client:
         # this is a bit future proof as we might decide to use a pinned version at some point
         # for now we just negotiate the highest available schema version and
         # guard incompatibility with the MIN_SERVER_SCHEMA_VERSION
-        if self.version.max_schema_version < MAX_SERVER_SCHEMA_VERSION:
-            self.schema_version = self.version.max_schema_version
+        if version.max_schema_version < MAX_SERVER_SCHEMA_VERSION:
+            self.schema_version = version.max_schema_version
 
-        self._logger.info(
+        LOGGER.info(
             "Connected to Home %s (Server %s, Driver %s, Using Schema %s)",
             version.home_id,
             version.server_version,
@@ -254,7 +264,7 @@ class Client:
 
             driver_ready.set()
 
-            self._logger.info(
+            LOGGER.info(
                 "Z-Wave JS initialized. %s nodes", len(self.driver.controller.nodes)
             )
 
@@ -263,7 +273,7 @@ class Client:
             pass
 
         finally:
-            self._logger.debug("Listen completed. Cleaning up")
+            LOGGER.debug("Listen completed. Cleaning up")
 
             for future in self._result_futures.values():
                 future.cancel()
@@ -277,7 +287,7 @@ class Client:
 
     async def disconnect(self) -> None:
         """Disconnect the client."""
-        self._logger.debug("Closing client connection")
+        LOGGER.debug("Closing client connection")
 
         if not self.connected:
             return
@@ -295,6 +305,18 @@ class Client:
 
         self._shutdown_complete_event = None
         self.driver = None
+
+    async def async_start_listening_logs(self) -> None:
+        """Send command to start listening to log events."""
+        await self.async_send_command(
+            {"command": "start_listening_logs"}, require_schema=31
+        )
+
+    async def async_stop_listening_logs(self) -> None:
+        """Send command to stop listening to log events."""
+        await self.async_send_command(
+            {"command": "stop_listening_logs"}, require_schema=31
+        )
 
     def begin_recording_messages(self) -> None:
         """Begin recording messages for replay later."""
@@ -318,6 +340,85 @@ class Client:
         self._recorded_events.clear()
 
         return list(data)
+
+    @property
+    def server_logging_enabled(self) -> bool:
+        """Return whether server logging is currently enabled."""
+        return self._server_logging_enabled
+
+    async def enable_server_logging(self) -> None:
+        """
+        Enable logging from the server.
+
+        Embeds server logs in the library's logs.
+        """
+        if not self.connected or not self.driver:
+            raise InvalidState(
+                "Can't enable server logging when not connected to server"
+            )
+        if (log_level := self.driver.log_config.level) and (
+            level := LOG_LEVEL_MAP[log_level]
+        ) < LOGGER.level:
+            LOGGER.warning(
+                (
+                    "Server logging is currently more verbose than library logging, "
+                    "setting library log level to %s to match."
+                ),
+                logging.getLevelName(level),
+            )
+            LOGGER.setLevel(level)
+
+        if self._server_logging_enabled:
+            return
+
+        self._server_logging_enabled = True
+
+        def handle_server_logs(event: dict) -> None:
+            """Handle driver `logging` event."""
+            log_msg: LogMessage = event["log_message"]
+            log_level = LogLevel(log_msg.level)
+            SERVER_LOGGER.log(
+                LOG_LEVEL_MAP[log_level],
+                "%s:\n%s",
+                log_msg.timestamp,
+                "\n".join(log_msg.formatted_message),
+            )
+
+        def handle_log_config_updates(event: dict) -> None:
+            """Handle driver `log config updated` events."""
+            if (log_level := event["config"]["level"].lower()) and (
+                level := LOG_LEVEL_MAP[log_level]
+            ) < LOGGER.level:
+                LOGGER.warning(
+                    (
+                        "Server logging is currently more verbose than library "
+                        "logging, setting library log level to %s to match."
+                    ),
+                    logging.getLevelName(level),
+                )
+            LOGGER.setLevel(level)
+
+        self._server_logger_unsubs = [
+            self.driver.on("logging", handle_server_logs),
+            self.driver.on("log config updated", handle_log_config_updates),
+        ]
+
+        await self.async_start_listening_logs()
+
+    async def disable_server_logging(self) -> None:
+        """Disable logging from the server."""
+        if not self.connected or not self.driver:
+            raise InvalidState(
+                "Can't disable server logging when not connected to server"
+            )
+        if not self._server_logging_enabled or not self._server_logger_unsubs:
+            LOGGER.info("Server logging is already disabled")
+            return
+
+        for unsub in self._server_logger_unsubs:
+            unsub()
+        self._server_logger_unsubs.clear()
+        self._server_logging_enabled = False
 
     async def receive_until_closed(self) -> None:
         """Receive messages until client is closed."""
@@ -350,8 +451,8 @@ class Client:
         except ValueError as err:
             raise InvalidMessage("Received invalid JSON.") from err
 
-        if self._logger.isEnabledFor(logging.DEBUG):
-            self._logger.debug("Received message:\n%s\n", pprint.pformat(msg))
+        if LOGGER.isEnabledFor(logging.DEBUG):
+            LOGGER.debug("Received message:\n%s\n", pprint.pformat(msg))
 
         return data
 
@@ -391,7 +492,7 @@ class Client:
 
         if msg["type"] != "event":
             # Can't handle
-            self._logger.debug(
+            LOGGER.debug(
                 "Received message with unknown type '%s': %s",
                 msg["type"],
                 msg,
@@ -419,8 +520,8 @@ class Client:
         if not self.connected:
             raise NotConnected
 
-        if self._logger.isEnabledFor(logging.DEBUG):
-            self._logger.debug("Publishing message:\n%s\n", pprint.pformat(message))
+        if LOGGER.isEnabledFor(logging.DEBUG):
+            LOGGER.debug("Publishing message:\n%s\n", pprint.pformat(message))
 
         assert self._client
         assert "messageId" in message
@@ -438,18 +539,6 @@ class Client:
             )
 
         await self._client.send_json(message)
-
-    async def async_start_listening_logs(self) -> None:
-        """Send command to start listening to log events."""
-        await self.async_send_command(
-            {"command": "start_listening_logs"}, require_schema=31
-        )
-
-    async def async_stop_listening_logs(self) -> None:
-        """Send command to stop listening to log events."""
-        await self.async_send_command(
-            {"command": "stop_listening_logs"}, require_schema=31
-        )
 
     async def __aenter__(self) -> "Client":
         """Connect to the websocket."""

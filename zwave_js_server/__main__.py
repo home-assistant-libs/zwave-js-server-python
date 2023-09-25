@@ -12,7 +12,7 @@ from .client import Client
 from .dump import dump_msgs
 from .version import get_server_version
 
-logger = logging.getLogger(__package__)
+LOGGER = logging.getLogger(__package__)
 
 
 def get_arguments() -> argparse.Namespace:
@@ -60,7 +60,7 @@ async def print_version(
     args: argparse.Namespace, session: aiohttp.ClientSession
 ) -> None:
     """Print the version of the server."""
-    logger.setLevel(logging.WARNING)
+    LOGGER.setLevel(logging.WARNING)
     version = await get_server_version(args.url, session)
     print("Driver:", version.driver_version)
     print("Server:", version.server_version)
@@ -112,7 +112,7 @@ def log_value_updated(event: dict) -> None:
     else:
         description = f"{node.device_class.generic} (missing device config)"
 
-    logger.info(
+    LOGGER.info(
         "Node %s %s (%s) changed to %s",
         description,
         value.property_name or "",
