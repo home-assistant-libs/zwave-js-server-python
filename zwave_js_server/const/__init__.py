@@ -11,9 +11,9 @@ PACKAGE_NAME = "zwave-js-server-python"
 __version__ = metadata.version(PACKAGE_NAME)
 
 # minimal server schema version we can handle
-MIN_SERVER_SCHEMA_VERSION = 31
+MIN_SERVER_SCHEMA_VERSION = 32
 # max server schema version we can handle (and our code is compatible with)
-MAX_SERVER_SCHEMA_VERSION = 31
+MAX_SERVER_SCHEMA_VERSION = 32
 
 VALUE_UNKNOWN = "unknown"
 

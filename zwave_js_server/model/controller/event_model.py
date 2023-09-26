@@ -66,17 +66,17 @@ class GrantSecurityClassesEventModel(BaseControllerEventModel):
     requested: InclusionGrantDataType
 
 
-class HealNetworkDoneEventModel(BaseControllerEventModel):
-    """Model for `heal network done` event data."""
+class RebuildRoutesDoneEventModel(BaseControllerEventModel):
+    """Model for `rebuild routes done` event data."""
 
-    event: Literal["heal network done"]
+    event: Literal["rebuild routes done"]
     result: dict[int, str]
 
 
-class HealNetworkProgressEventModel(BaseControllerEventModel):
-    """Model for `heal network progress` event data."""
+class RebuildRoutesProgressEventModel(BaseControllerEventModel):
+    """Model for `rebuild routes progress` event data."""
 
-    event: Literal["heal network progress"]
+    event: Literal["rebuild routes progress"]
     progress: dict[int, str]
 
 
@@ -190,8 +190,8 @@ CONTROLLER_EVENT_MODEL_MAP: dict[str, type["BaseControllerEventModel"]] = {
     "firmware update finished": FirmwareUpdateFinishedEventModel,
     "firmware update progress": FirmwareUpdateProgressEventModel,
     "grant security classes": GrantSecurityClassesEventModel,
-    "heal network done": HealNetworkDoneEventModel,
-    "heal network progress": HealNetworkProgressEventModel,
+    "rebuild routes done": RebuildRoutesDoneEventModel,
+    "rebuild routes progress": RebuildRoutesProgressEventModel,
     "identify": IdentifyEventModel,
     "inclusion aborted": InclusionAbortedEventModel,
     "inclusion failed": InclusionFailedEventModel,

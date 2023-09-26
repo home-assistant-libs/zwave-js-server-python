@@ -209,6 +209,7 @@ async def test_listen_not_success(client_session, url, result, driver_ready):
     """Test receive result message with success False on listen."""
     result["success"] = False
     result["errorCode"] = "error_code"
+    result["message"] = "test"
     client = Client(url, client_session)
     await client.connect()
 
@@ -224,6 +225,7 @@ async def test_initialize_not_success(
     """Test receive result message with success False on listen."""
     initialize_data["success"] = False
     initialize_data["errorCode"] = "error_code"
+    initialize_data["message"] = "test"
     client = Client(url, client_session)
     await client.connect()
 
@@ -239,6 +241,7 @@ async def test_get_log_config_not_success(
     """Test receive log config message with success False on listen."""
     get_log_config_data["success"] = False
     get_log_config_data["errorCode"] = "error_code"
+    get_log_config_data["message"] = "test"
     client = Client(url, client_session)
     await client.connect()
 
@@ -310,9 +313,7 @@ async def test_command_error_handling(client, mock_command):
     """Test error handling."""
     mock_command(
         {"command": "some_command"},
-        {
-            "errorCode": "unknown_command",
-        },
+        {"errorCode": "unknown_command", "message": "test"},
         False,
     )
 
@@ -320,6 +321,7 @@ async def test_command_error_handling(client, mock_command):
         await client.async_send_command({"command": "some_command"})
 
     assert raised.value.error_code == "unknown_command"
+    assert str(raised.value) == "unknown_command: test"
 
     mock_command(
         {"command": "some_zjs_command"},
@@ -455,7 +457,7 @@ async def test_additional_user_agent_components(client_session, url):
             {
                 "command": "initialize",
                 "messageId": "initialize",
-                "schemaVersion": 31,
+                "schemaVersion": 32,
                 "additionalUserAgentComponents": {
                     "zwave-js-server-python": __version__,
                     "foo": "bar",

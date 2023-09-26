@@ -22,6 +22,7 @@ class BaseNotificationDataType(TypedDict):
     source: Literal["node"]  # required
     event: Literal["notification"]  # required
     nodeId: int  # required
+    endpointIndex: int  # required
     ccId: int  # required
 
 
@@ -32,11 +33,13 @@ class BaseNotification:
     node: Node
     data: BaseNotificationDataType
     node_id: int = field(init=False)
+    endpoint_idx: int = field(init=False)
     command_class: int = field(init=False)
 
     def __post_init__(self) -> None:
         """Post initialization."""
         self.node_id = self.data["nodeId"]
+        self.endpoint_idx = self.data["endpointIndex"]
         self.command_class = self.data["ccId"]
 
 

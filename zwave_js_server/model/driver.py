@@ -159,10 +159,6 @@ class Driver(EventBase):
             "set_preferred_scales", scales=scales, require_schema=6
         )
 
-    async def async_enable_error_reporting(self) -> None:
-        """Send command to enable Sentry error reporting."""
-        await self._async_send_command("enable_error_reporting", require_schema=16)
-
     async def async_hard_reset(self) -> None:
         """Send command to hard reset controller."""
         await self._async_send_command("hard_reset", require_schema=25)

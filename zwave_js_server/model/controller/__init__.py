@@ -4,10 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal, cast
 
-from zwave_js_server.model.node.firmware import (
-    NodeFirmwareUpdateFileInfo,
-    NodeFirmwareUpdateInfo,
-)
+from zwave_js_server.model.node.firmware import NodeFirmwareUpdateInfo
 
 from ...const import (
     MINIMUM_QR_STRING_LENGTH,
@@ -33,6 +30,11 @@ from .inclusion_and_provisioning import (
     InclusionGrant,
     ProvisioningEntry,
     QRProvisioningInformation,
+)
+from .rebuild_routes import (
+    RebuildRoutesOptions,
+    RebuildRoutesOptionsDataType,
+    RebuildRoutesStatus,
 )
 from .statistics import (
     ControllerLifelineRoutes,
@@ -73,7 +75,8 @@ class Controller(EventBase):
         super().__init__()
         self.client = client
         self.nodes: dict[int, Node] = {}
-        self._heal_network_progress: dict[int, str] | None = None
+        self._rebuild_routes_progress: dict[Node, RebuildRoutesStatus] | None = None
+        self._last_rebuild_routes_result: dict[Node, RebuildRoutesStatus] | None = None
         self._statistics = ControllerStatistics(DEFAULT_CONTROLLER_STATISTICS)
         self._firmware_update_progress: ControllerFirmwareUpdateProgress | None = None
         for node_state in state["nodes"]:
@@ -190,9 +193,9 @@ class Controller(EventBase):
         return self.data.get("supportsTimers")
 
     @property
-    def is_heal_network_active(self) -> bool | None:
-        """Return is_heal_network_active."""
-        return self.data.get("isHealNetworkActive")
+    def is_rebuilding_routes(self) -> bool | None:
+        """Return is_rebuilding_routes."""
+        return self.data.get("isRebuildingRoutes")
 
     @property
     def statistics(self) -> ControllerStatistics:
@@ -200,9 +203,14 @@ class Controller(EventBase):
         return self._statistics
 
     @property
-    def heal_network_progress(self) -> dict[int, str] | None:
-        """Return heal network progress state."""
-        return self._heal_network_progress
+    def rebuild_routes_progress(self) -> dict[Node, RebuildRoutesStatus] | None:
+        """Return rebuild routes progress state."""
+        return self._rebuild_routes_progress
+
+    @property
+    def last_rebuild_routes_result(self) -> dict[Node, RebuildRoutesStatus] | None:
+        """Return the last rebuild routes result."""
+        return self._last_rebuild_routes_result
 
     @property
     def inclusion_state(self) -> InclusionState:
@@ -461,29 +469,35 @@ class Controller(EventBase):
         )
         return cast(bool, data["success"])
 
-    async def async_heal_node(self, node: Node) -> bool:
-        """Send healNode command to Controller."""
+    async def async_rebuild_node_routes(self, node: Node) -> bool:
+        """Send rebuildNodeRoutes command to Controller."""
         data = await self.client.async_send_command(
-            {"command": "controller.heal_node", "nodeId": node.node_id}
+            {"command": "controller.rebuild_node_routes", "nodeId": node.node_id},
+            require_schema=32,
         )
         return cast(bool, data["success"])
 
-    async def async_begin_healing_network(self) -> bool:
-        """Send beginHealingNetwork command to Controller."""
-        data = await self.client.async_send_command(
-            {"command": "controller.begin_healing_network"}
-        )
+    async def async_begin_rebuilding_routes(
+        self, options: RebuildRoutesOptions | None = None
+    ) -> bool:
+        """Send beginRebuildingRoutes command to Controller."""
+        msg: dict[str, str | RebuildRoutesOptionsDataType] = {
+            "command": "controller.begin_rebuilding_routes"
+        }
+        if options:
+            msg["options"] = options.to_dict()
+        data = await self.client.async_send_command(msg, require_schema=32)
         return cast(bool, data["success"])
 
-    async def async_stop_healing_network(self) -> bool:
-        """Send stopHealingNetwork command to Controller."""
+    async def async_stop_rebuilding_routes(self) -> bool:
+        """Send stopRebuildingRoutes command to Controller."""
         data = await self.client.async_send_command(
-            {"command": "controller.stop_healing_network"}
+            {"command": "controller.stop_rebuilding_routes"}, require_schema=32
         )
         success = cast(bool, data["success"])
         if success:
-            self._heal_network_progress = None
-            self.data["isHealNetworkActive"] = False
+            self._rebuild_routes_progress = None
+            self.data["isRebuildingRoutes"] = False
         return success
 
     async def async_is_failed_node(self, node: Node) -> bool:
@@ -784,22 +798,22 @@ class Controller(EventBase):
                 "apiKey": api_key,
                 "includePrereleases": include_prereleases,
             },
-            require_schema=24,
+            require_schema=32,
         )
         assert data
         return [NodeFirmwareUpdateInfo.from_dict(update) for update in data["updates"]]
 
     async def async_firmware_update_ota(
-        self, node: Node, updates: list[NodeFirmwareUpdateFileInfo]
+        self, node: Node, update_info: NodeFirmwareUpdateInfo
     ) -> NodeFirmwareUpdateResult:
         """Send firmwareUpdateOTA command to Controller."""
         data = await self.client.async_send_command(
             {
                 "command": "controller.firmware_update_ota",
                 "nodeId": node.node_id,
-                "updates": [update.to_dict() for update in updates],
+                "updateInfo": update_info.to_dict(),
             },
-            require_schema=29,
+            require_schema=32,
         )
         return NodeFirmwareUpdateResult(node, data["result"])
 
@@ -880,16 +894,22 @@ class Controller(EventBase):
         # Remove client from node since it's no longer connected to the controller
         event.data["node"].client = None
 
-    def handle_heal_network_progress(self, event: Event) -> None:
-        """Process a heal network progress event."""
-        self._heal_network_progress = event.data["progress"].copy()
-        self.data["isHealNetworkActive"] = True
+    def handle_rebuild_routes_progress(self, event: Event) -> None:
+        """Process a rebuild routes progress event."""
+        self._rebuild_routes_progress = {
+            self.nodes[node_id]: RebuildRoutesStatus(status)
+            for node_id, status in event.data["progress"].items()
+        }
+        self.data["isRebuildingRoutes"] = True
 
-    def handle_heal_network_done(self, event: Event) -> None:
-        """Process a heal network done event."""
-        # pylint: disable=unused-argument
-        self._heal_network_progress = None
-        self.data["isHealNetworkActive"] = False
+    def handle_rebuild_routes_done(self, event: Event) -> None:
+        """Process a rebuild routes done event."""
+        self._last_rebuild_routes_result = {
+            self.nodes[node_id]: RebuildRoutesStatus(status)
+            for node_id, status in event.data["result"].items()
+        }
+        self._rebuild_routes_progress = None
+        self.data["isRebuildingRoutes"] = False
 
     def handle_statistics_updated(self, event: Event) -> None:
         """Process a statistics updated event."""
