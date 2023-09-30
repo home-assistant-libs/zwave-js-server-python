@@ -297,7 +297,7 @@ class NodeFirmwareUpdateInfo:
         return cls(
             version=data["version"],
             changelog=data["changelog"],
-            channel=data.get("channel", "stable"),
+            channel=data["channel"],
             files=[
                 NodeFirmwareUpdateFileInfo.from_dict(file) for file in data["files"]
             ],
