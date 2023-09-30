@@ -460,7 +460,8 @@ class Client:
             raise InvalidMessage("Received invalid JSON.") from err
 
         if LOGGER.isEnabledFor(logging.DEBUG) and not (
-            data.get("type") == "event"
+            self.server_logging_enabled
+            and data.get("type") == "event"
             and data.get("event", {}).get("event") == "logging"
         ):
             LOGGER.debug("Received message:\n%s\n", pprint.pformat(msg))
