@@ -511,7 +511,9 @@ class Client:
             )
             return
 
-        if self._record_messages:
+        if self._record_messages and not (
+            self.server_logging_enabled and msg["event"]["event"] == "logging"
+        ):
             self._recorded_events.append(
                 {
                     "record_type": "event",
