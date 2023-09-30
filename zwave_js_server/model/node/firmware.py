@@ -265,7 +265,7 @@ class NodeFirmwareUpdateDeviceID:
         return cast(NodeFirmwareUpdateDeviceIDDataType, data)
 
 
-class NodeFirmwareUpdateInfoDataType(TypedDict):
+class NodeFirmwareUpdateInfoDataType(TypedDict, total=False):
     """Represent a firmware update info data dict type."""
 
     version: str
@@ -297,7 +297,7 @@ class NodeFirmwareUpdateInfo:
         return cls(
             version=data["version"],
             changelog=data["changelog"],
-            channel=data["channel"],
+            channel=data.get("channel", "stable"),
             files=[
                 NodeFirmwareUpdateFileInfo.from_dict(file) for file in data["files"]
             ],
