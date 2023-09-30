@@ -459,7 +459,11 @@ class Client:
         except ValueError as err:
             raise InvalidMessage("Received invalid JSON.") from err
 
-        if LOGGER.isEnabledFor(logging.DEBUG):
+        if LOGGER.isEnabledFor(logging.DEBUG) and not (
+            self.server_logging_enabled
+            and data.get("type") == "event"
+            and data.get("event", {}).get("event") == "logging"
+        ):
             LOGGER.debug("Received message:\n%s\n", pprint.pformat(msg))
 
         return data
@@ -507,7 +511,9 @@ class Client:
             )
             return
 
-        if self._record_messages:
+        if self._record_messages and not (
+            self.server_logging_enabled and msg["event"]["event"] == "logging"
+        ):
             self._recorded_events.append(
                 {
                     "record_type": "event",

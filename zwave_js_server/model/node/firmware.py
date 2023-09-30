@@ -265,7 +265,7 @@ class NodeFirmwareUpdateDeviceID:
         return cast(NodeFirmwareUpdateDeviceIDDataType, data)
 
 
-class NodeFirmwareUpdateInfoDataType(TypedDict):
+class NodeFirmwareUpdateInfoDataType(TypedDict, total=False):
     """Represent a firmware update info data dict type."""
 
     version: str
