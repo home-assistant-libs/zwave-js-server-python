@@ -1871,7 +1871,7 @@ async def test_get_available_firmware_updates(multisensor_6, uuid4, mock_command
         "command": "controller.get_available_firmware_updates",
         "nodeId": multisensor_6.node_id,
         "apiKey": "test",
-        "includePrereleases": False,
+        "includePrereleases": True,
         "messageId": uuid4,
     }
 
