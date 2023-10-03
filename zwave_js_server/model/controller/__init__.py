@@ -788,7 +788,7 @@ class Controller(EventBase):
         return cast(bool, data["progress"])
 
     async def async_get_available_firmware_updates(
-        self, node: Node, api_key: str, include_prereleases: bool = False
+        self, node: Node, api_key: str, include_prereleases: bool = True
     ) -> list[NodeFirmwareUpdateInfo]:
         """Send getAvailableFirmwareUpdates command to Controller."""
         data = await self.client.async_send_command(
