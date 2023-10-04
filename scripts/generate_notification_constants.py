@@ -97,6 +97,7 @@ def generate_int_enum_class_definition(
     get_id_func: Callable | None = None,
     docstring_info: str = "",
     base_class: str = "IntEnum",
+    include_missing: bool = False,
 ) -> list[str]:
     """Generate an IntEnum class definition as an array of lines of string."""
     class_def: list[str] = []
@@ -107,10 +108,21 @@ def generate_int_enum_class_definition(
     class_def.append(f"    {docstring}")
     if enum_ref_url:
         class_def.append(f"    # {enum_ref_url}")
+    if include_missing:
+        class_def.append("    UNKNOWN = -1")
     for enum_name, enum_id in sorted(enum_map.items(), key=lambda x: x[0]):
         if get_id_func:
             enum_id = get_id_func(enum_id)
         class_def.append(f"    {enum_name_format(enum_name, False)} = {enum_id}")
+    if include_missing:
+        class_def.extend(
+            [
+                "    @classmethod",
+                "    def _missing_(cls: type, value: object):  # noqa: ARG003",
+                '        """Set default enum member if an unknown value is provided."""',
+                f"        return {class_name}.UNKNOWN",
+            ]
+        )
     return class_def
 
 
@@ -170,6 +182,7 @@ for notification_type, state_variable_map in notifications.items():
                 NOTIFICATIONS_URL,
                 docstring_info=name.lower(),
                 base_class="NotificationEvent",
+                include_missing=True,
             )
         )
         _notification_type_to_enum_map[notification_type].append(
