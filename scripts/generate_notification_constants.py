@@ -102,7 +102,7 @@ def generate_int_enum_class_definition(
     """Generate an IntEnum class definition as an array of lines of string."""
     class_def: list[str] = []
     class_def.append(f"class {class_name}({base_class}):")
-    docstring = f'"""Enum for known {docstring_info} for Notification CC."""'.replace(
+    docstring = f'"""Enum for known {docstring_info}."""'.replace(
         "  ", " "
     )
     class_def.append(f"    {docstring}")
@@ -118,7 +118,7 @@ def generate_int_enum_class_definition(
         class_def.extend(
             [
                 "    @classmethod",
-                "    def _missing_(cls: type, value: object):  # noqa: ARG003",
+                f"    def _missing_(cls: type, value: object) -> {class_name}:  # noqa: ARG003",
                 '        """Set default enum member if an unknown value is provided."""',
                 f"        return {class_name}.UNKNOWN",
             ]
@@ -130,7 +130,7 @@ def generate_int_enum_base_class(class_name: str, docstring: str) -> list[str]:
     """Generate an IntEnum base class definition."""
     class_def: list[str] = []
     class_def.append(f"class {class_name}(IntEnum):")
-    class_def.append(f"\t{docstring}")
+    class_def.append(f"    {docstring}")
     return class_def
 
 
@@ -197,7 +197,7 @@ for unit_name, enum_list in notification_type_to_enum_map.items():
 
 notification_type_to_event_map_line = (
     "NOTIFICATION_TYPE_TO_EVENT_MAP: dict[NotificationType, "
-    "type[NotificationEvent]] = {"
+    "set[type[NotificationEvent]]] = {"
 )
 for notification_type, notification_events in notification_type_to_enum_map.items():
     notification_type_to_event_map_line += (
