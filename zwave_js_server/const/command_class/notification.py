@@ -104,11 +104,6 @@ class AccessControlNotificationEvent(NotificationEvent):
         """Set default enum member if an unknown value is provided."""
         return AccessControlNotificationEvent.UNKNOWN
 
-    @property
-    def unknown(self) -> AccessControlNotificationEvent:
-        """Return the unknown enum value so it can be checked."""
-        return AccessControlNotificationEvent.UNKNOWN
-
 
 class BarrierPerformingInitializationProcessNotificationEventValue(
     NotificationEventValue
@@ -127,11 +122,6 @@ class BarrierPerformingInitializationProcessNotificationEventValue(
         """Set default enum member if an unknown value is provided."""
         return BarrierPerformingInitializationProcessNotificationEventValue.UNKNOWN
 
-    @property
-    def unknown(self) -> BarrierPerformingInitializationProcessNotificationEventValue:
-        """Return the unknown enum value so it can be checked."""
-        return BarrierPerformingInitializationProcessNotificationEventValue.UNKNOWN
-
 
 class BarrierSafetyBeamObstacleNotificationEventValue(NotificationEventValue):
     """Enum for known barrier safety beam obstacle notification event value."""
@@ -146,11 +136,6 @@ class BarrierSafetyBeamObstacleNotificationEventValue(NotificationEventValue):
         cls: type, value: object
     ) -> BarrierSafetyBeamObstacleNotificationEventValue:  # noqa: ARG003
         """Set default enum member if an unknown value is provided."""
-        return BarrierSafetyBeamObstacleNotificationEventValue.UNKNOWN
-
-    @property
-    def unknown(self) -> BarrierSafetyBeamObstacleNotificationEventValue:
-        """Return the unknown enum value so it can be checked."""
         return BarrierSafetyBeamObstacleNotificationEventValue.UNKNOWN
 
 
@@ -169,11 +154,6 @@ class BarrierVacationModeNotificationEventValue(NotificationEventValue):
         """Set default enum member if an unknown value is provided."""
         return BarrierVacationModeNotificationEventValue.UNKNOWN
 
-    @property
-    def unknown(self) -> BarrierVacationModeNotificationEventValue:
-        """Return the unknown enum value so it can be checked."""
-        return BarrierVacationModeNotificationEventValue.UNKNOWN
-
 
 class DoorStateWindowDoorIsOpenNotificationEventValue(NotificationEventValue):
     """Enum for known door state window/door is open notification event value."""
@@ -188,11 +168,6 @@ class DoorStateWindowDoorIsOpenNotificationEventValue(NotificationEventValue):
         cls: type, value: object
     ) -> DoorStateWindowDoorIsOpenNotificationEventValue:  # noqa: ARG003
         """Set default enum member if an unknown value is provided."""
-        return DoorStateWindowDoorIsOpenNotificationEventValue.UNKNOWN
-
-    @property
-    def unknown(self) -> DoorStateWindowDoorIsOpenNotificationEventValue:
-        """Return the unknown enum value so it can be checked."""
         return DoorStateWindowDoorIsOpenNotificationEventValue.UNKNOWN
 
 
@@ -230,11 +205,6 @@ class ApplianceNotificationEvent(NotificationEvent):
         """Set default enum member if an unknown value is provided."""
         return ApplianceNotificationEvent.UNKNOWN
 
-    @property
-    def unknown(self) -> ApplianceNotificationEvent:
-        """Return the unknown enum value so it can be checked."""
-        return ApplianceNotificationEvent.UNKNOWN
-
 
 class ClockNotificationEvent(NotificationEvent):
     """Enum for known clock notification event."""
@@ -248,11 +218,6 @@ class ClockNotificationEvent(NotificationEvent):
     @classmethod
     def _missing_(cls: type, value: object) -> ClockNotificationEvent:  # noqa: ARG003
         """Set default enum member if an unknown value is provided."""
-        return ClockNotificationEvent.UNKNOWN
-
-    @property
-    def unknown(self) -> ClockNotificationEvent:
-        """Return the unknown enum value so it can be checked."""
         return ClockNotificationEvent.UNKNOWN
 
 
@@ -274,11 +239,6 @@ class CoAlarmNotificationEvent(NotificationEvent):
         """Set default enum member if an unknown value is provided."""
         return CoAlarmNotificationEvent.UNKNOWN
 
-    @property
-    def unknown(self) -> CoAlarmNotificationEvent:
-        """Return the unknown enum value so it can be checked."""
-        return CoAlarmNotificationEvent.UNKNOWN
-
 
 class TestStatusCarbonMonoxideTestNotificationEventValue(NotificationEventValue):
     """Enum for known test status carbon monoxide test notification event value."""
@@ -293,11 +253,6 @@ class TestStatusCarbonMonoxideTestNotificationEventValue(NotificationEventValue)
         cls: type, value: object
     ) -> TestStatusCarbonMonoxideTestNotificationEventValue:  # noqa: ARG003
         """Set default enum member if an unknown value is provided."""
-        return TestStatusCarbonMonoxideTestNotificationEventValue.UNKNOWN
-
-    @property
-    def unknown(self) -> TestStatusCarbonMonoxideTestNotificationEventValue:
-        """Return the unknown enum value so it can be checked."""
         return TestStatusCarbonMonoxideTestNotificationEventValue.UNKNOWN
 
 
@@ -321,11 +276,6 @@ class Co2AlarmNotificationEvent(NotificationEvent):
         """Set default enum member if an unknown value is provided."""
         return Co2AlarmNotificationEvent.UNKNOWN
 
-    @property
-    def unknown(self) -> Co2AlarmNotificationEvent:
-        """Return the unknown enum value so it can be checked."""
-        return Co2AlarmNotificationEvent.UNKNOWN
-
 
 class TestStatusCarbonDioxideTestNotificationEventValue(NotificationEventValue):
     """Enum for known test status carbon dioxide test notification event value."""
@@ -340,11 +290,6 @@ class TestStatusCarbonDioxideTestNotificationEventValue(NotificationEventValue):
         cls: type, value: object
     ) -> TestStatusCarbonDioxideTestNotificationEventValue:  # noqa: ARG003
         """Set default enum member if an unknown value is provided."""
-        return TestStatusCarbonDioxideTestNotificationEventValue.UNKNOWN
-
-    @property
-    def unknown(self) -> TestStatusCarbonDioxideTestNotificationEventValue:
-        """Return the unknown enum value so it can be checked."""
         return TestStatusCarbonDioxideTestNotificationEventValue.UNKNOWN
 
 
@@ -365,11 +310,6 @@ class GasAlarmNotificationEvent(NotificationEvent):
         cls: type, value: object
     ) -> GasAlarmNotificationEvent:  # noqa: ARG003
         """Set default enum member if an unknown value is provided."""
-        return GasAlarmNotificationEvent.UNKNOWN
-
-    @property
-    def unknown(self) -> GasAlarmNotificationEvent:
-        """Return the unknown enum value so it can be checked."""
         return GasAlarmNotificationEvent.UNKNOWN
 
 
@@ -399,11 +339,6 @@ class HeatAlarmNotificationEvent(NotificationEvent):
         """Set default enum member if an unknown value is provided."""
         return HeatAlarmNotificationEvent.UNKNOWN
 
-    @property
-    def unknown(self) -> HeatAlarmNotificationEvent:
-        """Return the unknown enum value so it can be checked."""
-        return HeatAlarmNotificationEvent.UNKNOWN
-
 
 class HomeHealthNotificationEvent(NotificationEvent):
     """Enum for known home health notification event."""
@@ -430,11 +365,6 @@ class HomeHealthNotificationEvent(NotificationEvent):
         """Set default enum member if an unknown value is provided."""
         return HomeHealthNotificationEvent.UNKNOWN
 
-    @property
-    def unknown(self) -> HomeHealthNotificationEvent:
-        """Return the unknown enum value so it can be checked."""
-        return HomeHealthNotificationEvent.UNKNOWN
-
 
 class SleepApneaStatusSleepApneaDetectedNotificationEventValue(NotificationEventValue):
     """Enum for known sleep apnea status sleep apnea detected notification event value."""
@@ -449,11 +379,6 @@ class SleepApneaStatusSleepApneaDetectedNotificationEventValue(NotificationEvent
         cls: type, value: object
     ) -> SleepApneaStatusSleepApneaDetectedNotificationEventValue:  # noqa: ARG003
         """Set default enum member if an unknown value is provided."""
-        return SleepApneaStatusSleepApneaDetectedNotificationEventValue.UNKNOWN
-
-    @property
-    def unknown(self) -> SleepApneaStatusSleepApneaDetectedNotificationEventValue:
-        """Return the unknown enum value so it can be checked."""
         return SleepApneaStatusSleepApneaDetectedNotificationEventValue.UNKNOWN
 
 
@@ -478,13 +403,6 @@ class VocLevelStatusVolatileOrganicCompoundLevelNotificationEventValue(
         """Set default enum member if an unknown value is provided."""
         return VocLevelStatusVolatileOrganicCompoundLevelNotificationEventValue.UNKNOWN
 
-    @property
-    def unknown(
-        self,
-    ) -> VocLevelStatusVolatileOrganicCompoundLevelNotificationEventValue:
-        """Return the unknown enum value so it can be checked."""
-        return VocLevelStatusVolatileOrganicCompoundLevelNotificationEventValue.UNKNOWN
-
 
 class HomeMonitoringNotificationEvent(NotificationEvent):
     """Enum for known home monitoring notification event."""
@@ -499,11 +417,6 @@ class HomeMonitoringNotificationEvent(NotificationEvent):
         cls: type, value: object
     ) -> HomeMonitoringNotificationEvent:  # noqa: ARG003
         """Set default enum member if an unknown value is provided."""
-        return HomeMonitoringNotificationEvent.UNKNOWN
-
-    @property
-    def unknown(self) -> HomeMonitoringNotificationEvent:
-        """Return the unknown enum value so it can be checked."""
         return HomeMonitoringNotificationEvent.UNKNOWN
 
 
@@ -532,11 +445,6 @@ class HomeSecurityNotificationEvent(NotificationEvent):
         """Set default enum member if an unknown value is provided."""
         return HomeSecurityNotificationEvent.UNKNOWN
 
-    @property
-    def unknown(self) -> HomeSecurityNotificationEvent:
-        """Return the unknown enum value so it can be checked."""
-        return HomeSecurityNotificationEvent.UNKNOWN
-
 
 class IrrigationNotificationEvent(NotificationEvent):
     """Enum for known irrigation notification event."""
@@ -556,11 +464,6 @@ class IrrigationNotificationEvent(NotificationEvent):
         """Set default enum member if an unknown value is provided."""
         return IrrigationNotificationEvent.UNKNOWN
 
-    @property
-    def unknown(self) -> IrrigationNotificationEvent:
-        """Return the unknown enum value so it can be checked."""
-        return IrrigationNotificationEvent.UNKNOWN
-
 
 class LightSensorNotificationEvent(NotificationEvent):
     """Enum for known light sensor notification event."""
@@ -575,11 +478,6 @@ class LightSensorNotificationEvent(NotificationEvent):
         cls: type, value: object
     ) -> LightSensorNotificationEvent:  # noqa: ARG003
         """Set default enum member if an unknown value is provided."""
-        return LightSensorNotificationEvent.UNKNOWN
-
-    @property
-    def unknown(self) -> LightSensorNotificationEvent:
-        """Return the unknown enum value so it can be checked."""
         return LightSensorNotificationEvent.UNKNOWN
 
 
@@ -602,11 +500,6 @@ class PestControlNotificationEvent(NotificationEvent):
         cls: type, value: object
     ) -> PestControlNotificationEvent:  # noqa: ARG003
         """Set default enum member if an unknown value is provided."""
-        return PestControlNotificationEvent.UNKNOWN
-
-    @property
-    def unknown(self) -> PestControlNotificationEvent:
-        """Return the unknown enum value so it can be checked."""
         return PestControlNotificationEvent.UNKNOWN
 
 
@@ -641,11 +534,6 @@ class PowerManagementNotificationEvent(NotificationEvent):
         """Set default enum member if an unknown value is provided."""
         return PowerManagementNotificationEvent.UNKNOWN
 
-    @property
-    def unknown(self) -> PowerManagementNotificationEvent:
-        """Return the unknown enum value so it can be checked."""
-        return PowerManagementNotificationEvent.UNKNOWN
-
 
 class SirenNotificationEvent(NotificationEvent):
     """Enum for known siren notification event."""
@@ -657,11 +545,6 @@ class SirenNotificationEvent(NotificationEvent):
     @classmethod
     def _missing_(cls: type, value: object) -> SirenNotificationEvent:  # noqa: ARG003
         """Set default enum member if an unknown value is provided."""
-        return SirenNotificationEvent.UNKNOWN
-
-    @property
-    def unknown(self) -> SirenNotificationEvent:
-        """Return the unknown enum value so it can be checked."""
         return SirenNotificationEvent.UNKNOWN
 
 
@@ -686,11 +569,6 @@ class SmokeAlarmNotificationEvent(NotificationEvent):
         """Set default enum member if an unknown value is provided."""
         return SmokeAlarmNotificationEvent.UNKNOWN
 
-    @property
-    def unknown(self) -> SmokeAlarmNotificationEvent:
-        """Return the unknown enum value so it can be checked."""
-        return SmokeAlarmNotificationEvent.UNKNOWN
-
 
 class SystemNotificationEvent(NotificationEvent):
     """Enum for known system notification event."""
@@ -704,11 +582,6 @@ class SystemNotificationEvent(NotificationEvent):
     @classmethod
     def _missing_(cls: type, value: object) -> SystemNotificationEvent:  # noqa: ARG003
         """Set default enum member if an unknown value is provided."""
-        return SystemNotificationEvent.UNKNOWN
-
-    @property
-    def unknown(self) -> SystemNotificationEvent:
-        """Return the unknown enum value so it can be checked."""
         return SystemNotificationEvent.UNKNOWN
 
 
@@ -736,11 +609,6 @@ class WaterAlarmNotificationEvent(NotificationEvent):
         """Set default enum member if an unknown value is provided."""
         return WaterAlarmNotificationEvent.UNKNOWN
 
-    @property
-    def unknown(self) -> WaterAlarmNotificationEvent:
-        """Return the unknown enum value so it can be checked."""
-        return WaterAlarmNotificationEvent.UNKNOWN
-
 
 class WaterFlowAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known water flow alarm notification event value."""
@@ -759,11 +627,6 @@ class WaterFlowAlarmNotificationEventValue(NotificationEventValue):
         """Set default enum member if an unknown value is provided."""
         return WaterFlowAlarmNotificationEventValue.UNKNOWN
 
-    @property
-    def unknown(self) -> WaterFlowAlarmNotificationEventValue:
-        """Return the unknown enum value so it can be checked."""
-        return WaterFlowAlarmNotificationEventValue.UNKNOWN
-
 
 class WaterLevelAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known water level alarm notification event value."""
@@ -779,11 +642,6 @@ class WaterLevelAlarmNotificationEventValue(NotificationEventValue):
         cls: type, value: object
     ) -> WaterLevelAlarmNotificationEventValue:  # noqa: ARG003
         """Set default enum member if an unknown value is provided."""
-        return WaterLevelAlarmNotificationEventValue.UNKNOWN
-
-    @property
-    def unknown(self) -> WaterLevelAlarmNotificationEventValue:
-        """Return the unknown enum value so it can be checked."""
         return WaterLevelAlarmNotificationEventValue.UNKNOWN
 
 
@@ -804,11 +662,6 @@ class WaterPressureAlarmNotificationEventValue(NotificationEventValue):
         """Set default enum member if an unknown value is provided."""
         return WaterPressureAlarmNotificationEventValue.UNKNOWN
 
-    @property
-    def unknown(self) -> WaterPressureAlarmNotificationEventValue:
-        """Return the unknown enum value so it can be checked."""
-        return WaterPressureAlarmNotificationEventValue.UNKNOWN
-
 
 class WaterTemperatureAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known water temperature alarm notification event value."""
@@ -824,11 +677,6 @@ class WaterTemperatureAlarmNotificationEventValue(NotificationEventValue):
         cls: type, value: object
     ) -> WaterTemperatureAlarmNotificationEventValue:  # noqa: ARG003
         """Set default enum member if an unknown value is provided."""
-        return WaterTemperatureAlarmNotificationEventValue.UNKNOWN
-
-    @property
-    def unknown(self) -> WaterTemperatureAlarmNotificationEventValue:
-        """Return the unknown enum value so it can be checked."""
         return WaterTemperatureAlarmNotificationEventValue.UNKNOWN
 
 
@@ -862,11 +710,6 @@ class WaterQualityMonitoringNotificationEvent(NotificationEvent):
         """Set default enum member if an unknown value is provided."""
         return WaterQualityMonitoringNotificationEvent.UNKNOWN
 
-    @property
-    def unknown(self) -> WaterQualityMonitoringNotificationEvent:
-        """Return the unknown enum value so it can be checked."""
-        return WaterQualityMonitoringNotificationEvent.UNKNOWN
-
 
 class AcidityStatusAcidityAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known acidity (ph) status acidity (ph) alarm notification event value."""
@@ -885,11 +728,6 @@ class AcidityStatusAcidityAlarmNotificationEventValue(NotificationEventValue):
         """Set default enum member if an unknown value is provided."""
         return AcidityStatusAcidityAlarmNotificationEventValue.UNKNOWN
 
-    @property
-    def unknown(self) -> AcidityStatusAcidityAlarmNotificationEventValue:
-        """Return the unknown enum value so it can be checked."""
-        return AcidityStatusAcidityAlarmNotificationEventValue.UNKNOWN
-
 
 class ChlorineAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known chlorine alarm notification event value."""
@@ -906,11 +744,6 @@ class ChlorineAlarmNotificationEventValue(NotificationEventValue):
         """Set default enum member if an unknown value is provided."""
         return ChlorineAlarmNotificationEventValue.UNKNOWN
 
-    @property
-    def unknown(self) -> ChlorineAlarmNotificationEventValue:
-        """Return the unknown enum value so it can be checked."""
-        return ChlorineAlarmNotificationEventValue.UNKNOWN
-
 
 class WaterOxidationAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known water oxidation alarm notification event value."""
@@ -925,11 +758,6 @@ class WaterOxidationAlarmNotificationEventValue(NotificationEventValue):
         cls: type, value: object
     ) -> WaterOxidationAlarmNotificationEventValue:  # noqa: ARG003
         """Set default enum member if an unknown value is provided."""
-        return WaterOxidationAlarmNotificationEventValue.UNKNOWN
-
-    @property
-    def unknown(self) -> WaterOxidationAlarmNotificationEventValue:
-        """Return the unknown enum value so it can be checked."""
         return WaterOxidationAlarmNotificationEventValue.UNKNOWN
 
 
@@ -952,11 +780,6 @@ class WaterValveNotificationEvent(NotificationEvent):
         """Set default enum member if an unknown value is provided."""
         return WaterValveNotificationEvent.UNKNOWN
 
-    @property
-    def unknown(self) -> WaterValveNotificationEvent:
-        """Return the unknown enum value so it can be checked."""
-        return WaterValveNotificationEvent.UNKNOWN
-
 
 class MasterValveCurrentAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known master valve current alarm notification event value."""
@@ -975,11 +798,6 @@ class MasterValveCurrentAlarmNotificationEventValue(NotificationEventValue):
         """Set default enum member if an unknown value is provided."""
         return MasterValveCurrentAlarmNotificationEventValue.UNKNOWN
 
-    @property
-    def unknown(self) -> MasterValveCurrentAlarmNotificationEventValue:
-        """Return the unknown enum value so it can be checked."""
-        return MasterValveCurrentAlarmNotificationEventValue.UNKNOWN
-
 
 class MasterValveOperationNotificationEventValue(NotificationEventValue):
     """Enum for known master valve operation notification event value."""
@@ -994,11 +812,6 @@ class MasterValveOperationNotificationEventValue(NotificationEventValue):
         cls: type, value: object
     ) -> MasterValveOperationNotificationEventValue:  # noqa: ARG003
         """Set default enum member if an unknown value is provided."""
-        return MasterValveOperationNotificationEventValue.UNKNOWN
-
-    @property
-    def unknown(self) -> MasterValveOperationNotificationEventValue:
-        """Return the unknown enum value so it can be checked."""
         return MasterValveOperationNotificationEventValue.UNKNOWN
 
 
@@ -1019,11 +832,6 @@ class ValveCurrentAlarmNotificationEventValue(NotificationEventValue):
         """Set default enum member if an unknown value is provided."""
         return ValveCurrentAlarmNotificationEventValue.UNKNOWN
 
-    @property
-    def unknown(self) -> ValveCurrentAlarmNotificationEventValue:
-        """Return the unknown enum value so it can be checked."""
-        return ValveCurrentAlarmNotificationEventValue.UNKNOWN
-
 
 class ValveOperationNotificationEventValue(NotificationEventValue):
     """Enum for known valve operation notification event value."""
@@ -1038,11 +846,6 @@ class ValveOperationNotificationEventValue(NotificationEventValue):
         cls: type, value: object
     ) -> ValveOperationNotificationEventValue:  # noqa: ARG003
         """Set default enum member if an unknown value is provided."""
-        return ValveOperationNotificationEventValue.UNKNOWN
-
-    @property
-    def unknown(self) -> ValveOperationNotificationEventValue:
-        """Return the unknown enum value so it can be checked."""
         return ValveOperationNotificationEventValue.UNKNOWN
 
 
@@ -1060,11 +863,6 @@ class WeatherAlarmNotificationEvent(NotificationEvent):
         cls: type, value: object
     ) -> WeatherAlarmNotificationEvent:  # noqa: ARG003
         """Set default enum member if an unknown value is provided."""
-        return WeatherAlarmNotificationEvent.UNKNOWN
-
-    @property
-    def unknown(self) -> WeatherAlarmNotificationEvent:
-        """Return the unknown enum value so it can be checked."""
         return WeatherAlarmNotificationEvent.UNKNOWN
 
 

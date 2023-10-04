@@ -130,11 +130,6 @@ def generate_int_enum_class_definition(
                 f"    def _missing_(cls: type, value: object) -> {class_name}:  # noqa: ARG003",
                 '        """Set default enum member if an unknown value is provided."""',
                 f"        return {class_name}.UNKNOWN",
-                "",
-                "    @property",
-                f"    def unknown(self) -> {class_name}:",
-                '        """Return the unknown enum value so it can be checked."""',
-                f"        return {class_name}.UNKNOWN",
             ]
         )
     return class_def
