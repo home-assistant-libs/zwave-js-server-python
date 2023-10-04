@@ -262,11 +262,17 @@ else:
     print("Could not run black on new file, please run it to properly format it.")
 
 if subprocess.run(["which", "git"], capture_output=True, check=True).stdout:
-    if subprocess.run(
-        ["git", "diff", "--stat"],
-        check=True,
-    ).stdout is not None:
+    if (
+        subprocess.run(
+            ["git", "diff", "--stat"],
+            check=True,
+        ).stdout
+        is not None
+    ):
         print("Repo is dirty and needs to be committed!")
         exit(1)
 else:
-    print("Could not run `git diff --stat` on repo, please run it to determine whether constants have changed.")
+    print(
+        "Could not run `git diff --stat` on repo, please run it to determine whether "
+        "constants have changed."
+    )
