@@ -139,6 +139,7 @@ NOTIFICATIONS_URL = (
 )
 
 lines = [
+    "# pylint: disable=line-too-long,too-many-lines",
     '"""Constants for the Notification CC."""',
     "",
     "# ----------------------------------------------------------------------------------- #",
