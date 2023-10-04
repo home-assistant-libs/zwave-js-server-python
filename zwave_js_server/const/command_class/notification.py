@@ -1,4 +1,4 @@
-# pylint: disable=line-too-long,too-many-lines
+# pylint: disable=line-too-long
 """Constants for the Notification CC."""
 
 # ----------------------------------------------------------------------------------- #
