@@ -28,6 +28,15 @@ class MeterType(IntEnum):
     COOLING = 5
 
 
+class RateType(IntEnum):
+    """Enum with all known rate types."""
+
+    # https://github.com/raman325/node-zwave-js/blob/master/packages/cc/src/lib/_Types.ts#L996
+    UNSPECIFIED = 0
+    CONSUMED = 1
+    PRODUCED = 2
+
+
 class MeterScaleType(IntEnum):
     """Common base class for meter scale enums."""
 
