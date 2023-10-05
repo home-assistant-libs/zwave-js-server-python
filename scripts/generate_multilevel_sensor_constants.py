@@ -17,8 +17,9 @@ BRANCH_NAME = "master"
 SENSOR_TYPES_FILE_PATH = "packages/config/config/sensorTypes.json"
 DEFAULT_SCALES_FILE_PATH = "packages/config/config/scales.json"
 
-CONST_FILE_PATH = pathlib.Path(__file__).parent.joinpath(
-    "../zwave_js_server/const/command_class/multilevel_sensor.py"
+CONST_FILE_PATH = (
+    pathlib.Path(__file__).parent.parent
+    / "zwave_js_server/const/command_class/multilevel_sensor.py"
 )
 
 

@@ -15,8 +15,9 @@ GITHUB_PROJECT = "zwave-js/node-zwave-js"
 BRANCH_NAME = "master"
 NOTIFICATIONS_FILE_PATH = "packages/config/config/notifications.json"
 
-CONST_FILE_PATH = pathlib.Path(__file__).parent.joinpath(
-    "../zwave_js_server/const/command_class/notification.py"
+CONST_FILE_PATH = (
+    pathlib.Path(__file__).parent.parent
+    / "zwave_js_server/const/command_class/notification.py"
 )
 
 
@@ -148,7 +149,7 @@ NOTIFICATIONS_URL = (
 )
 
 lines = [
-    "# pylint: disable=line-too-long,too-many-lines",
+    "# pylint: disable=line-too-long",
     '"""Constants for the Notification CC."""',
     "",
     "# ----------------------------------------------------------------------------------- #",
