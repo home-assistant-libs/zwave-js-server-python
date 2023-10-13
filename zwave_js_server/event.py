@@ -35,7 +35,7 @@ class EventBase:
         """Initialize event base."""
         self._listeners: dict[str, list[Callable]] = {}
 
-    def on(  # pylint: disable=invalid-name
+    def on(
         self, event_name: str, callback: Callable
     ) -> Callable:
         """Register an event callback."""
