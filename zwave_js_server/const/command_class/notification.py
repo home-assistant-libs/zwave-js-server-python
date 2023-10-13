@@ -22,6 +22,7 @@ class NotificationType(IntEnum):
     CLOCK = 11
     CO_ALARM = 2
     CO2_ALARM = 3
+    EMERGENCY_ALARM = 10
     GAS_ALARM = 18
     HEAT_ALARM = 4
     HOME_HEALTH = 13
@@ -33,7 +34,7 @@ class NotificationType(IntEnum):
     POWER_MANAGEMENT = 8
     SIREN = 14
     SMOKE_ALARM = 1
-    SYSTEM = 10
+    SYSTEM = 9
     WATER_ALARM = 5
     WATER_QUALITY_MONITORING = 21
     WATER_VALVE = 15
@@ -291,6 +292,23 @@ class TestStatusCarbonDioxideTestNotificationEventValue(NotificationEventValue):
     ) -> TestStatusCarbonDioxideTestNotificationEventValue:  # noqa: ARG003
         """Set default enum member if an unknown value is provided."""
         return TestStatusCarbonDioxideTestNotificationEventValue.UNKNOWN
+
+
+class EmergencyAlarmNotificationEvent(NotificationEvent):
+    """Enum for known emergency alarm notification event."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/notifications.json
+    UNKNOWN = -1
+    CONTACT_FIRE_SERVICE = 2
+    CONTACT_MEDICAL_SERVICE = 3
+    CONTACT_POLICE = 1
+
+    @classmethod
+    def _missing_(
+        cls: type, value: object
+    ) -> EmergencyAlarmNotificationEvent:  # noqa: ARG003
+        """Set default enum member if an unknown value is provided."""
+        return EmergencyAlarmNotificationEvent.UNKNOWN
 
 
 class GasAlarmNotificationEvent(NotificationEvent):
@@ -575,9 +593,13 @@ class SystemNotificationEvent(NotificationEvent):
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/notifications.json
     UNKNOWN = -1
-    CONTACT_FIRE_SERVICE = 2
-    CONTACT_MEDICAL_SERVICE = 3
-    CONTACT_POLICE = 1
+    COVER_STATUS_TAMPERING_PRODUCT_COVER_REMOVED = 6
+    EMERGENCY_SHUTOFF = 7
+    HARDWARE_STATUS_SYSTEM_HARDWARE_FAILURE = 1
+    HARDWARE_STATUS_SYSTEM_HARDWARE_FAILURE_WITH_FAILURE_CODE = 3
+    HEARTBEAT = 5
+    SOFTWARE_STATUS_SYSTEM_SOFTWARE_FAILURE = 2
+    SOFTWARE_STATUS_SYSTEM_SOFTWARE_FAILURE_WITH_FAILURE_CODE = 4
 
     @classmethod
     def _missing_(cls: type, value: object) -> SystemNotificationEvent:  # noqa: ARG003
@@ -872,6 +894,7 @@ NOTIFICATION_TYPE_TO_EVENT_MAP: dict[NotificationType, type[NotificationEvent]] 
     NotificationType.CLOCK: ClockNotificationEvent,
     NotificationType.CO_ALARM: CoAlarmNotificationEvent,
     NotificationType.CO2_ALARM: Co2AlarmNotificationEvent,
+    NotificationType.EMERGENCY_ALARM: EmergencyAlarmNotificationEvent,
     NotificationType.GAS_ALARM: GasAlarmNotificationEvent,
     NotificationType.HEAT_ALARM: HeatAlarmNotificationEvent,
     NotificationType.HOME_HEALTH: HomeHealthNotificationEvent,
