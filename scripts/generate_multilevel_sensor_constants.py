@@ -17,8 +17,9 @@ BRANCH_NAME = "master"
 SENSOR_TYPES_FILE_PATH = "packages/config/config/sensorTypes.json"
 DEFAULT_SCALES_FILE_PATH = "packages/config/config/scales.json"
 
-CONST_FILE_PATH = pathlib.Path(__file__).parent.joinpath(
-    "../zwave_js_server/const/command_class/multilevel_sensor.py"
+CONST_FILE_PATH = (
+    pathlib.Path(__file__).parent.parent
+    / "zwave_js_server/const/command_class/multilevel_sensor.py"
 )
 
 
@@ -260,3 +261,19 @@ if subprocess.run(["which", "black"], capture_output=True, check=True).stdout:
     )
 else:
     print("Could not run black on new file, please run it to properly format it.")
+
+if subprocess.run(["which", "git"], capture_output=True, check=True).stdout:
+    if (
+        subprocess.run(
+            ["git", "diff", "--stat"],
+            check=True,
+        ).stdout
+        is not None
+    ):
+        print("Repo is dirty and needs to be committed!")
+        exit(1)
+else:
+    print(
+        "Could not run `git diff --stat` on repo, please run it to determine whether "
+        "constants have changed."
+    )
