@@ -955,7 +955,7 @@ class Node(EventBase):
         if (property_is_name := isinstance(property_, str)) or (
             property_key_is_name := isinstance(property_key, str)
         ):
-            attr_to_value = {}
+            attr_to_value: dict[str, int | str | None] = {}
             key = "property_name" if property_is_name else "property_"
             attr_to_value[key] = property_
             key = "property_key_name" if property_key_is_name else "property_key"
@@ -979,9 +979,13 @@ class Node(EventBase):
             value = new_value
         else:
             try:
-                value = int(next(
-                    k for k, v in zwave_value.metadata.states.items() if v == new_value
-                ))
+                value = int(
+                    next(
+                        k
+                        for k, v in zwave_value.metadata.states.items()
+                        if v == new_value
+                    )
+                )
             except StopIteration:
                 raise NotFoundError(
                     f"Configuration parameter {zwave_value.value_id} does not have "
@@ -1011,11 +1015,9 @@ class Node(EventBase):
             require_schema=33,
         )
 
-        result: int | None = data.get("result")
-
-        if result is not None:
-            return SupervisionResult(result)
-        return None
+        if data is None or (result := data.get("result")) is None:
+            return None
+        return SupervisionResult(result)
 
     def handle_test_powerlevel_progress(self, event: Event) -> None:
         """Process a test power level progress event."""
