@@ -5,7 +5,7 @@ import asyncio
 import copy
 from datetime import datetime
 import logging
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from ...const import (
     INTERVIEW_FAILED,
@@ -39,8 +39,10 @@ from ..notification import (
 )
 from ..value import (
     ConfigurationValue,
+    ConfigurationValueFormat,
     MetaDataType,
     SetValueResult,
+    SupervisionResult,
     Value,
     ValueDataType,
     ValueMetadata,
@@ -939,6 +941,80 @@ class Node(EventBase):
         )
         if data and (changed := data.get("changed")) is not None:
             return cast(bool, changed)
+        return None
+
+    async def async_set_raw_config_parameter_value(
+        self,
+        new_value: int | str,
+        property_: int | str,
+        property_key: int | str | None = None,
+        value_size: Literal[1, 2, 4] | None = None,
+        value_format: ConfigurationValueFormat | None = None,
+    ) -> SupervisionResult | None:
+        """Send setRawConfigParameterValue."""
+        if (property_is_name := isinstance(property_, str)) or (
+            property_key_is_name := isinstance(property_key, str)
+        ):
+            attr_to_value = {}
+            key = "property_name" if property_is_name else "property_"
+            attr_to_value[key] = property_
+            key = "property_key_name" if property_key_is_name else "property_key"
+            attr_to_value[key] = property_key
+            try:
+                zwave_value = next(
+                    config_value
+                    for config_value in self.get_configuration_values().values()
+                    if all(
+                        getattr(config_value, attr_name) == value
+                        for attr_name, value in attr_to_value.items()
+                    )
+                )
+            except StopIteration:
+                raise NotFoundError(
+                    f"Configuration parameter with parameter {property_} and bitmask "
+                    f"{property_key} on node {self} could not be found"
+                ) from None
+
+        if not isinstance(new_value, str):
+            value = new_value
+        else:
+            try:
+                value = int(next(
+                    k for k, v in zwave_value.metadata.states.items() if v == new_value
+                ))
+            except StopIteration:
+                raise NotFoundError(
+                    f"Configuration parameter {zwave_value.value_id} does not have "
+                    f"{new_value} as a valid state. If this is a valid call, you must "
+                    "use the state key instead of the string."
+                ) from None
+
+        if (value_size is not None and value_format is None) or (
+            value_size is None and value_format is not None
+        ):
+            raise ValueError(
+                "value_size and value_format must either both be included or not "
+                "included"
+            )
+
+        options = {
+            "value": value,
+            "parameter": zwave_value.property_,
+            "bitMask": zwave_value.property_key,
+            "valueSize": value_size,
+            "valueFormat": value_format,
+        }
+
+        data = await self.async_send_command(
+            "setRawConfigParameterValue",
+            options={k: v for k, v in options.items() if v is not None},
+            require_schema=33,
+        )
+
+        result: int | None = data.get("result")
+
+        if result is not None:
+            return SupervisionResult(result)
         return None
 
     def handle_test_powerlevel_progress(self, event: Event) -> None:
