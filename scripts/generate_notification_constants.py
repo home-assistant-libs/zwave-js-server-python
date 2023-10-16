@@ -2,11 +2,11 @@
 """Script to generate Notification CC constants."""
 from __future__ import annotations
 
+from collections.abc import Callable, Mapping
 import json
 import pathlib
 import re
 import subprocess
-from collections.abc import Callable, Mapping
 
 import requests
 from slugify import slugify

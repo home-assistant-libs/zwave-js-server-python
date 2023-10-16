@@ -3,10 +3,10 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import json
-import logging
 from collections import defaultdict
 from collections.abc import Hashable
+import json
+import logging
 from typing import Any
 
 from aiohttp import WSMsgType, web, web_request

@@ -2,12 +2,12 @@
 """Script to generate Multilevel Sensor CC constants."""
 from __future__ import annotations
 
+from collections import defaultdict
+from collections.abc import Callable, Mapping
 import json
 import pathlib
 import re
 import subprocess
-from collections import defaultdict
-from collections.abc import Callable, Mapping
 
 import requests
 from slugify import slugify
