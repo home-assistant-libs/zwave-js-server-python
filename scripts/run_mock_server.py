@@ -28,12 +28,15 @@ class HashableDict(dict):
     """Dictionary that can be used as a key in a dictionary."""
 
     def __key(self) -> tuple:
+        """Return key representation of HashableDict."""
         return tuple((k, self[k]) for k in sorted(self))
 
     def __hash__(self) -> int:  # type: ignore
+        """Return hash representation of HashableDict."""
         return hash(self.__key())
 
     def __eq__(self, other: Any) -> bool:
+        """Return whether HashableDict is equal to other."""
         # pylint: disable=protected-access
         return isinstance(other, HashableDict) and self.__key() == other.__key()
 
@@ -292,14 +295,14 @@ def main() -> None:
     """Run main entrypoint."""
     args = get_args()
 
-    with open(args.network_state_path, "r", encoding="utf8") as fp:
+    with open(args.network_state_path, encoding="utf8") as fp:
         network_state_dump: list[dict] = json.load(fp)
 
     events_to_replay = []
     command_results: defaultdict[HashableDict, list] = defaultdict(list)
 
     if args.combined_replay_dump_path:
-        with open(args.combined_replay_dump_path, "r", encoding="utf8") as fp:
+        with open(args.combined_replay_dump_path, encoding="utf8") as fp:
             records: list[dict] = json.load(fp)
 
             for record in records:
@@ -313,7 +316,7 @@ def main() -> None:
                     add_command_result(command_results, record)
 
     if args.events_to_replay_path:
-        with open(args.events_to_replay_path, "r", encoding="utf8") as fp:
+        with open(args.events_to_replay_path, encoding="utf8") as fp:
             records = json.load(fp)
             if (
                 bad_record := next(
@@ -331,7 +334,7 @@ def main() -> None:
             events_to_replay.extend([record["event_msg"] for record in records])
 
     if args.command_results_path:
-        with open(args.command_results_path, "r", encoding="utf8") as fp:
+        with open(args.command_results_path, encoding="utf8") as fp:
             records = json.load(fp)
             if (
                 bad_record := next(
