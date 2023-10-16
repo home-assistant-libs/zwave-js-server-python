@@ -330,7 +330,7 @@ class SupervisionResultDataType(TypedDict, total=False):
 class SupervisionResult:
     """Represent a Supervision result type."""
 
-    data: SupervisionResultDataType
+    data: SupervisionResultDataType = field(repr=False)
     status: SupervisionStatus = field(init=False)
     remaining_duration: Duration | None = field(init=False, default=None)
 
