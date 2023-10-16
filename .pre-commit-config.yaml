@@ -1,0 +1,47 @@
+repos:
+  - repo: https://github.com/psf/black-pre-commit-mirror
+    rev: 23.9.1
+    hooks:
+      - id: black
+        args:
+          - --quiet
+        files: ^((zwave_js_server|scripts|test)/.+)?[^/]+\.py$
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: no-commit-to-branch
+        args:
+          - --branch=master
+  - repo: local
+    hooks:
+      # Run mypy through our wrapper script in order to get the possible
+      # pyenv and/or virtualenv activated; it may not have been e.g. if
+      # committing from a GUI tool that was not launched from an activated
+      # shell.
+      - id: mypy
+        name: mypy
+        entry: scripts/run-in-env.sh mypy
+        language: script
+        types: [python]
+        require_serial: true
+        files: ^(zwave_js_server)/.+\.py$
+      - id: flake8
+        name: flake8
+        entry: scripts/run-in-env.sh flake8
+        language: script
+        types: [python]
+        require_serial: true
+        files: ^(zwave_js_server|test)/.+\.py$
+      - id: pydocstyle
+        name: pydocstyle
+        entry: scripts/run-in-env.sh pydocstyle
+        language: script
+        types: [python]
+        require_serial: true
+        files: ^(zwave_js_server|test)/.+\.py$
+      - id: pylint
+        name: pylint
+        entry: scripts/run-in-env.sh pylint -j 0 --ignore-missing-annotations=y
+        language: script
+        types: [python]
+        files: ^zwave_js_server/.+\.py$
