@@ -12,7 +12,12 @@ from ..event import EventBase
 from ..exceptions import FailedCommand, NotFoundError
 from .command_class import CommandClass, CommandClassInfo, CommandClassInfoDataType
 from .device_class import DeviceClass, DeviceClassDataType
-from .value import ConfigurationValue, ConfigurationValueFormat, SupervisionResult, Value
+from .value import (
+    ConfigurationValue,
+    ConfigurationValueFormat,
+    SupervisionResult,
+    Value,
+)
 
 if TYPE_CHECKING:
     from ..client import Client
