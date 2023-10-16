@@ -952,67 +952,9 @@ class Node(EventBase):
         value_format: ConfigurationValueFormat | None = None,
     ) -> SupervisionResult | None:
         """Send setRawConfigParameterValue."""
-        try:
-            zwave_value = next(
-                config_value
-                for config_value in self.get_configuration_values().values()
-                if property_
-                == (
-                    config_value.property_name
-                    if isinstance(property_, str)
-                    else config_value.property_
-                )
-                and property_key == config_value.property_key
-            )
-        except StopIteration:
-            raise NotFoundError(
-                f"Configuration parameter with parameter {property_} and bitmask "
-                f"{property_key} on node {self} could not be found"
-            ) from None
-
-        if not isinstance(new_value, str):
-            value = new_value
-        else:
-            try:
-                value = int(
-                    next(
-                        k
-                        for k, v in zwave_value.metadata.states.items()
-                        if v == new_value
-                    )
-                )
-            except StopIteration:
-                raise NotFoundError(
-                    f"Configuration parameter {zwave_value.value_id} does not have "
-                    f"{new_value} as a valid state. If this is a valid call, you must "
-                    "use the state key instead of the string."
-                ) from None
-
-        if (value_size is not None and value_format is None) or (
-            value_size is None and value_format is not None
-        ):
-            raise ValueError(
-                "value_size and value_format must either both be included or not "
-                "included"
-            )
-
-        options = {
-            "value": value,
-            "parameter": zwave_value.property_,
-            "bitMask": zwave_value.property_key,
-            "valueSize": value_size,
-            "valueFormat": value_format,
-        }
-
-        data = await self.async_send_command(
-            "set_raw_config_parameter_value",
-            options={k: v for k, v in options.items() if v is not None},
-            require_schema=33,
+        return await self.endpoints[0].async_set_raw_config_parameter_value(
+            new_value, property_, property_key, value_size, value_format
         )
-
-        if data is None or (result := data.get("result")) is None:
-            return None
-        return SupervisionResult(result)
 
     def handle_test_powerlevel_progress(self, event: Event) -> None:
         """Process a test power level progress event."""

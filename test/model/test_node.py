@@ -2511,15 +2511,16 @@ async def test_set_raw_config_parameter_value(
     node = multisensor_6
 
     ack_commands = mock_command(
-        {"command": "node.set_raw_config_parameter_value", "nodeId": node.node_id},
+        {"command": "endpoint.set_raw_config_parameter_value", "nodeId": node.node_id},
         {},
     )
 
     assert await node.async_set_raw_config_parameter_value(1, 101, 1) is None
 
     assert ack_commands[0] == {
-        "command": "node.set_raw_config_parameter_value",
+        "command": "endpoint.set_raw_config_parameter_value",
         "nodeId": node.node_id,
+        "endpoint": 0,
         "options": {
             "parameter": 101,
             "bitMask": 1,
@@ -2536,8 +2537,9 @@ async def test_set_raw_config_parameter_value(
     )
 
     assert ack_commands[1] == {
-        "command": "node.set_raw_config_parameter_value",
+        "command": "endpoint.set_raw_config_parameter_value",
         "nodeId": node.node_id,
+        "endpoint": 0,
         "options": {
             "parameter": 2,
             "value": 0,
@@ -2553,8 +2555,9 @@ async def test_set_raw_config_parameter_value(
     )
 
     assert ack_commands[2] == {
-        "command": "node.set_raw_config_parameter_value",
+        "command": "endpoint.set_raw_config_parameter_value",
         "nodeId": node.node_id,
+        "endpoint": 0,
         "options": {
             "parameter": 101,
             "bitMask": 1,
@@ -2588,7 +2591,7 @@ async def test_supervision_result(inovelli_switch: node_pkg.Node, uuid4, mock_co
     node = inovelli_switch
 
     mock_command(
-        {"command": "node.set_raw_config_parameter_value", "nodeId": node.node_id},
+        {"command": "endpoint.set_raw_config_parameter_value", "nodeId": node.node_id},
         {"result": {"status": 1, "remainingDuration": "default"}},
     )
 
@@ -2605,7 +2608,7 @@ async def test_supervision_result_invalid(
     node = inovelli_switch
 
     mock_command(
-        {"command": "node.set_raw_config_parameter_value", "nodeId": node.node_id},
+        {"command": "endpoint.set_raw_config_parameter_value", "nodeId": node.node_id},
         {"result": {"status": 1}},
     )
 
