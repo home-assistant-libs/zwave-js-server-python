@@ -2,6 +2,10 @@
 
 Python library for communicating with [zwave-js-server](https://github.com/zwave-js/zwave-js-server/). Goal for this library is to replicate the structure and the events of Z-Wave JS 1:1. So it has a `Driver`, `Controller` and `Node` classes.
 
+## Setup development environment
+
+To setup your development environment, run `scripts/setup`, which will install all requirements and set up pre-commit checks.
+
 ## Trying it out
 
 ```shell
