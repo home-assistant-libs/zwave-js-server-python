@@ -7,17 +7,23 @@ repos:
           - --quiet
         files: ^((zwave_js_server|scripts|test)/.+)?[^/]+\.py$
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.5.0
     hooks:
       - id: no-commit-to-branch
         args:
           - --branch=master
+  - repo: https://github.com/pycqa/pydocstyle
+    rev: 6.3.0
+    hooks:
+      - id: pydocstyle
+        files: ^(zwave_js_server|test)/.+\.py$
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.1.0
+    hooks:
+      - id: flake8
+        files: ^((zwave_js_server|test)/.+)?[^/]+\.py$
   - repo: local
     hooks:
-      # Run mypy through our wrapper script in order to get the possible
-      # pyenv and/or virtualenv activated; it may not have been e.g. if
-      # committing from a GUI tool that was not launched from an activated
-      # shell.
       - id: mypy
         name: mypy
         entry: scripts/run-in-env.sh mypy
@@ -25,20 +31,6 @@ repos:
         types: [python]
         require_serial: true
         files: ^(zwave_js_server)/.+\.py$
-      - id: flake8
-        name: flake8
-        entry: scripts/run-in-env.sh flake8
-        language: script
-        types: [python]
-        require_serial: true
-        files: ^(zwave_js_server|test)/.+\.py$
-      - id: pydocstyle
-        name: pydocstyle
-        entry: scripts/run-in-env.sh pydocstyle
-        language: script
-        types: [python]
-        require_serial: true
-        files: ^(zwave_js_server|test)/.+\.py$
       - id: pylint
         name: pylint
         entry: scripts/run-in-env.sh pylint -j 0 --ignore-missing-annotations=y
