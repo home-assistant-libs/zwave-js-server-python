@@ -23,7 +23,7 @@ async def test_get_server_version(client_session, ws_client, url, version_data):
 async def test_missing_server_schema_version(
     client_session, ws_client, url, version_data
 ):
-    """test missing schema version processed as schema version 0."""
+    """Test missing schema version processed as schema version 0."""
     del version_data["minSchemaVersion"]
     del version_data["maxSchemaVersion"]
     ws_client.receive_json.return_value = version_data

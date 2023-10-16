@@ -22,7 +22,7 @@ class ControllerLifelineRoutesDataType(TypedDict):
 class ControllerLifelineRoutes:
     """Represent controller lifeline routes."""
 
-    client: "Client" = field(repr=False)
+    client: Client = field(repr=False)
     data: ControllerLifelineRoutesDataType = field(repr=False)
     lwr: RouteStatistics | None = field(init=False, default=None)
     nlwr: RouteStatistics | None = field(init=False, default=None)

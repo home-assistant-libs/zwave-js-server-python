@@ -183,7 +183,7 @@ class StatusChangedEventModel(BaseControllerEventModel):
     status: int
 
 
-CONTROLLER_EVENT_MODEL_MAP: dict[str, type["BaseControllerEventModel"]] = {
+CONTROLLER_EVENT_MODEL_MAP: dict[str, type[BaseControllerEventModel]] = {
     "exclusion failed": ExclusionFailedEventModel,
     "exclusion started": ExclusionStartedEventModel,
     "exclusion stopped": ExclusionStoppedEventModel,

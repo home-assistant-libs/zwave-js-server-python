@@ -19,7 +19,7 @@ class RebuildRoutesOptions:
     include_sleeping: bool | None = None
 
     @classmethod
-    def from_dict(cls, data: RebuildRoutesOptionsDataType) -> "RebuildRoutesOptions":
+    def from_dict(cls, data: RebuildRoutesOptionsDataType) -> RebuildRoutesOptions:
         """Return options from data."""
         return cls(include_sleeping=data.get("includeSleeping"))
 

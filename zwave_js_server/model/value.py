@@ -60,14 +60,14 @@ class ValueDataType(TypedDict, total=False):
     ccVersion: int  # required
 
 
-def _init_value(node: "Node", val: ValueDataType) -> "Value" | "ConfigurationValue":
+def _init_value(node: Node, val: ValueDataType) -> Value | ConfigurationValue:
     """Initialize a Value object from ValueDataType."""
     if val["commandClass"] == CommandClass.CONFIGURATION:
         return ConfigurationValue(node, val)
     return Value(node, val)
 
 
-def _get_value_id_str_from_dict(node: "Node", val: ValueDataType) -> str:
+def _get_value_id_str_from_dict(node: Node, val: ValueDataType) -> str:
     """Return string ID of value from ValueDataType dict."""
     return get_value_id_str(
         node,
@@ -79,7 +79,7 @@ def _get_value_id_str_from_dict(node: "Node", val: ValueDataType) -> str:
 
 
 def get_value_id_str(
-    node: "Node",
+    node: Node,
     command_class: int,
     property_: int | str,
     endpoint: int | None = None,
@@ -185,7 +185,7 @@ class ValueMetadata:
 class Value:
     """Represent a Z-Wave JS value."""
 
-    def __init__(self, node: "Node", data: ValueDataType) -> None:
+    def __init__(self, node: Node, data: ValueDataType) -> None:
         """Initialize value."""
         self.node = node
         self.data: ValueDataType = {}
@@ -298,7 +298,8 @@ class ValueNotification(Value):
     https://zwave-js.github.io/node-zwave-js/#/api/node?id=quotvalue-notificationquot
     """
 
-    # format is the same as a Value message, subclassed for easier identifying and future use
+    # format is the same as a Value message, subclassed for easier identifying and
+    # future use
 
 
 class ConfigurationValue(Value):

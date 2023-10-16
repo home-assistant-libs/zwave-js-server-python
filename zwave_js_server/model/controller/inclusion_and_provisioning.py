@@ -1,4 +1,4 @@
-"""Provide a model for the Z-Wave JS controller's inclusion/provisioning data structures."""
+"""Provide a model for inclusion and provisioning."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -30,7 +30,7 @@ class InclusionGrant:
         }
 
     @classmethod
-    def from_dict(cls, data: InclusionGrantDataType) -> "InclusionGrant":
+    def from_dict(cls, data: InclusionGrantDataType) -> InclusionGrant:
         """Return InclusionGrant from InclusionGrantDataType dict."""
         return cls(
             security_classes=[
@@ -65,7 +65,7 @@ class ProvisioningEntry:
         return data
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "ProvisioningEntry":
+    def from_dict(cls, data: dict[str, Any]) -> ProvisioningEntry:
         """Return ProvisioningEntry from data dict."""
         cls_instance = cls(
             dsk=data["dsk"],
@@ -140,7 +140,7 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
         return data
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "QRProvisioningInformation":
+    def from_dict(cls, data: dict[str, Any]) -> QRProvisioningInformation:
         """Return QRProvisioningInformation from data dict."""
         cls_instance = cls(
             version=QRCodeVersion(data["version"]),

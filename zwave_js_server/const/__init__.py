@@ -1,10 +1,10 @@
 """Constants for the Z-Wave JS python library."""
 from __future__ import annotations
 
-import logging
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum
 from importlib import metadata
+import logging
 from typing import TypedDict
 
 PACKAGE_NAME = "zwave-js-server-python"
@@ -391,7 +391,8 @@ class SetValueStatus(IntEnum):
     FAIL = 2
     # The endpoint specified in the value ID does not exist
     ENDPOINT_NOT_FOUND = 3
-    # The given CC or its API is not implemented (yet) or it has no `setValue` implementation
+    # The given CC or its API is not implemented (yet) or it has no `setValue`
+    # implementation
     NOT_IMPLEMENTED = 4
     # The value to set (or a related value) is invalid
     INVALID_VALUE = 5

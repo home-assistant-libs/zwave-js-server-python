@@ -1,6 +1,6 @@
 """Test the controller model."""
-import json
 from copy import deepcopy
+import json
 from unittest.mock import patch
 
 import pytest
@@ -21,8 +21,10 @@ from zwave_js_server.const import (
 )
 from zwave_js_server.event import Event
 from zwave_js_server.exceptions import RepeaterRssiErrorReceived, RssiErrorReceived
-from zwave_js_server.model import association as association_pkg
-from zwave_js_server.model import controller as controller_pkg
+from zwave_js_server.model import (
+    association as association_pkg,
+    controller as controller_pkg,
+)
 from zwave_js_server.model.controller.firmware import ControllerFirmwareUpdateStatus
 from zwave_js_server.model.controller.rebuild_routes import (
     RebuildRoutesOptions,
@@ -183,7 +185,7 @@ def test_controller_mods():
 
 
 def test_controller_status():
-    """ "Test controller status functionality."""
+    """Test controller status functionality."""
     state = json.loads(load_fixture("basic_dump.txt").split("\n")[0])["result"]["state"]
     state["controller"]["status"] = 0
 
@@ -425,7 +427,8 @@ async def test_begin_inclusion_errors(controller, uuid4, mock_command):
             InclusionStrategy.SECURITY_S0, dsk="test"
         )
 
-    # Test that Security S2 Inclusion Strategy doesn't support providing `force_security`
+    # Test that Security S2 Inclusion Strategy doesn't support providing
+    # `force_security`
     with pytest.raises(ValueError):
         await controller.async_begin_inclusion(
             InclusionStrategy.SECURITY_S2, force_security=True
@@ -1845,7 +1848,8 @@ async def test_get_available_firmware_updates(multisensor_6, uuid4, mock_command
         {"command": "controller.get_available_firmware_updates"},
         {"updates": [FIRMWARE_UPDATE_INFO]},
     )
-    updates = await multisensor_6.client.driver.controller.async_get_available_firmware_updates(
+    controller = multisensor_6.client.driver.controller
+    updates = await controller.async_get_available_firmware_updates(
         multisensor_6, "test"
     )
     assert len(updates) == 1

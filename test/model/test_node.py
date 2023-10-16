@@ -1,8 +1,8 @@
 """Test the node model."""
 import asyncio
-import json
 from copy import deepcopy
 from datetime import datetime, timezone
+import json
 from typing import Any
 from unittest.mock import AsyncMock, patch
 
@@ -34,8 +34,7 @@ from zwave_js_server.exceptions import (
     RssiErrorReceived,
     UnwriteableValue,
 )
-from zwave_js_server.model import endpoint as endpoint_pkg
-from zwave_js_server.model import node as node_pkg
+from zwave_js_server.model import endpoint as endpoint_pkg, node as node_pkg
 from zwave_js_server.model.node.firmware import (
     NodeFirmwareUpdateInfo,
     NodeFirmwareUpdateStatus,
@@ -183,7 +182,7 @@ def test_from_state(client):
 
 
 async def test_highest_security_value(lock_schlage_be469, ring_keypad):
-    """Test the highest_security_class property"""
+    """Test the highest_security_class property."""
     assert lock_schlage_be469.highest_security_class == SecurityClass.S0_LEGACY
     assert ring_keypad.highest_security_class is None
 
@@ -238,7 +237,8 @@ async def test_device_config(
         "controller being inoperable or otherwise unavailable.)"
     )
     assert device_config.metadata.manual == (
-        "https://products.z-wavealliance.org/ProductManual/File?folder=&filename=MarketCertificationFiles/2479/ZP3111-5_R2_20170316.pdf"
+        "https://products.z-wavealliance.org/ProductManual/File?folder=&filename="
+        "MarketCertificationFiles/2479/ZP3111-5_R2_20170316.pdf"
     )
     assert device_config.metadata.wakeup is None
     assert device_config.metadata.comments == [{"level": "info", "text": "test"}]

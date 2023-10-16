@@ -2,16 +2,16 @@
 from __future__ import annotations
 
 import asyncio
-import logging
-import pprint
-import uuid
 from collections import defaultdict
 from collections.abc import Callable
 from copy import deepcopy
 from datetime import datetime
+import logging
 from operator import itemgetter
+import pprint
 from types import TracebackType
 from typing import Any, cast
+import uuid
 
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, client_exceptions
 
@@ -94,7 +94,10 @@ class Client:
     def __repr__(self) -> str:
         """Return the representation."""
         prefix = "" if self.connected else "not "
-        return f"{type(self).__name__}(ws_server_url={self.ws_server_url!r}, {prefix}connected)"
+        return (
+            f"{type(self).__name__}(ws_server_url={self.ws_server_url!r}, "
+            f"{prefix}connected)"
+        )
 
     @property
     def connected(self) -> bool:
@@ -115,10 +118,11 @@ class Client:
             raise InvalidServerVersion(
                 self.version,
                 require_schema,
-                "Command not available due to incompatible server version. Update the Z-Wave "
-                f"JS Server to a version that supports at least api schema {require_schema}.",
+                "Command not available due to incompatible server version. Update "
+                "the Z-Wave JS Server to a version that supports at least api schema "
+                f"{require_schema}.",
             )
-        future: "asyncio.Future[dict]" = self._loop.create_future()
+        future: asyncio.Future[dict] = self._loop.create_future()
         message_id = message["messageId"] = uuid.uuid4().hex
         self._result_futures[message_id] = future
         await self._send_json_message(message)
@@ -136,8 +140,9 @@ class Client:
             raise InvalidServerVersion(
                 self.version,
                 require_schema,
-                "Command not available due to incompatible server version. Update the Z-Wave "
-                f"JS Server to a version that supports at least api schema {require_schema}.",
+                "Command not available due to incompatible server version. Update "
+                "the Z-Wave JS Server to a version that supports at least api schema "
+                f"{require_schema}.",
             )
         message["messageId"] = uuid.uuid4().hex
         await self._send_json_message(message)
@@ -180,8 +185,8 @@ class Client:
                 f"at least api schema {MIN_SERVER_SCHEMA_VERSION}",
             )
         # store the (highest possible) schema version we're going to use/request
-        # this is a bit future proof as we might decide to use a pinned version at some point
-        # for now we just negotiate the highest available schema version and
+        # this is a bit future proof as we might decide to use a pinned version at some
+        # point for now we just negotiate the highest available schema version and
         # guard incompatibility with the MIN_SERVER_SCHEMA_VERSION
         if version.max_schema_version < MAX_SERVER_SCHEMA_VERSION:
             self.schema_version = version.max_schema_version
@@ -554,7 +559,7 @@ class Client:
 
         await self._client.send_json(message)
 
-    async def __aenter__(self) -> "Client":
+    async def __aenter__(self) -> Client:
         """Connect to the websocket."""
         await self.connect()
         return self

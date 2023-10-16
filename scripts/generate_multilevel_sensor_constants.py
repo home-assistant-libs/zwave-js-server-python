@@ -2,12 +2,13 @@
 """Script to generate Multilevel Sensor CC constants."""
 from __future__ import annotations
 
+from collections import defaultdict
+from collections.abc import Callable, Mapping
 import json
 import pathlib
 import re
 import subprocess
-from collections import defaultdict
-from collections.abc import Callable, Mapping
+import sys
 
 import requests
 from slugify import slugify
@@ -271,7 +272,7 @@ if subprocess.run(["which", "git"], capture_output=True, check=True).stdout:
         is not None
     ):
         print("Repo is dirty and needs to be committed!")
-        exit(1)
+        sys.exit(1)
 else:
     print(
         "Could not run `git diff --stat` on repo, please run it to determine whether "

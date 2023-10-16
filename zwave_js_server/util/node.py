@@ -41,8 +41,7 @@ async def async_set_config_parameter(
     property_key: int | str | None = None,
     endpoint: int = 0,
 ) -> tuple[ConfigurationValue, CommandStatus]:
-    """
-    Set a value for a config parameter on this node.
+    """Set a value for a config parameter on this node.
 
     new_value and property_ can be provided as labels, so we need to resolve them to
     the appropriate key

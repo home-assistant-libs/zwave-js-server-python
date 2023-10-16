@@ -28,17 +28,17 @@ class RouteStatisticsDict(TypedDict):
     """Represent a route statistics data dict type."""
 
     protocol_data_rate: int
-    repeaters: list["Node"]
+    repeaters: list[Node]
     rssi: int | None
     repeater_rssi: list[int]
-    route_failed_between: tuple["Node", "Node"] | None
+    route_failed_between: tuple[Node, Node] | None
 
 
 @dataclass
 class RouteStatistics:
     """Represent route statistics."""
 
-    client: "Client" = field(repr=False)
+    client: Client = field(repr=False)
     data: RouteStatisticsDataType = field(repr=False)
     protocol_data_rate: ProtocolDataRate = field(init=False)
 
@@ -47,7 +47,7 @@ class RouteStatistics:
         self.protocol_data_rate = ProtocolDataRate(self.data["protocolDataRate"])
 
     @cached_property
-    def repeaters(self) -> list["Node"]:
+    def repeaters(self) -> list[Node]:
         """Return repeaters."""
         assert self.client.driver
         return [
@@ -75,7 +75,7 @@ class RouteStatistics:
         return repeater_rssi
 
     @cached_property
-    def route_failed_between(self) -> tuple["Node", "Node"] | None:
+    def route_failed_between(self) -> tuple[Node, Node] | None:
         """Return route failed between."""
         if (node_ids := self.data.get("routeFailedBetween")) is None:
             return None

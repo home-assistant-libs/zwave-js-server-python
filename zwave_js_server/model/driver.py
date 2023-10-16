@@ -41,7 +41,7 @@ LoggingEventModel = create_model_from_typeddict(
 )
 
 
-DRIVER_EVENT_MODEL_MAP: dict[str, type["BaseDriverEventModel"]] = {
+DRIVER_EVENT_MODEL_MAP: dict[str, type[BaseDriverEventModel]] = {
     "all nodes ready": AllNodesReadyEventModel,
     "log config updated": LogConfigUpdatedEventModel,
     "logging": LoggingEventModel,
@@ -62,7 +62,7 @@ class Driver(EventBase):
     """Represent a Z-Wave JS driver."""
 
     def __init__(
-        self, client: "Client", state: dict, log_config: LogConfigDataType
+        self, client: Client, state: dict, log_config: LogConfigDataType
     ) -> None:
         """Initialize driver."""
         super().__init__()

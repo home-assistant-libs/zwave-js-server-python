@@ -36,7 +36,7 @@ class Endpoint(EventBase):
 
     def __init__(
         self,
-        client: "Client",
+        client: Client,
         data: EndpointDataType,
         values: dict[str, ConfigurationValue | Value],
     ) -> None:
@@ -128,8 +128,8 @@ class Endpoint(EventBase):
         """
         Send an endpoint command. For internal use only.
 
-        If wait_for_result is not None, it will take precedence, otherwise we will decide
-        to wait or not based on the node status.
+        If wait_for_result is not None, it will take precedence, otherwise we will
+        decide to wait or not based on the node status.
         """
         if self.client.driver is None:
             raise FailedCommand(
@@ -234,7 +234,7 @@ class Endpoint(EventBase):
         assert result
         return cast(bool, result["version"])
 
-    async def async_get_node_unsafe(self) -> "NodeDataType":
+    async def async_get_node_unsafe(self) -> NodeDataType:
         """Call endpoint.get_node_unsafe command."""
         result = await self.async_send_command(
             "get_node_unsafe",

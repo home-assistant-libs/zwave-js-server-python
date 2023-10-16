@@ -146,7 +146,7 @@ class NodeFirmwareUpdateProgressDataType(TypedDict):
 class NodeFirmwareUpdateProgress:
     """Model for a node firmware update progress data."""
 
-    node: "Node"
+    node: Node
     data: NodeFirmwareUpdateProgressDataType = field(repr=False)
     current_file: int = field(init=False)
     total_files: int = field(init=False)
@@ -176,7 +176,7 @@ class NodeFirmwareUpdateResultDataType(TypedDict, total=False):
 class NodeFirmwareUpdateResult:
     """Model for node firmware update result data."""
 
-    node: "Node"
+    node: Node
     data: NodeFirmwareUpdateResultDataType = field(repr=False)
     status: NodeFirmwareUpdateStatus = field(init=False)
     success: bool = field(init=False)
@@ -210,7 +210,7 @@ class NodeFirmwareUpdateFileInfo:
     @classmethod
     def from_dict(
         cls, data: NodeFirmwareUpdateFileInfoDataType
-    ) -> "NodeFirmwareUpdateFileInfo":
+    ) -> NodeFirmwareUpdateFileInfo:
         """Initialize from dict."""
         return cls(**data)
 
@@ -242,7 +242,7 @@ class NodeFirmwareUpdateDeviceID:
     @classmethod
     def from_dict(
         cls, data: NodeFirmwareUpdateDeviceIDDataType
-    ) -> "NodeFirmwareUpdateDeviceID":
+    ) -> NodeFirmwareUpdateDeviceID:
         """Initialize from dict."""
         return cls(
             manufacturer_id=data["manufacturerId"],
@@ -290,9 +290,7 @@ class NodeFirmwareUpdateInfo:
     device: NodeFirmwareUpdateDeviceID
 
     @classmethod
-    def from_dict(
-        cls, data: NodeFirmwareUpdateInfoDataType
-    ) -> "NodeFirmwareUpdateInfo":
+    def from_dict(cls, data: NodeFirmwareUpdateInfoDataType) -> NodeFirmwareUpdateInfo:
         """Initialize from dict."""
         return cls(
             version=data["version"],
