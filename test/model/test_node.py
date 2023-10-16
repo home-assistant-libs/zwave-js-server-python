@@ -17,6 +17,7 @@ from zwave_js_server.const import (
     ProtocolVersion,
     RFRegion,
     SecurityClass,
+    SupervisionStatus,
     Weekday,
 )
 from zwave_js_server.const.command_class.entry_control import (
@@ -44,7 +45,11 @@ from zwave_js_server.model.node.health_check import (
     RouteHealthCheckResultDataType,
 )
 from zwave_js_server.model.node.statistics import NodeStatistics
-from zwave_js_server.model.value import ConfigurationValue, get_value_id_str
+from zwave_js_server.model.value import (
+    ConfigurationValue,
+    ConfigurationValueFormat,
+    get_value_id_str,
+)
 
 from .. import load_fixture
 
@@ -2497,3 +2502,112 @@ async def test_is_secure_none(client, multisensor_6_state):
     node_state.pop("isSecure")
     node = node_pkg.Node(client, node_state)
     assert node.is_secure is None
+
+
+async def test_set_raw_config_parameter_value(
+    multisensor_6: node_pkg.Node, uuid4, mock_command
+):
+    """Test set raw config parameter value."""
+    node = multisensor_6
+
+    ack_commands = mock_command(
+        {"command": "node.set_raw_config_parameter_value", "nodeId": node.node_id},
+        {},
+    )
+
+    assert await node.async_set_raw_config_parameter_value(1, 101, 1) is None
+
+    assert ack_commands[0] == {
+        "command": "node.set_raw_config_parameter_value",
+        "nodeId": node.node_id,
+        "options": {
+            "parameter": 101,
+            "bitMask": 1,
+            "value": 1,
+        },
+        "messageId": uuid4,
+    }
+
+    assert (
+        await node.async_set_raw_config_parameter_value(
+            "Disable", "Stay Awake in Battery Mode"
+        )
+        is None
+    )
+
+    assert ack_commands[1] == {
+        "command": "node.set_raw_config_parameter_value",
+        "nodeId": node.node_id,
+        "options": {
+            "parameter": 2,
+            "value": 0,
+        },
+        "messageId": uuid4,
+    }
+
+    assert (
+        await node.async_set_raw_config_parameter_value(
+            1, 101, 1, 1, ConfigurationValueFormat.SIGNED_INTEGER
+        )
+        is None
+    )
+
+    assert ack_commands[2] == {
+        "command": "node.set_raw_config_parameter_value",
+        "nodeId": node.node_id,
+        "options": {
+            "parameter": 101,
+            "bitMask": 1,
+            "valueSize": 1,
+            "valueFormat": 0,
+            "value": 1,
+        },
+        "messageId": uuid4,
+    }
+
+    # Test failures
+    with pytest.raises(NotFoundError):
+        await node.async_set_raw_config_parameter_value(
+            "fake", "Stay Awake in Battery Mode"
+        )
+
+    with pytest.raises(NotFoundError):
+        await node.async_set_raw_config_parameter_value(1, 1000)
+
+    with pytest.raises(ValueError):
+        await node.async_set_raw_config_parameter_value(1, 101, 1, 1)
+
+    with pytest.raises(ValueError):
+        await node.async_set_raw_config_parameter_value(
+            1, 101, 1, value_format=ConfigurationValueFormat.SIGNED_INTEGER
+        )
+
+
+async def test_supervision_result(inovelli_switch: node_pkg.Node, uuid4, mock_command):
+    """Test Supervision Result."""
+    node = inovelli_switch
+
+    mock_command(
+        {"command": "node.set_raw_config_parameter_value", "nodeId": node.node_id},
+        {"result": {"status": 1, "remainingDuration": "default"}},
+    )
+
+    result = await node.async_set_raw_config_parameter_value(1, 1)
+    assert result.status is SupervisionStatus.WORKING
+    duration = result.remaining_duration
+    assert duration.unit == "default"
+
+
+async def test_supervision_result_invalid(
+    inovelli_switch: node_pkg.Node, uuid4, mock_command
+):
+    """Test invalid Supervision Result."""
+    node = inovelli_switch
+
+    mock_command(
+        {"command": "node.set_raw_config_parameter_value", "nodeId": node.node_id},
+        {"result": {"status": 1}},
+    )
+
+    with pytest.raises(ValueError):
+        await node.async_set_raw_config_parameter_value(1, 1)

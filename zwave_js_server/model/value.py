@@ -323,7 +323,7 @@ class SupervisionResultDataType(TypedDict, total=False):
 
     # https://github.com/zwave-js/node-zwave-js/blob/cc_api_options/packages/core/src/consts/Transmission.ts#L311
     status: int
-    remainingDuration: DurationDataType  # optional unless status is 1 (working)
+    remainingDuration: DurationDataType  # not included unless status is 1 (working)
 
 
 @dataclass
@@ -341,7 +341,7 @@ class SupervisionResult:
             self.remaining_duration = Duration(remaining_duration)
 
         if self.status == SupervisionStatus.WORKING ^ bool(
-            self.remaining_duration is None
+            self.remaining_duration is not None
         ):
             raise ValueError(
                 "SupervisionStatus of WORKING requires a remaining duration, all "
