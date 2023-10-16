@@ -65,7 +65,7 @@ class NodeFirmwareUpdateCapabilitiesDict(TypedDict, total=False):
 class NodeFirmwareUpdateCapabilities:
     """Model for firmware update capabilities."""
 
-    data: NodeFirmwareUpdateCapabilitiesDataType
+    data: NodeFirmwareUpdateCapabilitiesDataType = field(repr=False)
     firmware_upgradable: bool = field(init=False)
 
     def __post_init__(self) -> None:
@@ -147,7 +147,7 @@ class NodeFirmwareUpdateProgress:
     """Model for a node firmware update progress data."""
 
     node: "Node"
-    data: NodeFirmwareUpdateProgressDataType
+    data: NodeFirmwareUpdateProgressDataType = field(repr=False)
     current_file: int = field(init=False)
     total_files: int = field(init=False)
     sent_fragments: int = field(init=False)
@@ -177,7 +177,7 @@ class NodeFirmwareUpdateResult:
     """Model for node firmware update result data."""
 
     node: "Node"
-    data: NodeFirmwareUpdateResultDataType
+    data: NodeFirmwareUpdateResultDataType = field(repr=False)
     status: NodeFirmwareUpdateStatus = field(init=False)
     success: bool = field(init=False)
     wait_time: int | None = field(init=False)

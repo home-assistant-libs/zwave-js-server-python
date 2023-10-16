@@ -22,8 +22,8 @@ class ControllerLifelineRoutesDataType(TypedDict):
 class ControllerLifelineRoutes:
     """Represent controller lifeline routes."""
 
-    client: "Client"
-    data: ControllerLifelineRoutesDataType
+    client: "Client" = field(repr=False)
+    data: ControllerLifelineRoutesDataType = field(repr=False)
     lwr: RouteStatistics | None = field(init=False, default=None)
     nlwr: RouteStatistics | None = field(init=False, default=None)
 
@@ -74,7 +74,7 @@ class ControllerStatisticsDataType(TypedDict, total=False):
 class ChannelRSSI:
     """Represent a channel RSSI."""
 
-    data: ChannelRSSIDataType
+    data: ChannelRSSIDataType = field(repr=False)
     average: int = field(init=False)
     current: int = field(init=False)
 
@@ -88,7 +88,7 @@ class ChannelRSSI:
 class BackgroundRSSI:
     """Represent a background RSSI update."""
 
-    data: BackgroundRSSIDataType
+    data: BackgroundRSSIDataType = field(repr=False)
     timestamp: int = field(init=False)
     channel_0: ChannelRSSI = field(init=False)
     channel_1: ChannelRSSI = field(init=False)
@@ -109,7 +109,7 @@ class BackgroundRSSI:
 class ControllerStatistics:
     """Represent a controller statistics update."""
 
-    data: ControllerStatisticsDataType
+    data: ControllerStatisticsDataType = field(repr=False)
     messages_tx: int = field(init=False)
     messages_rx: int = field(init=False)
     messages_dropped_rx: int = field(init=False)

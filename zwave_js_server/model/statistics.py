@@ -38,8 +38,8 @@ class RouteStatisticsDict(TypedDict):
 class RouteStatistics:
     """Represent route statistics."""
 
-    client: "Client"
-    data: RouteStatisticsDataType
+    client: "Client" = field(repr=False)
+    data: RouteStatisticsDataType = field(repr=False)
     protocol_data_rate: ProtocolDataRate = field(init=False)
 
     def __post_init__(self) -> None:

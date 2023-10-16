@@ -31,8 +31,8 @@ class BaseNotification:
     """Model for a Zwave Node's notification event."""
 
     node: Node
-    data: BaseNotificationDataType
-    node_id: int = field(init=False)
+    data: BaseNotificationDataType = field(repr=False)
+    node_id: int = field(init=False, repr=False)
     endpoint_idx: int = field(init=False)
     command_class: int = field(init=False)
 
@@ -63,7 +63,7 @@ class EntryControlNotificationDataType(BaseNotificationDataType):
 class EntryControlNotification(BaseNotification):
     """Model for a Zwave Node's Entry Control CC notification event."""
 
-    data: EntryControlNotificationDataType
+    data: EntryControlNotificationDataType = field(repr=False)
     event_type: int = field(init=False)
     event_type_label: str = field(init=False)
     data_type: int = field(init=False)
@@ -101,7 +101,7 @@ class NotificationNotificationDataType(BaseNotificationDataType):
 class NotificationNotification(BaseNotification):
     """Model for a Zwave Node's Notification CC notification event."""
 
-    data: NotificationNotificationDataType
+    data: NotificationNotificationDataType = field(repr=False)
     type_: int = field(init=False)
     label: str = field(init=False)
     event: int = field(init=False)
@@ -136,7 +136,7 @@ class PowerLevelNotificationDataType(BaseNotificationDataType):
 class PowerLevelNotification(BaseNotification):
     """Model for a Zwave Node's Power Level CC notification event."""
 
-    data: PowerLevelNotificationDataType
+    data: PowerLevelNotificationDataType = field(repr=False)
     test_node_id: int = field(init=False)
     status: PowerLevelTestStatus = field(init=False)
     acknowledged_frames: int = field(init=False)
@@ -167,7 +167,7 @@ class MultilevelSwitchNotificationDataType(BaseNotificationDataType):
 class MultilevelSwitchNotification(BaseNotification):
     """Model for a Zwave Node's Multi Level CC notification event."""
 
-    data: MultilevelSwitchNotificationDataType
+    data: MultilevelSwitchNotificationDataType = field(repr=False)
     event_type: MultilevelSwitchCommand = field(init=False)
     event_type_label: str = field(init=False)
     direction: str | None = field(init=False)

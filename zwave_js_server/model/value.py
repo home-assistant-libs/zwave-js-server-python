@@ -345,7 +345,7 @@ class SetValueResultDataType(TypedDict, total=False):
 class SetValueResult:
     """Result from setValue command."""
 
-    data: SetValueResultDataType
+    data: SetValueResultDataType = field(repr=False)
     status: SetValueStatus = field(init=False)
     remaining_duration: Duration | None = field(init=False)
     message: str | None = field(init=False)

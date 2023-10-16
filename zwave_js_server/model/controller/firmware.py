@@ -63,7 +63,7 @@ class ControllerFirmwareUpdateProgressDataType(TypedDict):
 class ControllerFirmwareUpdateProgress:
     """Model for a controller firmware update progress data."""
 
-    data: ControllerFirmwareUpdateProgressDataType
+    data: ControllerFirmwareUpdateProgressDataType = field(repr=False)
     sent_fragments: int = field(init=False)
     total_fragments: int = field(init=False)
     progress: float = field(init=False)
@@ -86,7 +86,7 @@ class ControllerFirmwareUpdateResultDataType(TypedDict):
 class ControllerFirmwareUpdateResult:
     """Model for controller firmware update result data."""
 
-    data: ControllerFirmwareUpdateResultDataType
+    data: ControllerFirmwareUpdateResultDataType = field(repr=False)
     status: ControllerFirmwareUpdateStatus = field(init=False)
     success: bool = field(init=False)
 
