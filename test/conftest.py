@@ -1,13 +1,13 @@
 """Provide common pytest fixtures."""
 import asyncio
-import json
 from collections import deque
 from copy import deepcopy
+import json
 from unittest.mock import AsyncMock, Mock, patch
 
-import pytest
 from aiohttp import ClientSession, ClientWebSocketResponse
 from aiohttp.http_websocket import WSMessage, WSMsgType
+import pytest
 
 from zwave_js_server.client import Client
 from zwave_js_server.model.controller import Controller

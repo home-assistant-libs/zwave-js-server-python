@@ -1,4 +1,18 @@
 repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.0.292
+    hooks:
+      - id: ruff
+        name: Check ruff for zwave_js_server
+        files: ^(zwave_js_server)/.+\.py$
+        args: [--fix, --exit-non-zero-on-fix]
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.0.292
+    hooks:
+      - id: ruff
+        name: Check ruff for scripts and test
+        files: ^(scripts|test)/.+\.py$
+        args: [--fix, --exit-non-zero-on-fix, --select, I001, D210, D400, D403, D415]
   - repo: https://github.com/psf/black-pre-commit-mirror
     rev: 23.9.1
     hooks:
@@ -17,11 +31,6 @@ repos:
     hooks:
       - id: pydocstyle
         files: ^(zwave_js_server|test)/.+\.py$
-  - repo: https://github.com/pycqa/flake8
-    rev: 6.1.0
-    hooks:
-      - id: flake8
-        files: ^((zwave_js_server|test)/.+)?[^/]+\.py$
   - repo: local
     hooks:
       - id: mypy
@@ -33,7 +42,7 @@ repos:
         files: ^(zwave_js_server)/.+\.py$
       - id: pylint
         name: pylint
-        entry: scripts/run-in-env.sh pylint -j 0 --ignore-missing-annotations=y
+        entry: scripts/run-in-env.sh pylint -j 0
         language: script
         types: [python]
         files: ^zwave_js_server/.+\.py$

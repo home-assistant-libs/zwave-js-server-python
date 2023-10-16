@@ -207,7 +207,7 @@ class FirmwareUpdateProgressEventModel(BaseNodeEventModel):
     progress: NodeFirmwareUpdateProgressDataType
 
 
-NODE_EVENT_MODEL_MAP: dict[str, type["BaseNodeEventModel"]] = {
+NODE_EVENT_MODEL_MAP: dict[str, type[BaseNodeEventModel]] = {
     "alive": AliveEventModel,
     "check lifeline health progress": CheckLifelineHealthProgressEventModel,
     "check route health progress": CheckRouteHealthProgressEventModel,

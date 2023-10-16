@@ -1,0 +1,50 @@
+[tool.ruff]
+select = [
+    "D",
+    "E",
+    "F",
+    "G",
+    "I",
+    "PLC",
+    "PLE",
+    "PLR",
+    "PLW",
+    "UP",
+    "W",
+]
+ignore = [
+    "D202",
+    "D212",
+    "D203",
+    "D213",
+    "E501",
+    "PLR0911", # Too many return statements ({returns} > {max_returns})
+    "PLR0912", # Too many branches ({branches} > {max_branches})
+    "PLR0913", # Too many arguments to function call ({c_args} > {max_args})
+    "PLR0915", # Too many statements ({statements} > {max_statements})
+    "PLR2004",  # Magic value used in comparison, consider replacing {value} with a constant variable
+    "PLW2901", # Outer {outer_kind} variable {name} overwritten by inner {inner_kind} target
+    "UP006", # keep type annotation style as is
+    "UP007", # keep type annotation style as is
+]
+exclude = [
+    ".venv",
+    ".git",
+    ".tox",
+    "docs",
+    "venv",
+    "bin",
+    "lib",
+    "deps",
+    "build",
+]
+line-length = 88
+
+[tool.ruff.isort]
+force-sort-within-sections = true
+known-first-party = [
+    "zwave_js_server",
+]
+combine-as-imports = true
+split-on-trailing-comma = false
+case-sensitive = true

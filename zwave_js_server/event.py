@@ -1,8 +1,8 @@
 """Provide Event base classes for Z-Wave JS."""
 from __future__ import annotations
 
-import logging
 from dataclasses import dataclass, field
+import logging
 from typing import Callable, Literal
 
 try:

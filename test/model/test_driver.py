@@ -5,9 +5,11 @@ import pytest
 
 from zwave_js_server.const import LogLevel
 from zwave_js_server.event import Event
-from zwave_js_server.model import driver as driver_pkg
-from zwave_js_server.model import log_config as log_config_pkg
-from zwave_js_server.model import log_message as log_message_pkg
+from zwave_js_server.model import (
+    driver as driver_pkg,
+    log_config as log_config_pkg,
+    log_message as log_message_pkg,
+)
 
 from .. import load_fixture
 

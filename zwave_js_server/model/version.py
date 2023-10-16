@@ -26,7 +26,7 @@ class VersionInfo:
     max_schema_version: int
 
     @classmethod
-    def from_message(cls, msg: VersionInfoDataType) -> "VersionInfo":
+    def from_message(cls, msg: VersionInfoDataType) -> VersionInfo:
         """Create a version info from a version message."""
         return cls(
             driver_version=msg["driverVersion"],

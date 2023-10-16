@@ -68,7 +68,7 @@ class InvalidServerVersion(BaseZwaveJSServerError):
 
     def __init__(
         self,
-        version_info: "VersionInfo",
+        version_info: VersionInfo,
         required_schema_version: int,
         message: str,
     ) -> None:
@@ -138,14 +138,14 @@ class BulkSetConfigParameterFailed(BaseZwaveJSServerError):
     """
     Exception raised when bulk setting a config parameter fails.
 
-    Derived from another exception
+    Derived from another exception.
     """
 
 
 class InvalidCommandClass(BaseZwaveJSServerError):
     """Exception raised when Zwave Value has an invalid command class."""
 
-    def __init__(self, value: "Value", command_class: "CommandClass") -> None:
+    def __init__(self, value: Value, command_class: CommandClass) -> None:
         """Initialize an invalid Command Class error."""
         self.value = value
         self.command_class = command_class
@@ -162,7 +162,7 @@ class UnknownValueData(BaseZwaveJSServerError):
     library.
     """
 
-    def __init__(self, value: "Value", path: str) -> None:
+    def __init__(self, value: Value, path: str) -> None:
         """Initialize an unknown data error."""
         self.value = value
         self.path = path
@@ -178,7 +178,7 @@ class UnknownValueData(BaseZwaveJSServerError):
 class RssiErrorReceived(BaseZwaveJSServerError):
     """Exception raised when an RSSI error is received."""
 
-    def __init__(self, error: "RssiError") -> None:
+    def __init__(self, error: RssiError) -> None:
         """Initialize an RSSI error."""
         self.error = error
         super().__init__()

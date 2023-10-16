@@ -164,7 +164,7 @@ class DeviceConfig:
 
     @property
     def manufacturer_id(self) -> str | None:  # TODO: In the dump this is an int.
-        """Return manufacturer id (as defined in the specs) as a 4-digit hexadecimal string."""
+        """Return manufacturer id (as defined in specs) as a 4-digit hex string."""
         return self.data.get("manufacturerId")
 
     @property

@@ -14,8 +14,8 @@ from ...const import (
     InclusionStrategy,
     NodeType,
     QRCodeVersion,
-    RemoveNodeReason,
     RFRegion,
+    RemoveNodeReason,
     ZwaveFeature,
 )
 from ...event import Event, EventBase
@@ -70,7 +70,7 @@ class NVMProgress:
 class Controller(EventBase):
     """Represent a Z-Wave JS controller."""
 
-    def __init__(self, client: "Client", state: dict) -> None:
+    def __init__(self, client: Client, state: dict) -> None:
         """Initialize controller."""
         super().__init__()
         self.client = client
@@ -261,7 +261,8 @@ class Controller(EventBase):
         if force_security is not None:
             if inclusion_strategy != InclusionStrategy.DEFAULT:
                 raise ValueError(
-                    "`forceSecurity` option is only supported with inclusion_strategy=DEFAULT"
+                    "`forceSecurity` option is only supported with inclusion_strategy="
+                    "DEFAULT"
                 )
             options["forceSecurity"] = force_security
 
@@ -270,7 +271,8 @@ class Controller(EventBase):
         if provisioning is not None:
             if inclusion_strategy != InclusionStrategy.SECURITY_S2:
                 raise ValueError(
-                    "`provisioning` option is only supported with inclusion_strategy=SECURITY_S2"
+                    "`provisioning` option is only supported with inclusion_strategy="
+                    "SECURITY_S2"
                 )
 
             if dsk is not None:
@@ -283,8 +285,8 @@ class Controller(EventBase):
                     provisioning
                 ) < MINIMUM_QR_STRING_LENGTH or not provisioning.startswith("90"):
                     raise ValueError(
-                        f"QR code string must be at least {MINIMUM_QR_STRING_LENGTH} characters "
-                        "long and start with `90`"
+                        f"QR code string must be at least {MINIMUM_QR_STRING_LENGTH} "
+                        "characters long and start with `90`"
                     )
                 options["provisioning"] = provisioning
             # If we get a Smart Start QR code, we provision the node and return because
@@ -294,8 +296,8 @@ class Controller(EventBase):
                 and provisioning.version == QRCodeVersion.SMART_START
             ):
                 raise ValueError(
-                    "Smart Start QR codes can't use the normal inclusion process. Use the "
-                    "provision_smart_start_node command to provision this device."
+                    "Smart Start QR codes can't use the normal inclusion process. Use "
+                    "the provision_smart_start_node command to provision this device."
                 )
             # Otherwise we assume the data is ProvisioningEntry or
             # QRProvisioningInformation that is not a Smart Start QR code
@@ -431,7 +433,8 @@ class Controller(EventBase):
         if force_security is not None:
             if inclusion_strategy != InclusionStrategy.DEFAULT:
                 raise ValueError(
-                    "`forceSecurity` option is only supported with inclusion_strategy=DEFAULT"
+                    "`forceSecurity` option is only supported with inclusion_strategy="
+                    "DEFAULT"
                 )
             options["forceSecurity"] = force_security
 
@@ -440,7 +443,8 @@ class Controller(EventBase):
         if provisioning is not None:
             if inclusion_strategy != InclusionStrategy.SECURITY_S2:
                 raise ValueError(
-                    "`provisioning` option is only supported with inclusion_strategy=SECURITY_S2"
+                    "`provisioning` option is only supported with inclusion_strategy="
+                    "SECURITY_S2"
                 )
             # Provisioning option was introduced in Schema 11
             require_schema = 11
@@ -450,8 +454,8 @@ class Controller(EventBase):
                     provisioning
                 ) < MINIMUM_QR_STRING_LENGTH or not provisioning.startswith("90"):
                     raise ValueError(
-                        f"QR code string must be at least {MINIMUM_QR_STRING_LENGTH} characters "
-                        "long and start with `90`"
+                        f"QR code string must be at least {MINIMUM_QR_STRING_LENGTH} "
+                        "characters long and start with `90`"
                     )
                 options["provisioning"] = provisioning
             # Otherwise we assume the data is ProvisioningEntry or
@@ -838,7 +842,8 @@ class Controller(EventBase):
         if event.data["source"] != "controller":
             # TODO decide what to do here
             print(
-                f"Controller doesn't know how to handle/forward this event: {event.data}"
+                "Controller doesn't know how to handle/forward this event: "
+                f"{event.data}"
             )
 
         CONTROLLER_EVENT_MODEL_MAP[event.type](**event.data)

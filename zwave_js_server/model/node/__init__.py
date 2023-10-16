@@ -3,8 +3,8 @@ from __future__ import annotations
 
 import asyncio
 import copy
-import logging
 from datetime import datetime
+import logging
 from typing import TYPE_CHECKING, Any, cast
 
 from ...const import (
@@ -102,7 +102,7 @@ def _get_value_id_dict_from_value_data(value_data: ValueDataType) -> dict[str, A
 class Node(EventBase):
     """Represent a Z-Wave JS node."""
 
-    def __init__(self, client: "Client", data: NodeDataType) -> None:
+    def __init__(self, client: Client, data: NodeDataType) -> None:
         """Initialize the node."""
         super().__init__()
         self.client = client
@@ -467,8 +467,8 @@ class Node(EventBase):
         """
         Send a node command. For internal use only.
 
-        If wait_for_result is not None, it will take precedence, otherwise we will decide
-        to wait or not based on the node status.
+        If wait_for_result is not None, it will take precedence, otherwise we will
+        decide to wait or not based on the node status.
         """
         kwargs = {}
         message = {"command": f"node.{cmd}", "nodeId": self.node_id, **cmd_kwargs}
@@ -704,7 +704,7 @@ class Node(EventBase):
         return None
 
     async def async_test_power_level(
-        self, test_node: "Node", power_level: PowerLevel, test_frame_count: int
+        self, test_node: Node, power_level: PowerLevel, test_frame_count: int
     ) -> int:
         """Send testPowerLevel command to Node."""
         data = await self.async_send_command(
@@ -735,7 +735,7 @@ class Node(EventBase):
         return LifelineHealthCheckSummary(data["summary"])
 
     async def async_check_route_health(
-        self, target_node: "Node", rounds: int | None = None
+        self, target_node: Node, rounds: int | None = None
     ) -> RouteHealthCheckSummary:
         """Send checkRouteHealth command to Node."""
         kwargs = {"targetNodeId": target_node.node_id}
@@ -840,7 +840,7 @@ class Node(EventBase):
         return cast(int, data["timestamp"])
 
     async def async_manually_idle_notification_value(self, val: Value | str) -> None:
-        """Send manuallyIdleNotificationValue command to Node for given value (or value_id)."""
+        """Send manuallyIdleNotificationValue cmd to Node for value (or value_id)."""
         # a value may be specified as value_id or the value itself
         if not isinstance(val, Value):
             val = self.values[val]

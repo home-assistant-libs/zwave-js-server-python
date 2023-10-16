@@ -1,13 +1,13 @@
 """Test the client."""
 import asyncio
-import logging
 from datetime import datetime
+import logging
 from unittest.mock import Mock, patch
 
-import pytest
 from aiohttp.client_exceptions import ClientError, WSServerHandshakeError
 from aiohttp.client_reqrep import ClientResponse, RequestInfo
 from aiohttp.http_websocket import WSMsgType
+import pytest
 
 from zwave_js_server.client import LOGGER, Client
 from zwave_js_server.const import MAX_SERVER_SCHEMA_VERSION, LogLevel, __version__
