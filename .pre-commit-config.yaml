@@ -6,6 +6,10 @@ repos:
         args:
           - --quiet
         files: ^((zwave_js_server|scripts|test)/.+)?[^/]+\.py$
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
