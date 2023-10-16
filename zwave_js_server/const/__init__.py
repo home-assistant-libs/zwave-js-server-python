@@ -459,7 +459,7 @@ class DateAndTimeDataType(TypedDict, total=False):
 class DateAndTime:
     """Represent a date and time."""
 
-    data: DateAndTimeDataType
+    data: DateAndTimeDataType = field(repr=False)
     hour: int | None = field(init=False)
     minute: int | None = field(init=False)
     weekday: Weekday | None = field(default=None, init=False)

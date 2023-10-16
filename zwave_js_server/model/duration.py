@@ -17,7 +17,7 @@ class DurationDataType(TypedDict, total=False):
 class Duration:
     """Duration class."""
 
-    data: DurationDataType | Literal["unknown", "default"]
+    data: DurationDataType | Literal["unknown", "default"] = field(repr=False)
     unit: Literal["seconds", "minutes", "unknown", "default"] = field(init=False)
     value: int | float | None = field(init=False)
 

@@ -33,7 +33,7 @@ class LifelineHealthCheckSummaryDataType(TypedDict):
 class LifelineHealthCheckResult:
     """Represent a lifeline health check result."""
 
-    data: LifelineHealthCheckResultDataType
+    data: LifelineHealthCheckResultDataType = field(repr=False)
     latency: int = field(init=False)
     num_neighbors: int = field(init=False)
     failed_pings_node: int = field(init=False)
@@ -60,7 +60,7 @@ class LifelineHealthCheckResult:
 class LifelineHealthCheckSummary:
     """Represent a lifeline health check summary update."""
 
-    data: LifelineHealthCheckSummaryDataType
+    data: LifelineHealthCheckSummaryDataType = field(repr=False)
     rating: int = field(init=False)
     results: list[LifelineHealthCheckResult] = field(init=False)
 
@@ -96,7 +96,7 @@ class RouteHealthCheckSummaryDataType(TypedDict):
 class RouteHealthCheckResult:
     """Represent a route health check result."""
 
-    data: RouteHealthCheckResultDataType
+    data: RouteHealthCheckResultDataType = field(repr=False)
     num_neighbors: int = field(init=False)
     rating: int = field(init=False)
     failed_pings_to_target: int | None = field(init=False)
@@ -120,7 +120,7 @@ class RouteHealthCheckResult:
 class RouteHealthCheckSummary:
     """Represent a route health check summary update."""
 
-    data: RouteHealthCheckSummaryDataType
+    data: RouteHealthCheckSummaryDataType = field(repr=False)
     rating: int = field(init=False)
     results: list[RouteHealthCheckResult] = field(init=False)
 

@@ -35,8 +35,8 @@ class NodeStatisticsDataType(TypedDict, total=False):
 class NodeStatistics:
     """Represent a node statistics update."""
 
-    client: "Client"
-    data: NodeStatisticsDataType
+    client: "Client" = field(repr=False)
+    data: NodeStatisticsDataType = field(repr=False)
     commands_tx: int = field(init=False)
     commands_rx: int = field(init=False)
     commands_dropped_rx: int = field(init=False)

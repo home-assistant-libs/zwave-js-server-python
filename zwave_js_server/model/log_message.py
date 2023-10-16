@@ -27,7 +27,7 @@ class LogMessageContextDataType(TypedDict, total=False):
 class LogMessageContext:
     """Represent log message context information."""
 
-    data: LogMessageContextDataType
+    data: LogMessageContextDataType = field(repr=False)
     source: Literal["config", "serial", "controller", "driver"] = field(init=False)
     type: Literal["controller", "value", "node"] | None = field(init=False)
     node_id: int | None = field(init=False)
@@ -90,7 +90,7 @@ def _process_message(message: str | list[str]) -> list[str]:
 class LogMessage:
     """Represent a log message."""
 
-    data: LogMessageDataType
+    data: LogMessageDataType = field(repr=False)
     message: list[str] = field(init=False)
     formatted_message: list[str] = field(init=False)
     direction: str = field(init=False)
