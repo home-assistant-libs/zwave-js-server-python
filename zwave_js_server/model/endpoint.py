@@ -172,7 +172,7 @@ class Endpoint(EventBase):
             wait_for_result is None and node.status != NodeStatus.ASLEEP
         ):
             result = await self.client.async_send_command(message, **kwargs)
-            return cast(dict[str, Any], result)
+            return result
 
         await self.client.async_send_command_no_wait(message, **kwargs)
         return None
