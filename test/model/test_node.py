@@ -2517,6 +2517,8 @@ async def test_set_raw_config_parameter_value(
 
     assert await node.async_set_raw_config_parameter_value(1, 101, 1) is None
 
+    assert len(ack_commands) == 1
+
     assert ack_commands[0] == {
         "command": "endpoint.set_raw_config_parameter_value",
         "nodeId": node.node_id,
@@ -2536,6 +2538,8 @@ async def test_set_raw_config_parameter_value(
         is None
     )
 
+    assert len(ack_commands) == 2
+
     assert ack_commands[1] == {
         "command": "endpoint.set_raw_config_parameter_value",
         "nodeId": node.node_id,
@@ -2549,18 +2553,19 @@ async def test_set_raw_config_parameter_value(
 
     assert (
         await node.async_set_raw_config_parameter_value(
-            1, 101, 1, 1, ConfigurationValueFormat.SIGNED_INTEGER
+            1, 2, value_size=1, value_format=ConfigurationValueFormat.SIGNED_INTEGER
         )
         is None
     )
+
+    assert len(ack_commands) == 3
 
     assert ack_commands[2] == {
         "command": "endpoint.set_raw_config_parameter_value",
         "nodeId": node.node_id,
         "endpoint": 0,
         "options": {
-            "parameter": 101,
-            "bitMask": 1,
+            "parameter": 2,
             "valueSize": 1,
             "valueFormat": 0,
             "value": 1,
