@@ -114,7 +114,7 @@ class Node(EventBase):
         self._firmware_update_progress: NodeFirmwareUpdateProgress | None = None
         self.values: dict[str, ConfigurationValue | Value] = {}
         self.endpoints: dict[int, Endpoint] = {}
-        self._status_event = asyncio.Event()
+        self.status_event = asyncio.Event()
         self.update(data)
 
     def __repr__(self) -> str:
@@ -428,7 +428,9 @@ class Node(EventBase):
             if endpoint_idx in self.endpoints:
                 self.endpoints[endpoint_idx].update(endpoint, values)
             else:
-                self.endpoints[endpoint_idx] = Endpoint(self.client, endpoint, values)
+                self.endpoints[endpoint_idx] = Endpoint(
+                    self.client, self, endpoint, values
+                )
 
     def get_command_class_values(
         self, command_class: CommandClass, endpoint: int | None = None
@@ -485,13 +487,13 @@ class Node(EventBase):
             result_task = asyncio.create_task(
                 self.client.async_send_command(message, **kwargs)
             )
-            status_task = asyncio.create_task(self._status_event.wait())
+            status_task = asyncio.create_task(self.status_event.wait())
             await asyncio.wait(
                 [result_task, status_task],
                 return_when=asyncio.FIRST_COMPLETED,
             )
             status_task.cancel()
-            if self._status_event.is_set() and not result_task.done():
+            if self.status_event.is_set() and not result_task.done():
                 result_task.cancel()
                 return None
             return result_task.result()
@@ -968,25 +970,25 @@ class Node(EventBase):
     def handle_wake_up(self, event: Event) -> None:
         """Process a node wake up event."""
         # pylint: disable=unused-argument
-        self._status_event.clear()
+        self.status_event.clear()
         self.data["status"] = NodeStatus.AWAKE
 
     def handle_sleep(self, event: Event) -> None:
         """Process a node sleep event."""
         # pylint: disable=unused-argument
-        self._status_event.set()
+        self.status_event.set()
         self.data["status"] = NodeStatus.ASLEEP
 
     def handle_dead(self, event: Event) -> None:
         """Process a node dead event."""
         # pylint: disable=unused-argument
-        self._status_event.set()
+        self.status_event.set()
         self.data["status"] = NodeStatus.DEAD
 
     def handle_alive(self, event: Event) -> None:
         """Process a node alive event."""
         # pylint: disable=unused-argument
-        self._status_event.clear()
+        self.status_event.clear()
         self.data["status"] = NodeStatus.ALIVE
 
     def handle_interview_started(self, event: Event) -> None:
