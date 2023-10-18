@@ -2585,6 +2585,11 @@ async def test_set_raw_config_parameter_value(
             1, 101, 1, value_format=ConfigurationValueFormat.SIGNED_INTEGER
         )
 
+    with pytest.raises(ValueError):
+        await node.async_set_raw_config_parameter_value(
+            1, 101, 1, 1, ConfigurationValueFormat.SIGNED_INTEGER
+        )
+
 
 async def test_supervision_result(inovelli_switch: node_pkg.Node, uuid4, mock_command):
     """Test Supervision Result."""

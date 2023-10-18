@@ -172,7 +172,7 @@ class Endpoint(EventBase):
             wait_for_result is None and node.status != NodeStatus.ASLEEP
         ):
             result = await self.client.async_send_command(message, **kwargs)
-            return result
+            return cast(dict[str, Any], result)
 
         await self.client.async_send_command_no_wait(message, **kwargs)
         return None
@@ -317,6 +317,12 @@ class Endpoint(EventBase):
             raise ValueError(
                 "value_size and value_format must either both be included or not "
                 "included"
+            )
+
+        if value_size is not None and property_key is not None:
+            raise ValueError(
+                "property_key can only be included when value_size and value_format "
+                "are not included"
             )
 
         options = {
