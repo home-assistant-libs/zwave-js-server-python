@@ -155,7 +155,7 @@ def test_from_state(client):
     assert node != node.node_id
     assert hash(node) == hash((client.driver, node.node_id))
     assert node.endpoints[0] == endpoint_pkg.Endpoint(
-        client, state["nodes"][0]["endpoints"][0], {}
+        client, node, state["nodes"][0]["endpoints"][0], {}
     )
     assert node.endpoints[0] != node.endpoints[0].index
     assert hash(node.endpoints[0]) == hash((client.driver, node.node_id, 0))
@@ -340,7 +340,7 @@ async def test_set_value(multisensor_6, uuid4, mock_command):
         await node.async_set_value(f"{value_id}_fake_value", 42)
 
 
-async def test_set_value_node_status_change(multisensor_6_state):
+async def test_set_value_node_status_change(driver, multisensor_6_state):
     """Test set value when node status changes."""
 
     async def async_send_command(
@@ -352,6 +352,7 @@ async def test_set_value_node_status_change(multisensor_6_state):
 
     with patch("zwave_js_server.client.Client", autospec=True) as client_class:
         client = client_class.return_value
+        client.driver = driver
 
     client.async_send_command = AsyncMock(side_effect=async_send_command)
     node = node_pkg.Node(client, multisensor_6_state)
@@ -359,9 +360,11 @@ async def test_set_value_node_status_change(multisensor_6_state):
     event = Event(type="wake up")
     node.handle_wake_up(event)
     task = asyncio.create_task(node.async_send_command("mock_cmd"))
+    task_2 = asyncio.create_task(node.endpoints[0].async_send_command("mock_cmd"))
     await asyncio.sleep(0.01)
     # we are waiting for the response
     assert not task.done()
+    assert not task_2.done()
     # node goes to sleep
     event = Event(type="sleep")
     node.handle_sleep(event)
@@ -369,6 +372,8 @@ async def test_set_value_node_status_change(multisensor_6_state):
     # we are no longer waiting for the response
     assert task.done()
     assert task.result() is None
+    assert task_2.done()
+    assert task_2.result() is None
 
 
 async def test_poll_value(multisensor_6, uuid4, mock_command):
