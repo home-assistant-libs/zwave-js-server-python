@@ -2557,9 +2557,15 @@ async def test_set_raw_config_parameter_value(
         "messageId": uuid4,
     }
 
+    # wake up node
+    event = Event(
+        "wake up", {"source": "node", "event": "wake up", "nodeId": node.node_id}
+    )
+    node.receive_event(event)
+
     assert await node.async_set_raw_config_parameter_value(
         1, 2, value_size=1, value_format=ConfigurationValueFormat.SIGNED_INTEGER
-    ) == SetConfigParameterResult(CommandStatus.QUEUED)
+    ) == SetConfigParameterResult(CommandStatus.ACCEPTED)
 
     assert len(ack_commands) == 3
 
