@@ -5,7 +5,8 @@ https://zwave-js.github.io/node-zwave-js/#/api/endpoint?id=endpoint-properties
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal, TypedDict, cast
+import asyncio
+from typing import TYPE_CHECKING, Any, TypedDict, cast
 
 from ..const import NodeStatus
 from ..event import EventBase
@@ -23,6 +24,7 @@ from .value import (
 
 if TYPE_CHECKING:
     from ..client import Client
+    from .node import Node
     from .node.data_model import NodeDataType
 
 
@@ -44,12 +46,14 @@ class Endpoint(EventBase):
     def __init__(
         self,
         client: Client,
+        node: Node,
         data: EndpointDataType,
         values: dict[str, ConfigurationValue | Value],
     ) -> None:
         """Initialize."""
         super().__init__()
         self.client = client
+        self.node = node
         self.data: EndpointDataType = data
         self.values: dict[str, ConfigurationValue | Value] = {}
         self.update(data, values)
@@ -159,7 +163,6 @@ class Endpoint(EventBase):
             raise FailedCommand(
                 "Command failed", "failed_command", "The client is not connected"
             )
-        node = self.client.driver.controller.nodes[self.node_id]
         kwargs = {}
         message = {
             "command": f"endpoint.{cmd}",
@@ -170,11 +173,27 @@ class Endpoint(EventBase):
         if require_schema is not None:
             kwargs["require_schema"] = require_schema
 
-        if wait_for_result or (
-            wait_for_result is None and node.status != NodeStatus.ASLEEP
-        ):
+        if wait_for_result:
             result = await self.client.async_send_command(message, **kwargs)
             return result
+
+        if wait_for_result is None and self.node.status not in (
+            NodeStatus.ASLEEP,
+            NodeStatus.DEAD,
+        ):
+            result_task = asyncio.create_task(
+                self.client.async_send_command(message, **kwargs)
+            )
+            status_task = asyncio.create_task(self.node.status_event.wait())
+            await asyncio.wait(
+                [result_task, status_task],
+                return_when=asyncio.FIRST_COMPLETED,
+            )
+            status_task.cancel()
+            if self.node.status_event.is_set() and not result_task.done():
+                result_task.cancel()
+                return None
+            return result_task.result()
 
         await self.client.async_send_command_no_wait(message, **kwargs)
         return None
