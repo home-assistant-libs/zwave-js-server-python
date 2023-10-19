@@ -6,7 +6,7 @@ https://zwave-js.github.io/node-zwave-js/#/api/endpoint?id=endpoint-properties
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, Any, TypedDict, cast
+from typing import TYPE_CHECKING, Any, Literal, TypedDict, cast
 
 from ..const import NodeStatus
 from ..event import EventBase
