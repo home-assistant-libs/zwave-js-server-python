@@ -13,9 +13,10 @@ from ..exceptions import FailedCommand, NotFoundError
 from .command_class import CommandClass, CommandClassInfo, CommandClassInfoDataType
 from .device_class import DeviceClass, DeviceClassDataType
 from .value import (
+    CommandStatus,
     ConfigurationValue,
     ConfigurationValueFormat,
-    SupervisionResult,
+    SetConfigParameterResult,
     Value,
 )
 
@@ -273,7 +274,7 @@ class Endpoint(EventBase):
         property_key: int | None = None,
         value_size: Literal[1, 2, 4] | None = None,
         value_format: ConfigurationValueFormat | None = None,
-    ) -> SupervisionResult | None:
+    ) -> SetConfigParameterResult:
         """Send setRawConfigParameterValue."""
         try:
             zwave_value = next(
@@ -339,6 +340,10 @@ class Endpoint(EventBase):
             require_schema=33,
         )
 
-        if data is None or (result := data.get("result")) is None:
-            return None
-        return SupervisionResult(result)
+        if data is None:
+            return SetConfigParameterResult(CommandStatus.QUEUED)
+
+        if (result := data.get("result")) is None:
+            return SetConfigParameterResult(CommandStatus.ACCEPTED)
+
+        return SetConfigParameterResult(CommandStatus.ACCEPTED, result)

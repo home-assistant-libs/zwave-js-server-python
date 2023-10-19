@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any, TypedDict
 from ..const import (
     VALUE_UNKNOWN,
     CommandClass,
+    CommandStatus,
     ConfigurationValueType,
     SetValueStatus,
     SupervisionStatus,
@@ -422,3 +423,11 @@ class SetValueResult:
             assert self.message
             return f"{status}: {self.message}"
         return status
+
+
+@dataclass
+class SetConfigParameterResult:
+    """Result of a set config parameter command."""
+
+    status: CommandStatus
+    result: SupervisionResult | SetValueResult | None = None
