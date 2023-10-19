@@ -17,6 +17,7 @@ from .value import (
     ConfigurationValue,
     ConfigurationValueFormat,
     SetConfigParameterResult,
+    SupervisionResult,
     Value,
 )
 
@@ -346,4 +347,6 @@ class Endpoint(EventBase):
         if (result := data.get("result")) is None:
             return SetConfigParameterResult(CommandStatus.ACCEPTED)
 
-        return SetConfigParameterResult(CommandStatus.ACCEPTED, result)
+        return SetConfigParameterResult(
+            CommandStatus.ACCEPTED, SupervisionResult(result)
+        )

@@ -11,6 +11,7 @@ import pytest
 from zwave_js_server.const import (
     INTERVIEW_FAILED,
     CommandClass,
+    CommandStatus,
     NodeStatus,
     PowerLevel,
     ProtocolDataRate,
@@ -48,6 +49,7 @@ from zwave_js_server.model.node.statistics import NodeStatistics
 from zwave_js_server.model.value import (
     ConfigurationValue,
     ConfigurationValueFormat,
+    SetConfigParameterResult,
     get_value_id_str,
 )
 
@@ -2515,7 +2517,9 @@ async def test_set_raw_config_parameter_value(
         {},
     )
 
-    assert await node.async_set_raw_config_parameter_value(1, 101, 1) is None
+    assert await node.async_set_raw_config_parameter_value(
+        1, 101, 1
+    ) == SetConfigParameterResult(CommandStatus.QUEUED)
 
     assert len(ack_commands) == 1
 
@@ -2531,12 +2535,9 @@ async def test_set_raw_config_parameter_value(
         "messageId": uuid4,
     }
 
-    assert (
-        await node.async_set_raw_config_parameter_value(
-            "Disable", "Stay Awake in Battery Mode"
-        )
-        is None
-    )
+    assert await node.async_set_raw_config_parameter_value(
+        "Disable", "Stay Awake in Battery Mode"
+    ) == SetConfigParameterResult(CommandStatus.QUEUED)
 
     assert len(ack_commands) == 2
 
@@ -2551,12 +2552,9 @@ async def test_set_raw_config_parameter_value(
         "messageId": uuid4,
     }
 
-    assert (
-        await node.async_set_raw_config_parameter_value(
-            1, 2, value_size=1, value_format=ConfigurationValueFormat.SIGNED_INTEGER
-        )
-        is None
-    )
+    assert await node.async_set_raw_config_parameter_value(
+        1, 2, value_size=1, value_format=ConfigurationValueFormat.SIGNED_INTEGER
+    ) == SetConfigParameterResult(CommandStatus.QUEUED)
 
     assert len(ack_commands) == 3
 
@@ -2606,8 +2604,8 @@ async def test_supervision_result(inovelli_switch: node_pkg.Node, uuid4, mock_co
     )
 
     result = await node.async_set_raw_config_parameter_value(1, 1)
-    assert result.status is SupervisionStatus.WORKING
-    duration = result.remaining_duration
+    assert result.result.status is SupervisionStatus.WORKING
+    duration = result.result.remaining_duration
     assert duration.unit == "default"
 
 
