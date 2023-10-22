@@ -5,8 +5,11 @@ Includes Door Lock and Lock CCs.
 """
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from enum import Enum, IntEnum
+from typing import TypedDict
 
+from ...model.endpoint import Endpoint
 from .. import CommandClass
 
 
@@ -128,3 +131,68 @@ LOCK_CMD_CLASS_TO_PROPERTY_MAP = {
     CommandClass.DOOR_LOCK: TARGET_MODE_PROPERTY,
     CommandClass.LOCK: LOCKED_PROPERTY,
 }
+
+
+class DoorLockCCConfigurationSetOptionsDataType(TypedDict, total=False):
+    """Door Lock CC Configuration Set command options."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/cc/src/cc/DoorLockCC.ts#L1156
+    operationType: int  # required
+    lockTimeoutConfiguration: int
+    outsideHandlesCanOpenDoorConfiguration: list[bool]  # required when from device
+    insideHandlesCanOpenDoorConfiguration: list[bool]  # required when from device
+    autoRelockTime: int
+    holdAndReleaseTime: int
+    twistAssist: bool
+    blockToBlock: bool
+
+
+DEFAULT_HANDLE_CONFIGURATION = [True, True, True, True]
+
+
+@dataclass
+class DoorLockCCConfigurationSetOptions:
+    """Door Lock CC Configuration Set command options."""
+
+    endpoint: Endpoint
+    operation_type: OperationType
+    lock_timeout_configuration: int | None = None
+    outside_handles_can_open_door_configuration: list[bool] = field(
+        default_factory=list
+    )
+    inside_handles_can_open_door_configuration: list[bool] = field(default_factory=list)
+    auto_relock_time: int | None = None
+    hold_and_release_time: int | None = None
+    twist_assist: bool | None = None
+    block_to_block: bool | None = None
+
+    def __post_init__(self) -> None:
+        """Post initialization."""
+        for attr_name in (
+            "inside_handles_can_open_door_configuration",
+            "outside_handles_can_open_door_configuration",
+        ):
+            if not getattr(self, attr_name):
+                setattr(self, attr_name, DEFAULT_HANDLE_CONFIGURATION)
+
+    def to_dict(self) -> DoorLockCCConfigurationSetOptionsDataType:
+        """Convert command options to dict."""
+        data = DoorLockCCConfigurationSetOptionsDataType(
+            operationType=self.operation_type,
+            outsideHandlesCanOpenDoorConfiguration=(
+                self.outside_handles_can_open_door_configuration
+            ),
+            insideHandlesCanOpenDoorConfiguration=(
+                self.inside_handles_can_open_door_configuration
+            ),
+        )
+        for prop_name, val in (
+            (CURRENT_AUTO_RELOCK_TIME_PROPERTY, self.auto_relock_time),
+            (CURRENT_HOLD_AND_RELEASE_TIME_PROPERTY, self.hold_and_release_time),
+            (CURRENT_TWIST_ASSIST_PROPERTY, self.twist_assist),
+            (CURRENT_BLOCK_TO_BLOCK_PROPERTY, self.block_to_block),
+        ):
+            if val is not None:
+                data[prop_name] = val  # type: ignore[literal-required]
+
+        return data
