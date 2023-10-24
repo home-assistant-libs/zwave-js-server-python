@@ -2,10 +2,17 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import StrEnum
+from enum import IntEnum, StrEnum
 from typing import TYPE_CHECKING, Any, TypedDict
 
-from ..const import VALUE_UNKNOWN, CommandClass, ConfigurationValueType, SetValueStatus
+from ..const import (
+    VALUE_UNKNOWN,
+    CommandClass,
+    CommandStatus,
+    ConfigurationValueType,
+    SetValueStatus,
+    SupervisionStatus,
+)
 from ..event import Event
 from ..util.helpers import parse_buffer
 from .duration import Duration, DurationDataType
@@ -302,6 +309,47 @@ class ValueNotification(Value):
     # future use
 
 
+class ConfigurationValueFormat(IntEnum):
+    """Enum of all known configuration value formats."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/cc_api_options/packages/core/src/values/Metadata.ts#L157
+    SIGNED_INTEGER = 0
+    UNSIGNED_INTEGER = 1
+    ENUMERATED = 2
+    BIT_FIELD = 3
+
+
+class SupervisionResultDataType(TypedDict, total=False):
+    """Represent a Supervision result data dict type."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/cc_api_options/packages/core/src/consts/Transmission.ts#L311
+    status: int
+    remainingDuration: DurationDataType  # not included unless status is 1 (working)
+
+
+@dataclass
+class SupervisionResult:
+    """Represent a Supervision result type."""
+
+    data: SupervisionResultDataType = field(repr=False)
+    status: SupervisionStatus = field(init=False)
+    remaining_duration: Duration | None = field(init=False, default=None)
+
+    def __post_init__(self) -> None:
+        """Post initialization."""
+        self.status = SupervisionStatus(self.data["status"])
+        if remaining_duration := self.data.get("remainingDuration"):
+            self.remaining_duration = Duration(remaining_duration)
+
+        if self.status == SupervisionStatus.WORKING ^ bool(
+            self.remaining_duration is not None
+        ):
+            raise ValueError(
+                "SupervisionStatus of WORKING requires a remaining duration, all "
+                "other statuses don't include it"
+            )
+
+
 class ConfigurationValue(Value):
     """Model for a Configuration Value."""
 
@@ -375,3 +423,11 @@ class SetValueResult:
             assert self.message
             return f"{status}: {self.message}"
         return status
+
+
+@dataclass
+class SetConfigParameterResult:
+    """Result of a set config parameter command."""
+
+    status: CommandStatus
+    result: SupervisionResult | SetValueResult | None = None

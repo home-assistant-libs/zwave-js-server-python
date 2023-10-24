@@ -11,9 +11,9 @@ PACKAGE_NAME = "zwave-js-server-python"
 __version__ = metadata.version(PACKAGE_NAME)
 
 # minimal server schema version we can handle
-MIN_SERVER_SCHEMA_VERSION = 32
+MIN_SERVER_SCHEMA_VERSION = 33
 # max server schema version we can handle (and our code is compatible with)
-MAX_SERVER_SCHEMA_VERSION = 32
+MAX_SERVER_SCHEMA_VERSION = 33
 
 VALUE_UNKNOWN = "unknown"
 
@@ -495,3 +495,13 @@ class ControllerStatus(IntEnum):
     UNRESPONSIVE = 1
     # The controller is unable to transmit
     JAMMED = 2
+
+
+class SupervisionStatus(IntEnum):
+    """Enum for all known supervision statuses."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/cc_api_options/packages/core/src/consts/Transmission.ts#L304
+    NO_SUPPORT = 0
+    WORKING = 1
+    FAIL = 2
+    SUCCESS = 255
