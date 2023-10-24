@@ -1,0 +1,14 @@
+{
+    "name": "zwave-js-server-python Dev",
+    "image": "mcr.microsoft.com/devcontainers/python:3.11",
+    "postCreateCommand": "scripts/setup",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.vscode-pylance",
+                "visualstudioexptteam.vscodeintellicode",
+                "GitHub.vscode-pull-request-github"
+            ]
+        }
+    }
+}
