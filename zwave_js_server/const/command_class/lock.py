@@ -9,7 +9,6 @@ from dataclasses import dataclass, field
 from enum import Enum, IntEnum
 from typing import TypedDict
 
-from ...model.endpoint import Endpoint
 from .. import CommandClass
 
 
@@ -154,7 +153,6 @@ DEFAULT_HANDLE_CONFIGURATION = [True, True, True, True]
 class DoorLockCCConfigurationSetOptions:
     """Door Lock CC Configuration Set command options."""
 
-    endpoint: Endpoint
     operation_type: OperationType
     lock_timeout_configuration: int | None = None
     outside_handles_can_open_door_configuration: list[bool] = field(
@@ -187,10 +185,10 @@ class DoorLockCCConfigurationSetOptions:
             ),
         )
         for prop_name, val in (
-            (CURRENT_AUTO_RELOCK_TIME_PROPERTY, self.auto_relock_time),
-            (CURRENT_HOLD_AND_RELEASE_TIME_PROPERTY, self.hold_and_release_time),
-            (CURRENT_TWIST_ASSIST_PROPERTY, self.twist_assist),
-            (CURRENT_BLOCK_TO_BLOCK_PROPERTY, self.block_to_block),
+            (TARGET_AUTO_RELOCK_TIME_PROPERTY, self.auto_relock_time),
+            (TARGET_HOLD_AND_RELEASE_TIME_PROPERTY, self.hold_and_release_time),
+            (TARGET_TWIST_ASSIST_PROPERTY, self.twist_assist),
+            (TARGET_BLOCK_TO_BLOCK_PROPERTY, self.block_to_block),
         ):
             if val is not None:
                 data[prop_name] = val  # type: ignore[literal-required]

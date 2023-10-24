@@ -159,8 +159,8 @@ async def set_configuration(
     """Set lock configuration."""
     # It is invalid to set the operation to timed with no timeout, or to constant
     # with a timeout
-    if configuration.operation_type == (
-        OperationType.TIMED ^ (configuration.lock_timeout_configuration is None)
+    if (configuration.operation_type == OperationType.CONSTANT) ^ (
+        configuration.lock_timeout_configuration is None
     ):
         raise ValueError(
             "Invalid operation type and lock timeout configuration combination"
@@ -198,7 +198,7 @@ async def set_configuration(
         raise ValueError("\n".join(errors))
 
     data = await endpoint.async_invoke_cc_api(
-        CommandClass.DOOR_LOCK, "setConfiguration", [configuration.to_dict()]
+        CommandClass.DOOR_LOCK, "setConfiguration", configuration.to_dict()
     )
 
     if data is None or (resp := data.get("response")) is None:
