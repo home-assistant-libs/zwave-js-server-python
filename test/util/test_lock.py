@@ -3,6 +3,7 @@ import copy
 
 import pytest
 
+from zwave_js_server.const import SupervisionStatus
 from zwave_js_server.const.command_class.lock import (
     ATTR_CODE_SLOT,
     ATTR_IN_USE,
@@ -13,6 +14,7 @@ from zwave_js_server.const.command_class.lock import (
 )
 from zwave_js_server.exceptions import NotFoundError
 from zwave_js_server.model.node import Node
+from zwave_js_server.model.value import SupervisionResult
 from zwave_js_server.util.lock import (
     clear_usercode,
     get_code_slots,
@@ -213,10 +215,10 @@ async def test_set_configuration_with_response(
         {"command": "endpoint.invoke_cc_api", "nodeId": node.node_id, "endpoint": 0},
         {"response": {"status": 0}},
     )
-    await set_configuration(
+    assert await set_configuration(
         node.endpoints[0],
         DoorLockCCConfigurationSetOptions(OperationType.CONSTANT),
-    )
+    ) == SupervisionResult(SupervisionStatus.NO_SUPPORT)
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
