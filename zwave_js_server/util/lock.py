@@ -22,7 +22,7 @@ from ..const.command_class.lock import (
 from ..exceptions import NotFoundError
 from ..model.endpoint import Endpoint
 from ..model.node import Node
-from ..model.value import SetValueResult, Value, get_value_id_str
+from ..model.value import SetValueResult, SupervisionResult, Value, get_value_id_str
 
 
 def get_code_slot_value(node: Node, code_slot: int, property_name: str) -> Value:
@@ -184,9 +184,10 @@ async def set_configuration(
             ),
             None,
         )
-        if cached_value is None and (
-            val := getattr(configuration, attr_name)
-        ) is not None:
+        if (
+            cached_value is None
+            and (val := getattr(configuration, attr_name)) is not None
+        ):
             errors.append(
                 f"- Can't provide value for {property_name} since it is unsupported"
             )
