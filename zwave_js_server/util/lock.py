@@ -67,7 +67,7 @@ def _get_code_slots(node: Node, include_usercode: bool = False) -> list[CodeSlot
         except NotFoundError:
             return slots
 
-        code_slot = int(value.property_key)
+        code_slot = int(value.property_key)  # type: ignore[arg-type]
         in_use = (
             None
             if status_value.value is None
@@ -103,7 +103,7 @@ def get_usercode(node: Node, code_slot: int) -> CodeSlot:
     value = get_code_slot_value(node, code_slot, LOCK_USERCODE_PROPERTY)
     status_value = get_code_slot_value(node, code_slot, LOCK_USERCODE_STATUS_PROPERTY)
 
-    code_slot = int(value.property_key)
+    code_slot = int(value.property_key)  # type: ignore[arg-type]
     in_use = (
         None
         if status_value.value is None
@@ -198,9 +198,7 @@ async def set_configuration(
         raise ValueError("\n".join(errors))
 
     data = await endpoint.async_invoke_cc_api(
-        CommandClass.DOOR_LOCK,
-        "setConfiguration",
-        configuration=configuration.to_dict(),
+        CommandClass.DOOR_LOCK, "setConfiguration", [configuration.to_dict()]
     )
 
     if data is None or (resp := data.get("response")) is None:
