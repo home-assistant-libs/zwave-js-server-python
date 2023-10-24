@@ -74,7 +74,7 @@ async def test_configuration_parameter_values(
         node_2, 190, 8, 255, endpoint=endpoint
     )
     assert isinstance(zwave_value, ConfigurationValue)
-    assert cmd_status == CommandStatus.ACCEPTED
+    assert cmd_status.status == CommandStatus.ACCEPTED
 
     value = node_2.values[f"31-112-{endpoint}-8-255"]
     assert len(ack_commands_2) == 1
@@ -95,7 +95,7 @@ async def test_configuration_parameter_values(
         node_2, "Blue", 8, 255, endpoint=endpoint
     )
     assert isinstance(zwave_value, ConfigurationValue)
-    assert cmd_status == CommandStatus.ACCEPTED
+    assert cmd_status.status == CommandStatus.ACCEPTED
 
     value = node_2.values[f"31-112-{endpoint}-8-255"]
     assert len(ack_commands_2) == 2
@@ -131,7 +131,7 @@ async def test_configuration_parameter_values(
         node, "2.0\u00b0 F", "Temperature Reporting Threshold", endpoint=endpoint
     )
     assert isinstance(zwave_value, ConfigurationValue)
-    assert cmd_status == CommandStatus.ACCEPTED
+    assert cmd_status.status == CommandStatus.ACCEPTED
 
     value = node.values[f"13-112-{endpoint}-1"]
     assert len(ack_commands) == 3
@@ -169,7 +169,7 @@ async def test_bulk_set_partial_config_parameters(
     cmd_status = await async_bulk_set_partial_config_parameters(
         node, 101, 241, endpoint=endpoint
     )
-    assert cmd_status == CommandStatus.QUEUED
+    assert cmd_status.status == CommandStatus.QUEUED
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "node.set_value",
@@ -186,7 +186,7 @@ async def test_bulk_set_partial_config_parameters(
     cmd_status = await async_bulk_set_partial_config_parameters(
         node, 101, {128: 1, 64: 1, 32: 1, 16: 1, 1: 1}, endpoint=endpoint
     )
-    assert cmd_status == CommandStatus.QUEUED
+    assert cmd_status.status == CommandStatus.QUEUED
     assert len(ack_commands) == 2
     assert ack_commands[1] == {
         "command": "node.set_value",
@@ -204,7 +204,7 @@ async def test_bulk_set_partial_config_parameters(
     cmd_status = await async_bulk_set_partial_config_parameters(
         node, 101, {64: 1, 32: 1, 16: 1, 1: 1}, endpoint=endpoint
     )
-    assert cmd_status == CommandStatus.QUEUED
+    assert cmd_status.status == CommandStatus.QUEUED
     assert len(ack_commands) == 3
     assert ack_commands[2] == {
         "command": "node.set_value",
@@ -230,7 +230,7 @@ async def test_bulk_set_partial_config_parameters(
         },
         endpoint=endpoint,
     )
-    assert cmd_status == CommandStatus.QUEUED
+    assert cmd_status.status == CommandStatus.QUEUED
     assert len(ack_commands) == 4
     assert ack_commands[3] == {
         "command": "node.set_value",
@@ -303,7 +303,7 @@ async def test_bulk_set_with_full_and_partial_parameters(
         node, 8, 34867929, endpoint=endpoint
     )
 
-    assert cmd_status == CommandStatus.ACCEPTED
+    assert cmd_status.status == CommandStatus.ACCEPTED
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "node.set_value",
@@ -370,13 +370,13 @@ async def test_returned_values(endpoint, client, multisensor_6_state, mock_comma
     cmd_status = await async_bulk_set_partial_config_parameters(
         node, 101, {64: 1, 32: 1, 16: 1, 1: 1}, endpoint=endpoint
     )
-    assert cmd_status == CommandStatus.ACCEPTED
+    assert cmd_status.status == CommandStatus.ACCEPTED
 
     zwave_value, cmd_status = await async_set_config_parameter(
         node, 1, 101, 64, endpoint=endpoint
     )
     assert isinstance(zwave_value, ConfigurationValue)
-    assert cmd_status == CommandStatus.ACCEPTED
+    assert cmd_status.status == CommandStatus.ACCEPTED
 
 
 async def test_dump_node_state(inovelli_switch, inovelli_switch_state):

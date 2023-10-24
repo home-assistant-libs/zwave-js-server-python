@@ -6,14 +6,21 @@ https://zwave-js.github.io/node-zwave-js/#/api/endpoint?id=endpoint-properties
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, Any, TypedDict, cast
+from typing import TYPE_CHECKING, Any, Literal, TypedDict, cast
 
 from ..const import NodeStatus
 from ..event import EventBase
 from ..exceptions import FailedCommand, NotFoundError
 from .command_class import CommandClass, CommandClassInfo, CommandClassInfoDataType
 from .device_class import DeviceClass, DeviceClassDataType
-from .value import ConfigurationValue, Value
+from .value import (
+    CommandStatus,
+    ConfigurationValue,
+    ConfigurationValueFormat,
+    SetConfigParameterResult,
+    SupervisionResult,
+    Value,
+)
 
 if TYPE_CHECKING:
     from ..client import Client
@@ -121,6 +128,23 @@ class Endpoint(EventBase):
         for value_id, value in values.items():
             if value_id not in self.values:
                 self.values[value_id] = value
+
+    def get_command_class_values(
+        self, command_class: CommandClass
+    ) -> dict[str, ConfigurationValue | Value]:
+        """Return all values for a given command class."""
+        return {
+            value_id: value
+            for value_id, value in self.values.items()
+            if value.command_class == command_class
+        }
+
+    def get_configuration_values(self) -> dict[str, ConfigurationValue]:
+        """Return all configuration values for an endpoint."""
+        return cast(
+            dict[str, ConfigurationValue],
+            self.get_command_class_values(CommandClass.CONFIGURATION),
+        )
 
     async def async_send_command(
         self,
@@ -262,3 +286,86 @@ class Endpoint(EventBase):
         )
         assert result
         return cast("NodeDataType", result["node"])
+
+    async def async_set_raw_config_parameter_value(
+        self,
+        new_value: int | str,
+        property_: int | str,
+        property_key: int | None = None,
+        value_size: Literal[1, 2, 4] | None = None,
+        value_format: ConfigurationValueFormat | None = None,
+    ) -> SetConfigParameterResult:
+        """Send setRawConfigParameterValue."""
+        try:
+            zwave_value = next(
+                config_value
+                for config_value in self.get_configuration_values().values()
+                if property_
+                == (
+                    config_value.property_name
+                    if isinstance(property_, str)
+                    else config_value.property_
+                )
+                and property_key == config_value.property_key
+            )
+        except StopIteration:
+            raise NotFoundError(
+                f"Configuration parameter with parameter {property_} and bitmask "
+                f"{property_key} on node {self} could not be found"
+            ) from None
+
+        if not isinstance(new_value, str):
+            value = new_value
+        else:
+            try:
+                value = int(
+                    next(
+                        k
+                        for k, v in zwave_value.metadata.states.items()
+                        if v == new_value
+                    )
+                )
+            except StopIteration:
+                raise NotFoundError(
+                    f"Configuration parameter {zwave_value.value_id} does not have "
+                    f"{new_value} as a valid state. If this is a valid call, you must "
+                    "use the state key instead of the string."
+                ) from None
+
+        if (value_size is not None and value_format is None) or (
+            value_size is None and value_format is not None
+        ):
+            raise ValueError(
+                "value_size and value_format must either both be included or not "
+                "included"
+            )
+
+        if value_size is not None and property_key is not None:
+            raise ValueError(
+                "property_key can only be included when value_size and value_format "
+                "are not included"
+            )
+
+        options = {
+            "value": value,
+            "parameter": zwave_value.property_,
+            "bitMask": zwave_value.property_key,
+            "valueSize": value_size,
+            "valueFormat": value_format,
+        }
+
+        data = await self.async_send_command(
+            "set_raw_config_parameter_value",
+            options={k: v for k, v in options.items() if v is not None},
+            require_schema=33,
+        )
+
+        if data is None:
+            return SetConfigParameterResult(CommandStatus.QUEUED)
+
+        if (result := data.get("result")) is None:
+            return SetConfigParameterResult(CommandStatus.ACCEPTED)
+
+        return SetConfigParameterResult(
+            CommandStatus.ACCEPTED, SupervisionResult(result)
+        )

@@ -13,7 +13,12 @@ from ..exceptions import (
     ValueTypeError,
 )
 from ..model.node import Node
-from ..model.value import ConfigurationValue, SetValueResult, get_value_id_str
+from ..model.value import (
+    ConfigurationValue,
+    SetConfigParameterResult,
+    SetValueResult,
+    get_value_id_str,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -40,7 +45,7 @@ async def async_set_config_parameter(
     property_or_property_name: int | str,
     property_key: int | str | None = None,
     endpoint: int = 0,
-) -> tuple[ConfigurationValue, CommandStatus]:
+) -> tuple[ConfigurationValue, SetConfigParameterResult]:
     """Set a value for a config parameter on this node.
 
     new_value and property_ can be provided as labels, so we need to resolve them to
@@ -91,7 +96,11 @@ async def async_set_config_parameter(
     ):
         raise SetValueFailed(str(result))
 
-    status = CommandStatus.ACCEPTED if result is not None else CommandStatus.QUEUED
+    status = (
+        SetConfigParameterResult(CommandStatus.ACCEPTED, result)
+        if result is not None
+        else SetConfigParameterResult(CommandStatus.QUEUED)
+    )
 
     return zwave_value, status
 
@@ -101,7 +110,7 @@ async def async_bulk_set_partial_config_parameters(
     property_: int,
     new_value: int | dict[int | str, int | str],
     endpoint: int = 0,
-) -> CommandStatus:
+) -> SetConfigParameterResult:
     """Bulk set partial configuration values on this node."""
     config_values = node.get_configuration_values()
     partial_param_values = {
@@ -167,7 +176,7 @@ async def async_bulk_set_partial_config_parameters(
 
     # If we didn't wait for a response, we assume the command has been queued
     if cmd_response is None:
-        return CommandStatus.QUEUED
+        return SetConfigParameterResult(CommandStatus.QUEUED)
 
     result = SetValueResult(cmd_response["result"])
 
@@ -178,7 +187,7 @@ async def async_bulk_set_partial_config_parameters(
     ):
         raise SetValueFailed(str(result))
 
-    return CommandStatus.ACCEPTED
+    return SetConfigParameterResult(CommandStatus.ACCEPTED, result)
 
 
 def _validate_and_transform_new_value(

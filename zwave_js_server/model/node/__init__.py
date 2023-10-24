@@ -5,7 +5,7 @@ import asyncio
 import copy
 from datetime import datetime
 import logging
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from ...const import (
     INTERVIEW_FAILED,
@@ -39,7 +39,9 @@ from ..notification import (
 )
 from ..value import (
     ConfigurationValue,
+    ConfigurationValueFormat,
     MetaDataType,
+    SetConfigParameterResult,
     SetValueResult,
     Value,
     ValueDataType,
@@ -942,6 +944,19 @@ class Node(EventBase):
         if data and (changed := data.get("changed")) is not None:
             return cast(bool, changed)
         return None
+
+    async def async_set_raw_config_parameter_value(
+        self,
+        new_value: int | str,
+        property_: int | str,
+        property_key: int | None = None,
+        value_size: Literal[1, 2, 4] | None = None,
+        value_format: ConfigurationValueFormat | None = None,
+    ) -> SetConfigParameterResult | None:
+        """Send setRawConfigParameterValue."""
+        return await self.endpoints[0].async_set_raw_config_parameter_value(
+            new_value, property_, property_key, value_size, value_format
+        )
 
     def handle_test_powerlevel_progress(self, event: Event) -> None:
         """Process a test power level progress event."""
