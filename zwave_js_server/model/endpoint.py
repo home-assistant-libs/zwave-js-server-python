@@ -294,7 +294,7 @@ class Endpoint(EventBase):
         property_key: int | None = None,
         value_size: Literal[1, 2, 4] | None = None,
         value_format: ConfigurationValueFormat | None = None,
-    ) -> SetConfigParameterResult:
+    ) -> tuple[Value, SetConfigParameterResult]:
         """Send setRawConfigParameterValue."""
         try:
             zwave_value = next(
@@ -361,11 +361,11 @@ class Endpoint(EventBase):
         )
 
         if data is None:
-            return SetConfigParameterResult(CommandStatus.QUEUED)
+            return zwave_value, SetConfigParameterResult(CommandStatus.QUEUED)
 
         if (result := data.get("result")) is None:
-            return SetConfigParameterResult(CommandStatus.ACCEPTED)
+            return zwave_value, SetConfigParameterResult(CommandStatus.ACCEPTED)
 
-        return SetConfigParameterResult(
+        return zwave_value, SetConfigParameterResult(
             CommandStatus.ACCEPTED, SupervisionResult(result)
         )
