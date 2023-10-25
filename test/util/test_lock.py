@@ -1,19 +1,26 @@
 """Test lock utility functions."""
+import copy
+
 import pytest
 
+from zwave_js_server.const import SupervisionStatus
 from zwave_js_server.const.command_class.lock import (
     ATTR_CODE_SLOT,
     ATTR_IN_USE,
     ATTR_NAME,
     ATTR_USERCODE,
+    DoorLockCCConfigurationSetOptions,
+    OperationType,
 )
 from zwave_js_server.exceptions import NotFoundError
+from zwave_js_server.model.node import Node
 from zwave_js_server.util.lock import (
     clear_usercode,
     get_code_slots,
     get_usercode,
     get_usercode_from_node,
     get_usercodes,
+    set_configuration,
     set_usercode,
 )
 
@@ -150,3 +157,142 @@ async def test_get_usercode_from_node(lock_schlage_be469, mock_command, uuid4):
         "methodName": "get",
         "args": [1],
     }
+
+
+async def test_set_configuration_empty_response(
+    lock_schlage_be469, mock_command, uuid4
+):
+    """Test set_configuration utility function without response."""
+    node = lock_schlage_be469
+    ack_commands = mock_command(
+        {"command": "endpoint.invoke_cc_api", "nodeId": node.node_id, "endpoint": 0},
+        {},
+    )
+    await set_configuration(
+        node.endpoints[0],
+        DoorLockCCConfigurationSetOptions(OperationType.CONSTANT),
+    )
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "endpoint.invoke_cc_api",
+        "nodeId": 20,
+        "endpoint": 0,
+        "commandClass": 98,
+        "messageId": uuid4,
+        "methodName": "setConfiguration",
+        "args": [
+            {
+                "insideHandlesCanOpenDoorConfiguration": [True, True, True, True],
+                "operationType": 1,
+                "outsideHandlesCanOpenDoorConfiguration": [True, True, True, True],
+            }
+        ],
+    }
+
+    with pytest.raises(ValueError):
+        await set_configuration(
+            node.endpoints[0],
+            DoorLockCCConfigurationSetOptions(OperationType.CONSTANT, 1),
+        )
+
+    with pytest.raises(ValueError):
+        await set_configuration(
+            node.endpoints[0],
+            DoorLockCCConfigurationSetOptions(OperationType.TIMED),
+        )
+
+
+async def test_set_configuration_with_response(lock_schlage_be469, mock_command, uuid4):
+    """Test set_configuration utility function with response."""
+    node = lock_schlage_be469
+    ack_commands = mock_command(
+        {"command": "endpoint.invoke_cc_api", "nodeId": node.node_id, "endpoint": 0},
+        {"response": {"status": 0}},
+    )
+    result = await set_configuration(
+        node.endpoints[0],
+        DoorLockCCConfigurationSetOptions(OperationType.CONSTANT),
+    )
+    assert result.status == SupervisionStatus.NO_SUPPORT
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "endpoint.invoke_cc_api",
+        "nodeId": 20,
+        "endpoint": 0,
+        "commandClass": 98,
+        "messageId": uuid4,
+        "methodName": "setConfiguration",
+        "args": [
+            {
+                "insideHandlesCanOpenDoorConfiguration": [True, True, True, True],
+                "operationType": 1,
+                "outsideHandlesCanOpenDoorConfiguration": [True, True, True, True],
+            }
+        ],
+    }
+
+
+async def test_set_configuration_v4(
+    driver, lock_ultraloq_ubolt_pro_state, mock_command, uuid4
+):
+    """Test v4 properties in set_configuration utility function."""
+    node_state = copy.deepcopy(lock_ultraloq_ubolt_pro_state)
+    node_state["values"].remove(
+        {
+            "endpoint": 0,
+            "commandClass": 98,
+            "commandClassName": "Door Lock",
+            "property": "twistAssist",
+            "propertyName": "twistAssist",
+            "ccVersion": 4,
+            "metadata": {
+                "type": "boolean",
+                "readable": True,
+                "writeable": True,
+                "label": "Twist Assist enabled",
+            },
+            "value": False,
+        },
+    )
+    node = Node(driver.client, node_state)
+    ack_commands = mock_command(
+        {"command": "endpoint.invoke_cc_api", "nodeId": node.node_id, "endpoint": 0},
+        {},
+    )
+    await set_configuration(
+        node.endpoints[0],
+        DoorLockCCConfigurationSetOptions(
+            OperationType.CONSTANT, hold_and_release_time=2, block_to_block=True
+        ),
+    )
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "endpoint.invoke_cc_api",
+        "nodeId": 34,
+        "endpoint": 0,
+        "commandClass": 98,
+        "messageId": uuid4,
+        "methodName": "setConfiguration",
+        "args": [
+            {
+                "insideHandlesCanOpenDoorConfiguration": [True, True, True, True],
+                "operationType": 1,
+                "outsideHandlesCanOpenDoorConfiguration": [True, True, True, True],
+                "autoRelockTime": 0,
+                "holdAndReleaseTime": 2,
+                "blockToBlock": True,
+            }
+        ],
+    }
+
+    # Test a property that isn't on the node
+    with pytest.raises(ValueError):
+        await set_configuration(
+            node.endpoints[0],
+            DoorLockCCConfigurationSetOptions(
+                OperationType.CONSTANT, twist_assist=True
+            ),
+        )

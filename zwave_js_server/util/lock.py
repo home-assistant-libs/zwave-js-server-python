@@ -9,13 +9,20 @@ from ..const.command_class.lock import (
     ATTR_IN_USE,
     ATTR_NAME,
     ATTR_USERCODE,
+    CURRENT_AUTO_RELOCK_TIME_PROPERTY,
+    CURRENT_BLOCK_TO_BLOCK_PROPERTY,
+    CURRENT_HOLD_AND_RELEASE_TIME_PROPERTY,
+    CURRENT_TWIST_ASSIST_PROPERTY,
     LOCK_USERCODE_PROPERTY,
     LOCK_USERCODE_STATUS_PROPERTY,
     CodeSlotStatus,
+    DoorLockCCConfigurationSetOptions,
+    OperationType,
 )
 from ..exceptions import NotFoundError
+from ..model.endpoint import Endpoint
 from ..model.node import Node
-from ..model.value import SetValueResult, Value, get_value_id_str
+from ..model.value import SetValueResult, SupervisionResult, Value, get_value_id_str
 
 
 def get_code_slot_value(node: Node, code_slot: int, property_name: str) -> Value:
@@ -60,7 +67,7 @@ def _get_code_slots(node: Node, include_usercode: bool = False) -> list[CodeSlot
         except NotFoundError:
             return slots
 
-        code_slot = int(value.property_key)  # type: ignore
+        code_slot = int(value.property_key)  # type: ignore[arg-type]
         in_use = (
             None
             if status_value.value is None
@@ -96,7 +103,7 @@ def get_usercode(node: Node, code_slot: int) -> CodeSlot:
     value = get_code_slot_value(node, code_slot, LOCK_USERCODE_PROPERTY)
     status_value = get_code_slot_value(node, code_slot, LOCK_USERCODE_STATUS_PROPERTY)
 
-    code_slot = int(value.property_key)  # type: ignore
+    code_slot = int(value.property_key)  # type: ignore[arg-type]
     in_use = (
         None
         if status_value.value is None
@@ -144,3 +151,56 @@ async def clear_usercode(node: Node, code_slot: int) -> SetValueResult | None:
     """Clear a code slot on the lock."""
     value = get_code_slot_value(node, code_slot, LOCK_USERCODE_STATUS_PROPERTY)
     return await node.async_set_value(value, CodeSlotStatus.AVAILABLE.value)
+
+
+async def set_configuration(
+    endpoint: Endpoint, configuration: DoorLockCCConfigurationSetOptions
+) -> SupervisionResult | None:
+    """Set lock configuration."""
+    # It is invalid to set the operation to timed with no timeout, or to constant
+    # with a timeout
+    if (configuration.operation_type == OperationType.CONSTANT) ^ (
+        configuration.lock_timeout_configuration is None
+    ):
+        raise ValueError(
+            "Invalid operation type and lock timeout configuration combination"
+        )
+    errors: list[str] = []
+
+    for property_name, attr_name in (
+        (CURRENT_AUTO_RELOCK_TIME_PROPERTY, "auto_relock_time"),
+        (CURRENT_HOLD_AND_RELEASE_TIME_PROPERTY, "hold_and_release_time"),
+        (CURRENT_TWIST_ASSIST_PROPERTY, "twist_assist"),
+        (CURRENT_BLOCK_TO_BLOCK_PROPERTY, "block_to_block"),
+    ):
+        # It a value for a particular configuration value is not provided and it exists
+        # on the node, use the cached value
+        cached_value = next(
+            (
+                value
+                for value in endpoint.values.values()
+                if value.command_class == CommandClass.DOOR_LOCK
+                and value.property_name == property_name
+            ),
+            None,
+        )
+        if (
+            val := getattr(configuration, attr_name)
+        ) is not None and cached_value is None:
+            errors.append(
+                f"- Can't provide value for {property_name} since it is unsupported"
+            )
+        elif cached_value is not None and val is None and not errors:
+            setattr(configuration, attr_name, cached_value.value)
+
+    if errors:
+        raise ValueError("\n".join(errors))
+
+    data = await endpoint.async_invoke_cc_api(
+        CommandClass.DOOR_LOCK, "setConfiguration", configuration.to_dict()
+    )
+
+    if not data:
+        return None
+
+    return SupervisionResult(data)

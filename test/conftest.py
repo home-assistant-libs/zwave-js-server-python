@@ -111,6 +111,12 @@ def energy_production_state_fixture():
     return json.loads(load_fixture("energy_production_state.json"))
 
 
+@pytest.fixture(name="lock_ultraloq_ubolt_pro_state", scope="session")
+def lock_ultraloq_ubolt_pro_state_fixture():
+    """Load the ultraloq U-Bolt Pro lock state fixture data."""
+    return json.loads(load_fixture("lock_ultraloq_ubolt_pro_state.json"))
+
+
 @pytest.fixture(name="client_session")
 def client_session_fixture(ws_client):
     """Mock an aiohttp client session."""
@@ -458,5 +464,13 @@ def switch_enbrighten_zw3010_fixture(driver, switch_enbrighten_zw3010_state):
 def energy_prodution_fixture(driver, energy_production_state):
     """Mock a mock node with Energy Production CC."""
     node = Node(driver.client, deepcopy(energy_production_state))
+    driver.controller.nodes[node.node_id] = node
+    return node
+
+
+@pytest.fixture(name="lock_ultraloq_ubolt_pro")
+def lock_ultraloq_ubolt_pro_fixture(driver, lock_ultraloq_ubolt_pro_state):
+    """Mock an Ultraloq U-Bolt Pro lock node."""
+    node = Node(driver.client, deepcopy(lock_ultraloq_ubolt_pro_state))
     driver.controller.nodes[node.node_id] = node
     return node
