@@ -185,9 +185,8 @@ async def set_configuration(
             None,
         )
         if (
-            cached_value is None
-            and (val := getattr(configuration, attr_name)) is not None
-        ):
+            val := getattr(configuration, attr_name)
+        ) is not None and cached_value is None:
             errors.append(
                 f"- Can't provide value for {property_name} since it is unsupported"
             )
@@ -201,7 +200,7 @@ async def set_configuration(
         CommandClass.DOOR_LOCK, "setConfiguration", configuration.to_dict()
     )
 
-    if data is None or (resp := data.get("response")) is None:
+    if not data:
         return None
 
-    return SupervisionResult(resp)
+    return SupervisionResult(data)
