@@ -40,11 +40,17 @@ class ThermostatMode(IntEnum):
     FULL_POWER = 15
     MANUFACTURER_SPECIFIC = 31
 
+    @classmethod
+    def _missing_(cls: type, _: object) -> ThermostatMode:
+        """Set default enum member if an unknown value is provided."""
+        return ThermostatMode.UNKNOWN
+
 
 class ThermostatOperatingState(IntEnum):
     """Enum with all (known/used) Z-Wave Thermostat OperatingStates."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/ThermostatOperatingStateCC.ts#L38-L51
+    UNKNOWN = -1
     IDLE = 0
     HEATING = 1
     COOLING = 2
@@ -58,12 +64,18 @@ class ThermostatOperatingState(IntEnum):
     SECOND_STAGE_AUX_HEAT = 10
     THIRD_STAGE_AUX_HEAT = 11
 
+    @classmethod
+    def _missing_(cls: type, _: object) -> ThermostatOperatingState:
+        """Set default enum member if an unknown value is provided."""
+        return ThermostatOperatingState.UNKNOWN
+
 
 class ThermostatSetpointType(IntEnum):
     """Enum with all (known/used) Z-Wave Thermostat Setpoint Types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/ThermostatSetpointCC.ts#L53-L66
-    RESERVED = -1
+    RESERVED = -2
+    UNKNOWN = -1
     NA = 0
     HEATING = 1
     COOLING = 2
@@ -78,12 +90,12 @@ class ThermostatSetpointType(IntEnum):
     FULL_POWER = 15
 
     @classmethod
-    def _missing_(cls: type, value: object) -> ThermostatSetpointType | None:
+    def _missing_(cls: type, value: object) -> ThermostatSetpointType:
         """Set default enum member if an unknown value is provided."""
         # Handle reserved values
         if isinstance(value, int) and 3 <= value <= 6:
             return ThermostatSetpointType.RESERVED
-        return None
+        return ThermostatSetpointType.UNKNOWN
 
 
 THERMOSTAT_MODE_SETPOINT_MAP: dict[int, list[ThermostatSetpointType]] = {
