@@ -22,6 +22,7 @@ class ThermostatMode(IntEnum):
     """Enum with all (known/used) Z-Wave ThermostatModes."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/ThermostatModeCC.ts#L53-L70
+    UNKNOWN = -1
     OFF = 0
     HEAT = 1
     COOL = 2
@@ -62,6 +63,7 @@ class ThermostatSetpointType(IntEnum):
     """Enum with all (known/used) Z-Wave Thermostat Setpoint Types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/ThermostatSetpointCC.ts#L53-L66
+    RESERVED = -1
     NA = 0
     HEATING = 1
     COOLING = 2
@@ -74,6 +76,14 @@ class ThermostatSetpointType(IntEnum):
     AWAY_HEATING = 13
     AWAY_COOLING = 14
     FULL_POWER = 15
+
+    @classmethod
+    def _missing_(cls: type, value: object) -> ThermostatSetpointType | None:
+        """Set default enum member if an unknown value is provided."""
+        # Handle reserved values
+        if isinstance(value, int) and 3 <= value <= 6:
+            return ThermostatSetpointType.RESERVED
+        return None
 
 
 THERMOSTAT_MODE_SETPOINT_MAP: dict[int, list[ThermostatSetpointType]] = {
@@ -96,4 +106,5 @@ THERMOSTAT_MODE_SETPOINT_MAP: dict[int, list[ThermostatSetpointType]] = {
         ThermostatSetpointType.AWAY_COOLING,
     ],
     ThermostatMode.FULL_POWER: [ThermostatSetpointType.FULL_POWER],
+    ThermostatMode.UNKNOWN: [ThermostatSetpointType.RESERVED],
 }
