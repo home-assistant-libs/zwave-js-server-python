@@ -4,8 +4,8 @@ from __future__ import annotations
 from enum import IntEnum
 
 NO_POSITION_SUFFIX = "(no position)"
-WINDOW_COVERING_LEVEL_CHANGE_DOWN = "levelChangeDown"
-WINDOW_COVERING_LEVEL_CHANGE_UP = "levelChangeUp"
+WINDOW_COVERING_LEVEL_CHANGE_DOWN_PROPERTY = "levelChangeDown"
+WINDOW_COVERING_LEVEL_CHANGE_UP_PROPERTY = "levelChangeUp"
 
 
 class WindowCoveringPropertyKey(IntEnum):
