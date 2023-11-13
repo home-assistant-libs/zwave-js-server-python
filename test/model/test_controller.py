@@ -1117,13 +1117,13 @@ async def test_get_association_groups(controller, uuid4, mock_command):
         {"command": "controller.get_association_groups"},
         {
             "groups": {
-                1: {
+                "1": {
                     "maxNodes": 10,
                     "isLifeline": True,
                     "multiChannel": True,
                     "label": "Association Group 1",
                 },
-                2: {
+                "2": {
                     "maxNodes": 30,
                     "isLifeline": False,
                     "multiChannel": False,
@@ -1733,10 +1733,10 @@ async def test_get_known_lifeline_routes(
         {"command": "controller.get_known_lifeline_routes"},
         {
             "routes": {
-                multisensor_6.node_id: {
+                f"{multisensor_6.node_id}": {
                     "lwr": {
                         "protocolDataRate": 1,
-                        "repeaters": [multisensor_6.node_id],
+                        "repeaters": [f"{multisensor_6.node_id}"],
                         "repeaterRSSI": [1],
                         "routeFailedBetween": [
                             ring_keypad.node_id,
@@ -1791,7 +1791,7 @@ async def test_get_known_lifeline_routes_bad_protocol_data_rates(
         {"command": "controller.get_known_lifeline_routes"},
         {
             "routes": {
-                multisensor_6.node_id: {
+                f"{multisensor_6.node_id}": {
                     "lwr": {
                         "protocolDataRate": 0,
                         "repeaters": [],
@@ -1910,10 +1910,10 @@ async def test_get_known_lifeline_routes_rssi_error(
         {"command": "controller.get_known_lifeline_routes"},
         {
             "routes": {
-                multisensor_6.node_id: {
+                f"{multisensor_6.node_id}": {
                     "lwr": {
                         "protocolDataRate": 1,
-                        "repeaters": [multisensor_6.node_id],
+                        "repeaters": [f"{multisensor_6.node_id}"],
                         "repeaterRSSI": [1],
                         "routeFailedBetween": [
                             ring_keypad.node_id,
