@@ -51,7 +51,7 @@ class RouteStatistics:
         """Return repeaters."""
         assert self.client.driver
         return [
-            self.client.driver.controller.nodes[node_id]
+            self.client.driver.controller.nodes[int(node_id)]
             for node_id in self.data["repeaters"]
         ]
 

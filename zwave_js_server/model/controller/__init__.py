@@ -774,7 +774,9 @@ class Controller(EventBase):
         )
 
         return {
-            self.nodes[node_id]: ControllerLifelineRoutes(self.client, lifeline_routes)
+            self.nodes[int(node_id)]: ControllerLifelineRoutes(
+                self.client, lifeline_routes
+            )
             for node_id, lifeline_routes in data["routes"].items()
         }
 
@@ -902,7 +904,7 @@ class Controller(EventBase):
     def handle_rebuild_routes_progress(self, event: Event) -> None:
         """Process a rebuild routes progress event."""
         self._rebuild_routes_progress = {
-            self.nodes[node_id]: RebuildRoutesStatus(status)
+            self.nodes[int(node_id)]: RebuildRoutesStatus(status)
             for node_id, status in event.data["progress"].items()
         }
         self.data["isRebuildingRoutes"] = True
@@ -910,7 +912,7 @@ class Controller(EventBase):
     def handle_rebuild_routes_done(self, event: Event) -> None:
         """Process a rebuild routes done event."""
         self._last_rebuild_routes_result = {
-            self.nodes[node_id]: RebuildRoutesStatus(status)
+            self.nodes[int(node_id)]: RebuildRoutesStatus(status)
             for node_id, status in event.data["result"].items()
         }
         self._rebuild_routes_progress = None

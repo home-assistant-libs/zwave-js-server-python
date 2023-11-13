@@ -1072,7 +1072,7 @@ async def test_stop_rebuilding_routes(client, multisensor_6, uuid4, mock_command
         {
             "source": "controller",
             "event": "rebuild routes progress",
-            "progress": {52: "pending"},
+            "progress": {"52": "pending"},
         },
     )
     controller.receive_event(event)
@@ -1399,7 +1399,7 @@ async def test_rebuild_routes_active(client, multisensor_6):
         {
             "source": "controller",
             "event": "rebuild routes progress",
-            "progress": {52: "pending"},
+            "progress": {"52": "pending"},
         },
     )
     controller.receive_event(event)
@@ -1413,7 +1413,7 @@ async def test_rebuild_routes_active(client, multisensor_6):
         {
             "source": "controller",
             "event": "rebuild routes done",
-            "result": {52: "failed"},
+            "result": {"52": "failed"},
         },
     )
     controller.receive_event(event)
