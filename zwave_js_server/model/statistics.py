@@ -51,7 +51,7 @@ class RouteStatistics:
         """Return repeaters."""
         assert self.client.driver
         return [
-            self.client.driver.controller.nodes[node_id]
+            self.client.driver.controller.nodes[int(node_id)]
             for node_id in self.data["repeaters"]
         ]
 
@@ -82,8 +82,8 @@ class RouteStatistics:
         assert self.client.driver
         assert len(node_ids) == 2
         return (
-            self.client.driver.controller.nodes[node_ids[0]],
-            self.client.driver.controller.nodes[node_ids[1]],
+            self.client.driver.controller.nodes[int(node_ids[0])],
+            self.client.driver.controller.nodes[int(node_ids[1])],
         )
 
     def as_dict(self) -> RouteStatisticsDict:

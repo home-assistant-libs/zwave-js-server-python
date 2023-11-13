@@ -70,14 +70,14 @@ class RebuildRoutesDoneEventModel(BaseControllerEventModel):
     """Model for `rebuild routes done` event data."""
 
     event: Literal["rebuild routes done"]
-    result: dict[int, str]
+    result: dict[str, str]
 
 
 class RebuildRoutesProgressEventModel(BaseControllerEventModel):
     """Model for `rebuild routes progress` event data."""
 
     event: Literal["rebuild routes progress"]
-    progress: dict[int, str]
+    progress: dict[str, str]
 
 
 class InclusionAbortedEventModel(BaseControllerEventModel):

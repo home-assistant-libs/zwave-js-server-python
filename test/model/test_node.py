@@ -1515,11 +1515,11 @@ async def test_statistics_updated(
                 "rssi": 7,
                 "lwr": {
                     "protocolDataRate": 1,
-                    "repeaters": [wallmote_central_scene.node_id],
+                    "repeaters": [f"{wallmote_central_scene.node_id}"],
                     "repeaterRSSI": [1],
                     "routeFailedBetween": [
-                        ring_keypad.node_id,
-                        multisensor_6.node_id,
+                        f"{ring_keypad.node_id}",
+                        f"{multisensor_6.node_id}",
                     ],
                 },
                 "nlwr": {
@@ -1527,8 +1527,8 @@ async def test_statistics_updated(
                     "repeaters": [],
                     "repeaterRSSI": [127],
                     "routeFailedBetween": [
-                        multisensor_6.node_id,
-                        ring_keypad.node_id,
+                        f"{multisensor_6.node_id}",
+                        f"{ring_keypad.node_id}",
                     ],
                 },
             },
@@ -1657,11 +1657,11 @@ async def test_statistics_updated_rssi_error(
                 "rssi": 127,
                 "lwr": {
                     "protocolDataRate": 1,
-                    "repeaters": [wallmote_central_scene.node_id],
+                    "repeaters": [f"{wallmote_central_scene.node_id}"],
                     "repeaterRSSI": [1],
                     "routeFailedBetween": [
-                        ring_keypad.node_id,
-                        multisensor_6.node_id,
+                        f"{ring_keypad.node_id}",
+                        f"{multisensor_6.node_id}",
                     ],
                 },
                 "nlwr": {
@@ -1669,8 +1669,8 @@ async def test_statistics_updated_rssi_error(
                     "repeaters": [],
                     "repeaterRSSI": [127],
                     "routeFailedBetween": [
-                        multisensor_6.node_id,
-                        ring_keypad.node_id,
+                        f"{multisensor_6.node_id}",
+                        f"{ring_keypad.node_id}",
                     ],
                 },
             },

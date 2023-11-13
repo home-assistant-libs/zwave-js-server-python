@@ -1072,7 +1072,7 @@ async def test_stop_rebuilding_routes(client, multisensor_6, uuid4, mock_command
         {
             "source": "controller",
             "event": "rebuild routes progress",
-            "progress": {52: "pending"},
+            "progress": {"52": "pending"},
         },
     )
     controller.receive_event(event)
@@ -1117,13 +1117,13 @@ async def test_get_association_groups(controller, uuid4, mock_command):
         {"command": "controller.get_association_groups"},
         {
             "groups": {
-                1: {
+                "1": {
                     "maxNodes": 10,
                     "isLifeline": True,
                     "multiChannel": True,
                     "label": "Association Group 1",
                 },
-                2: {
+                "2": {
                     "maxNodes": 30,
                     "isLifeline": False,
                     "multiChannel": False,
@@ -1399,7 +1399,7 @@ async def test_rebuild_routes_active(client, multisensor_6):
         {
             "source": "controller",
             "event": "rebuild routes progress",
-            "progress": {52: "pending"},
+            "progress": {"52": "pending"},
         },
     )
     controller.receive_event(event)
@@ -1413,7 +1413,7 @@ async def test_rebuild_routes_active(client, multisensor_6):
         {
             "source": "controller",
             "event": "rebuild routes done",
-            "result": {52: "failed"},
+            "result": {"52": "failed"},
         },
     )
     controller.receive_event(event)
@@ -1733,14 +1733,14 @@ async def test_get_known_lifeline_routes(
         {"command": "controller.get_known_lifeline_routes"},
         {
             "routes": {
-                multisensor_6.node_id: {
+                f"{multisensor_6.node_id}": {
                     "lwr": {
                         "protocolDataRate": 1,
-                        "repeaters": [multisensor_6.node_id],
+                        "repeaters": [f"{multisensor_6.node_id}"],
                         "repeaterRSSI": [1],
                         "routeFailedBetween": [
-                            ring_keypad.node_id,
-                            wallmote_central_scene.node_id,
+                            f"{ring_keypad.node_id}",
+                            f"{wallmote_central_scene.node_id}",
                         ],
                     },
                     "nlwr": {
@@ -1791,7 +1791,7 @@ async def test_get_known_lifeline_routes_bad_protocol_data_rates(
         {"command": "controller.get_known_lifeline_routes"},
         {
             "routes": {
-                multisensor_6.node_id: {
+                f"{multisensor_6.node_id}": {
                     "lwr": {
                         "protocolDataRate": 0,
                         "repeaters": [],
@@ -1910,14 +1910,14 @@ async def test_get_known_lifeline_routes_rssi_error(
         {"command": "controller.get_known_lifeline_routes"},
         {
             "routes": {
-                multisensor_6.node_id: {
+                f"{multisensor_6.node_id}": {
                     "lwr": {
                         "protocolDataRate": 1,
-                        "repeaters": [multisensor_6.node_id],
+                        "repeaters": [f"{multisensor_6.node_id}"],
                         "repeaterRSSI": [1],
                         "routeFailedBetween": [
-                            ring_keypad.node_id,
-                            wallmote_central_scene.node_id,
+                            f"{ring_keypad.node_id}",
+                            f"{wallmote_central_scene.node_id}",
                         ],
                     },
                     "nlwr": {
