@@ -1739,8 +1739,8 @@ async def test_get_known_lifeline_routes(
                         "repeaters": [f"{multisensor_6.node_id}"],
                         "repeaterRSSI": [1],
                         "routeFailedBetween": [
-                            ring_keypad.node_id,
-                            wallmote_central_scene.node_id,
+                            f"{ring_keypad.node_id}",
+                            f"{wallmote_central_scene.node_id}",
                         ],
                     },
                     "nlwr": {
@@ -1916,8 +1916,8 @@ async def test_get_known_lifeline_routes_rssi_error(
                         "repeaters": [f"{multisensor_6.node_id}"],
                         "repeaterRSSI": [1],
                         "routeFailedBetween": [
-                            ring_keypad.node_id,
-                            wallmote_central_scene.node_id,
+                            f"{ring_keypad.node_id}",
+                            f"{wallmote_central_scene.node_id}",
                         ],
                     },
                     "nlwr": {
