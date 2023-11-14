@@ -43,7 +43,7 @@ from .model.version import VersionInfo, VersionInfoDataType
 try:
     import orjson as json
 except ImportError:
-    import json  # type: ignore[no-redef]
+    import json
 
 SIZE_PARSE_JSON_EXECUTOR = 8192
 
