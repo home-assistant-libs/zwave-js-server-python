@@ -3,12 +3,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum
-from importlib import metadata
 import logging
 from typing import TypedDict
 
-PACKAGE_NAME = "zwave-js-server-python"
-__version__ = metadata.version(PACKAGE_NAME)
+__version__ = "0.54.0"
 
 # minimal server schema version we can handle
 MIN_SERVER_SCHEMA_VERSION = 33
