@@ -6,6 +6,7 @@ from collections import defaultdict
 from collections.abc import Callable
 from copy import deepcopy
 from datetime import datetime
+import functools
 import logging
 from operator import itemgetter
 import pprint
@@ -38,6 +39,11 @@ from .exceptions import (
 from .model.driver import Driver
 from .model.log_message import LogMessage
 from .model.version import VersionInfo, VersionInfoDataType
+
+try:
+    import orjson as json
+except ImportError:
+    import json
 
 SIZE_PARSE_JSON_EXECUTOR = 8192
 
@@ -458,9 +464,11 @@ class Client:
 
         try:
             if len(msg.data) > SIZE_PARSE_JSON_EXECUTOR:
-                data: dict = await self._loop.run_in_executor(None, msg.json)
+                data: dict = await self._loop.run_in_executor(
+                    None, functools.partial(msg.json, loads=json.loads)
+                )
             else:
-                data = msg.json()
+                data = msg.json(loads=json.loads)
         except ValueError as err:
             raise InvalidMessage("Received invalid JSON.") from err
 
@@ -557,7 +565,7 @@ class Client:
                 }
             )
 
-        await self._client.send_json(message)
+        await self._client.send_json(message, dumps=json.dumps)
 
     async def __aenter__(self) -> Client:
         """Connect to the websocket."""

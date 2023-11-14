@@ -1,9 +1,10 @@
 """Provide Event base classes for Z-Wave JS."""
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
 import logging
-from typing import Callable, Literal
+from typing import Literal
 
 try:
     from pydantic.v1 import BaseModel

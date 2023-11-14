@@ -177,7 +177,7 @@ async def ws_client_fixture(
 
     ws_client.receive.side_effect = receive
 
-    async def close_client(msg):
+    async def close_client(msg, dumps=json.dumps):
         """Close the client."""
         if msg["command"] in ("initialize", "start_listening"):
             return
@@ -328,7 +328,7 @@ def mock_command_fixture(ws_client, client, uuid4):
         mock_responses.append((match_command, response, success))
         return ack_commands
 
-    async def set_response(message):
+    async def set_response(message, dumps=json.dumps):
         """Check the message and set the mocked response if a command matches."""
         for match_command, response, success in mock_responses:
             if all(message[key] == value for key, value in match_command.items()):
