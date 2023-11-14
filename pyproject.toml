@@ -21,12 +21,15 @@ classifiers = [
 dependencies = ["aiohttp>3", "pydantic>=1.10.0"]
 dynamic = ["version"]
 
-[project.urls]
-"Source Code" = "https://github.com/home-assistant-libs/zwave-js-server-python"
-"Bug Reports" = "https://github.com/home-assistant-libs/zwave-js-server-python/issues"
+[project.optional-dependencies]
+orjson = ["orjson>=3.9.9"]
 
 [project.scripts]
 zwave-js-server-python = "zwave_js_server.__main__:main"
+
+[project.urls]
+"Source Code" = "https://github.com/home-assistant-libs/zwave-js-server-python"
+"Bug Reports" = "https://github.com/home-assistant-libs/zwave-js-server-python/issues"
 
 [tool.setuptools.dynamic]
 version = { attr = "zwave_js_server.const.__version__" }

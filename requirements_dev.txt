@@ -1,4 +1,5 @@
 -r requirements.txt
+-r requirements_extra.txt
 -r requirements_lint.txt
 -r requirements_scripts.txt
 -r requirements_test.txt
