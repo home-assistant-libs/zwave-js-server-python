@@ -26,13 +26,13 @@ dynamic = ["version"]
 "Bug Reports" = "https://github.com/home-assistant-libs/zwave-js-server-python/issues"
 
 [project.scripts]
-"zwave-js-server-python" = "zwave_js_server.__main__:main"
+zwave-js-server-python = "zwave_js_server.__main__:main"
 
 [tool.setuptools.dynamic]
 version = { attr = "zwave_js_server.const.__version__" }
 
 [tool.setuptools.packages.find]
-exclude = ["test.*", "test"]
+exclude = ["test", "test.*", "scripts"]
 
 [tool.setuptools.package-data]
 zwave_js_server = ["py.typed"]
