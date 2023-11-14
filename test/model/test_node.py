@@ -1,7 +1,7 @@
 """Test the node model."""
 import asyncio
 from copy import deepcopy
-from datetime import datetime, timezone
+from datetime import datetime
 import json
 from typing import Any
 from unittest.mock import AsyncMock, patch
@@ -185,7 +185,7 @@ def test_from_state(client):
         },
     )
     node.receive_event(event)
-    assert node.last_seen == datetime(2023, 7, 18, 15, 42, 34, 701000, timezone.utc)
+    assert node.last_seen == datetime(2023, 7, 18, 15, 42, 34, 701000, datetime.UTC)
 
 
 async def test_highest_security_value(lock_schlage_be469, ring_keypad):
