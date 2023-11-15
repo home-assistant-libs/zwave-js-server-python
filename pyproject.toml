@@ -59,6 +59,33 @@ warn_unused_configs = true
 module = "mypy-test.*"
 ignore_errors = true
 
+[tool.pylint.MAIN]
+disable = [
+    "duplicate-code",
+    "fixme",
+    "locally-disabled",
+    "too-few-public-methods",
+    "too-many-public-methods",
+]
+enable = ["useless-suppression", "use-symbolic-message-instead"]
+extension-pkg-allow-list = "pydantic"
+fail-on = ["I"]
+ignore = ["test"]
+jobs = 2
+load-plugins = ["pylint_strict_informational"]
+persistent = "no"
+score = "no"
+
+[tool.pylint.BASIC]
+good-names = ["id", "i", "j", "k", "ex", "Run", "_", "fp"]
+
+[tool.pylint.DESIGN]
+max-args = 9
+max-attributes = 15
+
+[tool.pylint.FORMAT]
+expected-line-ending-format = "LF"
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 
