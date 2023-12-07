@@ -132,19 +132,10 @@ def generate_int_enum_class_definition(
     class_def.append(f"    {docstring}")
     if enum_ref_url:
         class_def.append(f"    # {enum_ref_url}")
-    class_def.append("    UNKNOWN = -1")
     for enum_name, enum_id in enum_map.items():
         if get_id_func:
             enum_id = get_id_func(enum_id)
         class_def.append(f"    {enum_name} = {enum_id}")
-    class_def.extend(
-        [
-            "    @classmethod",
-            f"    def _missing_(cls: type, value: object) -> {class_name}:  # noqa: ARG003",
-            '        """Set default enum member if an unknown value is provided."""',
-            f"        return {class_name}.UNKNOWN",
-        ]
-    )
     return class_def
 
 

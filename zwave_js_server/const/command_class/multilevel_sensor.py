@@ -106,7 +106,6 @@ class MultilevelSensorType(IntEnum):
     """Enum for known multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     ACCELERATION_X_AXIS = 52
     ACCELERATION_Y_AXIS = 53
     ACCELERATION_Z_AXIS = 54
@@ -196,11 +195,6 @@ class MultilevelSensorType(IntEnum):
     WATER_TEMPERATURE = 23
     WEIGHT = 14
 
-    @classmethod
-    def _missing_(cls: type, value: object) -> MultilevelSensorType:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return MultilevelSensorType.UNKNOWN
-
 
 class MultilevelSensorScaleType(IntEnum):
     """Common base class for multilevel sensor scale enums."""
@@ -210,764 +204,424 @@ class AirFlowScale(MultilevelSensorScaleType):
     """Enum for known scales for AIR_FLOW multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     CUBIC_FEET_PER_MINUTE = 1
     CUBIC_METER_PER_HOUR = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> AirFlowScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return AirFlowScale.UNKNOWN
 
 
 class AnglePositionScale(MultilevelSensorScaleType):
     """Enum for known scales for ANGLE_POSITION multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     DEGREES_RELATIVE_TO_NORTH_POLE_OF_STANDING_EYE_VIEW = 1
     DEGREES_RELATIVE_TO_SOUTH_POLE_OF_STANDING_EYE_VIEW = 2
     PERCENTAGE_VALUE = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> AnglePositionScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return AnglePositionScale.UNKNOWN
 
 
 class AppliedForceOnTheSensorScale(MultilevelSensorScaleType):
     """Enum for known scales for APPLIED_FORCE_ON_THE_SENSOR multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     NEWTON = 0
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> AppliedForceOnTheSensorScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return AppliedForceOnTheSensorScale.UNKNOWN
 
 
 class AccelerationScale(MultilevelSensorScaleType):
     """Enum for known scales for Acceleration multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     METER_PER_SQUARE_SECOND = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> AccelerationScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return AccelerationScale.UNKNOWN
 
 
 class AcidityScale(MultilevelSensorScaleType):
     """Enum for known scales for Acidity multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     ACIDITY = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> AcidityScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return AcidityScale.UNKNOWN
 
 
 class AirPressureScale(MultilevelSensorScaleType):
     """Enum for known scales for Air Pressure multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     INCHES_OF_MERCURY = 1
     KILOPASCAL = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> AirPressureScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return AirPressureScale.UNKNOWN
 
 
 class BasisMetabolicRateScale(MultilevelSensorScaleType):
     """Enum for known scales for BASIS_METABOLIC_RATE multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     JOULE = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> BasisMetabolicRateScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return BasisMetabolicRateScale.UNKNOWN
 
 
 class BloodPressureScale(MultilevelSensorScaleType):
     """Enum for known scales for BLOOD_PRESSURE multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     DIASTOLIC = 1
     SYSTOLIC = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> BloodPressureScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return BloodPressureScale.UNKNOWN
 
 
 class BodyMassIndexScale(MultilevelSensorScaleType):
     """Enum for known scales for BODY_MASS_INDEX multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     BODY_MASS_INDEX = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> BodyMassIndexScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return BodyMassIndexScale.UNKNOWN
 
 
 class CarbonDioxideLevelScale(MultilevelSensorScaleType):
     """Enum for known scales for CARBON_DIOXIDE_LEVEL multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     PARTS_MILLION = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> CarbonDioxideLevelScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return CarbonDioxideLevelScale.UNKNOWN
 
 
 class CarbonMonoxideLevelScale(MultilevelSensorScaleType):
     """Enum for known scales for CARBON_MONOXIDE_LEVEL multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     MOLE_PER_CUBIC_METER = 0
     PARTS_MILLION = 1
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> CarbonMonoxideLevelScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return CarbonMonoxideLevelScale.UNKNOWN
 
 
 class CurrentScale(MultilevelSensorScaleType):
     """Enum for known scales for CURRENT multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     AMPERE = 0
     MILLIAMPERE = 1
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> CurrentScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return CurrentScale.UNKNOWN
 
 
 class DistanceScale(MultilevelSensorScaleType):
     """Enum for known scales for DISTANCE multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     CENTIMETER = 1
     FEET = 2
     METER = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> DistanceScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return DistanceScale.UNKNOWN
 
 
 class DensityScale(MultilevelSensorScaleType):
     """Enum for known scales for Density multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     DENSITY = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> DensityScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return DensityScale.UNKNOWN
 
 
 class DirectionScale(MultilevelSensorScaleType):
     """Enum for known scales for Direction multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     DEGREES = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> DirectionScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return DirectionScale.UNKNOWN
 
 
 class ElectricalConductivityScale(MultilevelSensorScaleType):
     """Enum for known scales for ELECTRICAL_CONDUCTIVITY multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     SIEMENS_PER_METER = 0
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> ElectricalConductivityScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return ElectricalConductivityScale.UNKNOWN
 
 
 class ElectricalResistivityScale(MultilevelSensorScaleType):
     """Enum for known scales for ELECTRICAL_RESISTIVITY multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     OHM_METER = 0
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> ElectricalResistivityScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return ElectricalResistivityScale.UNKNOWN
 
 
 class FormaldehydeLevelScale(MultilevelSensorScaleType):
     """Enum for known scales for FORMALDEHYDE_LEVEL multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     MOLE_PER_CUBIC_METER = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> FormaldehydeLevelScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return FormaldehydeLevelScale.UNKNOWN
 
 
 class FrequencyScale(MultilevelSensorScaleType):
     """Enum for known scales for FREQUENCY multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     HERTZ = 0
     KILOHERTZ = 1
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> FrequencyScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return FrequencyScale.UNKNOWN
 
 
 class GeneralPurposeScale(MultilevelSensorScaleType):
     """Enum for known scales for GENERAL_PURPOSE multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     DIMENSIONLESS_VALUE = 1
     PERCENTAGE_VALUE = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> GeneralPurposeScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return GeneralPurposeScale.UNKNOWN
 
 
 class HeartRateScale(MultilevelSensorScaleType):
     """Enum for known scales for HEART_RATE multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     BEATS_PER_MINUTE = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> HeartRateScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return HeartRateScale.UNKNOWN
 
 
 class HumidityScale(MultilevelSensorScaleType):
     """Enum for known scales for Humidity multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     ABSOLUTE_HUMIDITY = 1
     PERCENTAGE_VALUE = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> HumidityScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return HumidityScale.UNKNOWN
 
 
 class IlluminanceScale(MultilevelSensorScaleType):
     """Enum for known scales for ILLUMINANCE multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     LUX = 1
     PERCENTAGE_VALUE = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> IlluminanceScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return IlluminanceScale.UNKNOWN
 
 
 class LoudnessScale(MultilevelSensorScaleType):
     """Enum for known scales for LOUDNESS multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     A_WEIGHTED_DECIBELS = 1
     DECIBEL = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> LoudnessScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return LoudnessScale.UNKNOWN
 
 
 class MethaneDensityScale(MultilevelSensorScaleType):
     """Enum for known scales for METHANE_DENSITY multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     MOLE_PER_CUBIC_METER = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> MethaneDensityScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return MethaneDensityScale.UNKNOWN
 
 
 class MoistureScale(MultilevelSensorScaleType):
     """Enum for known scales for MOISTURE multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     IMPEDANCE = 2
     PERCENTAGE_VALUE = 0
     VOLUME_WATER_CONTENT = 1
     WATER_ACTIVITY = 3
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> MoistureScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return MoistureScale.UNKNOWN
 
 
 class MassScale(MultilevelSensorScaleType):
     """Enum for known scales for Mass multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     KILOGRAM = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> MassScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return MassScale.UNKNOWN
 
 
 class ParticulateMatter10Scale(MultilevelSensorScaleType):
     """Enum for known scales for PARTICULATE_MATTER_10 multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     MICROGRAM_PER_CUBIC_METER = 1
     MOLE_PER_CUBIC_METER = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> ParticulateMatter10Scale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return ParticulateMatter10Scale.UNKNOWN
 
 
 class ParticulateMatter25Scale(MultilevelSensorScaleType):
     """Enum for known scales for PARTICULATE_MATTER_2_5 multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     MICROGRAM_PER_CUBIC_METER = 1
     MOLE_PER_CUBIC_METER = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> ParticulateMatter25Scale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return ParticulateMatter25Scale.UNKNOWN
 
 
 class PowerScale(MultilevelSensorScaleType):
     """Enum for known scales for POWER multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     BTU_H = 1
     WATT = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> PowerScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return PowerScale.UNKNOWN
 
 
 class PercentageScale(MultilevelSensorScaleType):
     """Enum for known scales for Percentage multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     PERCENTAGE_VALUE = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> PercentageScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return PercentageScale.UNKNOWN
 
 
 class PressureScale(MultilevelSensorScaleType):
     """Enum for known scales for Pressure multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     KILOPASCAL = 0
     POUND_PER_SQUARE_INCH = 1
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> PressureScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return PressureScale.UNKNOWN
 
 
 class RadonConcentrationScale(MultilevelSensorScaleType):
     """Enum for known scales for RADON_CONCENTRATION multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     BECQUEREL_PER_CUBIC_METER = 0
     PICOCURIES_PER_LITER = 1
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> RadonConcentrationScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return RadonConcentrationScale.UNKNOWN
 
 
 class RainRateScale(MultilevelSensorScaleType):
     """Enum for known scales for RAIN_RATE multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     INCHES_PER_HOUR = 1
     MILLIMETER_HOUR = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> RainRateScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return RainRateScale.UNKNOWN
 
 
 class RespiratoryRateScale(MultilevelSensorScaleType):
     """Enum for known scales for RESPIRATORY_RATE multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     BREATHS_PER_MINUTE = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> RespiratoryRateScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return RespiratoryRateScale.UNKNOWN
 
 
 class RfSignalStrengthScale(MultilevelSensorScaleType):
     """Enum for known scales for RF_SIGNAL_STRENGTH multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     POWER_LEVEL = 1
     RSSI = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> RfSignalStrengthScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return RfSignalStrengthScale.UNKNOWN
 
 
 class RotationScale(MultilevelSensorScaleType):
     """Enum for known scales for ROTATION multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     HERTZ = 1
     REVOLUTIONS_PER_MINUTE = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> RotationScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return RotationScale.UNKNOWN
 
 
 class SeismicIntensityScale(MultilevelSensorScaleType):
     """Enum for known scales for SEISMIC_INTENSITY multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     EUROPEAN_MACROSEISMIC = 1
     LIEDU = 2
     MERCALLI = 0
     SHINDO = 3
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> SeismicIntensityScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return SeismicIntensityScale.UNKNOWN
 
 
 class SeismicMagnitudeScale(MultilevelSensorScaleType):
     """Enum for known scales for SEISMIC_MAGNITUDE multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     BODY_WAVE = 3
     LOCAL = 0
     MOMENT = 1
     SURFACE_WAVE = 2
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> SeismicMagnitudeScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return SeismicMagnitudeScale.UNKNOWN
 
 
 class SoilSalinityScale(MultilevelSensorScaleType):
     """Enum for known scales for SOIL_SALINITY multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     MOLE_PER_CUBIC_METER = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> SoilSalinityScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return SoilSalinityScale.UNKNOWN
 
 
 class SolarRadiationScale(MultilevelSensorScaleType):
     """Enum for known scales for SOLAR_RADIATION multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     WATT_PER_SQUARE_METER = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> SolarRadiationScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return SolarRadiationScale.UNKNOWN
 
 
 class TankCapacityScale(MultilevelSensorScaleType):
     """Enum for known scales for TANK_CAPACITY multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     CUBIC_METER = 1
     GALLONS = 2
     LITER = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> TankCapacityScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return TankCapacityScale.UNKNOWN
 
 
 class TideLevelScale(MultilevelSensorScaleType):
     """Enum for known scales for TIDE_LEVEL multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     FEET = 1
     METER = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> TideLevelScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return TideLevelScale.UNKNOWN
 
 
 class TimeScale(MultilevelSensorScaleType):
     """Enum for known scales for TIME multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     SECOND = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> TimeScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return TimeScale.UNKNOWN
 
 
 class TemperatureScale(MultilevelSensorScaleType):
     """Enum for known scales for Temperature multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     CELSIUS = 0
     FAHRENHEIT = 1
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> TemperatureScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return TemperatureScale.UNKNOWN
 
 
 class UltravioletScale(MultilevelSensorScaleType):
     """Enum for known scales for ULTRAVIOLET multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     UV_INDEX = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> UltravioletScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return UltravioletScale.UNKNOWN
 
 
 class UnitlessScale(MultilevelSensorScaleType):
     """Enum for known scales for Unitless multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     UNITLESS = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> UnitlessScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return UnitlessScale.UNKNOWN
 
 
 class VelocityScale(MultilevelSensorScaleType):
     """Enum for known scales for VELOCITY multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     MPH = 1
     M_S = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> VelocityScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return VelocityScale.UNKNOWN
 
 
 class VolatileOrganicCompoundLevelScale(MultilevelSensorScaleType):
     """Enum for known scales for VOLATILE_ORGANIC_COMPOUND_LEVEL multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     MOLE_PER_CUBIC_METER = 0
     PARTS_MILLION = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> VolatileOrganicCompoundLevelScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return VolatileOrganicCompoundLevelScale.UNKNOWN
 
 
 class VoltageScale(MultilevelSensorScaleType):
     """Enum for known scales for VOLTAGE multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     MILLIVOLT = 1
     VOLT = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> VoltageScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return VoltageScale.UNKNOWN
 
 
 class WaterChlorineLevelScale(MultilevelSensorScaleType):
     """Enum for known scales for WATER_CHLORINE_LEVEL multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     MILLIGRAM_PER_LITER = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> WaterChlorineLevelScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return WaterChlorineLevelScale.UNKNOWN
 
 
 class WaterFlowScale(MultilevelSensorScaleType):
     """Enum for known scales for WATER_FLOW multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     LITER_PER_HOUR = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> WaterFlowScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return WaterFlowScale.UNKNOWN
 
 
 class WaterOxidationReductionPotentialScale(MultilevelSensorScaleType):
     """Enum for known scales for WATER_OXIDATION_REDUCTION_POTENTIAL multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     MILLIVOLT = 0
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> WaterOxidationReductionPotentialScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return WaterOxidationReductionPotentialScale.UNKNOWN
 
 
 class WaterPressureScale(MultilevelSensorScaleType):
     """Enum for known scales for WATER_PRESSURE multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     KILOPASCAL = 0
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> WaterPressureScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return WaterPressureScale.UNKNOWN
 
 
 class WeightScale(MultilevelSensorScaleType):
     """Enum for known scales for WEIGHT multilevel sensor types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/sensorTypes.json
-    UNKNOWN = -1
     KILOGRAM = 0
     POUNDS = 1
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> WeightScale:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return WeightScale.UNKNOWN
 
 
 MULTILEVEL_SENSOR_TYPE_TO_SCALE_MAP: dict[
