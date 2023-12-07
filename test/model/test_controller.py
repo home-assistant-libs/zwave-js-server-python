@@ -168,20 +168,23 @@ def test_from_state():
         == 0
     )
     assert ctrl.rf_region is None
+    assert ctrl.rebuild_routes_progress is None
 
 
-def test_controller_mods():
+def test_controller_mods(client):
     """Test modifications to controller method."""
     state = json.loads(load_fixture("basic_dump.txt").split("\n")[0])["result"]["state"]
     state["controller"].pop("ownNodeId")
     state["controller"]["rfRegion"] = 0
     state["controller"]["status"] = 0
+    state["controller"]["rebuildRoutesProgress"] = {1: "pending"}
 
-    ctrl = controller_pkg.Controller(None, state)
+    ctrl = controller_pkg.Controller(client, state)
     assert ctrl.own_node_id is None
     assert ctrl.own_node is None
     assert ctrl.rf_region == RFRegion.EUROPE
     assert ctrl.status == ControllerStatus.READY
+    assert ctrl.rebuild_routes_progress == {ctrl.nodes[1]: RebuildRoutesStatus.PENDING}
 
 
 def test_controller_status():

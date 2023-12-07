@@ -240,6 +240,11 @@ class Controller(EventBase):
         self._statistics = ControllerStatistics(
             self.data.get("statistics", DEFAULT_CONTROLLER_STATISTICS)
         )
+        if "rebuildRoutesProgress" in self.data:
+            self._rebuild_routes_progress = {
+                self.nodes[int(node_id)]: RebuildRoutesStatus(status)
+                for node_id, status in self.data["rebuildRoutesProgress"].items()
+            }
 
     async def async_begin_inclusion(
         self,
