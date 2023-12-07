@@ -17,6 +17,7 @@ class NotificationType(IntEnum):
     """Enum for known notification types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/notifications.json
+    UNKNOWN = -1
     ACCESS_CONTROL = 6
     APPLIANCE = 12
     CLOCK = 11
@@ -39,6 +40,11 @@ class NotificationType(IntEnum):
     WATER_QUALITY_MONITORING = 21
     WATER_VALVE = 15
     WEATHER_ALARM = 16
+
+    @classmethod
+    def _missing_(cls: type, value: object) -> NotificationType:  # noqa: ARG003
+        """Set default enum member if an unknown value is provided."""
+        return NotificationType.UNKNOWN
 
 
 class NotificationEvent(IntEnum):

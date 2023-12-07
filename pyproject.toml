@@ -66,6 +66,7 @@ disable = [
     "locally-disabled",
     "too-few-public-methods",
     "too-many-public-methods",
+    "too-many-lines",
 ]
 enable = ["useless-suppression", "use-symbolic-message-instead"]
 extension-pkg-allow-list = "pydantic"

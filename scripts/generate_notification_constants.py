@@ -110,7 +110,6 @@ def generate_int_enum_class_definition(
     get_id_func: Callable | None = None,
     docstring_info: str = "",
     base_class: str = "IntEnum",
-    include_missing: bool = False,
 ) -> list[str]:
     """Generate an IntEnum class definition as an array of lines of string."""
     class_def: list[str] = []
@@ -119,21 +118,19 @@ def generate_int_enum_class_definition(
     class_def.append(f"    {docstring}")
     if enum_ref_url:
         class_def.append(f"    # {enum_ref_url}")
-    if include_missing:
-        class_def.append("    UNKNOWN = -1")
+    class_def.append("    UNKNOWN = -1")
     for _enum_name, _enum_id in sorted(enum_map.items(), key=lambda x: x[0]):
         if get_id_func:
             _enum_id = get_id_func(_enum_id)
         class_def.append(f"    {enum_name_format(_enum_name, False)} = {_enum_id}")
-    if include_missing:
-        class_def.extend(
-            [
-                "    @classmethod",
-                f"    def _missing_(cls: type, value: object) -> {class_name}:  # noqa: ARG003",
-                '        """Set default enum member if an unknown value is provided."""',
-                f"        return {class_name}.UNKNOWN",
-            ]
-        )
+    class_def.extend(
+        [
+            "    @classmethod",
+            f"    def _missing_(cls: type, value: object) -> {class_name}:  # noqa: ARG003",
+            '        """Set default enum member if an unknown value is provided."""',
+            f"        return {class_name}.UNKNOWN",
+        ]
+    )
     return class_def
 
 
@@ -201,7 +198,6 @@ for notification_type, event_map in notifications.items():
             NOTIFICATIONS_URL,
             docstring_info=notification_event_name.lower(),
             base_class="NotificationEvent",
-            include_missing=True,
         )
     )
     _notification_type_to_notification_event_map[
@@ -217,7 +213,6 @@ for notification_type, event_map in notifications.items():
                     NOTIFICATIONS_URL,
                     docstring_info=notification_event_value_name.lower(),
                     base_class="NotificationEventValue",
-                    include_missing=True,
                 )
             )
             _notification_event_to_event_value_map[

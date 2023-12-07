@@ -100,7 +100,7 @@ for sensor_id, sensor_props in sensor_types.items():
     if sensor_id in (87, 88):
         remove_parenthesis_ = False
     sensor_name = enum_name_format(sensor_props["label"], remove_parenthesis_)
-    sensors[sensor_name] = {"id": sensor_id}
+    sensors[sensor_name] = {"id": sensor_id, "label": sensor_props["label"]}
     if isinstance(scale_def, str):
         sensors[sensor_name]["scale"] = normalize_name(
             scale_def.replace("$SCALES:", "")
@@ -164,7 +164,12 @@ lines = [
     "from enum import IntEnum",
     'CC_SPECIFIC_SCALE = "scale"',
     'CC_SPECIFIC_SENSOR_TYPE = "sensorType"',
+    "",
 ]
+
+lines.extend(
+    [f"{sensor}_PROPERTY = \"{data['label']}\"" for sensor, data in sensors.items()]
+)
 
 lines.extend(
     generate_int_enum_class_definition(
