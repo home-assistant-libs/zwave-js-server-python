@@ -98,6 +98,15 @@ class Controller(EventBase):
             return False
         return self.home_id == other.home_id
 
+    def _generate_rebuild_routes_status(
+        self, data: dict[str, str]
+    ) -> dict[Node, RebuildRoutesStatus]:
+        """Generate rebuild routes status."""
+        return {
+            self.nodes[int(node_id)]: RebuildRoutesStatus(status)
+            for node_id, status in data.items()
+        }
+
     @property
     def sdk_version(self) -> str | None:
         """Return sdk_version."""
@@ -241,10 +250,9 @@ class Controller(EventBase):
             self.data.get("statistics", DEFAULT_CONTROLLER_STATISTICS)
         )
         if "rebuildRoutesProgress" in self.data:
-            self._rebuild_routes_progress = {
-                self.nodes[int(node_id)]: RebuildRoutesStatus(status)
-                for node_id, status in self.data["rebuildRoutesProgress"].items()
-            }
+            self._rebuild_routes_progress = self._generate_rebuild_routes_status(
+                self.data["rebuildRoutesProgress"]
+            )
 
     async def async_begin_inclusion(
         self,
@@ -908,18 +916,16 @@ class Controller(EventBase):
 
     def handle_rebuild_routes_progress(self, event: Event) -> None:
         """Process a rebuild routes progress event."""
-        self._rebuild_routes_progress = {
-            self.nodes[int(node_id)]: RebuildRoutesStatus(status)
-            for node_id, status in event.data["progress"].items()
-        }
+        self._rebuild_routes_progress = self._generate_rebuild_routes_status(
+            event.data["progress"]
+        )
         self.data["isRebuildingRoutes"] = True
 
     def handle_rebuild_routes_done(self, event: Event) -> None:
         """Process a rebuild routes done event."""
-        self._last_rebuild_routes_result = {
-            self.nodes[int(node_id)]: RebuildRoutesStatus(status)
-            for node_id, status in event.data["result"].items()
-        }
+        self._last_rebuild_routes_result = self._generate_rebuild_routes_status(
+            event.data["result"]
+        )
         self._rebuild_routes_progress = None
         self.data["isRebuildingRoutes"] = False
 
