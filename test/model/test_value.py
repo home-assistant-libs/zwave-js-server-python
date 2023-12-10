@@ -5,6 +5,7 @@ from zwave_js_server.const import ConfigurationValueType, SetValueStatus
 from zwave_js_server.model.node import Node
 from zwave_js_server.model.value import (
     ConfigurationValue,
+    ConfigurationValueFormat,
     MetaDataType,
     SetValueResult,
     ValueDataType,
@@ -222,3 +223,60 @@ def test_set_value_result_str():
     result = SetValueResult({"status": 1, "remainingDuration": "unknown"})
     assert result.status == SetValueStatus.WORKING
     assert str(result) == "Working (unknown duration)"
+
+
+def test_configuration_value_metadata(inovelli_switch_state):
+    """Test configuration value specific metadata."""
+    value = ConfigurationValue(
+        inovelli_switch_state,
+        ValueDataType(
+            commandClass=112,
+            property=8,
+            propertyName="8",
+            endpoint=0,
+            metadata=MetaDataType(
+                type="boolean",
+                max=2,
+                min=0,
+                allowManualEntry=True,
+                states={True: "On", False: "Off"},
+            ),
+        ),
+    )
+    metadata = value.metadata
+    assert metadata.is_advanced is None
+    assert metadata.is_from_config is None
+    assert metadata.requires_re_inclusion is None
+    assert metadata.no_bulk_support is None
+    assert metadata.value_size is None
+    assert metadata.format is None
+
+    value = ConfigurationValue(
+        inovelli_switch_state,
+        ValueDataType(
+            commandClass=112,
+            property=8,
+            propertyName="8",
+            endpoint=0,
+            metadata=MetaDataType(
+                type="boolean",
+                max=2,
+                min=0,
+                allowManualEntry=True,
+                states={True: "On", False: "Off"},
+                isAdvanced=True,
+                isFromConfig=True,
+                requiresReInclusion=True,
+                noBulkSupport=True,
+                valueSize=1,
+                format=0,
+            ),
+        ),
+    )
+    metadata = value.metadata
+    assert metadata.is_advanced
+    assert metadata.is_from_config
+    assert metadata.requires_re_inclusion
+    assert metadata.no_bulk_support
+    assert metadata.value_size == 1
+    assert metadata.format == ConfigurationValueFormat.SIGNED_INTEGER

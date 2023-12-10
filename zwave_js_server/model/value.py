@@ -45,9 +45,16 @@ class MetaDataType(TypedDict, total=False):
     ccSpecific: dict[str, Any]
     valueChangeOptions: list[str]
     allowManualEntry: bool
-    valueSize: int
     stateful: bool
     secret: bool
+    default: int
+    # Configuration Value specific attributes
+    valueSize: int
+    format: int
+    noBulkSupport: bool  # deprecated
+    isAdvanced: bool
+    requiresReInclusion: bool
+    isFromConfig: bool
 
 
 class ValueDataType(TypedDict, total=False):
@@ -183,6 +190,38 @@ class ValueMetadata:
     def secret(self) -> bool | None:
         """Return secret."""
         return self.data.get("secret")
+
+    @property
+    def default(self) -> int | None:
+        """Return default."""
+        return self.data.get("default")
+
+    @property
+    def format(self) -> ConfigurationValueFormat | None:
+        """Return format."""
+        if (format_ := self.data.get("format")) is None:
+            return None
+        return ConfigurationValueFormat(format_)
+
+    @property
+    def no_bulk_support(self) -> bool | None:
+        """Return noBulkSupport."""
+        return self.data.get("noBulkSupport")
+
+    @property
+    def is_advanced(self) -> bool | None:
+        """Return isAdvanced."""
+        return self.data.get("isAdvanced")
+
+    @property
+    def requires_re_inclusion(self) -> bool | None:
+        """Return requiresReInclusion."""
+        return self.data.get("requiresReInclusion")
+
+    @property
+    def is_from_config(self) -> bool | None:
+        """Return isFromConfig."""
+        return self.data.get("isFromConfig")
 
     def update(self, data: MetaDataType) -> None:
         """Update data."""
