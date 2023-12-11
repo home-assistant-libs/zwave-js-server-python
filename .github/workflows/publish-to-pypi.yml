@@ -15,10 +15,10 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install wheel
-        run: >-
+        run: |-
           pip install wheel
       - name: Build
-        run: >-
+        run: |-
           pip install build
           python -m build
       - name: Publish release to PyPI
