@@ -18,7 +18,7 @@ jobs:
         run: >-
           pip install wheel
       - name: Build
-        run: >-
+        run: |
           pip install build
           python -m build
       - name: Publish release to PyPI
