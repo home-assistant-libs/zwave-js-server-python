@@ -457,7 +457,7 @@ async def test_additional_user_agent_components(client_session, url):
             {
                 "command": "initialize",
                 "messageId": "initialize",
-                "schemaVersion": 33,
+                "schemaVersion": 34,
                 "additionalUserAgentComponents": {
                     "zwave-js-server-python": __version__,
                     "foo": "bar",
