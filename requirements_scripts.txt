@@ -4,3 +4,4 @@ python-slugify==8.0.1
 types-python-slugify==8.0.0.3
 types-requests==2.31.0.10
 -r requirements.txt
+-r requirements_lint.txt
