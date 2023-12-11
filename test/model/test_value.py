@@ -244,6 +244,7 @@ def test_configuration_value_metadata(inovelli_switch_state):
         ),
     )
     metadata = value.metadata
+    assert metadata.default is None
     assert metadata.is_advanced is None
     assert metadata.is_from_config is None
     assert metadata.requires_re_inclusion is None
@@ -264,6 +265,7 @@ def test_configuration_value_metadata(inovelli_switch_state):
                 min=0,
                 allowManualEntry=True,
                 states={True: "On", False: "Off"},
+                default=2,
                 isAdvanced=True,
                 isFromConfig=True,
                 requiresReInclusion=True,
@@ -274,6 +276,7 @@ def test_configuration_value_metadata(inovelli_switch_state):
         ),
     )
     metadata = value.metadata
+    assert metadata.default == 2
     assert metadata.is_advanced
     assert metadata.is_from_config
     assert metadata.requires_re_inclusion
