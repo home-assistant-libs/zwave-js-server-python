@@ -16,7 +16,7 @@ class ControllerDataType(TypedDict, total=False):
     isPrimary: bool
     isSUC: bool
     nodeType: int
-    isUsingHomeIdFromOtherNetwork: bool  # TODO: The following items are missing in the docs.
+    isUsingHomeIdFromOtherNetwork: bool
     isSISPresent: bool
     wasRealPrimary: bool
     firmwareVersion: str
@@ -31,3 +31,4 @@ class ControllerDataType(TypedDict, total=False):
     inclusionState: int
     rfRegion: int
     status: int
+    rebuildRoutesProgress: dict[str, str]
