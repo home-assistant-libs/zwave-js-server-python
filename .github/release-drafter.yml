@@ -3,6 +3,10 @@ categories:
   - title: "⚠ Breaking Changes"
     labels:
       - "breaking-change"
+  - title: "🤖 Automated Updates"
+    collapse-after: 1
+    labels:
+      - "ci-generated"
   - title: "⬆️ Dependencies"
     collapse-after: 1
     labels:
