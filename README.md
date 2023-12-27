@@ -32,7 +32,3 @@ try:
 except zwave_js_server.client.FailedCommand as err:
     print("Command failed with", err.error_code)
 ```
-
-## Optional dependencies
-
-`zwave-js-server-python` optionally supports `orjson` which can be installed with the `orjson` extra (e.g. `pip install zwave-js-server-python[orjson]`)
