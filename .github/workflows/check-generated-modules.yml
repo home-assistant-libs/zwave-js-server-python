@@ -2,7 +2,7 @@ name: Check Generated Modules
 
 on:
   schedule:
-    - cron:  '30 3 * * *'
+    - cron:  '30 3 15 * *'
 
 jobs:
   check-generated-modules:
