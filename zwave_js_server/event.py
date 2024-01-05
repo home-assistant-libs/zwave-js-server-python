@@ -65,7 +65,7 @@ class EventBase:
             try:
                 listener(data)
             except Exception:  # pylint: disable=broad-exception-caught
-                LOGGER.warning("Error handling event: %s", event_name, exc_info=True)
+                LOGGER.exception("Error handling event: %s", event_name)
 
     def _handle_event_protocol(self, event: Event) -> None:
         """Process an event based on event protocol."""
