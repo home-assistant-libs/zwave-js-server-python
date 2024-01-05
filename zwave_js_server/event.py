@@ -62,7 +62,10 @@ class EventBase:
     def emit(self, event_name: str, data: dict) -> None:
         """Run all callbacks for an event."""
         for listener in self._listeners.get(event_name, []).copy():
-            listener(data)
+            try:
+                listener(data)
+            except Exception:  # pylint: disable=broad-exception-caught
+                LOGGER.exception("Error handling event: %s", event_name)
 
     def _handle_event_protocol(self, event: Event) -> None:
         """Process an event based on event protocol."""
