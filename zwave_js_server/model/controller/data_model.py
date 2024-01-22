@@ -32,3 +32,4 @@ class ControllerDataType(TypedDict, total=False):
     rfRegion: int
     status: int
     rebuildRoutesProgress: dict[str, str]
+    supportsLongRange: bool

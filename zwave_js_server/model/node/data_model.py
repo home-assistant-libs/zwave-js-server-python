@@ -65,3 +65,4 @@ class NodeDataType(TypedDict, total=False):
     lastSeen: str
     defaultVolume: int | float | None
     defaultTransitionDuration: int | float | None
+    protocol: int
