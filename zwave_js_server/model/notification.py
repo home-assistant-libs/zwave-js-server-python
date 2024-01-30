@@ -3,6 +3,7 @@ Model for a Zwave Node's Notification Event.
 
 https://zwave-js.github.io/node-zwave-js/#/api/node?id=quotnotificationquot
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field

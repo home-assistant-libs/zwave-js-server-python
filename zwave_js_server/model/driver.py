@@ -1,4 +1,5 @@
 """Provide a model for the Z-Wave JS Driver."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal, cast

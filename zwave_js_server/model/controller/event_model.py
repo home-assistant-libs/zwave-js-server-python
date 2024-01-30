@@ -1,4 +1,5 @@
 """Provide a model for the Z-Wave JS controller's events."""
+
 from __future__ import annotations
 
 from typing import Literal, TypedDict

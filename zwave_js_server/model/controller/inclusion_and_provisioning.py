@@ -1,4 +1,5 @@
 """Provide a model for inclusion and provisioning."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

@@ -4,6 +4,7 @@ Constants for the Thermostat CCs.
 Includes Thermostat Fan Mode, Thermostat Fan State, Thermostat Mode, Thermostat
 Operating State, Thermostat Setback, and Thermostat Setpoint CCs.
 """
+
 from __future__ import annotations
 
 from enum import IntEnum

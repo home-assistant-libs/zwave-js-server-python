@@ -1,4 +1,5 @@
 """Test node utility functions."""
+
 import copy
 from unittest.mock import patch
 

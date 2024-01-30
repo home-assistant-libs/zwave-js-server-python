@@ -1,4 +1,5 @@
 """Common models for statistics."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -94,9 +95,11 @@ class RouteStatistics:
             "rssi": self.data.get("rssi"),
             "repeater_rssi": self.data.get("repeaterRSSI", []),
             "route_failed_between": (
-                self.route_failed_between[0],
-                self.route_failed_between[1],
-            )
-            if self.route_failed_between
-            else None,
+                (
+                    self.route_failed_between[0],
+                    self.route_failed_between[1],
+                )
+                if self.route_failed_between
+                else None
+            ),
         }

@@ -1,4 +1,5 @@
 """Provide Event base classes for Z-Wave JS."""
+
 from __future__ import annotations
 
 from collections.abc import Callable

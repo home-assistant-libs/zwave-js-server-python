@@ -1,4 +1,5 @@
 """Provide a model for the log config."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

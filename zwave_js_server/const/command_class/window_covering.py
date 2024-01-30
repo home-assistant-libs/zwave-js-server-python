@@ -1,4 +1,5 @@
 """Constants for the Barrier Operator CC."""
+
 from __future__ import annotations
 
 from enum import IntEnum

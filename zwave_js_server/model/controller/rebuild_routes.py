@@ -1,4 +1,5 @@
 """Provide models for rebuilding routes."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

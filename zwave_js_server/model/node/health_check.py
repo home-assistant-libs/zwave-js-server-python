@@ -1,4 +1,5 @@
 """Provide a model for the Z-Wave JS node's health checks and power tests."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field

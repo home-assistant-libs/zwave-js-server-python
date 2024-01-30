@@ -1,4 +1,5 @@
 """Provide common pytest fixtures."""
+
 import asyncio
 from collections import deque
 from copy import deepcopy

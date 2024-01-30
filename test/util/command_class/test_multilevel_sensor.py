@@ -1,4 +1,5 @@
 """Test command class utility functions."""
+
 import pytest
 
 from zwave_js_server.const import CommandClass

@@ -1,4 +1,5 @@
 """Provide a model for the Z-Wave JS controller."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -350,9 +351,11 @@ class Controller(EventBase):
         await self.client.async_send_command(
             {
                 "command": "controller.provision_smart_start_node",
-                "entry": provisioning_info
-                if isinstance(provisioning_info, str)
-                else provisioning_info.to_dict(),
+                "entry": (
+                    provisioning_info
+                    if isinstance(provisioning_info, str)
+                    else provisioning_info.to_dict()
+                ),
             },
             require_schema=11,
         )
@@ -870,9 +873,9 @@ class Controller(EventBase):
 
     def handle_firmware_update_progress(self, event: Event) -> None:
         """Process a firmware update progress event."""
-        self._firmware_update_progress = event.data[
-            "firmware_update_progress"
-        ] = ControllerFirmwareUpdateProgress(event.data["progress"])
+        self._firmware_update_progress = event.data["firmware_update_progress"] = (
+            ControllerFirmwareUpdateProgress(event.data["progress"])
+        )
 
     def handle_firmware_update_finished(self, event: Event) -> None:
         """Process a firmware update finished event."""

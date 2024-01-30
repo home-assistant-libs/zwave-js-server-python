@@ -1,4 +1,5 @@
 """Represents the version from the server."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
