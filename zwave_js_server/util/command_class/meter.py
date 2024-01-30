@@ -1,4 +1,5 @@
 """Meter Command Class specific utility functions for values."""
+
 from __future__ import annotations
 
 from ...const import CommandClass

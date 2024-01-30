@@ -1,4 +1,5 @@
 """Provide a model for the Z-Wave JS controller's statistics."""
+
 from __future__ import annotations
 
 from contextlib import suppress

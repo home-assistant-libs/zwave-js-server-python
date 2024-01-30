@@ -3,6 +3,7 @@ Model for a Zwave Node's device config.
 
 https://zwave-js.github.io/node-zwave-js/#/api/node?id=deviceconfig
 """
+
 from __future__ import annotations
 
 from typing import Any, Literal, TypedDict

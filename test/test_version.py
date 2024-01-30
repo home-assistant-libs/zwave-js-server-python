@@ -1,4 +1,5 @@
 """Test the server version helper."""
+
 from unittest.mock import call
 
 from zwave_js_server.version import get_server_version

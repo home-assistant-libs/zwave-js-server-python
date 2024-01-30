@@ -1,4 +1,5 @@
 """Common methods for tests."""
+
 import asyncio
 from unittest.mock import AsyncMock
 

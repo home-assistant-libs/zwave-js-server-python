@@ -1,4 +1,5 @@
 """Test the controller model."""
+
 from copy import deepcopy
 import json
 from unittest.mock import patch

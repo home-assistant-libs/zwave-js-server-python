@@ -1,4 +1,5 @@
 """Test the CLI in main."""
+
 import sys
 from unittest.mock import AsyncMock, patch
 
@@ -23,9 +24,10 @@ def client_session_fixture(ws_client):
 
 def test_server_version(client_session, url, ws_client, result, capsys):
     """Test print server version."""
-    with patch.object(
-        sys, "argv", ["zwave_js_server", url, "--server-version"]
-    ), pytest.raises(SystemExit) as sys_exit:
+    with (
+        patch.object(sys, "argv", ["zwave_js_server", url, "--server-version"]),
+        pytest.raises(SystemExit) as sys_exit,
+    ):
         main()
 
     assert sys_exit.value.code == 0
@@ -45,9 +47,10 @@ def test_dump_state(
 ):
     """Test dump state."""
     update_ws_client_msg_queue(ws_client, (version_data, initialize_data, result))
-    with patch.object(
-        sys, "argv", ["zwave_js_server", url, "--dump-state"]
-    ), pytest.raises(SystemExit) as sys_exit:
+    with (
+        patch.object(sys, "argv", ["zwave_js_server", url, "--dump-state"]),
+        pytest.raises(SystemExit) as sys_exit,
+    ):
         main()
 
     assert sys_exit.value.code == 0
@@ -66,9 +69,10 @@ def test_dump_state(
 
 def test_connect(client_session, url, ws_client):
     """Test connect."""
-    with patch.object(sys, "argv", ["zwave_js_server", url]), pytest.raises(
-        SystemExit
-    ) as sys_exit:
+    with (
+        patch.object(sys, "argv", ["zwave_js_server", url]),
+        pytest.raises(SystemExit) as sys_exit,
+    ):
         main()
 
     assert sys_exit.value.code == 0

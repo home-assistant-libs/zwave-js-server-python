@@ -1,4 +1,5 @@
 """Data model for a Z-Wave JS controller."""
+
 from __future__ import annotations
 
 from typing import TypedDict

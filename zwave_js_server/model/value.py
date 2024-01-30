@@ -1,4 +1,5 @@
 """Provide a model for the Z-Wave JS value."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field

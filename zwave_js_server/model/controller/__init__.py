@@ -1,4 +1,5 @@
 """Provide a model for the Z-Wave JS controller."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -350,9 +351,11 @@ class Controller(EventBase):
         await self.client.async_send_command(
             {
                 "command": "controller.provision_smart_start_node",
-                "entry": provisioning_info
-                if isinstance(provisioning_info, str)
-                else provisioning_info.to_dict(),
+                "entry": (
+                    provisioning_info
+                    if isinstance(provisioning_info, str)
+                    else provisioning_info.to_dict()
+                ),
             },
             require_schema=11,
         )

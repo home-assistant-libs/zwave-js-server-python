@@ -1,4 +1,5 @@
 """Utility functions for Z-Wave JS nodes."""
+
 from __future__ import annotations
 
 import logging

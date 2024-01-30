@@ -1,4 +1,5 @@
 """Run a mock zwave-js-server instance off of a network state dump."""
+
 from __future__ import annotations
 
 import argparse

@@ -1,4 +1,5 @@
 """Test the firmware update helper."""
+
 from unittest.mock import patch
 
 from zwave_js_server.firmware import controller_firmware_update_otw, update_firmware
@@ -14,13 +15,12 @@ from zwave_js_server.model.node.firmware import (
 
 async def test_update_firmware_guess_format(url, client_session, multisensor_6):
     """Test update_firmware with guessed format."""
-    with patch("zwave_js_server.firmware.Client.connect") as connect_mock, patch(
-        "zwave_js_server.firmware.Client.initialize"
-    ) as initialize_mock, patch(
-        "zwave_js_server.firmware.Client.async_send_command"
-    ) as cmd_mock, patch(
-        "zwave_js_server.firmware.Client.disconnect"
-    ) as disconnect_mock:
+    with (
+        patch("zwave_js_server.firmware.Client.connect") as connect_mock,
+        patch("zwave_js_server.firmware.Client.initialize") as initialize_mock,
+        patch("zwave_js_server.firmware.Client.async_send_command") as cmd_mock,
+        patch("zwave_js_server.firmware.Client.disconnect") as disconnect_mock,
+    ):
         node = multisensor_6
         cmd_mock.return_value = {
             "result": {"status": 255, "success": True, "reInterview": False}
@@ -54,13 +54,12 @@ async def test_update_firmware_known_format_and_target(
     url, client_session, multisensor_6
 ):
     """Test update_firmware with known format."""
-    with patch("zwave_js_server.firmware.Client.connect") as connect_mock, patch(
-        "zwave_js_server.firmware.Client.initialize"
-    ) as initialize_mock, patch(
-        "zwave_js_server.firmware.Client.async_send_command"
-    ) as cmd_mock, patch(
-        "zwave_js_server.firmware.Client.disconnect"
-    ) as disconnect_mock:
+    with (
+        patch("zwave_js_server.firmware.Client.connect") as connect_mock,
+        patch("zwave_js_server.firmware.Client.initialize") as initialize_mock,
+        patch("zwave_js_server.firmware.Client.async_send_command") as cmd_mock,
+        patch("zwave_js_server.firmware.Client.disconnect") as disconnect_mock,
+    ):
         node = multisensor_6
         cmd_mock.return_value = {
             "result": {"status": 255, "success": True, "reInterview": False}
@@ -97,13 +96,12 @@ async def test_update_firmware_known_format_and_target(
 
 async def test_controller_firmware_update_otw_guess_format(url, client_session):
     """Test controller_firmware_update_otw with guessed format."""
-    with patch("zwave_js_server.firmware.Client.connect") as connect_mock, patch(
-        "zwave_js_server.firmware.Client.initialize"
-    ) as initialize_mock, patch(
-        "zwave_js_server.firmware.Client.async_send_command"
-    ) as cmd_mock, patch(
-        "zwave_js_server.firmware.Client.disconnect"
-    ) as disconnect_mock:
+    with (
+        patch("zwave_js_server.firmware.Client.connect") as connect_mock,
+        patch("zwave_js_server.firmware.Client.initialize") as initialize_mock,
+        patch("zwave_js_server.firmware.Client.async_send_command") as cmd_mock,
+        patch("zwave_js_server.firmware.Client.disconnect") as disconnect_mock,
+    ):
         cmd_mock.return_value = {"result": {"status": 255, "success": True}}
         result = await controller_firmware_update_otw(
             url, ControllerFirmwareUpdateData("test", bytes(10)), client_session
@@ -128,13 +126,12 @@ async def test_controller_firmware_update_otw_known_format_and_target(
     url, client_session
 ):
     """Test controller_firmware_update_otw with known format."""
-    with patch("zwave_js_server.firmware.Client.connect") as connect_mock, patch(
-        "zwave_js_server.firmware.Client.initialize"
-    ) as initialize_mock, patch(
-        "zwave_js_server.firmware.Client.async_send_command"
-    ) as cmd_mock, patch(
-        "zwave_js_server.firmware.Client.disconnect"
-    ) as disconnect_mock:
+    with (
+        patch("zwave_js_server.firmware.Client.connect") as connect_mock,
+        patch("zwave_js_server.firmware.Client.initialize") as initialize_mock,
+        patch("zwave_js_server.firmware.Client.async_send_command") as cmd_mock,
+        patch("zwave_js_server.firmware.Client.disconnect") as disconnect_mock,
+    ):
         cmd_mock.return_value = {"result": {"status": 255, "success": True}}
         result = await controller_firmware_update_otw(
             url=url,

@@ -1,4 +1,5 @@
 """Provide a model for the Z-Wave JS node."""
+
 from __future__ import annotations
 
 import asyncio

@@ -1,4 +1,5 @@
 """Test node utility functions."""
+
 from zwave_js_server.const import CommandClass, SetValueStatus
 from zwave_js_server.util.multicast import (
     async_multicast_endpoint_get_cc_version,

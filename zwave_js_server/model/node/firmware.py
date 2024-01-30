@@ -1,4 +1,5 @@
 """Provide a model for Z-Wave firmware."""
+
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field

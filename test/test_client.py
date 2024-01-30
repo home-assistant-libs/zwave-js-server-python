@@ -1,4 +1,5 @@
 """Test the client."""
+
 import asyncio
 from datetime import datetime
 import logging
@@ -446,11 +447,14 @@ async def test_additional_user_agent_components(client_session, url):
         url, client_session, additional_user_agent_components={"foo": "bar"}
     )
     client._client = True
-    with patch(
-        "zwave_js_server.client.Client._send_json_message", return_value=None
-    ) as send_json_mock, patch(
-        "zwave_js_server.client.Client._receive_json_or_raise",
-        return_value={"success": True},
+    with (
+        patch(
+            "zwave_js_server.client.Client._send_json_message", return_value=None
+        ) as send_json_mock,
+        patch(
+            "zwave_js_server.client.Client._receive_json_or_raise",
+            return_value={"success": True},
+        ),
     ):
         await client.initialize()
         send_json_mock.assert_called_once_with(

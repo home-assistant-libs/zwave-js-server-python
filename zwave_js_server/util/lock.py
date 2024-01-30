@@ -1,4 +1,5 @@
 """Utility functions for Z-Wave JS locks."""
+
 from __future__ import annotations
 
 from typing import TypedDict, cast

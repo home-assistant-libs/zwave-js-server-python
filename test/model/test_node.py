@@ -1,4 +1,5 @@
 """Test the node model."""
+
 import asyncio
 from copy import deepcopy
 from datetime import UTC, datetime

@@ -1,4 +1,5 @@
 """Test value model."""
+
 from copy import deepcopy
 
 from zwave_js_server.const import ConfigurationValueType, SetValueStatus

@@ -1,4 +1,5 @@
 """Test the dump helper."""
+
 from unittest.mock import call
 
 import pytest

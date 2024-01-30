@@ -1,4 +1,5 @@
 """Provide tests for zwave-js-server."""
+
 import pathlib
 
 

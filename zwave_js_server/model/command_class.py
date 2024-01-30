@@ -3,6 +3,7 @@ Model for Zwave Command Class Info.
 
 https://zwave-js.github.io/node-zwave-js/#/api/endpoint?id=commandclasses
 """
+
 from __future__ import annotations
 
 from typing import TypedDict

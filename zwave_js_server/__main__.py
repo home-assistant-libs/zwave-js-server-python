@@ -1,4 +1,5 @@
 """Basic CLI to test Z-Wave JS server."""
+
 from __future__ import annotations
 
 import argparse
@@ -17,7 +18,6 @@ LOGGER = logging.getLogger(__package__)
 
 def get_arguments() -> argparse.Namespace:
     """Get parsed passed in arguments."""
-
     parser = argparse.ArgumentParser(description="Z-Wave JS Server Python")
     parser.add_argument("--debug", action="store_true", help="Log with debug level")
     parser.add_argument(

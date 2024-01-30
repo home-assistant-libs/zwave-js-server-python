@@ -1,4 +1,5 @@
 """Test the multilevel sensor command class constants."""
+
 from zwave_js_server.const.command_class.multilevel_sensor import (
     UNIT_ABSOLUTE_HUMIDITY,
     UNIT_HERTZ,

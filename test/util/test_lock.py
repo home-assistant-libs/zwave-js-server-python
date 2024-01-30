@@ -1,4 +1,5 @@
 """Test lock utility functions."""
+
 import copy
 
 import pytest

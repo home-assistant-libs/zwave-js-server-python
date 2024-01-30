@@ -1,4 +1,5 @@
 """Test the driver model."""
+
 import json
 
 import pytest

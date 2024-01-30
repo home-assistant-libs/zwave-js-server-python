@@ -3,6 +3,7 @@ Model for a Zwave Node's endpoints.
 
 https://zwave-js.github.io/node-zwave-js/#/api/endpoint?id=endpoint-properties
 """
+
 from __future__ import annotations
 
 import asyncio
