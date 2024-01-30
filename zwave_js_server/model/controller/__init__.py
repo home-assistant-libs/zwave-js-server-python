@@ -257,7 +257,7 @@ class Controller(EventBase):
 
     async def async_begin_inclusion(
         self,
-        inclusion_strategy: Literal[
+        inclusion_strategy: Literal[  # type: ignore[valid-type]
             InclusionStrategy.DEFAULT,
             InclusionStrategy.SECURITY_S0,
             InclusionStrategy.SECURITY_S2,
@@ -432,7 +432,7 @@ class Controller(EventBase):
     async def async_replace_failed_node(
         self,
         node: Node,
-        inclusion_strategy: Literal[
+        inclusion_strategy: Literal[  # type: ignore[valid-type]
             InclusionStrategy.DEFAULT,
             InclusionStrategy.SECURITY_S0,
             InclusionStrategy.SECURITY_S2,
@@ -873,9 +873,9 @@ class Controller(EventBase):
 
     def handle_firmware_update_progress(self, event: Event) -> None:
         """Process a firmware update progress event."""
-        self._firmware_update_progress = event.data[
-            "firmware_update_progress"
-        ] = ControllerFirmwareUpdateProgress(event.data["progress"])
+        self._firmware_update_progress = event.data["firmware_update_progress"] = (
+            ControllerFirmwareUpdateProgress(event.data["progress"])
+        )
 
     def handle_firmware_update_finished(self, event: Event) -> None:
         """Process a firmware update finished event."""

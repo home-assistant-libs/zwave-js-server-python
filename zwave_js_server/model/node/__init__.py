@@ -1100,10 +1100,10 @@ class Node(EventBase):
 
     def handle_firmware_update_progress(self, event: Event) -> None:
         """Process a node firmware update progress event."""
-        self._firmware_update_progress = event.data[
-            "firmware_update_progress"
-        ] = NodeFirmwareUpdateProgress(
-            self, cast(NodeFirmwareUpdateProgressDataType, event.data["progress"])
+        self._firmware_update_progress = event.data["firmware_update_progress"] = (
+            NodeFirmwareUpdateProgress(
+                self, cast(NodeFirmwareUpdateProgressDataType, event.data["progress"])
+            )
         )
 
     def handle_firmware_update_finished(self, event: Event) -> None:

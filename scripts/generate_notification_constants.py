@@ -170,9 +170,9 @@ for notification_type, event_map in notifications.items():
             base_class="NotificationEvent",
         )
     )
-    _notification_type_to_notification_event_map[
-        notification_type
-    ] = format_for_class_name(notification_event_name)
+    _notification_type_to_notification_event_map[notification_type] = (
+        format_for_class_name(notification_event_name)
+    )
     if notification_type in params:
         for event_name, event_values in params[notification_type].items():
             notification_event_value_name = f"{event_name} Notification Event Value"
