@@ -105,19 +105,22 @@ def _get_value_id_dict_from_value_data(value_data: ValueDataType) -> dict[str, A
 class Node(EventBase):
     """Represent a Z-Wave JS node."""
 
+    client: Client
+    data: NodeDataType = {}
+    values: dict[str, ConfigurationValue | Value] = {}
+    endpoints: dict[int, Endpoint] = {}
+    status_event: asyncio.Event = asyncio.Event()
+    _device_config: DeviceConfig = DeviceConfig({})
+    _firmware_update_progress: NodeFirmwareUpdateProgress | None = None
+    _statistics: NodeStatistics
+
     def __init__(self, client: Client, data: NodeDataType) -> None:
         """Initialize the node."""
         super().__init__()
         self.client = client
-        self.data: NodeDataType = {}
-        self._device_config = DeviceConfig({})
         self._statistics = NodeStatistics(
             client, data.get("statistics", DEFAULT_NODE_STATISTICS)
         )
-        self._firmware_update_progress: NodeFirmwareUpdateProgress | None = None
-        self.values: dict[str, ConfigurationValue | Value] = {}
-        self.endpoints: dict[int, Endpoint] = {}
-        self.status_event = asyncio.Event()
         self.update(data)
 
     def __repr__(self) -> str:
@@ -380,6 +383,8 @@ class Node(EventBase):
         self._statistics = NodeStatistics(
             self.client, self.data.get("statistics", DEFAULT_NODE_STATISTICS)
         )
+        if not self._statistics.last_seen:
+            self._statistics.last_seen = self.last_seen
 
         new_values_data = {
             _get_value_id_str_from_dict(self, val): val
