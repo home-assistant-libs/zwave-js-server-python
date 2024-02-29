@@ -1122,5 +1122,5 @@ class Node(EventBase):
         event.data["statistics_updated"] = self._statistics = NodeStatistics(
             self.client, statistics
         )
-        if last_seen := statistics.get("lastSeen"):
-            self._last_seen = datetime.fromisoformat(last_seen)
+        if self._statistics.last_seen:
+            self._last_seen = self._statistics.last_seen
