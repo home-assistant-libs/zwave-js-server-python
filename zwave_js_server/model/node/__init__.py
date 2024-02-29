@@ -105,15 +105,6 @@ def _get_value_id_dict_from_value_data(value_data: ValueDataType) -> dict[str, A
 class Node(EventBase):
     """Represent a Z-Wave JS node."""
 
-    client: Client
-    data: NodeDataType = {}
-    values: dict[str, ConfigurationValue | Value] = {}
-    endpoints: dict[int, Endpoint] = {}
-    status_event: asyncio.Event = asyncio.Event()
-    _device_config: DeviceConfig = DeviceConfig({})
-    _firmware_update_progress: NodeFirmwareUpdateProgress | None = None
-    _statistics: NodeStatistics
-
     def __init__(self, client: Client, data: NodeDataType) -> None:
         """Initialize the node."""
         super().__init__()
@@ -124,6 +115,9 @@ class Node(EventBase):
             client, data.get("statistics", DEFAULT_NODE_STATISTICS)
         )
         self._firmware_update_progress: NodeFirmwareUpdateProgress | None = None
+        self._last_seen: datetime | None = None
+        if last_seen := data.get("lastSeen"):
+            self._last_seen = datetime.fromisoformat(last_seen)
         self.values: dict[str, ConfigurationValue | Value] = {}
         self.endpoints: dict[int, Endpoint] = {}
         self.status_event = asyncio.Event()
@@ -368,9 +362,7 @@ class Node(EventBase):
     @property
     def last_seen(self) -> datetime | None:
         """Return when the node was last seen."""
-        if last_seen := self.data.get("lastSeen"):
-            return datetime.fromisoformat(last_seen)
-        return None
+        return self._last_seen
 
     @property
     def default_volume(self) -> int | float | None:
@@ -1131,4 +1123,4 @@ class Node(EventBase):
             self.client, statistics
         )
         if last_seen := statistics.get("lastSeen"):
-            self.data["lastSeen"] = last_seen
+            self._last_seen = datetime.fromisoformat(last_seen)
