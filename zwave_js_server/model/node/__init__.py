@@ -118,9 +118,15 @@ class Node(EventBase):
         """Initialize the node."""
         super().__init__()
         self.client = client
+        self.data: NodeDataType = {}
+        self._device_config = DeviceConfig({})
         self._statistics = NodeStatistics(
             client, data.get("statistics", DEFAULT_NODE_STATISTICS)
         )
+        self._firmware_update_progress: NodeFirmwareUpdateProgress | None = None
+        self.values: dict[str, ConfigurationValue | Value] = {}
+        self.endpoints: dict[int, Endpoint] = {}
+        self.status_event = asyncio.Event()
         self.update(data)
 
     def __repr__(self) -> str:
