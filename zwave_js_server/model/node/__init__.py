@@ -116,8 +116,6 @@ class Node(EventBase):
         )
         self._firmware_update_progress: NodeFirmwareUpdateProgress | None = None
         self._last_seen: datetime | None = None
-        if last_seen := data.get("lastSeen"):
-            self._last_seen = datetime.fromisoformat(last_seen)
         self.values: dict[str, ConfigurationValue | Value] = {}
         self.endpoints: dict[int, Endpoint] = {}
         self.status_event = asyncio.Event()
@@ -381,6 +379,8 @@ class Node(EventBase):
         self._statistics = NodeStatistics(
             self.client, self.data.get("statistics", DEFAULT_NODE_STATISTICS)
         )
+        if last_seen := data.get("lastSeen"):
+            self._last_seen = datetime.fromisoformat(last_seen)
         if not self._statistics.last_seen:
             self._statistics.last_seen = self.last_seen
 
