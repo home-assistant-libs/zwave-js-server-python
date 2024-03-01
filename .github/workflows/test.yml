@@ -49,3 +49,5 @@ jobs:
         uses: actions/download-artifact@v3.0.2
       - name: Upload coverage report
         uses: codecov/codecov-action@v3.1.6
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
