@@ -2,6 +2,6 @@ colorlog==6.8.2
 requests==2.31.0
 python-slugify==8.0.4
 types-python-slugify==8.0.2.20240310
-types-requests==2.31.0.20240218
+types-requests==2.31.0.20240311
 -r requirements.txt
 -r requirements_lint.txt
