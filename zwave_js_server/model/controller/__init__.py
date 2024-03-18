@@ -244,6 +244,11 @@ class Controller(EventBase):
         """Return status."""
         return ControllerStatus(self.data["status"])
 
+    @property
+    def supports_long_range(self) -> bool | None:
+        """Return whether controller supports long range or not."""
+        return self.data.get("supportsLongRange")
+
     def update(self, data: ControllerDataType) -> None:
         """Update controller data."""
         self.data = data
