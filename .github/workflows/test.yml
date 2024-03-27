@@ -48,6 +48,6 @@ jobs:
       - name: Download all coverage data
         uses: actions/download-artifact@v3.0.2
       - name: Upload coverage report
-        uses: codecov/codecov-action@v4.1.0
+        uses: codecov/codecov-action@v4.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
