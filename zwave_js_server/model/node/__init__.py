@@ -374,7 +374,7 @@ class Node(EventBase):
 
 
     @property
-    def protocol(self) -> int | None:
+    def protocol(self) -> Protocols | None:
         """Return the protocol used to communicate with this node."""
         if "protocol" in self.data:
             return Protocols(self.data["protocol"])
