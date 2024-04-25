@@ -115,6 +115,7 @@ class Node(EventBase):
             client, data.get("statistics", DEFAULT_NODE_STATISTICS)
         )
         self._firmware_update_progress: NodeFirmwareUpdateProgress | None = None
+        self._device_class: None | DeviceClass = None
         self.values: dict[str, ConfigurationValue | Value] = {}
         self.endpoints: dict[int, Endpoint] = {}
         self.status_event = asyncio.Event()
@@ -149,9 +150,7 @@ class Node(EventBase):
     @property
     def device_class(self) -> DeviceClass | None:
         """Return the device_class."""
-        if (device_class := self.data.get("deviceClass")) is None:
-            return None
-        return DeviceClass(device_class)
+        return self._device_class
 
     @property
     def installer_icon(self) -> int | None:
@@ -377,6 +376,11 @@ class Node(EventBase):
         """Update the internal state data."""
         self.data = copy.deepcopy(data)
         self._device_config = DeviceConfig(self.data.get("deviceConfig", {}))
+        if (device_class := self.data.get("deviceClass")) is None:
+            self._device_class = None
+        else:
+            self._device_class = DeviceClass(device_class)
+
         self._statistics = NodeStatistics(
             self.client, self.data.get("statistics", DEFAULT_NODE_STATISTICS)
         )
