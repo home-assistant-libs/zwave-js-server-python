@@ -6,9 +6,9 @@
   "status": 4,
   "ready": true,
   "deviceClass": {
-    "basic": "Routing Slave",
-    "generic": "Entry Control",
-    "specific": "Secure Keypad Door Lock",
+    "basic": { "key": 4, "label": "Routing Slave" },
+    "generic": { "key": 2, "label": "Entry Control" },
+    "specific": { "key": 3, "label": "Secure Keypad Door Lock" },
     "mandatorySupportedCCs": [
       "Basic",
       "Door Lock",
@@ -17,7 +17,7 @@
       "Security",
       "Version"
     ],
-    "mandatoryControlCCs": []
+    "mandatoryControlledCCs": []
   },
   "isListening": false,
   "isFrequentListening": true,
