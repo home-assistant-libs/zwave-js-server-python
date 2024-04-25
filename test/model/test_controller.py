@@ -179,6 +179,7 @@ def test_controller_mods(client):
     state["controller"]["rfRegion"] = 0
     state["controller"]["status"] = 0
     state["controller"]["rebuildRoutesProgress"] = {1: "pending"}
+    state["controller"]["supportsLongRange"] = True
 
     ctrl = controller_pkg.Controller(client, state)
     assert ctrl.own_node_id is None
@@ -186,6 +187,7 @@ def test_controller_mods(client):
     assert ctrl.rf_region == RFRegion.EUROPE
     assert ctrl.status == ControllerStatus.READY
     assert ctrl.rebuild_routes_progress == {ctrl.nodes[1]: RebuildRoutesStatus.PENDING}
+    assert ctrl.supports_long_range is True
 
 
 def test_controller_status():
