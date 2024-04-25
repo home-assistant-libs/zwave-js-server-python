@@ -115,6 +115,7 @@ class Node(EventBase):
             client, data.get("statistics", DEFAULT_NODE_STATISTICS)
         )
         self._firmware_update_progress: NodeFirmwareUpdateProgress | None = None
+        self._last_seen: datetime | None = None
         self.values: dict[str, ConfigurationValue | Value] = {}
         self.endpoints: dict[int, Endpoint] = {}
         self.status_event = asyncio.Event()
@@ -359,9 +360,7 @@ class Node(EventBase):
     @property
     def last_seen(self) -> datetime | None:
         """Return when the node was last seen."""
-        if last_seen := self.data.get("lastSeen"):
-            return datetime.fromisoformat(last_seen)
-        return None
+        return self._last_seen
 
     @property
     def default_volume(self) -> int | float | None:
@@ -380,6 +379,10 @@ class Node(EventBase):
         self._statistics = NodeStatistics(
             self.client, self.data.get("statistics", DEFAULT_NODE_STATISTICS)
         )
+        if last_seen := data.get("lastSeen"):
+            self._last_seen = datetime.fromisoformat(last_seen)
+        if not self._statistics.last_seen:
+            self._statistics.last_seen = self.last_seen
 
         new_values_data = {
             _get_value_id_str_from_dict(self, val): val
@@ -1119,5 +1122,5 @@ class Node(EventBase):
         event.data["statistics_updated"] = self._statistics = NodeStatistics(
             self.client, statistics
         )
-        if last_seen := statistics.get("lastSeen"):
-            self.data["lastSeen"] = last_seen
+        if self._statistics.last_seen:
+            self._last_seen = self._statistics.last_seen

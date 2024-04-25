@@ -189,6 +189,14 @@ def test_from_state(client):
     assert node.last_seen == datetime(2023, 7, 18, 15, 42, 34, 701000, UTC)
 
 
+async def test_last_seen(lock_schlage_be469):
+    """Test last seen property."""
+    assert lock_schlage_be469.last_seen == datetime(
+        2023, 7, 18, 15, 42, 34, 701000, UTC
+    )
+    assert lock_schlage_be469.last_seen == lock_schlage_be469.statistics.last_seen
+
+
 async def test_highest_security_value(lock_schlage_be469, ring_keypad):
     """Test the highest_security_class property."""
     assert lock_schlage_be469.highest_security_class == SecurityClass.S0_LEGACY
