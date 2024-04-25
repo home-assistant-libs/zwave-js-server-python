@@ -194,6 +194,7 @@ async def test_last_seen(lock_schlage_be469):
     assert lock_schlage_be469.last_seen == datetime(
         2023, 7, 18, 15, 42, 34, 701000, UTC
     )
+    assert lock_schlage_be469.last_seen == lock_schlage_be469.statistics.last_seen
 
 
 async def test_highest_security_value(lock_schlage_be469, ring_keypad):
