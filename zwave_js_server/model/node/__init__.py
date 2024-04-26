@@ -27,7 +27,7 @@ from ...exceptions import (
 from ..command_class import CommandClassInfo
 from ..device_class import DeviceClass
 from ..device_config import DeviceConfig
-from ..endpoint import Endpoint
+from ..endpoint import Endpoint, EndpointDataType
 from ..notification import (
     EntryControlNotification,
     EntryControlNotificationDataType,
@@ -371,7 +371,7 @@ class Node(EventBase):
         """Return the default transition duration."""
         return self.data.get("defaultTransitionDuration")
 
-    def _update_endpoints(self, endpoints: list[Endpoint]) -> None:
+    def _update_endpoints(self, endpoints: list[EndpointDataType]) -> None:
         """Update the endpoints data."""
         new_endpoints_data = {endpoint["index"]: endpoint for endpoint in endpoints}
         new_endpoint_idxs = set(new_endpoints_data)
