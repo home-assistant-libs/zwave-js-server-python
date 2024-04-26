@@ -42,6 +42,7 @@
     }
   },
   "label": "BE469",
+  "lastSeen": "2023-07-18T15:42:34.701Z",
   "neighbors": [1, 2, 3, 4, 13],
   "interviewAttempts": 1,
   "endpoints": [

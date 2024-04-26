@@ -18,11 +18,11 @@ jobs:
           - "3.11"
 
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.4
         with:
           fetch-depth: 2
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5.0.0
+        uses: actions/setup-python@v5.1.0
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
@@ -42,10 +42,12 @@ jobs:
     needs: build
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v4.1.1
+        uses: actions/checkout@v4.1.4
         with:
           fetch-depth: 2
       - name: Download all coverage data
         uses: actions/download-artifact@v3.0.2
       - name: Upload coverage report
-        uses: codecov/codecov-action@v3.1.6
+        uses: codecov/codecov-action@v4.3.0
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
