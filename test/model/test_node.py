@@ -611,6 +611,57 @@ def test_node_inclusion(multisensor_6_state):
     assert node.device_config.manufacturer == "AEON Labs"
     assert len(node.values) > 0
 
+    new_state = deepcopy(multisensor_6_state)
+    new_state["values"].append(
+        {
+            "commandClassName": "Binary Sensor",
+            "commandClass": 48,
+            "endpoint": 0,
+            "property": "test",
+            "propertyName": "test",
+            "metadata": {
+                "type": "boolean",
+                "readable": True,
+                "writeable": False,
+                "label": "Any",
+                "ccSpecific": {"sensorType": 255},
+            },
+            "value": False,
+        }
+    )
+    new_state["endpoints"].append(
+        {"nodeId": 52, "index": 1, "installerIcon": 3079, "userIcon": 3079}
+    )
+
+    event = Event(
+        "ready",
+        {
+            "event": "ready",
+            "source": "node",
+            "nodeId": node.node_id,
+            "nodeState": new_state,
+            "result": [],
+        },
+    )
+    node.receive_event(event)
+    assert "52-48-0-test" in node.values
+    assert 1 in node.endpoints
+
+    new_state = deepcopy(new_state)
+    new_state["endpoints"].pop(1)
+    event = Event(
+        "ready",
+        {
+            "event": "ready",
+            "source": "node",
+            "nodeId": node.node_id,
+            "nodeState": multisensor_6_state,
+            "result": [],
+        },
+    )
+    node.receive_event(event)
+    assert 1 not in node.endpoints
+
 
 def test_node_ready_event(switch_enbrighten_zw3010_state):
     """Emulate a node ready event."""

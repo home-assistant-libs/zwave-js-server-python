@@ -382,7 +382,7 @@ class Node(EventBase):
             self.endpoints.pop(endpoint_idx)
 
         # Add new endpoints or update existing ones
-        for endpoint_idx in new_endpoint_idxs - stale_endpoint_idxs:
+        for endpoint_idx in new_endpoint_idxs:
             endpoint = new_endpoints_data[endpoint_idx]
             values = {
                 value_id: value
