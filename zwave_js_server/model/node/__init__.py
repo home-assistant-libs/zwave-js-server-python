@@ -397,7 +397,7 @@ class Node(EventBase):
                 )
 
     def _update_values(self, values: list[ValueDataType]) -> None:
-        """Update the internal state data."""
+        """Update the values data."""
         new_values_data = {
             _get_value_id_str_from_dict(self, val): val for val in values
         }
