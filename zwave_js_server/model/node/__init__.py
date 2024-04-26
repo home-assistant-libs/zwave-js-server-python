@@ -115,7 +115,7 @@ class Node(EventBase):
             client, data.get("statistics", DEFAULT_NODE_STATISTICS)
         )
         self._firmware_update_progress: NodeFirmwareUpdateProgress | None = None
-        self._device_class: None | DeviceClass = None
+        self._device_class: DeviceClass | None = None
         self._last_seen: datetime | None = None
         self.values: dict[str, ConfigurationValue | Value] = {}
         self.endpoints: dict[int, Endpoint] = {}
