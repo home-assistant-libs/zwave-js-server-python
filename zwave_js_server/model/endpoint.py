@@ -57,7 +57,7 @@ class Endpoint(EventBase):
         self.node = node
         self.data: EndpointDataType = data
         self.values: dict[str, ConfigurationValue | Value] = {}
-        self._device_class: None | DeviceClass = None
+        self._device_class: DeviceClass | None = None
         self.update(data, values)
 
     def __repr__(self) -> str:
