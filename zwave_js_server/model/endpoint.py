@@ -57,6 +57,7 @@ class Endpoint(EventBase):
         self.node = node
         self.data: EndpointDataType = data
         self.values: dict[str, ConfigurationValue | Value] = {}
+        self._device_class: DeviceClass | None = None
         self.update(data, values)
 
     def __repr__(self) -> str:
@@ -90,9 +91,7 @@ class Endpoint(EventBase):
     @property
     def device_class(self) -> DeviceClass | None:
         """Return the device_class."""
-        if (device_class := self.data.get("deviceClass")) is None:
-            return None
-        return DeviceClass(device_class)
+        return self._device_class
 
     @property
     def installer_icon(self) -> int | None:
@@ -119,6 +118,10 @@ class Endpoint(EventBase):
     ) -> None:
         """Update the endpoint data."""
         self.data = data
+        if (device_class := self.data.get("deviceClass")) is None:
+            self._device_class = None
+        else:
+            self._device_class = DeviceClass(device_class)
 
         # Remove stale values
         self.values = {

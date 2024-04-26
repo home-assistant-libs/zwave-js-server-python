@@ -40,29 +40,33 @@ class DeviceClass:
 
     def __init__(self, data: DeviceClassDataType) -> None:
         """Initialize."""
-        self.data = data
+        self._basic = DeviceClassItem(**data["basic"])
+        self._generic = DeviceClassItem(**data["generic"])
+        self._specific = DeviceClassItem(**data["specific"])
+        self._mandatory_supported_ccs: list[int] = data["mandatorySupportedCCs"]
+        self._mandatory_controlled_ccs: list[int] = data["mandatoryControlledCCs"]
 
     @property
     def basic(self) -> DeviceClassItem:
         """Return basic DeviceClass."""
-        return DeviceClassItem(**self.data["basic"])
+        return self._basic
 
     @property
     def generic(self) -> DeviceClassItem:
         """Return generic DeviceClass."""
-        return DeviceClassItem(**self.data["generic"])
+        return self._generic
 
     @property
     def specific(self) -> DeviceClassItem:
         """Return specific DeviceClass."""
-        return DeviceClassItem(**self.data["specific"])
+        return self._specific
 
     @property
     def mandatory_supported_ccs(self) -> list[int]:
         """Return list of mandatory Supported CC id's."""
-        return self.data["mandatorySupportedCCs"]
+        return self._mandatory_supported_ccs
 
     @property
     def mandatory_controlled_ccs(self) -> list[int]:
         """Return list of mandatory Controlled CC id's."""
-        return self.data["mandatoryControlledCCs"]
+        return self._mandatory_controlled_ccs

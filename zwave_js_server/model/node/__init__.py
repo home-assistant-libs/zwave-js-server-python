@@ -27,7 +27,7 @@ from ...exceptions import (
 from ..command_class import CommandClassInfo
 from ..device_class import DeviceClass
 from ..device_config import DeviceConfig
-from ..endpoint import Endpoint
+from ..endpoint import Endpoint, EndpointDataType
 from ..notification import (
     EntryControlNotification,
     EntryControlNotificationDataType,
@@ -115,6 +115,7 @@ class Node(EventBase):
             client, data.get("statistics", DEFAULT_NODE_STATISTICS)
         )
         self._firmware_update_progress: NodeFirmwareUpdateProgress | None = None
+        self._device_class: DeviceClass | None = None
         self._last_seen: datetime | None = None
         self.values: dict[str, ConfigurationValue | Value] = {}
         self.endpoints: dict[int, Endpoint] = {}
@@ -150,9 +151,7 @@ class Node(EventBase):
     @property
     def device_class(self) -> DeviceClass | None:
         """Return the device_class."""
-        if (device_class := self.data.get("deviceClass")) is None:
-            return None
-        return DeviceClass(device_class)
+        return self._device_class
 
     @property
     def installer_icon(self) -> int | None:
@@ -372,21 +371,35 @@ class Node(EventBase):
         """Return the default transition duration."""
         return self.data.get("defaultTransitionDuration")
 
-    def update(self, data: NodeDataType) -> None:
-        """Update the internal state data."""
-        self.data = copy.deepcopy(data)
-        self._device_config = DeviceConfig(self.data.get("deviceConfig", {}))
-        self._statistics = NodeStatistics(
-            self.client, self.data.get("statistics", DEFAULT_NODE_STATISTICS)
-        )
-        if last_seen := data.get("lastSeen"):
-            self._last_seen = datetime.fromisoformat(last_seen)
-        if not self._statistics.last_seen:
-            self._statistics.last_seen = self.last_seen
+    def _update_endpoints(self, endpoints: list[EndpointDataType]) -> None:
+        """Update the endpoints data."""
+        new_endpoints_data = {endpoint["index"]: endpoint for endpoint in endpoints}
+        new_endpoint_idxs = set(new_endpoints_data)
+        stale_endpoint_idxs = set(self.endpoints) - new_endpoint_idxs
 
+        # Remove stale endpoints
+        for endpoint_idx in stale_endpoint_idxs:
+            self.endpoints.pop(endpoint_idx)
+
+        # Add new endpoints or update existing ones
+        for endpoint_idx in new_endpoint_idxs:
+            endpoint = new_endpoints_data[endpoint_idx]
+            values = {
+                value_id: value
+                for value_id, value in self.values.items()
+                if self.index == value.endpoint
+            }
+            if endpoint_idx in self.endpoints:
+                self.endpoints[endpoint_idx].update(endpoint, values)
+            else:
+                self.endpoints[endpoint_idx] = Endpoint(
+                    self.client, self, endpoint, values
+                )
+
+    def _update_values(self, values: list[ValueDataType]) -> None:
+        """Update the values data."""
         new_values_data = {
-            _get_value_id_str_from_dict(self, val): val
-            for val in self.data.pop("values")
+            _get_value_id_str_from_dict(self, val): val for val in values
         }
         new_value_ids = set(new_values_data)
         stale_value_ids = set(self.values) - new_value_ids
@@ -413,30 +426,25 @@ class Node(EventBase):
                 # If we can't parse the value, don't store it
                 pass
 
-        new_endpoints_data = {
-            endpoint["index"]: endpoint for endpoint in self.data.pop("endpoints")
-        }
-        new_endpoint_idxs = set(new_endpoints_data)
-        stale_endpoint_idxs = set(self.endpoints) - new_endpoint_idxs
+    def update(self, data: NodeDataType) -> None:
+        """Update the internal state data."""
+        self.data = copy.deepcopy(data)
+        self._device_config = DeviceConfig(self.data.get("deviceConfig", {}))
+        if (device_class := self.data.get("deviceClass")) is None:
+            self._device_class = None
+        else:
+            self._device_class = DeviceClass(device_class)
 
-        # Remove stale endpoints
-        for endpoint_idx in stale_endpoint_idxs:
-            self.endpoints.pop(endpoint_idx)
+        self._statistics = NodeStatistics(
+            self.client, self.data.get("statistics", DEFAULT_NODE_STATISTICS)
+        )
+        if last_seen := data.get("lastSeen"):
+            self._last_seen = datetime.fromisoformat(last_seen)
+        if not self._statistics.last_seen:
+            self._statistics.last_seen = self.last_seen
 
-        # Add new endpoints or update existing ones
-        for endpoint_idx in new_endpoint_idxs - stale_endpoint_idxs:
-            endpoint = new_endpoints_data[endpoint_idx]
-            values = {
-                value_id: value
-                for value_id, value in self.values.items()
-                if self.index == value.endpoint
-            }
-            if endpoint_idx in self.endpoints:
-                self.endpoints[endpoint_idx].update(endpoint, values)
-            else:
-                self.endpoints[endpoint_idx] = Endpoint(
-                    self.client, self, endpoint, values
-                )
+        self._update_values(self.data.pop("values"))
+        self._update_endpoints(self.data.pop("endpoints"))
 
     def get_command_class_values(
         self, command_class: CommandClass, endpoint: int | None = None

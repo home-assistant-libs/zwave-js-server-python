@@ -10,7 +10,7 @@
     "generic": { "key": 2, "label": "Multilevel Switch" },
     "specific": { "key": 3, "label": "Motor Control Class C" },
     "mandatorySupportedCCs": [],
-    "mandatoryControlCCs": []
+    "mandatoryControlledCCs": []
   },
   "isListening": true,
   "isFrequentListening": false,
