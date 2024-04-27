@@ -15,6 +15,7 @@ from ...const import (
     DateAndTime,
     NodeStatus,
     PowerLevel,
+    Protocols,
     SecurityClass,
 )
 from ...event import Event, EventBase
@@ -370,6 +371,13 @@ class Node(EventBase):
     def default_transition_duration(self) -> int | float | None:
         """Return the default transition duration."""
         return self.data.get("defaultTransitionDuration")
+
+    @property
+    def protocol(self) -> Protocols | None:
+        """Return the protocol used to communicate with this node."""
+        if "protocol" in self.data:
+            return Protocols(self.data["protocol"])
+        return None
 
     def _update_endpoints(self, endpoints: list[EndpointDataType]) -> None:
         """Update the endpoints data."""

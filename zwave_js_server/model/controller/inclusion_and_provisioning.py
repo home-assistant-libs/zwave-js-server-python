@@ -49,6 +49,7 @@ class ProvisioningEntry:
     security_classes: list[SecurityClass]
     requested_security_classes: list[SecurityClass] | None = None
     status: ProvisioningEntryStatus = ProvisioningEntryStatus.ACTIVE
+    protocol: Protocols | None = None
     additional_properties: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
@@ -63,6 +64,8 @@ class ProvisioningEntry:
             data["requestedSecurityClasses"] = [
                 sec_cls.value for sec_cls in self.requested_security_classes
             ]
+        if self.protocol is not None:
+            data["protocol"] = self.protocol.value
         return data
 
     @classmethod
@@ -86,6 +89,8 @@ class ProvisioningEntry:
             ]
         if "status" in data:
             cls_instance.status = ProvisioningEntryStatus(data["status"])
+        if "protocol" in data:
+            cls_instance.protocol = Protocols(data["protocol"])
         return cls_instance
 
 

@@ -17,6 +17,7 @@ from zwave_js_server.const import (
     PowerLevel,
     ProtocolDataRate,
     ProtocolVersion,
+    Protocols,
     RFRegion,
     SecurityClass,
     SupervisionStatus,
@@ -116,6 +117,7 @@ def test_from_state(client):
     assert node.max_data_rate == 100000
     assert node.supported_data_rates == [40000, 100000]
     assert node.is_secure is False
+    assert node.protocol is None
     assert node.protocol_version == ProtocolVersion.VERSION_4_5X_OR_6_0X
     assert node.supports_beaming is True
     assert node.supports_security is False
@@ -263,6 +265,14 @@ async def test_device_config(
     assert device_config.supports_zwave_plus is None
 
     assert climate_radio_thermostat_ct100_plus.device_config.metadata.comments == []
+
+
+async def test_protocol(client, wallmote_central_scene_state):
+    """Test protocol of a node."""
+    node_state = deepcopy(wallmote_central_scene_state)
+    node_state["protocol"] = 0
+    node = node_pkg.Node(client, node_state)
+    assert node.protocol is Protocols.ZWAVE
 
 
 async def test_endpoint_no_device_class(climate_radio_thermostat_ct100_plus):
