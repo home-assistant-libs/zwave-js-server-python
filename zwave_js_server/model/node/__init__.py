@@ -372,14 +372,12 @@ class Node(EventBase):
         """Return the default transition duration."""
         return self.data.get("defaultTransitionDuration")
 
-
     @property
     def protocol(self) -> Protocols | None:
         """Return the protocol used to communicate with this node."""
         if "protocol" in self.data:
             return Protocols(self.data["protocol"])
         return None
-
 
     def _update_endpoints(self, endpoints: list[EndpointDataType]) -> None:
         """Update the endpoints data."""
@@ -435,7 +433,6 @@ class Node(EventBase):
             except UnparseableValue:
                 # If we can't parse the value, don't store it
                 pass
-
 
     def update(self, data: NodeDataType) -> None:
         """Update the internal state data."""
