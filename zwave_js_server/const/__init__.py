@@ -8,7 +8,7 @@ import logging
 from typing import TypedDict
 
 PACKAGE_NAME = "zwave-js-server-python"
-__version__ = "0.55.3"
+__version__ = "0.55.4"
 
 # minimal server schema version we can handle
 MIN_SERVER_SCHEMA_VERSION = 33
