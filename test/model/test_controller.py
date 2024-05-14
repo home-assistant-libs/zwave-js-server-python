@@ -571,6 +571,48 @@ async def test_provision_smart_start_node_qr_info(controller, uuid4, mock_comman
         "messageId": uuid4,
     }
 
+    ack_commands.clear()
+    provisioning_entry = controller_pkg.QRProvisioningInformation(
+        dsk="test1",
+        security_classes=[SecurityClass.S2_UNAUTHENTICATED],
+        requested_security_classes=[SecurityClass.S2_UNAUTHENTICATED],
+        status=ProvisioningEntryStatus.INACTIVE,
+        version=QRCodeVersion.SMART_START,
+        generic_device_class=1,
+        specific_device_class=2,
+        installer_icon_type=3,
+        manufacturer_id=4,
+        product_type=5,
+        product_id=6,
+        application_version="test2",
+        max_inclusion_request_interval=7,
+        uuid="test3",
+        supported_protocols=None,
+    )
+    await controller.async_provision_smart_start_node(provisioning_entry)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.provision_smart_start_node",
+        "entry": {
+            "version": 1,
+            "securityClasses": [0],
+            "requestedSecurityClasses": [0],
+            "status": 1,
+            "dsk": "test1",
+            "genericDeviceClass": 1,
+            "specificDeviceClass": 2,
+            "installerIconType": 3,
+            "manufacturerId": 4,
+            "productType": 5,
+            "productId": 6,
+            "applicationVersion": "test2",
+            "maxInclusionRequestInterval": 7,
+            "uuid": "test3",
+        },
+        "messageId": uuid4,
+    }
+
     # Test that S2 QR Code can't be used with `async_provision_smart_start_node`
     provisioning_entry = controller_pkg.QRProvisioningInformation(
         dsk="test1",

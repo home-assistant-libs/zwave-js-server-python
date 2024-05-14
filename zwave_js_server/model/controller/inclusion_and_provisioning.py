@@ -148,6 +148,12 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> QRProvisioningInformation:
         """Return QRProvisioningInformation from data dict."""
+        supported_protocols: list[Protocols] | None = None
+        if "supportedProtocols" in data:
+            supported_protocols = [
+                Protocols(supported_protocol)
+                for supported_protocol in data["supportedProtocols"]
+            ]
         cls_instance = cls(
             version=QRCodeVersion(data["version"]),
             security_classes=[
@@ -163,10 +169,7 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
             application_version=data["applicationVersion"],
             max_inclusion_request_interval=data.get("maxInclusionRequestInterval"),
             uuid=data.get("uuid"),
-            supported_protocols=[
-                Protocols(supported_protocol)
-                for supported_protocol in data.get("supportedProtocols", [])
-            ],
+            supported_protocols=supported_protocols,
             additional_properties={
                 k: v
                 for k, v in data.items()
