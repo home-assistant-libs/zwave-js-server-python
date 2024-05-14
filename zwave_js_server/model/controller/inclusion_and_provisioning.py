@@ -154,8 +154,7 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
                 Protocols(supported_protocol)
                 for supported_protocol in data["supportedProtocols"]
             ]
-        additional_properties: dict[str, Any] | None = None
-        if _additional_properties := {
+        additional_properties: dict[str, Any] | None = {
             k: v
             for k, v in data.items()
             if k
@@ -176,8 +175,9 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
                 "supportedProtocols",
                 "status",
             }
-        }:
-            additional_properties = _additional_properties
+        }
+        if not additional_properties:
+            additional_properties = None
         cls_instance = cls(
             version=QRCodeVersion(data["version"]),
             security_classes=[
