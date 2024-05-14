@@ -7,7 +7,7 @@ name = "zwave-js-server-python"
 authors = [{ name = "Home Assistant Team", email = "hello@home-assistant.io" }]
 description = "Python wrapper for zwave-js-server"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 license = { file = "LICENSE" }
 keywords = ["home", "automation", "zwave", "zwave-js"]
 classifiers = [
@@ -15,7 +15,7 @@ classifiers = [
     "Intended Audience :: Developers",
     "Natural Language :: English",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Home Automation",
 ]
 dependencies = ["aiohttp>3", "pydantic>=1.10.0"]
