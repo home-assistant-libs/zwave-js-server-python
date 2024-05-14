@@ -154,6 +154,30 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
                 Protocols(supported_protocol)
                 for supported_protocol in data["supportedProtocols"]
             ]
+        additional_properties: dict[str, Any] | None = None
+        if _additional_properties := {
+            k: v
+            for k, v in data.items()
+            if k
+            not in {
+                "version",
+                "securityClasses",
+                "requestedSecurityClasses",
+                "dsk",
+                "genericDeviceClass",
+                "specificDeviceClass",
+                "installerIconType",
+                "manufacturerId",
+                "productType",
+                "productId",
+                "applicationVersion",
+                "maxInclusionRequestInterval",
+                "uuid",
+                "supportedProtocols",
+                "status",
+            }
+        }:
+            additional_properties = _additional_properties
         cls_instance = cls(
             version=QRCodeVersion(data["version"]),
             security_classes=[
@@ -170,28 +194,7 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
             max_inclusion_request_interval=data.get("maxInclusionRequestInterval"),
             uuid=data.get("uuid"),
             supported_protocols=supported_protocols,
-            additional_properties={
-                k: v
-                for k, v in data.items()
-                if k
-                not in {
-                    "version",
-                    "securityClasses",
-                    "requestedSecurityClasses",
-                    "dsk",
-                    "genericDeviceClass",
-                    "specificDeviceClass",
-                    "installerIconType",
-                    "manufacturerId",
-                    "productType",
-                    "productId",
-                    "applicationVersion",
-                    "maxInclusionRequestInterval",
-                    "uuid",
-                    "supportedProtocols",
-                    "status",
-                }
-            },
+            additional_properties=additional_properties,
         )
         if "requestedSecurityClasses" in data:
             cls_instance.requested_security_classes = [
