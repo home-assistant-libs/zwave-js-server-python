@@ -631,7 +631,8 @@ async def test_provision_smart_start_node_qr_info(controller, uuid4, mock_comman
         application_version="test2",
         max_inclusion_request_interval=7,
         uuid="test3",
-        supported_protocols=None,
+        supported_protocols=[Protocols.ZWAVE],
+        additional_properties={"test": "foo"},
     ) == controller_pkg.QRProvisioningInformation.from_dict(
         {
             "version": 1,
@@ -648,6 +649,8 @@ async def test_provision_smart_start_node_qr_info(controller, uuid4, mock_comman
             "applicationVersion": "test2",
             "maxInclusionRequestInterval": 7,
             "uuid": "test3",
+            "supportedProtocols": [0],
+            "test": "foo",
         }
     )
 

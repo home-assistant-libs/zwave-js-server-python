@@ -76,13 +76,13 @@ class ProvisioningEntry:
             security_classes=[
                 SecurityClass(sec_cls) for sec_cls in data["securityClasses"]
             ],
-            additional_properties={
-                k: v
-                for k, v in data.items()
-                if k
-                not in {"dsk", "securityClasses", "requestedSecurityClasses", "status"}
-            },
         )
+        if additional_properties := {
+            k: v
+            for k, v in data.items()
+            if k not in ("dsk", "securityClasses", "requestedSecurityClasses", "status")
+        }:
+            cls_instance.additional_properties = additional_properties
         if "requestedSecurityClasses" in data:
             cls_instance.requested_security_classes = [
                 SecurityClass(sec_cls) for sec_cls in data["requestedSecurityClasses"]
