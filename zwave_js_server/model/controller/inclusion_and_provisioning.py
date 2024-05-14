@@ -154,7 +154,24 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
                 Protocols(supported_protocol)
                 for supported_protocol in data["supportedProtocols"]
             ]
-        additional_properties: dict[str, Any] | None = {
+        cls_instance = cls(
+            version=QRCodeVersion(data["version"]),
+            security_classes=[
+                SecurityClass(sec_cls) for sec_cls in data["securityClasses"]
+            ],
+            dsk=data["dsk"],
+            generic_device_class=data["genericDeviceClass"],
+            specific_device_class=data["specificDeviceClass"],
+            installer_icon_type=data["installerIconType"],
+            manufacturer_id=data["manufacturerId"],
+            product_type=data["productType"],
+            product_id=data["productId"],
+            application_version=data["applicationVersion"],
+            max_inclusion_request_interval=data.get("maxInclusionRequestInterval"),
+            uuid=data.get("uuid"),
+            supported_protocols=supported_protocols,
+        )
+        if additional_properties := {
             k: v
             for k, v in data.items()
             if k
@@ -175,27 +192,8 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
                 "supportedProtocols",
                 "status",
             )
-        }
-        if not additional_properties:
-            additional_properties = None
-        cls_instance = cls(
-            version=QRCodeVersion(data["version"]),
-            security_classes=[
-                SecurityClass(sec_cls) for sec_cls in data["securityClasses"]
-            ],
-            dsk=data["dsk"],
-            generic_device_class=data["genericDeviceClass"],
-            specific_device_class=data["specificDeviceClass"],
-            installer_icon_type=data["installerIconType"],
-            manufacturer_id=data["manufacturerId"],
-            product_type=data["productType"],
-            product_id=data["productId"],
-            application_version=data["applicationVersion"],
-            max_inclusion_request_interval=data.get("maxInclusionRequestInterval"),
-            uuid=data.get("uuid"),
-            supported_protocols=supported_protocols,
-            additional_properties=additional_properties,
-        )
+        }:
+            cls_instance.additional_properties = additional_properties
         if "requestedSecurityClasses" in data:
             cls_instance.requested_security_classes = [
                 SecurityClass(sec_cls) for sec_cls in data["requestedSecurityClasses"]
