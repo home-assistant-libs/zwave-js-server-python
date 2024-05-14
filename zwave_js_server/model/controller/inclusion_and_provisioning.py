@@ -158,7 +158,7 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
             k: v
             for k, v in data.items()
             if k
-            not in {
+            not in (
                 "version",
                 "securityClasses",
                 "requestedSecurityClasses",
@@ -174,7 +174,7 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
                 "uuid",
                 "supportedProtocols",
                 "status",
-            }
+            )
         }
         if not additional_properties:
             additional_properties = None
