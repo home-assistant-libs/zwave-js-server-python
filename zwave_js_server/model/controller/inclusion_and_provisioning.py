@@ -76,13 +76,13 @@ class ProvisioningEntry:
             security_classes=[
                 SecurityClass(sec_cls) for sec_cls in data["securityClasses"]
             ],
-            additional_properties={
-                k: v
-                for k, v in data.items()
-                if k
-                not in {"dsk", "securityClasses", "requestedSecurityClasses", "status"}
-            },
         )
+        if additional_properties := {
+            k: v
+            for k, v in data.items()
+            if k not in ("dsk", "securityClasses", "requestedSecurityClasses", "status")
+        }:
+            cls_instance.additional_properties = additional_properties
         if "requestedSecurityClasses" in data:
             cls_instance.requested_security_classes = [
                 SecurityClass(sec_cls) for sec_cls in data["requestedSecurityClasses"]
@@ -148,6 +148,12 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> QRProvisioningInformation:
         """Return QRProvisioningInformation from data dict."""
+        supported_protocols: list[Protocols] | None = None
+        if "supportedProtocols" in data:
+            supported_protocols = [
+                Protocols(supported_protocol)
+                for supported_protocol in data["supportedProtocols"]
+            ]
         cls_instance = cls(
             version=QRCodeVersion(data["version"]),
             security_classes=[
@@ -163,33 +169,31 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
             application_version=data["applicationVersion"],
             max_inclusion_request_interval=data.get("maxInclusionRequestInterval"),
             uuid=data.get("uuid"),
-            supported_protocols=[
-                Protocols(supported_protocol)
-                for supported_protocol in data.get("supportedProtocols", [])
-            ],
-            additional_properties={
-                k: v
-                for k, v in data.items()
-                if k
-                not in {
-                    "version",
-                    "securityClasses",
-                    "requestedSecurityClasses",
-                    "dsk",
-                    "genericDeviceClass",
-                    "specificDeviceClass",
-                    "installerIconType",
-                    "manufacturerId",
-                    "productType",
-                    "productId",
-                    "applicationVersion",
-                    "maxInclusionRequestInterval",
-                    "uuid",
-                    "supportedProtocols",
-                    "status",
-                }
-            },
+            supported_protocols=supported_protocols,
         )
+        if additional_properties := {
+            k: v
+            for k, v in data.items()
+            if k
+            not in (
+                "version",
+                "securityClasses",
+                "requestedSecurityClasses",
+                "dsk",
+                "genericDeviceClass",
+                "specificDeviceClass",
+                "installerIconType",
+                "manufacturerId",
+                "productType",
+                "productId",
+                "applicationVersion",
+                "maxInclusionRequestInterval",
+                "uuid",
+                "supportedProtocols",
+                "status",
+            )
+        }:
+            cls_instance.additional_properties = additional_properties
         if "requestedSecurityClasses" in data:
             cls_instance.requested_security_classes = [
                 SecurityClass(sec_cls) for sec_cls in data["requestedSecurityClasses"]
