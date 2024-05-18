@@ -594,27 +594,34 @@ async def test_provision_smart_start_node_qr_info(controller, uuid4, mock_comman
     )
     await controller.async_provision_smart_start_node(provisioning_entry)
 
+    qr_entry = {
+        "version": 1,
+        "securityClasses": [0],
+        "requestedSecurityClasses": [0],
+        "status": 1,
+        "dsk": "test1",
+        "genericDeviceClass": 1,
+        "specificDeviceClass": 2,
+        "installerIconType": 3,
+        "manufacturerId": 4,
+        "productType": 5,
+        "productId": 6,
+        "applicationVersion": "test2",
+        "maxInclusionRequestInterval": 7,
+        "uuid": "test3",
+    }
+
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.provision_smart_start_node",
-        "entry": {
-            "version": 1,
-            "securityClasses": [0],
-            "requestedSecurityClasses": [0],
-            "status": 1,
-            "dsk": "test1",
-            "genericDeviceClass": 1,
-            "specificDeviceClass": 2,
-            "installerIconType": 3,
-            "manufacturerId": 4,
-            "productType": 5,
-            "productId": 6,
-            "applicationVersion": "test2",
-            "maxInclusionRequestInterval": 7,
-            "uuid": "test3",
-        },
+        "entry": qr_entry,
         "messageId": uuid4,
     }
+
+    assert (
+        qr_entry
+        == controller_pkg.QRProvisioningInformation.from_dict(qr_entry).to_dict()
+    )
 
     assert controller_pkg.QRProvisioningInformation(
         dsk="test1",
