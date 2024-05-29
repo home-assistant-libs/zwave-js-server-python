@@ -1,5 +1,5 @@
 colorlog==6.8.2
-requests==2.31.0
+requests==2.32.2
 python-slugify==8.0.4
 types-python-slugify==8.0.2.20240310
 types-requests==2.31.0.20240406
