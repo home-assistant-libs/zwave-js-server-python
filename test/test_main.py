@@ -58,7 +58,7 @@ def test_dump_state(
     assert captured.out == (
         "{'type': 'version', 'driverVersion': 'test_driver_version', "
         "'serverVersion': 'test_server_version', 'homeId': 'test_home_id', "
-        "'minSchemaVersion': 0, 'maxSchemaVersion': 35}\n"
+        "'minSchemaVersion': 0, 'maxSchemaVersion': 36}\n"
         "{'type': 'result', 'success': True, 'result': {}, 'messageId': 'initialize'}\n"
         "test_result\n"
     )

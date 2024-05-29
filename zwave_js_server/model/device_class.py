@@ -23,8 +23,6 @@ class DeviceClassDataType(TypedDict):
     basic: DeviceClassItemDataType
     generic: DeviceClassItemDataType
     specific: DeviceClassItemDataType
-    mandatorySupportedCCs: list[int]
-    mandatoryControlledCCs: list[int]
 
 
 @dataclass
@@ -43,8 +41,6 @@ class DeviceClass:
         self._basic = DeviceClassItem(**data["basic"])
         self._generic = DeviceClassItem(**data["generic"])
         self._specific = DeviceClassItem(**data["specific"])
-        self._mandatory_supported_ccs: list[int] = data["mandatorySupportedCCs"]
-        self._mandatory_controlled_ccs: list[int] = data["mandatoryControlledCCs"]
 
     @property
     def basic(self) -> DeviceClassItem:
@@ -60,13 +56,3 @@ class DeviceClass:
     def specific(self) -> DeviceClassItem:
         """Return specific DeviceClass."""
         return self._specific
-
-    @property
-    def mandatory_supported_ccs(self) -> list[int]:
-        """Return list of mandatory Supported CC id's."""
-        return self._mandatory_supported_ccs
-
-    @property
-    def mandatory_controlled_ccs(self) -> list[int]:
-        """Return list of mandatory Controlled CC id's."""
-        return self._mandatory_controlled_ccs

@@ -11,9 +11,9 @@ PACKAGE_NAME = "zwave-js-server-python"
 __version__ = "0.56.0"
 
 # minimal server schema version we can handle
-MIN_SERVER_SCHEMA_VERSION = 35
+MIN_SERVER_SCHEMA_VERSION = 36
 # max server schema version we can handle (and our code is compatible with)
-MAX_SERVER_SCHEMA_VERSION = 35
+MAX_SERVER_SCHEMA_VERSION = 36
 
 VALUE_UNKNOWN = "unknown"
 
@@ -182,7 +182,7 @@ class CommandClass(IntEnum):
     VERSION = 134
     WAKE_UP = 132
     WINDOW_COVERING = 106
-    ZIP = 35
+    ZIP = 36
     ZIP_6LOWPAN = 79
     ZIP_GATEWAY = 95
     ZIP_NAMING = 104
