@@ -19,12 +19,7 @@ from ...const import (
     SecurityClass,
 )
 from ...event import Event, EventBase
-from ...exceptions import (
-    FailedCommand,
-    NotFoundError,
-    UnparseableValue,
-    UnwriteableValue,
-)
+from ...exceptions import NotFoundError, UnparseableValue, UnwriteableValue
 from ..command_class import CommandClassInfo
 from ..device_class import DeviceClass
 from ..device_config import DeviceConfig
@@ -50,7 +45,6 @@ from ..value import (
     ValueMetadata,
     ValueNotification,
     _get_value_id_str_from_dict,
-    _init_value,
 )
 from .data_model import NodeDataType
 from .event_model import NODE_EVENT_MODEL_MAP
@@ -138,6 +132,12 @@ class Node(EventBase):
         return (
             self.client.driver == other.client.driver and self.node_id == other.node_id
         )
+
+    def _init_value(self, val: ValueDataType) -> Value | ConfigurationValue:
+        """Initialize a Value object from ValueDataType."""
+        if val["commandClass"] == CommandClass.CONFIGURATION:
+            return ConfigurationValue(self, val)
+        return Value(self, val)
 
     @property
     def node_id(self) -> int:
@@ -429,7 +429,7 @@ class Node(EventBase):
                 if value_id in self.values:
                     self.values[value_id].update(val)
                 else:
-                    self.values[value_id] = _init_value(self, val)
+                    self.values[value_id] = self._init_value(val)
             except UnparseableValue:
                 # If we can't parse the value, don't store it
                 pass
@@ -448,8 +448,9 @@ class Node(EventBase):
         )
         if last_seen := data.get("lastSeen"):
             self._last_seen = datetime.fromisoformat(last_seen)
-        if not self._statistics.last_seen:
+        if not self._statistics.last_seen and self.last_seen:
             self._statistics.last_seen = self.last_seen
+            self._statistics.data["lastSeen"] = self.last_seen.isoformat()
 
         self._update_values(self.data.pop("values"))
         self._update_endpoints(self.data.pop("endpoints"))
@@ -593,12 +594,9 @@ class Node(EventBase):
         data = await self.async_send_command(
             "get_defined_value_ids", wait_for_result=True
         )
-
-        if data is None:
-            # We should never reach this code
-            raise FailedCommand("Command failed", "failed_command")
+        assert data
         return [
-            _init_value(self, cast(ValueDataType, value_id))
+            self._init_value(cast(ValueDataType, value_id))
             for value_id in data["valueIds"]
         ]
 
@@ -1061,7 +1059,7 @@ class Node(EventBase):
         value_id = _get_value_id_str_from_dict(self, evt_val_data)
         value = self.values.get(value_id)
         if value is None:
-            value = _init_value(self, evt_val_data)
+            value = self._init_value(evt_val_data)
             self.values[value.value_id] = event.data["value"] = value
         else:
             value.receive_event(event)

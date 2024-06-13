@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, Any, TypedDict
 
 from ..const import (
     VALUE_UNKNOWN,
-    CommandClass,
     CommandStatus,
     ConfigurationValueType,
     SetValueStatus,
@@ -73,13 +72,6 @@ class ValueDataType(TypedDict, total=False):
     prevValue: Any
     metadata: MetaDataType  # required
     ccVersion: int  # required
-
-
-def _init_value(node: Node, val: ValueDataType) -> Value | ConfigurationValue:
-    """Initialize a Value object from ValueDataType."""
-    if val["commandClass"] == CommandClass.CONFIGURATION:
-        return ConfigurationValue(node, val)
-    return Value(node, val)
 
 
 def _get_value_id_str_from_dict(node: Node, val: ValueDataType) -> str:
