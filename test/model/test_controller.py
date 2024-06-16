@@ -2104,8 +2104,6 @@ async def test_node_found(controller):
             "basic": {"key": 2, "label": "1"},
             "generic": {"key": 3, "label": "2"},
             "specific": {"key": 4, "label": "3"},
-            "mandatorySupportedCCs": [112],
-            "mandatoryControlledCCs": [112],
         },
         "supportedCCs": [112],
         "controlledCCs": [112],

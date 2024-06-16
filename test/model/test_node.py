@@ -108,8 +108,6 @@ def test_from_state(client):
     assert node.ready is True
     assert node.device_class.basic.key == 2
     assert node.device_class.generic.label == "Static Controller"
-    assert node.device_class.mandatory_supported_ccs == []
-    assert node.device_class.mandatory_controlled_ccs == [32]
 
     assert node.is_listening is True
     assert node.is_frequent_listening is False
