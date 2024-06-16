@@ -182,7 +182,7 @@ class CommandClass(IntEnum):
     VERSION = 134
     WAKE_UP = 132
     WINDOW_COVERING = 106
-    ZIP = 36
+    ZIP = 35
     ZIP_6LOWPAN = 79
     ZIP_GATEWAY = 95
     ZIP_NAMING = 104
