@@ -5,6 +5,7 @@ from __future__ import annotations
 from enum import IntEnum
 
 VALUE_PROPERTY = "value"
+RESET_PROPERTY = "reset"
 
 CC_SPECIFIC_SCALE = "scale"
 CC_SPECIFIC_METER_TYPE = "meterType"
