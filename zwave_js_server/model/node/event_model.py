@@ -32,6 +32,15 @@ class BaseNodeEventModel(BaseEventModel):
     source: Literal["node"]
     nodeId: int
 
+    @classmethod
+    def from_dict(cls, data: dict) -> BaseNodeEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            nodeId=data["nodeId"],
+        )
+
 
 class AliveEventModel(BaseNodeEventModel):
     """Model for `alive` event data."""
@@ -49,6 +58,18 @@ class CheckHealthProgressEventModel(BaseNodeEventModel):
     rounds: int
     totalRounds: int
     lastRating: int
+
+    @classmethod
+    def from_dict(cls, data: dict) -> CheckHealthProgressEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            nodeId=data["nodeId"],
+            rounds=data["rounds"],
+            totalRounds=data["totalRounds"],
+            lastRating=data["lastRating"],
+        )
 
 
 class CheckLifelineHealthProgressEventModel(CheckHealthProgressEventModel):
@@ -83,6 +104,19 @@ class InterviewFailedEventArgsModel(BaseModel):
     attempt: int | None
     maxAttempts: int | None
 
+    @classmethod
+    def from_dict(cls, data: dict) -> InterviewFailedEventArgsModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            nodeId=data["nodeId"],
+            errorMessage=data["errorMessage"],
+            isFinal=data["isFinal"],
+            attempt=data["attempt"],
+            maxAttempts=data["maxAttempts"],
+        )
+
 
 class InterviewFailedEventModel(BaseNodeEventModel):
     """Model for `interview failed` event data."""
@@ -90,12 +124,32 @@ class InterviewFailedEventModel(BaseNodeEventModel):
     event: Literal["interview failed"]
     args: InterviewFailedEventArgsModel
 
+    @classmethod
+    def from_dict(cls, data: dict) -> InterviewFailedEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            nodeId=data["nodeId"],
+            args=data["args"],
+        )
+
 
 class InterviewStageCompletedEventModel(BaseNodeEventModel):
     """Model for `interview stage completed` event data."""
 
     event: Literal["interview stage completed"]
     stageName: str
+
+    @classmethod
+    def from_dict(cls, data: dict) -> InterviewStageCompletedEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            nodeId=data["nodeId"],
+            stageName=data["stageName"],
+        )
 
 
 class InterviewStartedEventModel(BaseNodeEventModel):
@@ -118,12 +172,34 @@ class NotificationEventModel(BaseNodeEventModel):
         | MultilevelSwitchNotificationArgsDataType
     )
 
+    @classmethod
+    def from_dict(cls, data: dict) -> NotificationEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            nodeId=data["nodeId"],
+            endpointIndex=data["endpointIndex"],
+            ccId=data["ccId"],
+            args=data["args"],
+        )
+
 
 class ReadyEventModel(BaseNodeEventModel):
     """Model for `ready` event data."""
 
     event: Literal["ready"]
     nodeState: NodeDataType
+
+    @classmethod
+    def from_dict(cls, data: dict) -> ReadyEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            nodeId=data["nodeId"],
+            nodeState=data["nodeState"],
+        )
 
 
 class SleepEventModel(BaseNodeEventModel):
@@ -138,6 +214,16 @@ class StatisticsUpdatedEventModel(BaseNodeEventModel):
     event: Literal["statistics updated"]
     statistics: NodeStatisticsDataType
 
+    @classmethod
+    def from_dict(cls, data: dict) -> StatisticsUpdatedEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            nodeId=data["nodeId"],
+            statistics=data["statistics"],
+        )
+
 
 class TestPowerLevelProgressEventModel(BaseNodeEventModel):
     """Model for `test powerlevel progress` event data."""
@@ -145,6 +231,17 @@ class TestPowerLevelProgressEventModel(BaseNodeEventModel):
     event: Literal["test powerlevel progress"]
     acknowledged: int
     total: int
+
+    @classmethod
+    def from_dict(cls, data: dict) -> TestPowerLevelProgressEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            nodeId=data["nodeId"],
+            acknowledged=data["acknowledged"],
+            total=data["total"],
+        )
 
 
 class ValueEventModel(BaseNodeEventModel):
@@ -156,6 +253,16 @@ class ValueEventModel(BaseNodeEventModel):
     """
 
     args: ValueDataType
+
+    @classmethod
+    def from_dict(cls, data: dict) -> ValueEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            nodeId=data["nodeId"],
+            args=data["args"],
+        )
 
 
 class MetadataUpdatedEventModel(ValueEventModel):
@@ -200,12 +307,32 @@ class FirmwareUpdateFinishedEventModel(BaseNodeEventModel):
     event: Literal["firmware update finished"]
     result: NodeFirmwareUpdateResultDataType
 
+    @classmethod
+    def from_dict(cls, data: dict) -> FirmwareUpdateFinishedEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            nodeId=data["nodeId"],
+            result=data["result"],
+        )
+
 
 class FirmwareUpdateProgressEventModel(BaseNodeEventModel):
     """Model for `firmware update progress` event data."""
 
     event: Literal["firmware update progress"]
     progress: NodeFirmwareUpdateProgressDataType
+
+    @classmethod
+    def from_dict(cls, data: dict) -> FirmwareUpdateProgressEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            nodeId=data["nodeId"],
+            progress=data["progress"],
+        )
 
 
 NODE_EVENT_MODEL_MAP: dict[str, type[BaseNodeEventModel]] = {

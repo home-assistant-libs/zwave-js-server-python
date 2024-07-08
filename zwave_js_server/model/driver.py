@@ -30,6 +30,15 @@ class LogConfigUpdatedEventModel(BaseDriverEventModel):
     event: Literal["log config updated"]
     config: LogConfigDataType
 
+    @classmethod
+    def from_dict(cls, data: dict) -> LogConfigUpdatedEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            config=data["config"],
+        )
+
 
 class AllNodesReadyEventModel(BaseDriverEventModel):
     """Model for `all nodes ready` event data."""
@@ -87,7 +96,7 @@ class Driver(EventBase):
             self.controller.receive_event(event)
             return
 
-        DRIVER_EVENT_MODEL_MAP[event.type](**event.data)
+        DRIVER_EVENT_MODEL_MAP[event.type].from_dict(event.data)
 
         self._handle_event_protocol(event)
 

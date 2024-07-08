@@ -869,7 +869,7 @@ class Controller(EventBase):
                 f"{event.data}"
             )
 
-        CONTROLLER_EVENT_MODEL_MAP[event.type](**event.data)
+        CONTROLLER_EVENT_MODEL_MAP[event.type].from_dict(event.data)
 
         self._handle_event_protocol(event)
 
