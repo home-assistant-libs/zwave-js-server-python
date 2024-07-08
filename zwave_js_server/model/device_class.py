@@ -39,13 +39,16 @@ class DeviceClass:
     def __init__(self, data: DeviceClassDataType) -> None:
         """Initialize."""
         self._basic = DeviceClassItem(
-            key=data["basic"]["key"], label=data["basic"]["label"]
+            key=data["basic"]["key"],
+            label=data["basic"]["label"],
         )
         self._generic = DeviceClassItem(
-            key=data["generic"]["key"], label=data["generic"]["label"]
+            key=data["generic"]["key"],
+            label=data["generic"]["label"],
         )
         self._specific = DeviceClassItem(
-            key=data["specific"]["key"], label=data["specific"]["label"]
+            key=data["specific"]["key"],
+            label=data["specific"]["label"],
         )
 
     @property
