@@ -213,7 +213,11 @@ class NodeFirmwareUpdateFileInfo:
         cls, data: NodeFirmwareUpdateFileInfoDataType
     ) -> NodeFirmwareUpdateFileInfo:
         """Initialize from dict."""
-        return cls(**data)
+        return cls(
+            target=data["target"],
+            url=data["url"],
+            integrity=data["integrity"],
+        )
 
     def to_dict(self) -> NodeFirmwareUpdateFileInfoDataType:
         """Return dict representation of the object."""
