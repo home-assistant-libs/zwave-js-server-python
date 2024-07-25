@@ -13,7 +13,7 @@ __version__ = "0.57.0"
 # minimal server schema version we can handle
 MIN_SERVER_SCHEMA_VERSION = 36
 # max server schema version we can handle (and our code is compatible with)
-MAX_SERVER_SCHEMA_VERSION = 36
+MAX_SERVER_SCHEMA_VERSION = 37
 
 VALUE_UNKNOWN = "unknown"
 
@@ -505,3 +505,16 @@ class SupervisionStatus(IntEnum):
     WORKING = 1
     FAIL = 2
     SUCCESS = 255
+
+
+class AssociationCheckResult(IntEnum):
+    """Enum for all known association check results."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/cc/src/lib/_Types.ts#L47
+    OK = 1
+    FORBIDDEN_DESTINATION_IS_LONG_RANGE = 2
+    FORBIDDEN_SOURCE_IS_LONG_RANGE = 3
+    FORBIDDEN_SELF_ASSOCIATION = 4
+    FORBIDDEN_SECURITY_CLASS_MISMATCH = 5
+    FORBIDDEN_DESTINATION_SECURITY_CLASS_NOT_GRANTED = 6
+    FORBIDDEN_NO_SUPPORTED_CCS = 7

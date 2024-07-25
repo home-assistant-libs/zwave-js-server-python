@@ -14,9 +14,11 @@ CC_SPECIFIC_RATE_TYPE = "rateType"
 RESET_METER_CC_API = "reset"
 
 # optional attributes when calling the Meter CC reset API.
-# https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/MeterCC.ts#L873-L881
+# https://github.com/zwave-js/node-zwave-js/blob/master/packages/cc/src/cc/MeterCC.ts
 RESET_METER_OPTION_TARGET_VALUE = "targetValue"
 RESET_METER_OPTION_TYPE = "type"
+RESET_METER_OPTION_SCALE = "scale"
+RESET_METER_OPTION_RATE_TYPE = "rateType"
 
 
 # https://github.com/zwave-js/node-zwave-js/blob/master/packages/config/config/meters.json
