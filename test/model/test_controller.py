@@ -1336,7 +1336,7 @@ async def test_check_association(controller, uuid4, mock_command):
         "messageId": uuid4,
         "nodeId": assoc_addr.node_id,
         "group": group,
-        "assoc": {"nodeId": 5, "endpoint": 0},
+        "association": {"nodeId": 5, "endpoint": 0},
     }
 
 
