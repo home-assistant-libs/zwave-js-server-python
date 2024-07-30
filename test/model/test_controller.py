@@ -1306,6 +1306,14 @@ async def test_get_associations(controller, uuid4, mock_command):
     }
 
 
+async def test_association_address_model(client, multisensor_6, uuid4, mock_command):
+    """Test association address model."""
+
+    CLASS = association_pkg.AssociationAddress
+    assert CLASS(client.driver.controller, node_id=52).node == multisensor_6
+    assert CLASS(client.driver.controller, node_id=255).node is None
+
+
 async def test_check_association(controller, uuid4, mock_command):
     """Test is association allowed."""
 
