@@ -1318,8 +1318,11 @@ async def test_check_association(controller, uuid4, mock_command):
     group = 0
     association = association_pkg.AssociationAddress(controller, node_id=5, endpoint=0)
 
-    assert AssociationCheckResult.OK is await controller.async_check_association(
-        association_address, group, association
+    assert (
+        await controller.async_check_association(
+            association_address, group, association
+        )
+        is AssociationCheckResult.OK
     )
 
     assert len(ack_commands) == 1
