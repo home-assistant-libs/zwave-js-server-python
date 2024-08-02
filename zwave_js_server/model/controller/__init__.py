@@ -9,6 +9,7 @@ from zwave_js_server.model.node.firmware import NodeFirmwareUpdateInfo
 
 from ...const import (
     MINIMUM_QR_STRING_LENGTH,
+    AssociationCheckResult,
     ControllerStatus,
     ExclusionStrategy,
     InclusionState,
@@ -574,6 +575,7 @@ class Controller(EventBase):
         for key, association_addresses in data["associations"].items():
             associations[int(key)] = [
                 AssociationAddress(
+                    self,
                     node_id=association_address["nodeId"],
                     endpoint=association_address.get("endpoint"),
                 )
@@ -581,10 +583,10 @@ class Controller(EventBase):
             ]
         return associations
 
-    async def async_is_association_allowed(
+    async def async_check_association(
         self, source: AssociationAddress, group: int, association: AssociationAddress
-    ) -> bool:
-        """Send isAssociationAllowed command to Controller."""
+    ) -> AssociationCheckResult:
+        """Send checkAssociation command to Controller."""
         source_data = {"nodeId": source.node_id}
         if source.endpoint is not None:
             source_data["endpoint"] = source.endpoint
@@ -594,13 +596,14 @@ class Controller(EventBase):
             association_data["endpoint"] = association.endpoint
         data = await self.client.async_send_command(
             {
-                "command": "controller.is_association_allowed",
+                "command": "controller.check_association",
                 **source_data,
                 "group": group,
                 "association": association_data,
-            }
+            },
+            require_schema=37,
         )
-        return cast(bool, data["allowed"])
+        return AssociationCheckResult(data["result"])
 
     async def async_add_associations(
         self,
