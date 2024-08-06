@@ -1,5 +1,5 @@
 black==24.4.2
-mypy==1.11.0
+mypy==1.11.1
 pylint==3.2.6
 pylint-strict-informational==0.1
 pre-commit==3.8.0
