@@ -22,7 +22,7 @@ jobs:
           pip install build
           python -m build
       - name: Publish release to PyPI
-        uses: pypa/gh-action-pypi-publish@v1.10.0
+        uses: pypa/gh-action-pypi-publish@v1.10.1
         with:
           user: __token__
           password: ${{ secrets.PYPI_TOKEN }}
