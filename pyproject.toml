@@ -117,9 +117,9 @@ exclude = [
 ]
 line-length = 88
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 force-sort-within-sections = true
-known-first-party = ["zwave_js_server"]
+known-first-party = ["zwave_js_server", "test"]
 combine-as-imports = true
 split-on-trailing-comma = false
 case-sensitive = true
