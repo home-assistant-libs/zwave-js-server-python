@@ -4,6 +4,7 @@ import copy
 
 import pytest
 
+from test.common import MockCommandProtocol
 from zwave_js_server.const import SupervisionStatus
 from zwave_js_server.const.command_class.lock import (
     ATTR_CODE_SLOT,
@@ -14,7 +15,6 @@ from zwave_js_server.const.command_class.lock import (
     OperationType,
 )
 from zwave_js_server.exceptions import NotFoundError
-from zwave_js_server.model.driver import Driver
 from zwave_js_server.model.node import Node
 from zwave_js_server.util.lock import (
     clear_usercode,
@@ -27,8 +27,6 @@ from zwave_js_server.util.lock import (
 )
 
 from .const import CODE_SLOTS
-
-from test.common import MockCommandProtocol
 
 
 def test_get_code_slots(lock_schlage_be469):
