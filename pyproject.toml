@@ -88,6 +88,20 @@ expected-line-ending-format = "LF"
 asyncio_mode = "auto"
 
 [tool.ruff]
+exclude = [
+    ".venv",
+    ".git",
+    ".tox",
+    "docs",
+    "venv",
+    "bin",
+    "lib",
+    "deps",
+    "build",
+]
+line-length = 88
+
+[tool.ruff.lint]
 select = ["D", "E", "F", "G", "I", "PLC", "PLE", "PLR", "PLW", "UP", "W"]
 ignore = [
     "D202",
@@ -104,18 +118,6 @@ ignore = [
     "UP006",   # keep type annotation style as is
     "UP007",   # keep type annotation style as is
 ]
-exclude = [
-    ".venv",
-    ".git",
-    ".tox",
-    "docs",
-    "venv",
-    "bin",
-    "lib",
-    "deps",
-    "build",
-]
-line-length = 88
 
 [tool.ruff.lint.isort]
 force-sort-within-sections = true
