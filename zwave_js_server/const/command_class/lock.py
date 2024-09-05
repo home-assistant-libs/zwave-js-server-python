@@ -186,6 +186,7 @@ class DoorLockCCConfigurationSetOptions:
             ),
         )
         for prop_name, val in (
+            (TARGET_LOCK_TIMEOUT_PROPERTY, self.lock_timeout_configuration),
             (TARGET_AUTO_RELOCK_TIME_PROPERTY, self.auto_relock_time),
             (TARGET_HOLD_AND_RELEASE_TIME_PROPERTY, self.hold_and_release_time),
             (TARGET_TWIST_ASSIST_PROPERTY, self.twist_assist),

@@ -2,8 +2,10 @@
 
 import asyncio
 from collections import deque
+from collections.abc import Generator
 from copy import deepcopy
 import json
+from typing import Any
 from unittest.mock import AsyncMock, Mock, patch
 
 from aiohttp import ClientSession, ClientWebSocketResponse
@@ -16,6 +18,7 @@ from zwave_js_server.model.driver import Driver
 from zwave_js_server.model.node import Node
 
 from . import load_fixture
+from .common import MockCommandProtocol
 
 # pylint: disable=protected-access, unused-argument
 
@@ -38,6 +41,12 @@ def multisensor_6_state_fixture():
 def lock_schlage_be469_state_fixture():
     """Load the schlage lock node state fixture data."""
     return json.loads(load_fixture("lock_schlage_be469_state.json"))
+
+
+@pytest.fixture(name="timed_lock_state", scope="session")
+def timed_lock_state_fixture() -> dict[str, Any]:
+    """Load the timed lock node state fixture data."""
+    return json.loads(load_fixture("timed_lock_state.json"))
 
 
 @pytest.fixture(name="climate_radio_thermostat_ct100_plus_state", scope="session")
@@ -293,7 +302,7 @@ def ws_message_fixture(result):
 
 
 @pytest.fixture(name="uuid4")
-def mock_uuid_fixture():
+def mock_uuid_fixture() -> Generator[str, None, None]:
     """Patch uuid4."""
     uuid4_hex = "1234"
     with patch("uuid.uuid4") as uuid4:
@@ -314,7 +323,9 @@ async def client_fixture(client_session, ws_client, uuid4):
 
 
 @pytest.fixture(name="mock_command")
-def mock_command_fixture(ws_client, client, uuid4):
+def mock_command_fixture(
+    ws_client: AsyncMock, client: Client, uuid4: str
+) -> MockCommandProtocol:
     """Mock a command and response."""
     mock_responses: list[tuple[dict, dict, bool]] = []
     ack_commands: list[dict] = []
@@ -329,7 +340,7 @@ def mock_command_fixture(ws_client, client, uuid4):
         mock_responses.append((match_command, response, success))
         return ack_commands
 
-    async def set_response(message):
+    async def set_response(message: dict[str, Any]) -> None:
         """Check the message and set the mocked response if a command matches."""
         for match_command, response, success in mock_responses:
             if all(message[key] == value for key, value in match_command.items()):
@@ -372,6 +383,14 @@ def multisensor_6_fixture(driver, multisensor_6_state):
 def lock_schlage_be469_fixture(driver, lock_schlage_be469_state):
     """Mock a schlage lock node."""
     node = Node(driver.client, deepcopy(lock_schlage_be469_state))
+    driver.controller.nodes[node.node_id] = node
+    return node
+
+
+@pytest.fixture(name="timed_lock")
+def timed_lock_fixture(driver: Driver, timed_lock_state: dict[str, Any]) -> Node:
+    """Mock a schlage lock node."""
+    node = Node(driver.client, deepcopy(timed_lock_state))
     driver.controller.nodes[node.node_id] = node
     return node
 

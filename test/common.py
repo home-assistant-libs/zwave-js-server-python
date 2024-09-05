@@ -1,7 +1,17 @@
 """Common methods for tests."""
 
 import asyncio
+from typing import Protocol
 from unittest.mock import AsyncMock
+
+
+class MockCommandProtocol(Protocol):
+    """Represent the function signature of mock_the mock_command callable."""
+
+    def __call__(
+        self, command: dict, response: dict, success: bool = True
+    ) -> list[dict]:
+        """Represent the signature of the mock_command callable."""
 
 
 def update_ws_client_msg_queue(fixture, new_messages):
