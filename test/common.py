@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock
 
 
 class MockCommandProtocol(Protocol):
-    """Represent the function signature of mock_the mock_command callable."""
+    """Represent the function signature of the mock_command callable."""
 
     def __call__(
         self, command: dict, response: dict, success: bool = True
