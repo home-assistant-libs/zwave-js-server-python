@@ -111,10 +111,12 @@ class MockZwaveJsServer:
 
         version_info: VersionInfoDataType = self.network_state_dump[0]
         # adjust min/max schemas if needed to get things to work
-        if MAX_SERVER_SCHEMA_VERSION > version_info["maxSchemaVersion"]:
-            version_info["maxSchemaVersion"] = MAX_SERVER_SCHEMA_VERSION
-        if MIN_SERVER_SCHEMA_VERSION < version_info["minSchemaVersion"]:
-            version_info["minSchemaVersion"] = MIN_SERVER_SCHEMA_VERSION
+        version_info["maxSchemaVersion"] = max(
+            MAX_SERVER_SCHEMA_VERSION, version_info["maxSchemaVersion"]
+        )
+        version_info["minSchemaVersion"] = min(
+            MIN_SERVER_SCHEMA_VERSION, version_info["minSchemaVersion"]
+        )
         await self.send_json(version_info)
 
         async for msg in ws_resp:
