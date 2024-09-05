@@ -4,6 +4,7 @@ import copy
 
 import pytest
 
+from test.common import MockCommandProtocol
 from zwave_js_server.const import SupervisionStatus
 from zwave_js_server.const.command_class.lock import (
     ATTR_CODE_SLOT,
@@ -297,3 +298,43 @@ async def test_set_configuration_v4(
                 OperationType.CONSTANT, twist_assist=True
             ),
         )
+
+
+@pytest.mark.usefixtures("driver")
+async def test_set_configuration_timed_lock(
+    timed_lock: Node, mock_command: MockCommandProtocol, uuid4: str
+) -> None:
+    """Test a timed lock in set_configuration utility function."""
+    node = timed_lock
+    ack_commands = mock_command(
+        {"command": "endpoint.invoke_cc_api", "nodeId": node.node_id, "endpoint": 0},
+        {},
+    )
+    await set_configuration(
+        node.endpoints[0],
+        DoorLockCCConfigurationSetOptions(
+            OperationType.TIMED, lock_timeout_configuration=42
+        ),
+    )
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "endpoint.invoke_cc_api",
+        "nodeId": 7,
+        "endpoint": 0,
+        "commandClass": 98,
+        "messageId": uuid4,
+        "methodName": "setConfiguration",
+        "args": [
+            {
+                "operationType": OperationType.TIMED,
+                "autoRelockTime": 0,
+                "blockToBlock": True,
+                "holdAndReleaseTime": 0,
+                "twistAssist": True,
+                "insideHandlesCanOpenDoorConfiguration": [True, True, True, True],
+                "outsideHandlesCanOpenDoorConfiguration": [True, True, True, True],
+                "lockTimeoutConfiguration": 42,
+            }
+        ],
+    }

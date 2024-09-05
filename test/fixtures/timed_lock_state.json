@@ -1,0 +1,776 @@
+{
+  "nodeId": 7,
+  "index": 0,
+  "installerIcon": 1792,
+  "userIcon": 1792,
+  "status": 4,
+  "ready": true,
+  "isListening": true,
+  "isRouting": true,
+  "isSecure": true,
+  "manufacturerId": 65535,
+  "productId": 1,
+  "productType": 170,
+  "firmwareVersion": "0.0",
+  "zwavePlusVersion": 2,
+  "interviewAttempts": 1,
+  "isFrequentListening": false,
+  "maxDataRate": 100000,
+  "supportedDataRates": [
+    40000,
+    100000
+  ],
+  "protocolVersion": 3,
+  "supportsBeaming": true,
+  "supportsSecurity": false,
+  "nodeType": 1,
+  "zwavePlusNodeType": 0,
+  "zwavePlusRoleType": 5,
+  "deviceClass": {
+    "basic": {
+      "key": 4,
+      "label": "Routing End Node"
+    },
+    "generic": {
+      "key": 64,
+      "label": "Entry Control"
+    },
+    "specific": {
+      "key": 1,
+      "label": "Door Lock"
+    }
+  },
+  "interviewStage": "Complete",
+  "deviceDatabaseUrl": "https://devices.zwave-js.io/?jumpTo=0xffff:0x00aa:0x0001:0.0",
+  "statistics": {
+    "commandsTX": 49,
+    "commandsRX": 48,
+    "commandsDroppedRX": 2,
+    "commandsDroppedTX": 0,
+    "timeoutResponse": 0,
+    "rtt": 29.3,
+    "lastSeen": "2024-09-04T11:55:07.601Z",
+    "rssi": -68,
+    "lwr": {
+      "protocolDataRate": 3,
+      "repeaters": [],
+      "rssi": -69,
+      "repeaterRSSI": []
+    }
+  },
+  "highestSecurityClass": 2,
+  "isControllerNode": false,
+  "keepAwake": false,
+  "lastSeen": "2024-09-04T11:54:44.326Z",
+  "protocol": 0,
+  "values": [
+    {
+      "endpoint": 0,
+      "commandClass": 98,
+      "commandClassName": "Door Lock",
+      "property": "targetMode",
+      "propertyName": "targetMode",
+      "ccVersion": 4,
+      "metadata": {
+        "type": "number",
+        "readable": true,
+        "writeable": true,
+        "label": "Target lock mode",
+        "min": 0,
+        "max": 255,
+        "states": {
+          "0": "Unsecured",
+          "1": "UnsecuredWithTimeout",
+          "16": "InsideUnsecured",
+          "17": "InsideUnsecuredWithTimeout",
+          "32": "OutsideUnsecured",
+          "33": "OutsideUnsecuredWithTimeout",
+          "255": "Secured"
+        },
+        "stateful": true,
+        "secret": false
+      },
+      "value": 255
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 98,
+      "commandClassName": "Door Lock",
+      "property": "operationType",
+      "propertyName": "operationType",
+      "ccVersion": 4,
+      "metadata": {
+        "type": "number",
+        "readable": true,
+        "writeable": true,
+        "label": "Lock operation type",
+        "min": 0,
+        "max": 255,
+        "states": {
+          "1": "Constant",
+          "2": "Timed"
+        },
+        "stateful": true,
+        "secret": false
+      },
+      "value": 1
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 98,
+      "commandClassName": "Door Lock",
+      "property": "latchStatus",
+      "propertyName": "latchStatus",
+      "ccVersion": 4,
+      "metadata": {
+        "type": "any",
+        "readable": true,
+        "writeable": false,
+        "label": "Current status of the latch",
+        "stateful": true,
+        "secret": false
+      },
+      "value": "open"
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 98,
+      "commandClassName": "Door Lock",
+      "property": "boltStatus",
+      "propertyName": "boltStatus",
+      "ccVersion": 4,
+      "metadata": {
+        "type": "any",
+        "readable": true,
+        "writeable": false,
+        "label": "Current status of the bolt",
+        "stateful": true,
+        "secret": false
+      },
+      "value": "unlocked"
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 98,
+      "commandClassName": "Door Lock",
+      "property": "outsideHandlesCanOpenDoorConfiguration",
+      "propertyName": "outsideHandlesCanOpenDoorConfiguration",
+      "ccVersion": 4,
+      "metadata": {
+        "type": "any",
+        "readable": true,
+        "writeable": true,
+        "label": "Which outside handles can open the door (configuration)",
+        "stateful": true,
+        "secret": false
+      },
+      "value": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 98,
+      "commandClassName": "Door Lock",
+      "property": "insideHandlesCanOpenDoorConfiguration",
+      "propertyName": "insideHandlesCanOpenDoorConfiguration",
+      "ccVersion": 4,
+      "metadata": {
+        "type": "any",
+        "readable": true,
+        "writeable": true,
+        "label": "Which inside handles can open the door (configuration)",
+        "stateful": true,
+        "secret": false
+      },
+      "value": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 98,
+      "commandClassName": "Door Lock",
+      "property": "autoRelockTime",
+      "propertyName": "autoRelockTime",
+      "ccVersion": 4,
+      "metadata": {
+        "type": "number",
+        "readable": true,
+        "writeable": true,
+        "label": "Duration in seconds until lock returns to secure state",
+        "min": 0,
+        "max": 65535,
+        "stateful": true,
+        "secret": false
+      },
+      "value": 0
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 98,
+      "commandClassName": "Door Lock",
+      "property": "holdAndReleaseTime",
+      "propertyName": "holdAndReleaseTime",
+      "ccVersion": 4,
+      "metadata": {
+        "type": "number",
+        "readable": true,
+        "writeable": true,
+        "label": "Duration in seconds the latch stays retracted",
+        "min": 0,
+        "max": 65535,
+        "stateful": true,
+        "secret": false
+      },
+      "value": 0
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 98,
+      "commandClassName": "Door Lock",
+      "property": "twistAssist",
+      "propertyName": "twistAssist",
+      "ccVersion": 4,
+      "metadata": {
+        "type": "boolean",
+        "readable": true,
+        "writeable": true,
+        "label": "Twist Assist enabled",
+        "stateful": true,
+        "secret": false
+      },
+      "value": true
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 98,
+      "commandClassName": "Door Lock",
+      "property": "blockToBlock",
+      "propertyName": "blockToBlock",
+      "ccVersion": 4,
+      "metadata": {
+        "type": "boolean",
+        "readable": true,
+        "writeable": true,
+        "label": "Block-to-block functionality enabled",
+        "stateful": true,
+        "secret": false
+      },
+      "value": true
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 98,
+      "commandClassName": "Door Lock",
+      "property": "currentMode",
+      "propertyName": "currentMode",
+      "ccVersion": 4,
+      "metadata": {
+        "type": "number",
+        "readable": true,
+        "writeable": false,
+        "label": "Current lock mode",
+        "min": 0,
+        "max": 255,
+        "states": {
+          "0": "Unsecured",
+          "1": "UnsecuredWithTimeout",
+          "16": "InsideUnsecured",
+          "17": "InsideUnsecuredWithTimeout",
+          "32": "OutsideUnsecured",
+          "33": "OutsideUnsecuredWithTimeout",
+          "254": "Unknown",
+          "255": "Secured"
+        },
+        "stateful": true,
+        "secret": false
+      },
+      "value": 255
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 98,
+      "commandClassName": "Door Lock",
+      "property": "duration",
+      "propertyName": "duration",
+      "ccVersion": 4,
+      "metadata": {
+        "type": "duration",
+        "readable": true,
+        "writeable": false,
+        "label": "Remaining duration until target lock mode",
+        "stateful": true,
+        "secret": false
+      },
+      "value": {
+        "value": 0,
+        "unit": "seconds"
+      }
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 98,
+      "commandClassName": "Door Lock",
+      "property": "outsideHandlesCanOpenDoor",
+      "propertyName": "outsideHandlesCanOpenDoor",
+      "ccVersion": 4,
+      "metadata": {
+        "type": "any",
+        "readable": true,
+        "writeable": false,
+        "label": "Which outside handles can open the door (actual status)",
+        "stateful": true,
+        "secret": false
+      },
+      "value": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 98,
+      "commandClassName": "Door Lock",
+      "property": "insideHandlesCanOpenDoor",
+      "propertyName": "insideHandlesCanOpenDoor",
+      "ccVersion": 4,
+      "metadata": {
+        "type": "any",
+        "readable": true,
+        "writeable": false,
+        "label": "Which inside handles can open the door (actual status)",
+        "stateful": true,
+        "secret": false
+      },
+      "value": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 98,
+      "commandClassName": "Door Lock",
+      "property": "lockTimeoutConfiguration",
+      "propertyName": "lockTimeoutConfiguration",
+      "ccVersion": 4,
+      "metadata": {
+        "type": "number",
+        "readable": true,
+        "writeable": true,
+        "label": "Duration of timed mode in seconds",
+        "min": 0,
+        "max": 65535,
+        "stateful": true,
+        "secret": false
+      }
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 98,
+      "commandClassName": "Door Lock",
+      "property": "lockTimeout",
+      "propertyName": "lockTimeout",
+      "ccVersion": 4,
+      "metadata": {
+        "type": "number",
+        "readable": true,
+        "writeable": false,
+        "label": "Seconds until lock mode times out",
+        "min": 0,
+        "max": 65535,
+        "stateful": true,
+        "secret": false
+      }
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 114,
+      "commandClassName": "Manufacturer Specific",
+      "property": "manufacturerId",
+      "propertyName": "manufacturerId",
+      "ccVersion": 2,
+      "metadata": {
+        "type": "number",
+        "readable": true,
+        "writeable": false,
+        "label": "Manufacturer ID",
+        "min": 0,
+        "max": 65535,
+        "stateful": true,
+        "secret": false
+      },
+      "value": 65535
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 114,
+      "commandClassName": "Manufacturer Specific",
+      "property": "productType",
+      "propertyName": "productType",
+      "ccVersion": 2,
+      "metadata": {
+        "type": "number",
+        "readable": true,
+        "writeable": false,
+        "label": "Product type",
+        "min": 0,
+        "max": 65535,
+        "stateful": true,
+        "secret": false
+      },
+      "value": 170
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 114,
+      "commandClassName": "Manufacturer Specific",
+      "property": "productId",
+      "propertyName": "productId",
+      "ccVersion": 2,
+      "metadata": {
+        "type": "number",
+        "readable": true,
+        "writeable": false,
+        "label": "Product ID",
+        "min": 0,
+        "max": 65535,
+        "stateful": true,
+        "secret": false
+      },
+      "value": 1
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 134,
+      "commandClassName": "Version",
+      "property": "libraryType",
+      "propertyName": "libraryType",
+      "ccVersion": 3,
+      "metadata": {
+        "type": "number",
+        "readable": true,
+        "writeable": false,
+        "label": "Library type",
+        "states": {
+          "0": "Unknown",
+          "1": "Static Controller",
+          "2": "Controller",
+          "3": "Enhanced Slave",
+          "4": "Slave",
+          "5": "Installer",
+          "6": "Routing Slave",
+          "7": "Bridge Controller",
+          "8": "Device under Test",
+          "9": "N/A",
+          "10": "AV Remote",
+          "11": "AV Device"
+        },
+        "stateful": true,
+        "secret": false
+      },
+      "value": 3
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 134,
+      "commandClassName": "Version",
+      "property": "protocolVersion",
+      "propertyName": "protocolVersion",
+      "ccVersion": 3,
+      "metadata": {
+        "type": "string",
+        "readable": true,
+        "writeable": false,
+        "label": "Z-Wave protocol version",
+        "stateful": true,
+        "secret": false
+      },
+      "value": "0.0"
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 134,
+      "commandClassName": "Version",
+      "property": "firmwareVersions",
+      "propertyName": "firmwareVersions",
+      "ccVersion": 3,
+      "metadata": {
+        "type": "string[]",
+        "readable": true,
+        "writeable": false,
+        "label": "Z-Wave chip firmware versions",
+        "stateful": true,
+        "secret": false
+      },
+      "value": [
+        "0.0"
+      ]
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 134,
+      "commandClassName": "Version",
+      "property": "hardwareVersion",
+      "propertyName": "hardwareVersion",
+      "ccVersion": 3,
+      "metadata": {
+        "type": "number",
+        "readable": true,
+        "writeable": false,
+        "label": "Z-Wave chip hardware version",
+        "stateful": true,
+        "secret": false
+      },
+      "value": 0
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 134,
+      "commandClassName": "Version",
+      "property": "sdkVersion",
+      "propertyName": "sdkVersion",
+      "ccVersion": 3,
+      "metadata": {
+        "type": "string",
+        "readable": true,
+        "writeable": false,
+        "label": "SDK version",
+        "stateful": true,
+        "secret": false
+      },
+      "value": "7.0.0"
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 134,
+      "commandClassName": "Version",
+      "property": "applicationFrameworkAPIVersion",
+      "propertyName": "applicationFrameworkAPIVersion",
+      "ccVersion": 3,
+      "metadata": {
+        "type": "string",
+        "readable": true,
+        "writeable": false,
+        "label": "Z-Wave application framework API version",
+        "stateful": true,
+        "secret": false
+      },
+      "value": "unused"
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 134,
+      "commandClassName": "Version",
+      "property": "applicationFrameworkBuildNumber",
+      "propertyName": "applicationFrameworkBuildNumber",
+      "ccVersion": 3,
+      "metadata": {
+        "type": "string",
+        "readable": true,
+        "writeable": false,
+        "label": "Z-Wave application framework API build number",
+        "stateful": true,
+        "secret": false
+      },
+      "value": 0
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 134,
+      "commandClassName": "Version",
+      "property": "hostInterfaceVersion",
+      "propertyName": "hostInterfaceVersion",
+      "ccVersion": 3,
+      "metadata": {
+        "type": "string",
+        "readable": true,
+        "writeable": false,
+        "label": "Serial API version",
+        "stateful": true,
+        "secret": false
+      },
+      "value": "unused"
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 134,
+      "commandClassName": "Version",
+      "property": "hostInterfaceBuildNumber",
+      "propertyName": "hostInterfaceBuildNumber",
+      "ccVersion": 3,
+      "metadata": {
+        "type": "string",
+        "readable": true,
+        "writeable": false,
+        "label": "Serial API build number",
+        "stateful": true,
+        "secret": false
+      },
+      "value": 0
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 134,
+      "commandClassName": "Version",
+      "property": "zWaveProtocolVersion",
+      "propertyName": "zWaveProtocolVersion",
+      "ccVersion": 3,
+      "metadata": {
+        "type": "string",
+        "readable": true,
+        "writeable": false,
+        "label": "Z-Wave protocol version",
+        "stateful": true,
+        "secret": false
+      },
+      "value": "7.0.0"
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 134,
+      "commandClassName": "Version",
+      "property": "zWaveProtocolBuildNumber",
+      "propertyName": "zWaveProtocolBuildNumber",
+      "ccVersion": 3,
+      "metadata": {
+        "type": "string",
+        "readable": true,
+        "writeable": false,
+        "label": "Z-Wave protocol build number",
+        "stateful": true,
+        "secret": false
+      },
+      "value": 255
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 134,
+      "commandClassName": "Version",
+      "property": "applicationVersion",
+      "propertyName": "applicationVersion",
+      "ccVersion": 3,
+      "metadata": {
+        "type": "string",
+        "readable": true,
+        "writeable": false,
+        "label": "Application version",
+        "stateful": true,
+        "secret": false
+      },
+      "value": "1.0.0"
+    },
+    {
+      "endpoint": 0,
+      "commandClass": 134,
+      "commandClassName": "Version",
+      "property": "applicationBuildNumber",
+      "propertyName": "applicationBuildNumber",
+      "ccVersion": 3,
+      "metadata": {
+        "type": "string",
+        "readable": true,
+        "writeable": false,
+        "label": "Application build number",
+        "stateful": true,
+        "secret": false
+      },
+      "value": 255
+    }
+  ],
+  "endpoints": [
+    {
+      "nodeId": 7,
+      "index": 0,
+      "installerIcon": 1792,
+      "userIcon": 1792,
+      "deviceClass": {
+        "basic": {
+          "key": 4,
+          "label": "Routing End Node"
+        },
+        "generic": {
+          "key": 64,
+          "label": "Entry Control"
+        },
+        "specific": {
+          "key": 1,
+          "label": "Door Lock"
+        }
+      },
+      "commandClasses": [
+        {
+          "id": 94,
+          "name": "Z-Wave Plus Info",
+          "version": 2,
+          "isSecure": false
+        },
+        {
+          "id": 159,
+          "name": "Security 2",
+          "version": 1,
+          "isSecure": true
+        },
+        {
+          "id": 152,
+          "name": "Security",
+          "version": 1,
+          "isSecure": true
+        },
+        {
+          "id": 108,
+          "name": "Supervision",
+          "version": 1,
+          "isSecure": false
+        },
+        {
+          "id": 85,
+          "name": "Transport Service",
+          "version": 2,
+          "isSecure": false
+        },
+        {
+          "id": 134,
+          "name": "Version",
+          "version": 3,
+          "isSecure": true
+        },
+        {
+          "id": 133,
+          "name": "Association",
+          "version": 2,
+          "isSecure": true
+        },
+        {
+          "id": 89,
+          "name": "Association Group Information",
+          "version": 3,
+          "isSecure": true
+        },
+        {
+          "id": 98,
+          "name": "Door Lock",
+          "version": 4,
+          "isSecure": true
+        },
+        {
+          "id": 114,
+          "name": "Manufacturer Specific",
+          "version": 2,
+          "isSecure": true
+        }
+      ]
+    }
+  ]
+}
