@@ -218,6 +218,7 @@ async def test_command_classes(endpoints_with_command_classes: Node) -> None:
     assert command_class_info.name == "Multilevel Switch"
     assert command_class_info.version == 2
     assert command_class_info.is_secure is False
+    assert command_class_info.to_dict() == command_class_info.data
 
 
 async def test_device_config(
