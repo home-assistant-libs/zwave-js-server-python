@@ -39,6 +39,7 @@ from zwave_js_server.exceptions import (
     UnwriteableValue,
 )
 from zwave_js_server.model import endpoint as endpoint_pkg, node as node_pkg
+from zwave_js_server.model.node import Node
 from zwave_js_server.model.node.firmware import (
     NodeFirmwareUpdateInfo,
     NodeFirmwareUpdateStatus,
@@ -207,14 +208,16 @@ async def test_highest_security_value(lock_schlage_be469, ring_keypad):
     assert ring_keypad.highest_security_class is None
 
 
-async def test_command_classes(endpoints_with_command_classes):
+async def test_command_classes(endpoints_with_command_classes: Node) -> None:
     """Test command_classes property on endpoint."""
-    assert len(endpoints_with_command_classes.endpoints[0].command_classes) == 17
-    assert endpoints_with_command_classes.endpoints[0].command_classes[0].id == 38
-    assert (
-        endpoints_with_command_classes.endpoints[0].command_classes[0].command_class
-        == CommandClass.SWITCH_MULTILEVEL
-    )
+    node = endpoints_with_command_classes
+    assert len(node.endpoints[0].command_classes) == 17
+    command_class_info = node.endpoints[0].command_classes[0]
+    assert command_class_info.id == 38
+    assert command_class_info.command_class == CommandClass.SWITCH_MULTILEVEL
+    assert command_class_info.name == "Multilevel Switch"
+    assert command_class_info.version == 2
+    assert command_class_info.is_secure is False
 
 
 async def test_device_config(
