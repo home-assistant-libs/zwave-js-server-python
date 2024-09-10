@@ -52,11 +52,6 @@ class CommandClassInfo:
         """Return if the CommandClass is used securely on this node/endpoint."""
         return self.data["isSecure"]
 
-    def to_dict(self) -> dict[str, bool | int | str]:
+    def to_dict(self) -> CommandClassInfoDataType:
         """Create a dictionary from itself."""
-        return {
-            "id": self.id,
-            "name": self.name,
-            "version": self.version,
-            "is_secure": self.is_secure,
-        }
+        return self.data.copy()
