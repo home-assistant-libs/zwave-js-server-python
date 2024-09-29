@@ -84,6 +84,9 @@ max-attributes = 15
 [tool.pylint.FORMAT]
 expected-line-ending-format = "LF"
 
+[tool.pylint.MESSAGE_CONTROL]
+disable="too-many-positional-arguments"
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 
