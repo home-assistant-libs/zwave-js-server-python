@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Literal, TypedDict
 
-from ...const import RemoveNodeReason
+from ...const import InclusionStrategy, RemoveNodeReason
 from ...event import BaseEventModel
 from ..node.data_model import FoundNodeDataType, NodeDataType
 from .firmware import (
@@ -142,7 +142,7 @@ class InclusionStartedEventModel(BaseControllerEventModel):
     """Model for `inclusion started` event data."""
 
     event: Literal["inclusion started"]
-    secure: bool
+    strategy: InclusionStrategy
 
     @classmethod
     def from_dict(cls, data: dict) -> InclusionStartedEventModel:
@@ -150,7 +150,7 @@ class InclusionStartedEventModel(BaseControllerEventModel):
         return cls(
             source=data["source"],
             event=data["event"],
-            secure=data["secure"],
+            strategy=data["strategy"],
         )
 
 
