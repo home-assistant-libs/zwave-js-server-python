@@ -27,6 +27,7 @@ from zwave_js_server.model import (
     association as association_pkg,
     controller as controller_pkg,
 )
+from zwave_js_server.model.controller import Controller
 from zwave_js_server.model.controller.firmware import ControllerFirmwareUpdateStatus
 from zwave_js_server.model.controller.rebuild_routes import (
     RebuildRoutesOptions,
@@ -2230,7 +2231,7 @@ async def test_unknown_event(controller):
         )
 
 
-async def test_additional_events(controller):
+async def test_additional_events(controller: Controller) -> None:
     """Test that remaining events pass pydantic validation."""
     event = Event(
         "exclusion failed", {"source": "controller", "event": "exclusion failed"}
@@ -2250,7 +2251,7 @@ async def test_additional_events(controller):
     controller.receive_event(event)
     event = Event(
         "inclusion started",
-        {"source": "controller", "event": "inclusion started", "secure": True},
+        {"source": "controller", "event": "inclusion started", "strategy": 0},
     )
     controller.receive_event(event)
     event = Event(
