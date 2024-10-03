@@ -970,7 +970,7 @@ class Node(EventBase):
         property_key: int | None = None,
         value_size: Literal[1, 2, 4] | None = None,
         value_format: ConfigurationValueFormat | None = None,
-    ) -> tuple[Value, SetConfigParameterResult | None]:
+    ) -> SetConfigParameterResult:
         """Send setRawConfigParameterValue."""
         return await self.endpoints[0].async_set_raw_config_parameter_value(
             new_value, property_, property_key, value_size, value_format
