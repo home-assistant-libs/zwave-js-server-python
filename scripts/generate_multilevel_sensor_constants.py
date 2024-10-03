@@ -55,9 +55,9 @@ for sensor_props in sensors_file:
         remove_parenthesis_ = False
     sensor_name = enum_name_format(sensor_props["label"], remove_parenthesis_)
     sensors[sensor_name] = {"id": sensor_id, "label": sensor_props["label"]}
-    scale_name = scale_def.get("scaleGroupName", sensor_name)
+    scale_name = normalize_name(sensor_props.get("scaleGroupName", sensor_name))
     scales[scale_name] = normalize_scale_definition(scale_def)
-    sensors[sensor_name]["scale"] = normalize_name(scale_name)
+    sensors[sensor_name]["scale"] = scale_name
 
 scales = dict(sorted(scales.items(), key=lambda kv: kv[0]))
 sensors = dict(sorted(sensors.items(), key=lambda kv: kv[0]))
