@@ -1,7 +1,6 @@
 """Helpers for scripts."""
 
 import json
-import os
 import re
 import subprocess
 import sys
@@ -91,9 +90,6 @@ def separate_camel_case(my_str: str) -> str:
 
 def get_json_file(file_path: str):
     """Get a JSON file from the given file path."""
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f"{file_path} not found")
-
     with open(file_path) as fp:
         return json.load(fp)
 
