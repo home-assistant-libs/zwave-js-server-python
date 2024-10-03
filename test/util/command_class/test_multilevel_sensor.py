@@ -5,7 +5,7 @@ import pytest
 from zwave_js_server.const import CommandClass
 from zwave_js_server.const.command_class.multilevel_sensor import (
     MultilevelSensorType,
-    TemperatureScale,
+    TargetTemperatureScale,
 )
 from zwave_js_server.exceptions import InvalidCommandClass, UnknownValueData
 from zwave_js_server.model.node import Node
@@ -56,7 +56,7 @@ async def test_get_multilevel_sensor_scale_type(multisensor_6: Node):
     value_id = get_value_id_str(node, CommandClass.SENSOR_MULTILEVEL, "Air temperature")
     assert (
         get_multilevel_sensor_scale_type(node.values.get(value_id))
-        == TemperatureScale.CELSIUS
+        == TargetTemperatureScale.CELSIUS
     )
 
 

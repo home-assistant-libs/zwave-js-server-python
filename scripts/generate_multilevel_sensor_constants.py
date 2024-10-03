@@ -57,7 +57,7 @@ for sensor_props in sensors_file:
     sensors[sensor_name] = {"id": sensor_id, "label": sensor_props["label"]}
     scale_name = scale_def.get("scaleGroupName", sensor_name)
     scales[scale_name] = normalize_scale_definition(scale_def)
-    sensors[sensor_name]["scale"] = normalize_name(sensor_name)
+    sensors[sensor_name]["scale"] = normalize_name(scale_name)
 
 scales = dict(sorted(scales.items(), key=lambda kv: kv[0]))
 sensors = dict(sorted(sensors.items(), key=lambda kv: kv[0]))
