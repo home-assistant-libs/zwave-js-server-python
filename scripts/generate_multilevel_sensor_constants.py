@@ -28,9 +28,8 @@ def normalize_scale_definition(scale_definitions: dict[str, dict]) -> dict[str, 
     """Convert a scales definition dictionary into a normalized dictionary."""
     scale_def_ = {}
     for scale_id, scale_props in scale_definitions.items():
-        _scale_id = int(scale_id, 16)
         scale_name_ = enum_name_format(scale_props["label"], True)
-        scale_def_[scale_name_] = _scale_id
+        scale_def_[scale_name_] = int(scale_id)
 
     return dict(sorted(scale_def_.items(), key=lambda kv: kv[0]))
 
@@ -46,14 +45,10 @@ for sensor_props in get_json_file("sensors.json"):
         remove_parenthesis_ = False
     sensor_name = enum_name_format(sensor_props["label"], remove_parenthesis_)
     sensors[sensor_name] = {"id": sensor_id, "label": sensor_props["label"]}
-    if not (
-        scale_name := enum_name_format(
-            split_camel_case(sensor_props.get("scaleGroupName", "")),
-            remove_parenthesis_,
-        )
-    ):
+    scale_name = split_camel_case(sensor_props.get("scaleGroupName", ""))
+    if not (scale_name := enum_name_format(scale_name, remove_parenthesis_)):
         scale_name = sensor_name
-    scales[scale_name] = normalize_scale_definition(scale_def)
+    scales.setdefault(scale_name, {}).update(normalize_scale_definition(scale_def))
     sensors[sensor_name]["scale"] = scale_name
 
 scales = dict(sorted(scales.items(), key=lambda kv: kv[0]))

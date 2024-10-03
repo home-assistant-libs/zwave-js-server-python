@@ -83,9 +83,10 @@ def enum_name_format(name: str, should_remove_parenthesis: bool) -> str:
 def split_camel_case(myStr: str) -> str:
     """Split a camel case string."""
     if all(char.islower() for char in myStr):
-        return myStr
+        return myStr.title()
     start_idx = [i for i, e in enumerate(myStr) if e.isupper()] + [len(myStr)]
-    return " ".join(myStr[x:y] for x, y in zip(start_idx, start_idx[1:]))
+    start_idx = [0] + start_idx
+    return " ".join(myStr[x:y] for x, y in zip(start_idx, start_idx[1:])).title()
 
 
 def get_json_file(file_path: str):

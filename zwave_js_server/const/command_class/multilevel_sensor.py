@@ -222,6 +222,14 @@ class AirFlowScale(MultilevelSensorScaleType):
     CUBIC_METER_PER_HOUR = 0
 
 
+class AirPressureScale(MultilevelSensorScaleType):
+    """Enum for known scales for AIR_PRESSURE multilevel sensor types."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/SensorTypes.ts
+    INCHES_OF_MERCURY = 1
+    KILOPASCAL = 0
+
+
 class AnglePositionScale(MultilevelSensorScaleType):
     """Enum for known scales for ANGLE_POSITION multilevel sensor types."""
 
@@ -627,8 +635,8 @@ MULTILEVEL_SENSOR_TYPE_TO_SCALE_MAP: dict[
     MultilevelSensorType.AMMONIA: DensityScale,
     MultilevelSensorType.ANGLE_POSITION: AnglePositionScale,
     MultilevelSensorType.APPLIED_FORCE_ON_THE_SENSOR: AppliedForceOnTheSensorScale,
-    MultilevelSensorType.ATMOSPHERIC_PRESSURE: PressureScale,
-    MultilevelSensorType.BAROMETRIC_PRESSURE: PressureScale,
+    MultilevelSensorType.ATMOSPHERIC_PRESSURE: AirPressureScale,
+    MultilevelSensorType.BAROMETRIC_PRESSURE: AirPressureScale,
     MultilevelSensorType.BASIS_METABOLIC_RATE: BasisMetabolicRateScale,
     MultilevelSensorType.BLOOD_PRESSURE: BloodPressureScale,
     MultilevelSensorType.BODY_MASS_INDEX: BodyMassIndexScale,
@@ -764,6 +772,9 @@ UNIT_HERTZ: list[MultilevelSensorScaleType] = [
     RotationScale.HERTZ,
 ]
 UNIT_IMPEDANCE: list[MultilevelSensorScaleType] = [MoistureScale.IMPEDANCE]
+UNIT_INCHES_OF_MERCURY: list[MultilevelSensorScaleType] = [
+    AirPressureScale.INCHES_OF_MERCURY
+]
 UNIT_INCHES_PER_HOUR: list[MultilevelSensorScaleType] = [RainRateScale.INCHES_PER_HOUR]
 UNIT_JOULE: list[MultilevelSensorScaleType] = [BasisMetabolicRateScale.JOULE]
 UNIT_KILOGRAM: list[MultilevelSensorScaleType] = [
@@ -772,6 +783,7 @@ UNIT_KILOGRAM: list[MultilevelSensorScaleType] = [
 ]
 UNIT_KILOHERTZ: list[MultilevelSensorScaleType] = [FrequencyScale.KILOHERTZ]
 UNIT_KILOPASCAL: list[MultilevelSensorScaleType] = [
+    AirPressureScale.KILOPASCAL,
     PressureScale.KILOPASCAL,
     WaterPressureScale.KILOPASCAL,
 ]
