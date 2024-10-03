@@ -1,5 +1,7 @@
 """Helpers for scripts."""
 
+import json
+import os
 import re
 import subprocess
 import sys
@@ -84,6 +86,15 @@ def split_camel_case(myStr: str) -> str:
         return myStr
     start_idx = [i for i, e in enumerate(myStr) if e.isupper()] + [len(myStr)]
     return " ".join(myStr[x:y] for x, y in zip(start_idx, start_idx[1:]))
+
+
+def get_json_file(file_path: str):
+    """Get a JSON file from the given file path."""
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"{file_path} not found")
+
+    with open(file_path) as fp:
+        return json.load(fp)
 
 
 def normalize_name(name: str) -> str:

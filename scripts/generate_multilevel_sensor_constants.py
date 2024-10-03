@@ -5,21 +5,18 @@ from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import Callable, Mapping
-import json
-import os
 import pathlib
 
 from const import AUTO_GEN_POST, AUTO_GEN_PRE
 from helpers import (
     enum_name_format,
     format_for_class_name,
+    get_json_file,
     get_manually_written_code,
     get_registry_location,
     run_black,
     split_camel_case,
 )
-
-SENSORS_FILE_PATH = "sensors.json"
 
 CONST_FILE_PATH = (
     pathlib.Path(__file__).parent.parent
@@ -38,16 +35,10 @@ def normalize_scale_definition(scale_definitions: dict[str, dict]) -> dict[str, 
     return dict(sorted(scale_def_.items(), key=lambda kv: kv[0]))
 
 
-if not os.path.exists(SENSORS_FILE_PATH):
-    raise FileNotFoundError(f"{SENSORS_FILE_PATH} not found")
-
-with open(SENSORS_FILE_PATH) as fp:
-    sensors_file = json.load(fp)
-
 scales = {}
 sensors = {}
 
-for sensor_props in sensors_file:
+for sensor_props in get_json_file("sensors.json"):
     sensor_id = sensor_props["key"]
     scale_def = sensor_props["scales"]
     remove_parenthesis_ = True

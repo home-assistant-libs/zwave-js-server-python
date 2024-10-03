@@ -4,35 +4,26 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
-import json
-import os
 import pathlib
 
 from const import AUTO_GEN_POST, AUTO_GEN_PRE
 from helpers import (
     enum_name_format,
     format_for_class_name,
+    get_json_file,
     get_manually_written_code,
     get_registry_location,
     run_black,
 )
-
-NOTIFICATIONS_FILE_PATH = pathlib.Path(__file__).parent / "notifications.json"
 
 CONST_FILE_PATH = (
     pathlib.Path(__file__).parent.parent
     / "zwave_js_server/const/command_class/notification.py"
 )
 
-if not os.path.exists(NOTIFICATIONS_FILE_PATH):
-    raise FileNotFoundError(f"{NOTIFICATIONS_FILE_PATH} not found")
-
-with open(NOTIFICATIONS_FILE_PATH) as fp:
-    notifications_file = json.load(fp)
-
 notifications = {}
 params = {}
-for notification_payload in notifications_file:
+for notification_payload in get_json_file("notifications.json"):
     notification_type = notification_payload["type"]
     notification_name = notification_payload["name"].title()
     notifications[notification_name] = {
