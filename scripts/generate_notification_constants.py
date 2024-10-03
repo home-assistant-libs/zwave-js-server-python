@@ -10,7 +10,6 @@ from const import AUTO_GEN_POST, AUTO_GEN_PRE
 from helpers import (
     enum_name_format,
     format_for_class_name,
-    get_json_file,
     get_manually_written_code,
     get_registry_location,
     run_black,
@@ -23,7 +22,7 @@ CONST_FILE_PATH = (
 
 notifications = {}
 params = {}
-for notification_payload in get_json_file("notifications.json"):
+for notification_payload in pathlib.Path("notifications.json").read_text():
     notification_type = notification_payload["type"]
     notification_name = notification_payload["name"].title()
     notifications[notification_name] = {

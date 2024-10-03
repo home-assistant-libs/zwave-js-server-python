@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "generate": "node scripts/retrieve_zwave_js_registries.ts"
+    "generate": "node scripts/generate_zwave_js_registry_json.js"
   },
   "type": "module",
   "devDependencies": {

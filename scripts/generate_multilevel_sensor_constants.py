@@ -11,11 +11,10 @@ from const import AUTO_GEN_POST, AUTO_GEN_PRE
 from helpers import (
     enum_name_format,
     format_for_class_name,
-    get_json_file,
     get_manually_written_code,
     get_registry_location,
     run_black,
-    split_camel_case,
+    separate_camel_case,
 )
 
 CONST_FILE_PATH = (
@@ -37,7 +36,7 @@ def normalize_scale_definition(scale_definitions: dict[str, dict]) -> dict[str, 
 scales = {}
 sensors = {}
 
-for sensor_props in get_json_file("sensors.json"):
+for sensor_props in pathlib.Path("sensors.json").read_text():
     sensor_id = sensor_props["key"]
     scale_def = sensor_props["scales"]
     remove_parenthesis_ = True
@@ -45,7 +44,7 @@ for sensor_props in get_json_file("sensors.json"):
         remove_parenthesis_ = False
     sensor_name = enum_name_format(sensor_props["label"], remove_parenthesis_)
     sensors[sensor_name] = {"id": sensor_id, "label": sensor_props["label"]}
-    scale_name = split_camel_case(sensor_props.get("scaleGroupName", ""))
+    scale_name = separate_camel_case(sensor_props.get("scaleGroupName", ""))
     if not (scale_name := enum_name_format(scale_name, remove_parenthesis_)):
         scale_name = sensor_name
     scales.setdefault(scale_name, {}).update(normalize_scale_definition(scale_def))
