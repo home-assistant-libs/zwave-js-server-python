@@ -23,11 +23,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-      - name: Install dependencies
+      - name: Generate registry JSON files
         run: |
           npm install
-      - name: Generate registry files
-        run: |
           npm run generate
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5.2.0
