@@ -15,8 +15,8 @@ from helpers import (
     format_for_class_name,
     get_manually_written_code,
     get_registry_location,
-    normalize_name,
     run_black,
+    split_camel_case,
 )
 
 SENSORS_FILE_PATH = "sensors.json"
@@ -55,7 +55,8 @@ for sensor_props in sensors_file:
         remove_parenthesis_ = False
     sensor_name = enum_name_format(sensor_props["label"], remove_parenthesis_)
     sensors[sensor_name] = {"id": sensor_id, "label": sensor_props["label"]}
-    scale_name = normalize_name(sensor_props.get("scaleGroupName", sensor_name))
+    if not (scale_name := split_camel_case(sensor_props.get("scaleGroupName", ""))):
+        scale_name = sensor_name
     scales[scale_name] = normalize_scale_definition(scale_def)
     sensors[sensor_name]["scale"] = scale_name
 

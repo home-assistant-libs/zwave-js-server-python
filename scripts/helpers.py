@@ -78,6 +78,12 @@ def enum_name_format(name: str, should_remove_parenthesis: bool) -> str:
     return slugify(name, separator="_").upper()
 
 
+def split_camel_case(myStr: str) -> str:
+    """Split a camel case string."""
+    start_idx = [i for i, e in enumerate(myStr) if e.isupper()] + [len(myStr)]
+    return " ".join(myStr[x:y] for x, y in zip(start_idx, start_idx[1:]))
+
+
 def normalize_name(name: str) -> str:
     """Convert a sensor/scale name into a normalized name."""
     return enum_name_format(name, True).replace("_", " ").title()
