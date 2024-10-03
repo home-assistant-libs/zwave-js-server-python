@@ -1,7 +1,8 @@
 {
   "scripts": {
-    "generate": "ts-node scripts/retrieve_zwave_js_registries.ts"
+    "generate": "node scripts/retrieve_zwave_js_registries.ts"
   },
+  "type": "module",
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
     "@types/node": "^22.7.4",

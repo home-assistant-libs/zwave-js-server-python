@@ -10,7 +10,7 @@ for (const [filename, data] of Object.entries({
   }
   fs.writeFileSync(
     filename,
-    JSON.stringify(data, (_: any, value: any) =>
+    JSON.stringify(data, (_, value) =>
       value instanceof Map ? Object.fromEntries(value) : value
     )
   );
