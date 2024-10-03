@@ -32,7 +32,7 @@ def check_dirty_repo():
 def get_registry_location(filename: str) -> str:
     """Get the registry location for the given filename."""
     return (
-        f"https://github.com//{GITHUB_PROJECT}/tree/{BRANCH_NAME}/packages/core/"
+        f"https://github.com//{GITHUB_PROJECT}/blob/{BRANCH_NAME}/packages/core/"
         f"src/registries/{filename}"
     )
 
