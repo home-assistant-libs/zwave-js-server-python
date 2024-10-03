@@ -55,7 +55,12 @@ for sensor_props in sensors_file:
         remove_parenthesis_ = False
     sensor_name = enum_name_format(sensor_props["label"], remove_parenthesis_)
     sensors[sensor_name] = {"id": sensor_id, "label": sensor_props["label"]}
-    if not (scale_name := split_camel_case(sensor_props.get("scaleGroupName", ""))):
+    if not (
+        scale_name := enum_name_format(
+            split_camel_case(sensor_props.get("scaleGroupName", "")),
+            remove_parenthesis_,
+        )
+    ):
         scale_name = sensor_name
     scales[scale_name] = normalize_scale_definition(scale_def)
     sensors[sensor_name]["scale"] = scale_name
