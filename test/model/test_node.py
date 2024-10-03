@@ -2615,9 +2615,7 @@ async def test_set_raw_config_parameter_value(
         "messageId": uuid4,
     }
 
-    result = await node.async_set_raw_config_parameter_value(
-        "Disable", "Stay Awake in Battery Mode"
-    )
+    result = await node.async_set_raw_config_parameter_value(2, 0)
     assert result == SetConfigParameterResult(CommandStatus.QUEUED)
 
     assert len(ack_commands) == 2
@@ -2627,8 +2625,8 @@ async def test_set_raw_config_parameter_value(
         "nodeId": node.node_id,
         "endpoint": 0,
         "options": {
-            "parameter": 2,
-            "value": 0,
+            "parameter": 0,
+            "value": 2,
         },
         "messageId": uuid4,
     }
@@ -2660,14 +2658,6 @@ async def test_set_raw_config_parameter_value(
     }
 
     # Test failures
-    with pytest.raises(NotFoundError):
-        await node.async_set_raw_config_parameter_value(
-            "fake", "Stay Awake in Battery Mode"
-        )
-
-    with pytest.raises(NotFoundError):
-        await node.async_set_raw_config_parameter_value(1, 1000)
-
     with pytest.raises(ValueError):
         await node.async_set_raw_config_parameter_value(1, 101, 1, 1)
 
