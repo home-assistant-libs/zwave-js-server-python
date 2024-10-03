@@ -4,6 +4,7 @@ import re
 import subprocess
 import sys
 
+from const import BRANCH_NAME, GITHUB_PROJECT
 from slugify import slugify
 
 
@@ -24,6 +25,14 @@ def check_dirty_repo():
             "Could not run `git diff --stat` on repo, please run it to determine "
             "whether constants have changed."
         )
+
+
+def get_registry_location(filename: str) -> str:
+    """Get the registry location for the given filename."""
+    return (
+        f"https://github.com//{GITHUB_PROJECT}/tree/{BRANCH_NAME}/packages/core/"
+        f"src/registries/{filename}"
+    )
 
 
 def run_black(file_path: str):
@@ -55,13 +64,6 @@ def get_manually_written_code(file_path: str):
             for line in existing_const_file[manually_written_code_start_idx:]
         ]
     return []
-
-
-def remove_comments(text: str) -> str:
-    """Remove comments from a JSON string."""
-    return "\n".join(
-        line for line in text.split("\n") if not line.strip().startswith("//")
-    )
 
 
 def remove_parenthesis(text: str) -> str:

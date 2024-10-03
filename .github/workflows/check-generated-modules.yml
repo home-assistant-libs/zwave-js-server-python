@@ -11,16 +11,29 @@ jobs:
       matrix:
         python-version:
           - "3.12"
+        node-version:
+          - "20"
 
     steps:
       - uses: actions/checkout@v4.2.0
         with:
           fetch-depth: 2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - name: Install dependencies
+        run: |
+          npm install
+      - name: Generate registry files
+        run: |
+          npm run generate
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5.2.0
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
+      - name: Install Python scripts dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements_scripts.txt
