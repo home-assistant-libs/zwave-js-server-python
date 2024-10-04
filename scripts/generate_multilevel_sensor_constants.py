@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import Callable, Mapping
+import json
 import pathlib
 
 from const import AUTO_GEN_POST, AUTO_GEN_PRE
@@ -28,7 +29,7 @@ def normalize_scale_definition(scale_definitions: dict[str, dict]) -> dict[str, 
     scale_def_ = {}
     for scale_id, scale_props in scale_definitions.items():
         scale_name_ = enum_name_format(scale_props["label"], True)
-        scale_def_[scale_name_] = int(scale_id)
+        scale_def_[scale_name_] = scale_id
 
     return dict(sorted(scale_def_.items(), key=lambda kv: kv[0]))
 
@@ -36,7 +37,7 @@ def normalize_scale_definition(scale_definitions: dict[str, dict]) -> dict[str, 
 scales = {}
 sensors = {}
 
-for sensor_props in pathlib.Path("sensors.json").read_text():
+for sensor_props in json.loads(pathlib.Path("sensors.json").read_text()):
     sensor_id = sensor_props["key"]
     scale_def = sensor_props["scales"]
     remove_parenthesis_ = True

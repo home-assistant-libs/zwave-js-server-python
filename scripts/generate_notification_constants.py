@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
+import json
 import pathlib
 
 from const import AUTO_GEN_POST, AUTO_GEN_PRE
@@ -22,7 +23,7 @@ CONST_FILE_PATH = (
 
 notifications = {}
 params = {}
-for notification_payload in pathlib.Path("notifications.json").read_text():
+for notification_payload in json.loads(pathlib.Path("notifications.json").read_text()):
     notification_type = notification_payload["type"]
     notification_name = notification_payload["name"].title()
     notifications[notification_name] = {
@@ -46,7 +47,7 @@ for notification_payload in pathlib.Path("notifications.json").read_text():
                 and state_props["parameter"]["type"] == "enum"
             ):
                 for enum_id, enum_name in state_props["parameter"]["values"].items():
-                    enum_id = int(enum_id, 16)
+                    enum_id = int(enum_id)
                     params.setdefault(notification_name, {}).setdefault(state_name, {})[
                         enum_name.title()
                     ] = enum_id

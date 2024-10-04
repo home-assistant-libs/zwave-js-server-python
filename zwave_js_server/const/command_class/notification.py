@@ -136,7 +136,7 @@ class BarrierPerformingInitializationProcessNotificationEventValue(
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
     UNKNOWN = -1
-    PERFORMING_PROCESS = 597
+    PERFORMING_PROCESS = 255
     PROCESS_COMPLETED = 0
 
     @classmethod
@@ -153,7 +153,7 @@ class BarrierSafetyBeamObstacleNotificationEventValue(NotificationEventValue):
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
     UNKNOWN = -1
     NO_OBSTRUCTION = 0
-    OBSTRUCTION = 597
+    OBSTRUCTION = 255
 
     @classmethod
     def _missing_(
@@ -169,7 +169,7 @@ class BarrierVacationModeNotificationEventValue(NotificationEventValue):
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
     UNKNOWN = -1
     MODE_DISABLED = 0
-    MODE_ENABLED = 597
+    MODE_ENABLED = 255
 
     @classmethod
     def _missing_(
