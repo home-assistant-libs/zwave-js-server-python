@@ -1,47 +1,30 @@
 #!/usr/bin/env python3
 """Script to generate Notification CC constants."""
+
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
-import json
 import pathlib
 
 from const import AUTO_GEN_POST, AUTO_GEN_PRE
 from helpers import (
     enum_name_format,
     format_for_class_name,
+    get_json,
     get_manually_written_code,
-    remove_comments,
+    get_registry_location,
     run_black,
 )
-import requests
-
-GITHUB_PROJECT = "zwave-js/node-zwave-js"
-BRANCH_NAME = "master"
-NOTIFICATIONS_FILE_PATH = "packages/config/config/notifications.json"
 
 CONST_FILE_PATH = (
     pathlib.Path(__file__).parent.parent
     / "zwave_js_server/const/command_class/notification.py"
 )
 
-
-notifications_file = json.loads(
-    remove_comments(
-        requests.get(
-            (
-                f"https://raw.githubusercontent.com/{GITHUB_PROJECT}/{BRANCH_NAME}/"
-                f"{NOTIFICATIONS_FILE_PATH}"
-            ),
-            timeout=10,
-        ).text
-    )
-)
-
 notifications = {}
 params = {}
-for notification_type, notification_payload in notifications_file.items():
-    notification_type = int(notification_type, 16)
+for notification_payload in get_json("notifications.json"):
+    notification_type = notification_payload["type"]
     notification_name = notification_payload["name"].title()
     notifications[notification_name] = {
         "type": notification_type,
@@ -50,8 +33,8 @@ for notification_type, notification_payload in notifications_file.items():
     for event in notification_payload.get("variables", []):
         event_name = event["name"].title()
         states = notifications[notification_name]["events"]
-        for state_id, state_props in event["states"].items():
-            state_id = int(state_id, 16)
+        for state_props in event["states"].values():
+            state_id = state_props["value"]
             state_name = state_props["label"].title()
             if (
                 state_name.lower() not in event_name.lower()
@@ -59,14 +42,17 @@ for notification_type, notification_payload in notifications_file.items():
             ):
                 state_name = f"{event_name} {state_name}"
             states[state_name] = state_id
-            if "params" in state_props and state_props["params"]["type"] == "enum":
-                for enum_id, enum_name in state_props["params"]["values"].items():
-                    enum_id = int(enum_id, 16)
+            if (
+                "parameter" in state_props
+                and state_props["parameter"]["type"] == "enum"
+            ):
+                for enum_id, enum_name in state_props["parameter"]["values"].items():
+                    enum_id = int(enum_id)
                     params.setdefault(notification_name, {}).setdefault(state_name, {})[
                         enum_name.title()
                     ] = enum_id
-    for event_id, event_data in notification_payload.get("events", {}).items():
-        event_id = int(event_id, 16)
+    for event_data in notification_payload.get("events", {}).values():
+        event_id = event_data["value"]
         notifications[notification_name]["events"][
             event_data["label"].title()
         ] = event_id
@@ -117,9 +103,7 @@ def generate_int_enum_base_class(class_name: str, docstring: str) -> list[str]:
     return class_def
 
 
-NOTIFICATIONS_URL = (
-    f"https://github.com/{GITHUB_PROJECT}/blob/{BRANCH_NAME}/{NOTIFICATIONS_FILE_PATH}"
-)
+NOTIFICATIONS_URL = get_registry_location("Notifications.ts")
 
 lines = [
     "# pylint: disable=line-too-long",

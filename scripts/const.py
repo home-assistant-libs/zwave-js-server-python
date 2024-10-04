@@ -18,3 +18,5 @@ AUTO_GEN_PRE = [
     "# ----------------------------------------------------------------------------------- #",
     "",
 ]
+GITHUB_PROJECT = "zwave-js/node-zwave-js"
+BRANCH_NAME = "master"

@@ -2,19 +2,25 @@
 
 This directory contains scripts that are used to help maintain this library.
 
+## Python scripts
+
 To run these scripts, you will need to install `zwave-js-server-python` library's [requirements_scripts.txt](../../requirements_scripts.txt) into your environment.
 
 These scripts have to be run manually, and any changes that result from running the scripts have to be submitted as a PR to be included in the project.
 
-## `generate_multilevel_sensor_constants.py`
+### `generate_multilevel_sensor_constants.py`
 
-This script is used to download the latest multilevel sensor types and scales JSON files from the [zwave-js](https://github.com/zwave-js/zwave-js-server) repository and generate constants for the multilevel sensor command class. The generated constants can be found [here](../../zwave_js_server/const/command_class/multilevel_sensor.py).
+This script is used to download the latest multilevel sensor types and scales registries from the [zwave-js](https://github.com/zwave-js/zwave-js-server) repository and generate constants for the multilevel sensor command class. The generated constants can be found [here](../../zwave_js_server/const/command_class/multilevel_sensor.py).
 
-## `run_mock_server.py`
+### `generate_notification_constants.py`
+
+This script is used to download the latest notification registry from the [zwave-js](https://github.com/zwave-js/zwave-js-server) repository and generate constants for the notification command class. The generated constants can be found [here](../../zwave_js_server/const/command_class/notification.py).
+
+### `run_mock_server.py`
 
 This script allows you to run a mock Z-Wave JS Server instance using a network state dump from the `zwave-js-server-python` library. While the functionality is limited for now and is intended to be expanded in the future, the mock server also supports manipulating the state of the network by replaying events on it and emulating a responsive network by setting up mocked responses to commands. The main purpose of this mock server is to allow developers to test, build, and troubleshoot applications that use the `zwave-js-server-python` library to integrate with [zwave-js](https://github.com/zwave-js/node-zwave-js) (e.g. Home Assistant).
 
-### Usage
+#### Usage
 
 At a minimum, the mock server instance needs the file path to a network state dump (which can be retrieved from an existing network using the library's [dump](../../zwave_js_server/dump.py) module). All other inputs are optional.
 
@@ -45,13 +51,13 @@ optional arguments:
                         received.
 ```
 
-### Inputs/File Formats
+#### Inputs/File Formats
 
-#### Network State Dump (required)
+##### Network State Dump (required)
 
 The network state dump tells the server what the initial state of the network should be for the driver, the controller, and all of the network's nodes. The output of the library's [dump](../../zwave_js_server/dump.py) module can be used directly as the input to the server.
 
-##### File Format
+###### File Format
 
 ```json
 [
@@ -90,13 +96,13 @@ The network state dump tells the server what the initial state of the network sh
 ]
 ```
 
-#### Events to Replay (optional)
+##### Events to Replay (optional)
 
 `zwave-js` events can be replayed on the server once a client has connected to the server instance and started listening to emulate things happening on the network. These events can be provided initially at runtime via a JSON file, but the server also has a [`/replay` endpoint](#replay-endpoint) that can be POSTed to in order to add events to the replay queue.
 
 Command results can be recorded from a live network using the library's Client class (see the [Recording section](#recording-events-and-commandscommand-responses) for more details)
 
-##### Limitations
+###### Limitations
 
 - The queue currently only gets played immediately after a new client starts listening to the server
 - The events will fire sequentially without any delays between the events
@@ -105,7 +111,7 @@ Command results can be recorded from a live network using the library's Client c
 - There is currently no way to control the timing of the events
 - There is currently no way to reorder events in the queue
 
-##### File Format
+###### File Format
 
 ```json
 [
@@ -120,20 +126,20 @@ Command results can be recorded from a live network using the library's Client c
 ]
 ```
 
-#### Command Results (optional)
+##### Command Results (optional)
 
 The server can respond to commands from a queue of command responses. After each command, the first response for that command is removed from the queue and sent back to the client. In this way, you can control the exact behavior of what the server would send the client, even if there are multiple calls for the same command. These command results can be provided initially at runtime via a JSON file, but the server also has a [`/replay` endpoint](#replay-endpoint) that can be POSTed to in order to add command results to the queue.
 
 Command results can be recorded from a live network using the library's Client class (see the [Recording section](#recording-events-and-commandscommand-responses) for more details)
 
-##### Limitations
+###### Limitations
 
 - Unlike events, which remain in the queue forever, command results are only returned once. To add to the queue, use the `/replay` endpoint
 - There is currently no way to clear a queue for a particular command
 - There is currently no way to clear all command responses
 - There is currently no way to reorder command results in the queue
 
-##### File Format
+###### File Format
 
 ```json
 [
@@ -152,20 +158,28 @@ Command results can be recorded from a live network using the library's Client c
 ]
 ```
 
-### Recording events and commands/command responses
+#### Recording events and commands/command responses
 
 The library's Client class can record event and command/command result messages that occur between a server instance and a client. This would allow you to e.g. troubleshoot a user's problem by having them record everything that happens, reproduce the issue, and then send you the result to feed directly into the mock server.
 
-#### Begin recording
+##### Begin recording
 
 There are two ways to enable recording of commands and messages:
 1. When creating the Client class instance, pass `record_messages=True` into the Client constructor and the class instance will begin recording all events, commands, and results of commands after the client starts listening to updates from the server.
 2. Call `Client.begin_recording_messages()` at any point to begin recording all events, commands, and results of commands.
 
-#### End recording
+##### End recording
 
 You can end recording by calling `Client.end_recording_messages()`. This call will return a list which can be directly passed into the `--combined-replay-dump-path` option once serialized to a JSON file.
 
-### `/replay` endpoint
+#### `/replay` endpoint
 
 The `replay` endpoint accepts an HTTP POST request with either a single event or command/command response or a list of them. They will be added to the end of their respective queue.
+
+## Typescript scripts
+
+To run these scripts, go to the `scripts` folder and run `yarn install`.
+
+### `serialize_zwave_js_registries.ts`
+
+This script imports helper functions from Z-Wave JS to retrieve the Z-Wave JS registries used in the Python scripts above.
