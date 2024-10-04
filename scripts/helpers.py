@@ -1,6 +1,7 @@
 """Helpers for scripts."""
 
 import json
+import pathlib
 import re
 import subprocess
 import sys
@@ -88,10 +89,9 @@ def separate_camel_case(my_str: str) -> str:
     return " ".join(my_str[x:y] for x, y in zip(start_idx, start_idx[1:])).title()
 
 
-def get_json_file(file_path: str):
-    """Get a JSON file from the given file path."""
-    with open(file_path) as fp:
-        return json.load(fp)
+def get_json(file_path: str) -> list | dict:
+    """Get a JSON dict/list from the given file path."""
+    return json.loads(pathlib.Path(file_path).read_text())
 
 
 def normalize_name(name: str) -> str:

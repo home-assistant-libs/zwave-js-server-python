@@ -5,13 +5,13 @@ from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import Callable, Mapping
-import json
 import pathlib
 
 from const import AUTO_GEN_POST, AUTO_GEN_PRE
 from helpers import (
     enum_name_format,
     format_for_class_name,
+    get_json,
     get_manually_written_code,
     get_registry_location,
     run_black,
@@ -37,7 +37,7 @@ def normalize_scale_definition(scale_definitions: dict[str, dict]) -> dict[str, 
 scales = {}
 sensors = {}
 
-for sensor_props in json.loads(pathlib.Path("sensors.json").read_text()):
+for sensor_props in get_json("sensors.json"):
     sensor_id = sensor_props["key"]
     scale_def = sensor_props["scales"]
     remove_parenthesis_ = True

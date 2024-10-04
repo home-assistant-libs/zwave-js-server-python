@@ -4,13 +4,13 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
-import json
 import pathlib
 
 from const import AUTO_GEN_POST, AUTO_GEN_PRE
 from helpers import (
     enum_name_format,
     format_for_class_name,
+    get_json,
     get_manually_written_code,
     get_registry_location,
     run_black,
@@ -23,7 +23,7 @@ CONST_FILE_PATH = (
 
 notifications = {}
 params = {}
-for notification_payload in json.loads(pathlib.Path("notifications.json").read_text()):
+for notification_payload in get_json("notifications.json"):
     notification_type = notification_payload["type"]
     notification_name = notification_payload["name"].title()
     notifications[notification_name] = {
