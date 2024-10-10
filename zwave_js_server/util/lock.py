@@ -163,7 +163,7 @@ async def set_usercodes(node: Node, codes: dict[int, str]) -> SupervisionResult 
         if len(str(usercode)) >= 4
     ]
 
-    if len(cc_api_codes) != len(codes):
+    if len(cc_api_codes) < len(codes):
         raise ValueError("User codes must be at least 4 digits")
 
     # https://zwave-js.github.io/node-zwave-js/#/api/CCs/UserCode?id=setmany
