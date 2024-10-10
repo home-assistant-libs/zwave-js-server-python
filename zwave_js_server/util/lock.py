@@ -171,7 +171,7 @@ async def set_usercodes(node: Node, codes: dict[int, str]) -> SupervisionResult 
     )
 
     if not data:
-        return None
+        raise ValueError("Received unexpected response from User Code CC setMany API")
 
     return SupervisionResult(data)
 

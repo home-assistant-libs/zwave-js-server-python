@@ -20,6 +20,7 @@ from zwave_js_server.const.command_class.lock import (
 )
 from zwave_js_server.exceptions import NotFoundError
 from zwave_js_server.model.node import Node
+from zwave_js_server.model.value import SupervisionResult
 from zwave_js_server.util.lock import (
     clear_usercode,
     get_code_slots,
@@ -116,7 +117,9 @@ async def test_set_usercodes(lock_schlage_be469, mock_command, uuid4):
     )
 
     # Test wrong types to ensure values get converted
-    await set_usercodes(node, {"1": 1234})
+    assert await set_usercodes(node, {"1": 1234}) == SupervisionResult(
+        {"status": SupervisionStatus.SUCCESS}
+    )
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "endpoint.invoke_cc_api",
@@ -142,6 +145,18 @@ async def test_set_usercodes(lock_schlage_be469, mock_command, uuid4):
 
     # assert no new command calls
     assert len(ack_commands) == 1
+
+
+async def test_set_usercodes_invalid(lock_schlage_be469, mock_command):
+    """Test set_usercodes utility function with invalid response."""
+    node = lock_schlage_be469
+    mock_command(
+        {"command": "endpoint.invoke_cc_api", "endpoint": 0, "nodeId": node.node_id},
+        {"response": {}},
+    )
+
+    with pytest.raises(ValueError):
+        assert await set_usercodes(node, {"1": 1234})
 
 
 async def test_clear_usercode(lock_schlage_be469, mock_command, uuid4):
