@@ -156,7 +156,7 @@ async def set_usercodes(node: Node, codes: dict[int, str]) -> SupervisionResult 
     if any(len(str(usercode)) < 4 for usercode in codes.values()):
         raise ValueError("User codes must be at least 4 digits")
 
-    codes_api = [
+    cc_api_codes = [
         {
             LOCK_USERCODE_ID_PROPERTY: int(code_slot),
             LOCK_USERCODE_STATUS_PROPERTY: CodeSlotStatus.ENABLED,
@@ -167,7 +167,7 @@ async def set_usercodes(node: Node, codes: dict[int, str]) -> SupervisionResult 
 
     # https://zwave-js.github.io/node-zwave-js/#/api/CCs/UserCode?id=setmany
     data = await node.async_invoke_cc_api(
-        CommandClass.USER_CODE, "setMany", codes_api, wait_for_result=True
+        CommandClass.USER_CODE, "setMany", cc_api_codes, wait_for_result=True
     )
 
     if not data:
