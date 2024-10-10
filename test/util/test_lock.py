@@ -108,7 +108,9 @@ async def test_set_usercode(lock_schlage_be469, mock_command, uuid4):
     assert len(ack_commands) == 1
 
 
-async def test_set_usercodes(lock_schlage_be469, mock_command, uuid4):
+async def test_set_usercodes(
+    lock_schlage_be469: Node, mock_command: MockCommandProtocol, uuid4: str
+) -> None:
     """Test set_usercodes utility function."""
     node = lock_schlage_be469
     ack_commands = mock_command(
