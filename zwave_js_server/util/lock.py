@@ -69,7 +69,7 @@ def _get_code_slots(node: Node, include_usercode: bool = False) -> list[CodeSlot
         except NotFoundError:
             return slots
 
-        code_slot = int(value.property_key)
+        code_slot = int(value.property_key)  # type: ignore[arg-type]
         in_use = (
             None
             if status_value.value is None
@@ -105,7 +105,7 @@ def get_usercode(node: Node, code_slot: int) -> CodeSlot:
     value = get_code_slot_value(node, code_slot, LOCK_USERCODE_PROPERTY)
     status_value = get_code_slot_value(node, code_slot, LOCK_USERCODE_STATUS_PROPERTY)
 
-    code_slot = int(value.property_key)
+    code_slot = int(value.property_key)  # type: ignore[arg-type]
     in_use = (
         None
         if status_value.value is None
@@ -151,7 +151,7 @@ async def set_usercode(
     return await node.async_set_value(value, usercode)
 
 
-async def set_usercodes(node: Node, codes: dict[int, str]) -> SetValueResult | None:
+async def set_usercodes(node: Node, codes: dict[int, str]) -> SupervisionResult | None:
     """Set the usercode to index X on the lock."""
     if any(len(str(usercode)) < 4 for usercode in codes.values()):
         raise ValueError("User codes must be at least 4 digits")
@@ -172,6 +172,7 @@ async def set_usercodes(node: Node, codes: dict[int, str]) -> SetValueResult | N
 
     if not data:
         return None
+
     return SupervisionResult(data)
 
 
