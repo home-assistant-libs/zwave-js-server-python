@@ -149,7 +149,9 @@ async def test_set_usercodes(
     assert len(ack_commands) == 1
 
 
-async def test_set_usercodes_invalid(lock_schlage_be469, mock_command):
+async def test_set_usercodes_invalid(
+    lock_schlage_be469: Node, mock_command: MockCommandProtocol
+) -> None:
     """Test set_usercodes utility function with invalid response."""
     node = lock_schlage_be469
     mock_command(
