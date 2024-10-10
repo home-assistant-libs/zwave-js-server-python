@@ -14,6 +14,7 @@ from ..const.command_class.lock import (
     CURRENT_BLOCK_TO_BLOCK_PROPERTY,
     CURRENT_HOLD_AND_RELEASE_TIME_PROPERTY,
     CURRENT_TWIST_ASSIST_PROPERTY,
+    LOCK_USERCODE_ID_PROPERTY,
     LOCK_USERCODE_PROPERTY,
     LOCK_USERCODE_STATUS_PROPERTY,
     CodeSlotStatus,
@@ -68,7 +69,7 @@ def _get_code_slots(node: Node, include_usercode: bool = False) -> list[CodeSlot
         except NotFoundError:
             return slots
 
-        code_slot = int(value.property_key)  # type: ignore[arg-type]
+        code_slot = int(value.property_key)
         in_use = (
             None
             if status_value.value is None
@@ -104,7 +105,7 @@ def get_usercode(node: Node, code_slot: int) -> CodeSlot:
     value = get_code_slot_value(node, code_slot, LOCK_USERCODE_PROPERTY)
     status_value = get_code_slot_value(node, code_slot, LOCK_USERCODE_STATUS_PROPERTY)
 
-    code_slot = int(value.property_key)  # type: ignore[arg-type]
+    code_slot = int(value.property_key)
     in_use = (
         None
         if status_value.value is None
@@ -130,6 +131,7 @@ async def get_usercode_from_node(node: Node, code_slot: int) -> CodeSlot:
     This call will populate the ValueDB and trigger value update events from the
     driver.
     """
+    # https://zwave-js.github.io/node-zwave-js/#/api/CCs/UserCode?id=get
     await node.async_invoke_cc_api(
         CommandClass.USER_CODE, "get", code_slot, wait_for_result=True
     )
@@ -141,11 +143,36 @@ async def set_usercode(
 ) -> SetValueResult | None:
     """Set the usercode to index X on the lock."""
     value = get_code_slot_value(node, code_slot, LOCK_USERCODE_PROPERTY)
+    usercode = str(usercode)
 
-    if len(str(usercode)) < 4:
+    if len(usercode) < 4:
         raise ValueError("User code must be at least 4 digits")
 
     return await node.async_set_value(value, usercode)
+
+
+async def set_usercodes(node: Node, codes: dict[int, str]) -> SetValueResult | None:
+    """Set the usercode to index X on the lock."""
+    if any(len(str(usercode)) < 4 for usercode in codes.values()):
+        raise ValueError("User codes must be at least 4 digits")
+
+    codes_api = [
+        {
+            LOCK_USERCODE_ID_PROPERTY: int(code_slot),
+            LOCK_USERCODE_STATUS_PROPERTY: CodeSlotStatus.ENABLED,
+            LOCK_USERCODE_PROPERTY: str(usercode),
+        }
+        for code_slot, usercode in codes.items()
+    ]
+
+    # https://zwave-js.github.io/node-zwave-js/#/api/CCs/UserCode?id=setmany
+    data = await node.async_invoke_cc_api(
+        CommandClass.USER_CODE, "setMany", codes_api, wait_for_result=True
+    )
+
+    if not data:
+        return None
+    return SupervisionResult(data)
 
 
 async def clear_usercode(node: Node, code_slot: int) -> SetValueResult | None:
@@ -197,6 +224,7 @@ async def set_configuration(
     if errors:
         raise ValueError("\n".join(errors))
 
+    # https://zwave-js.github.io/node-zwave-js/#/api/CCs/UserCode?id=setconfiguration
     data = await endpoint.async_invoke_cc_api(
         CommandClass.DOOR_LOCK, "setConfiguration", configuration.to_dict()
     )
