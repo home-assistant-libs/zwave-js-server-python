@@ -118,6 +118,7 @@ LOCKED_PROPERTY = "locked"
 
 # User Code CC constants
 LOCK_USERCODE_PROPERTY = "userCode"
+LOCK_USERCODE_ID_PROPERTY = "userId"
 LOCK_USERCODE_STATUS_PROPERTY = "userIdStatus"
 
 ATTR_CODE_SLOT = "code_slot"
