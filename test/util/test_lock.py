@@ -100,13 +100,6 @@ async def test_set_usercode(lock_schlage_be469, mock_command, uuid4):
     # assert no new command calls
     assert len(ack_commands) == 1
 
-    # Test invalid code length
-    with pytest.raises(ValueError):
-        await set_usercode(node, 1, "123")
-
-    # assert no new command calls
-    assert len(ack_commands) == 1
-
 
 async def test_set_usercodes(
     lock_schlage_be469: Node, mock_command: MockCommandProtocol, uuid4: str
@@ -140,13 +133,6 @@ async def test_set_usercodes(
             ]
         ],
     }
-
-    # Test invalid code length
-    with pytest.raises(ValueError):
-        await set_usercodes(node, {1: "123"})
-
-    # assert no new command calls
-    assert len(ack_commands) == 1
 
 
 async def test_set_usercodes_invalid(

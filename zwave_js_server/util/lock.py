@@ -143,12 +143,7 @@ async def set_usercode(
 ) -> SetValueResult | None:
     """Set the usercode to index X on the lock."""
     value = get_code_slot_value(node, code_slot, LOCK_USERCODE_PROPERTY)
-    usercode = str(usercode)
-
-    if len(usercode) < 4:
-        raise ValueError("User code must be at least 4 digits")
-
-    return await node.async_set_value(value, usercode)
+    return await node.async_set_value(value, str(usercode))
 
 
 async def set_usercodes(node: Node, codes: dict[int, str]) -> SupervisionResult | None:
@@ -160,12 +155,7 @@ async def set_usercodes(node: Node, codes: dict[int, str]) -> SupervisionResult 
             LOCK_USERCODE_PROPERTY: str(usercode),
         }
         for code_slot, usercode in codes.items()
-        if len(str(usercode)) >= 4
     ]
-
-    if len(cc_api_codes) < len(codes):
-        raise ValueError("User codes must be at least 4 digits")
-
     # https://zwave-js.github.io/node-zwave-js/#/api/CCs/UserCode?id=setmany
     data = await node.async_invoke_cc_api(
         CommandClass.USER_CODE, "setMany", cc_api_codes, wait_for_result=True
@@ -180,7 +170,7 @@ async def set_usercodes(node: Node, codes: dict[int, str]) -> SupervisionResult 
 async def clear_usercode(node: Node, code_slot: int) -> SetValueResult | None:
     """Clear a code slot on the lock."""
     value = get_code_slot_value(node, code_slot, LOCK_USERCODE_STATUS_PROPERTY)
-    return await node.async_set_value(value, CodeSlotStatus.AVAILABLE.value)
+    return await node.async_set_value(value, CodeSlotStatus.AVAILABLE)
 
 
 async def set_configuration(
