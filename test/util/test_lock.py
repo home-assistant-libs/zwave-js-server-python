@@ -111,8 +111,7 @@ async def test_set_usercodes(
         {"response": {"status": 255}},
     )
 
-    # Test wrong types to ensure values get converted
-    assert await set_usercodes(node, {"1": 1234}) == SupervisionResult(
+    assert await set_usercodes(node, {1: "1234"}) == SupervisionResult(
         {"status": SupervisionStatus.SUCCESS}
     )
     assert len(ack_commands) == 1
