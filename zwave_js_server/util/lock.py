@@ -143,16 +143,16 @@ async def set_usercode(
 ) -> SetValueResult | None:
     """Set the usercode to index X on the lock."""
     value = get_code_slot_value(node, code_slot, LOCK_USERCODE_PROPERTY)
-    return await node.async_set_value(value, str(usercode))
+    return await node.async_set_value(value, usercode)
 
 
 async def set_usercodes(node: Node, codes: dict[int, str]) -> SupervisionResult | None:
     """Set the usercode to index X on the lock."""
     cc_api_codes = [
         {
-            LOCK_USERCODE_ID_PROPERTY: int(code_slot),
+            LOCK_USERCODE_ID_PROPERTY: code_slot,
             LOCK_USERCODE_STATUS_PROPERTY: CodeSlotStatus.ENABLED,
-            LOCK_USERCODE_PROPERTY: str(usercode),
+            LOCK_USERCODE_PROPERTY: usercode,
         }
         for code_slot, usercode in codes.items()
     ]
