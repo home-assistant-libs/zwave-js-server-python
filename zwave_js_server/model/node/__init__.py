@@ -976,6 +976,17 @@ class Node(EventBase):
             new_value, property_, property_key, value_size, value_format
         )
 
+    async def async_get_raw_config_parameter_value(
+        self,
+        property_: int,
+        property_key: int | None = None,
+        allow_unexpected_response: bool | None = None,
+    ) -> int:
+        """Call getRawConfigParameterValue."""
+        return await self.endpoints[0].async_get_raw_config_parameter_value(
+            property_, property_key, allow_unexpected_response
+        )
+
     def handle_test_powerlevel_progress(self, event: Event) -> None:
         """Process a test power level progress event."""
         event.data["test_power_level_progress"] = TestPowerLevelProgress(

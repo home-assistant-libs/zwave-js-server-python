@@ -2672,6 +2672,30 @@ async def test_set_raw_config_parameter_value(
         )
 
 
+async def test_get_raw_config_parameter_value(
+    multisensor_6: node_pkg.Node, uuid4, mock_command
+):
+    """Test get raw config parameter value."""
+    node = multisensor_6
+
+    ack_commands = mock_command(
+        {"command": "endpoint.get_raw_config_parameter_value", "nodeId": node.node_id},
+        {"value": 1},
+    )
+
+    value = await node.async_get_raw_config_parameter_value(101)
+    assert value == 1
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "endpoint.get_raw_config_parameter_value",
+        "nodeId": node.node_id,
+        "endpoint": 0,
+        "options": {"parameter": 101},
+        "messageId": uuid4,
+    }
+
+
 async def test_supervision_result(inovelli_switch: node_pkg.Node, uuid4, mock_command):
     """Test Supervision Result."""
     node = inovelli_switch

@@ -1,27 +1,22 @@
 #!/usr/bin/env python3
 """Script to generate Multilevel Sensor CC constants."""
+
 from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import Callable, Mapping
-import json
 import pathlib
 
 from const import AUTO_GEN_POST, AUTO_GEN_PRE
 from helpers import (
     enum_name_format,
     format_for_class_name,
+    get_json,
     get_manually_written_code,
-    normalize_name,
-    remove_comments,
+    get_registry_location,
     run_black,
+    separate_camel_case,
 )
-import requests
-
-GITHUB_PROJECT = "zwave-js/node-zwave-js"
-BRANCH_NAME = "master"
-SENSOR_TYPES_FILE_PATH = "packages/config/config/sensorTypes.json"
-DEFAULT_SCALES_FILE_PATH = "packages/config/config/scales.json"
 
 CONST_FILE_PATH = (
     pathlib.Path(__file__).parent.parent
@@ -33,57 +28,28 @@ def normalize_scale_definition(scale_definitions: dict[str, dict]) -> dict[str, 
     """Convert a scales definition dictionary into a normalized dictionary."""
     scale_def_ = {}
     for scale_id, scale_props in scale_definitions.items():
-        _scale_id = int(scale_id, 16)
         scale_name_ = enum_name_format(scale_props["label"], True)
-        scale_def_[scale_name_] = _scale_id
+        scale_def_[scale_name_] = scale_id
 
     return dict(sorted(scale_def_.items(), key=lambda kv: kv[0]))
 
 
-sensor_types = json.loads(
-    remove_comments(
-        requests.get(
-            (
-                f"https://raw.githubusercontent.com/{GITHUB_PROJECT}/{BRANCH_NAME}/"
-                f"{SENSOR_TYPES_FILE_PATH}"
-            ),
-            timeout=10,
-        ).text
-    )
-)
-default_scales = json.loads(
-    remove_comments(
-        requests.get(
-            (
-                f"https://raw.githubusercontent.com/{GITHUB_PROJECT}/{BRANCH_NAME}/"
-                f"{DEFAULT_SCALES_FILE_PATH}"
-            ),
-            timeout=10,
-        ).text
-    )
-)
-
-scales = {
-    normalize_name(scale_name): normalize_scale_definition(scale_def)
-    for scale_name, scale_def in default_scales.items()
-}
-
+scales = {}
 sensors = {}
-for sensor_id, sensor_props in sensor_types.items():
-    sensor_id = int(sensor_id, 16)
+
+for sensor_props in get_json("sensors.json"):
+    sensor_id = sensor_props["key"]
     scale_def = sensor_props["scales"]
     remove_parenthesis_ = True
     if sensor_id in (87, 88):
         remove_parenthesis_ = False
     sensor_name = enum_name_format(sensor_props["label"], remove_parenthesis_)
     sensors[sensor_name] = {"id": sensor_id, "label": sensor_props["label"]}
-    if isinstance(scale_def, str):
-        sensors[sensor_name]["scale"] = normalize_name(
-            scale_def.replace("$SCALES:", "")
-        )
-    else:
-        scales[sensor_name] = normalize_scale_definition(scale_def)
-        sensors[sensor_name]["scale"] = normalize_name(sensor_name)
+    scale_name = separate_camel_case(sensor_props.get("scaleGroupName", ""))
+    if not (scale_name := enum_name_format(scale_name, remove_parenthesis_)):
+        scale_name = sensor_name
+    scales.setdefault(scale_name, {}).update(normalize_scale_definition(scale_def))
+    sensors[sensor_name]["scale"] = scale_name
 
 scales = dict(sorted(scales.items(), key=lambda kv: kv[0]))
 sensors = dict(sorted(sensors.items(), key=lambda kv: kv[0]))
@@ -123,9 +89,7 @@ def generate_int_enum_base_class(class_name: str, docstring: str) -> list[str]:
     return class_def
 
 
-SENSOR_TYPE_URL = (
-    f"https://github.com/{GITHUB_PROJECT}/blob/{BRANCH_NAME}/{SENSOR_TYPES_FILE_PATH}"
-)
+SENSOR_TYPE_URL = get_registry_location("SensorTypes.ts")
 
 lines = [
     '"""Constants for the Multilevel Sensor CC."""',

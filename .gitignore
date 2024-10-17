@@ -1,3 +1,9 @@
+node_modules
+*.lock
+package-lock.json
+notifications.json
+sensors.json
+
 # Hide sublime text stuff
 *.sublime-project
 *.sublime-workspace

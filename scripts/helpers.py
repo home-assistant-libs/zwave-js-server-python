@@ -1,9 +1,12 @@
 """Helpers for scripts."""
 
+import json
+import pathlib
 import re
 import subprocess
 import sys
 
+from const import BRANCH_NAME, GITHUB_PROJECT
 from slugify import slugify
 
 
@@ -24,6 +27,14 @@ def check_dirty_repo():
             "Could not run `git diff --stat` on repo, please run it to determine "
             "whether constants have changed."
         )
+
+
+def get_registry_location(filename: str) -> str:
+    """Get the registry location for the given filename."""
+    return (
+        f"https://github.com/{GITHUB_PROJECT}/blob/{BRANCH_NAME}/packages/core/"
+        f"src/registries/{filename}"
+    )
 
 
 def run_black(file_path: str):
@@ -57,13 +68,6 @@ def get_manually_written_code(file_path: str):
     return []
 
 
-def remove_comments(text: str) -> str:
-    """Remove comments from a JSON string."""
-    return "\n".join(
-        line for line in text.split("\n") if not line.strip().startswith("//")
-    )
-
-
 def remove_parenthesis(text: str) -> str:
     """Remove text in parenthesis from a string."""
     return re.sub(r"\([^)]*\)", "", text)
@@ -74,6 +78,20 @@ def enum_name_format(name: str, should_remove_parenthesis: bool) -> str:
     if should_remove_parenthesis:
         name = remove_parenthesis(name)
     return slugify(name, separator="_").upper()
+
+
+def separate_camel_case(my_str: str) -> str:
+    """Split a camel case string."""
+    if all(char.islower() for char in my_str):
+        return my_str.title()
+    start_idx = [i for i, e in enumerate(my_str) if e.isupper()] + [len(my_str)]
+    start_idx = [0] + start_idx
+    return " ".join(my_str[x:y] for x, y in zip(start_idx, start_idx[1:])).title()
+
+
+def get_json(file_path: str) -> list | dict:
+    """Get a JSON dict/list from the given file path."""
+    return json.loads(pathlib.Path(file_path).read_text())
 
 
 def normalize_name(name: str) -> str:
