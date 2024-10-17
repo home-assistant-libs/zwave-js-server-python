@@ -391,7 +391,7 @@ async def test_record_messages(client, wallmote_central_scene, mock_command, uui
                     "nodeId": wallmote_central_scene.node_id,
                     "args": {
                         "commandClassName": "Binary Switch",
-                        "commandClass": 37,
+                        "commandClass": 39,
                         "endpoint": 0,
                         "property": "currentValue",
                         "newValue": False,
@@ -415,7 +415,7 @@ async def test_record_messages(client, wallmote_central_scene, mock_command, uui
             "nodeId": wallmote_central_scene.node_id,
             "args": {
                 "commandClassName": "Binary Switch",
-                "commandClass": 37,
+                "commandClass": 39,
                 "endpoint": 0,
                 "property": "currentValue",
                 "newValue": False,
@@ -461,7 +461,7 @@ async def test_additional_user_agent_components(client_session, url):
             {
                 "command": "initialize",
                 "messageId": "initialize",
-                "schemaVersion": 37,
+                "schemaVersion": 39,
                 "additionalUserAgentComponents": {
                     "zwave-js-server-python": __version__,
                     "foo": "bar",

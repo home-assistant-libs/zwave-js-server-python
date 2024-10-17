@@ -373,3 +373,25 @@ class Endpoint(EventBase):
         return zwave_value, SetConfigParameterResult(
             CommandStatus.ACCEPTED, SupervisionResult(result)
         )
+
+    async def async_get_raw_config_parameter_value(
+        self,
+        property_: int,
+        property_key: int | None = None,
+        allow_unexpected_response: bool | None = None,
+    ) -> Any:
+        """Call getRawConfigParameterValue."""
+        options = {
+            "parameter": property_,
+            "bitMask": property_key,
+            "allowUnexpectedResponse": allow_unexpected_response,
+        }
+
+        result = await self.async_send_command(
+            "get_raw_config_parameter_value",
+            options={k: v for k, v in options.items() if v is not None},
+            require_schema=39,
+            wait_for_result=True,
+        )
+        assert result
+        return result["value"]
