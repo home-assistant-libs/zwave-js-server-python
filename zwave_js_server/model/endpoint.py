@@ -390,7 +390,7 @@ class Endpoint(EventBase):
         result = await self.async_send_command(
             "get_raw_config_parameter_value",
             options={k: v for k, v in options.items() if v is not None},
-            require_schema=33,
+            require_schema=39,
             wait_for_result=True,
         )
         assert result
