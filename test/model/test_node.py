@@ -2598,7 +2598,7 @@ async def test_set_raw_config_parameter_value(
         {},
     )
 
-    _, result = await node.async_set_raw_config_parameter_value(1, 101, 1)
+    result = await node.async_set_raw_config_parameter_value(1, 101, 1)
     assert result == SetConfigParameterResult(CommandStatus.QUEUED)
 
     assert len(ack_commands) == 1
@@ -2615,9 +2615,7 @@ async def test_set_raw_config_parameter_value(
         "messageId": uuid4,
     }
 
-    _, result = await node.async_set_raw_config_parameter_value(
-        "Disable", "Stay Awake in Battery Mode"
-    )
+    result = await node.async_set_raw_config_parameter_value(2, 0)
     assert result == SetConfigParameterResult(CommandStatus.QUEUED)
 
     assert len(ack_commands) == 2
@@ -2627,8 +2625,8 @@ async def test_set_raw_config_parameter_value(
         "nodeId": node.node_id,
         "endpoint": 0,
         "options": {
-            "parameter": 2,
-            "value": 0,
+            "parameter": 0,
+            "value": 2,
         },
         "messageId": uuid4,
     }
@@ -2639,7 +2637,7 @@ async def test_set_raw_config_parameter_value(
     )
     node.receive_event(event)
 
-    _, result = await node.async_set_raw_config_parameter_value(
+    result = await node.async_set_raw_config_parameter_value(
         1, 2, value_size=1, value_format=ConfigurationValueFormat.SIGNED_INTEGER
     )
     assert result == SetConfigParameterResult(CommandStatus.ACCEPTED)
@@ -2660,14 +2658,6 @@ async def test_set_raw_config_parameter_value(
     }
 
     # Test failures
-    with pytest.raises(NotFoundError):
-        await node.async_set_raw_config_parameter_value(
-            "fake", "Stay Awake in Battery Mode"
-        )
-
-    with pytest.raises(NotFoundError):
-        await node.async_set_raw_config_parameter_value(1, 1000)
-
     with pytest.raises(ValueError):
         await node.async_set_raw_config_parameter_value(1, 101, 1, 1)
 
@@ -2715,7 +2705,7 @@ async def test_supervision_result(inovelli_switch: node_pkg.Node, uuid4, mock_co
         {"result": {"status": 1, "remainingDuration": "default"}},
     )
 
-    _, result = await node.async_set_raw_config_parameter_value(1, 1)
+    result = await node.async_set_raw_config_parameter_value(1, 1)
     assert result.result.status is SupervisionStatus.WORKING
     duration = result.result.remaining_duration
     assert duration.unit == "default"
