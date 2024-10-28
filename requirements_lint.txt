@@ -3,4 +3,4 @@ mypy==1.12.1
 pylint==3.3.1
 pylint-strict-informational==0.1
 pre-commit==4.0.1
-ruff==0.7.0
+ruff==0.7.1
