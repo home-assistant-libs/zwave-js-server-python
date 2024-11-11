@@ -263,7 +263,7 @@ class Controller(EventBase):
 
     async def async_begin_inclusion(
         self,
-        inclusion_strategy: Literal[
+        inclusion_strategy: Literal[  # type: ignore[valid-type]
             InclusionStrategy.DEFAULT,
             InclusionStrategy.SECURITY_S0,
             InclusionStrategy.SECURITY_S2,
@@ -438,7 +438,7 @@ class Controller(EventBase):
     async def async_replace_failed_node(
         self,
         node: Node,
-        inclusion_strategy: Literal[
+        inclusion_strategy: Literal[  # type: ignore[valid-type]
             InclusionStrategy.DEFAULT,
             InclusionStrategy.SECURITY_S0,
             InclusionStrategy.SECURITY_S2,
@@ -900,6 +900,9 @@ class Controller(EventBase):
 
     def handle_inclusion_started(self, event: Event) -> None:
         """Process an inclusion started event."""
+
+    def handle_inclusion_state_changed(self, event: Event) -> None:
+        """Process an inclusion state changed event."""
 
     def handle_exclusion_started(self, event: Event) -> None:
         """Process an exclusion started event."""
