@@ -2255,6 +2255,11 @@ async def test_additional_events(controller: Controller) -> None:
     )
     controller.receive_event(event)
     event = Event(
+        "inclusion state changed",
+        {"source": "controller", "event": "inclusion state changed", "state": 1},
+    )
+    controller.receive_event(event)
+    event = Event(
         "inclusion stopped", {"source": "controller", "event": "inclusion stopped"}
     )
     controller.receive_event(event)
