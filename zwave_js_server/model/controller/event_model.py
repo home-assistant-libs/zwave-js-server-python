@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Literal, TypedDict
 
-from ...const import InclusionStrategy, RemoveNodeReason
+from ...const import InclusionState, InclusionStrategy, RemoveNodeReason
 from ...event import BaseEventModel
 from ..node.data_model import FoundNodeDataType, NodeDataType
 from .firmware import (
@@ -151,6 +151,22 @@ class InclusionStartedEventModel(BaseControllerEventModel):
             source=data["source"],
             event=data["event"],
             strategy=data["strategy"],
+        )
+
+
+class InclusionStateChangedEventModel(BaseControllerEventModel):
+    """Model for `inclusion state changed` event data."""
+
+    event: Literal["inclusion state changed"]
+    state: InclusionState
+
+    @classmethod
+    def from_dict(cls, data: dict) -> InclusionStateChangedEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            state=data["state"],
         )
 
 
@@ -336,6 +352,7 @@ CONTROLLER_EVENT_MODEL_MAP: dict[str, type[BaseControllerEventModel]] = {
     "inclusion aborted": InclusionAbortedEventModel,
     "inclusion failed": InclusionFailedEventModel,
     "inclusion started": InclusionStartedEventModel,
+    "inclusion state changed": InclusionStateChangedEventModel,
     "inclusion stopped": InclusionStoppedEventModel,
     "node added": NodeAddedEventModel,
     "node found": NodeFoundEventModel,

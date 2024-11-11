@@ -901,6 +901,9 @@ class Controller(EventBase):
     def handle_inclusion_started(self, event: Event) -> None:
         """Process an inclusion started event."""
 
+    def handle_inclusion_state_changed(self, event: Event) -> None:
+        """Process an inclusion state changed event."""
+
     def handle_exclusion_started(self, event: Event) -> None:
         """Process an exclusion started event."""
 
