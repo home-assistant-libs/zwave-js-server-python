@@ -324,8 +324,9 @@ class Endpoint(EventBase):
 
         data = await self.async_send_command(
             "set_raw_config_parameter_value",
-            **{k: v for k, v in options.items() if v is not None},
             require_schema=33,
+            wait_for_result=None,
+            **{k: v for k, v in options.items() if v is not None},
         )
 
         if data is None:
@@ -353,9 +354,9 @@ class Endpoint(EventBase):
 
         result = await self.async_send_command(
             "get_raw_config_parameter_value",
-            **{k: v for k, v in options.items() if v is not None},
             require_schema=39,
             wait_for_result=True,
+            **{k: v for k, v in options.items() if v is not None},
         )
         assert result
         return result["value"]
