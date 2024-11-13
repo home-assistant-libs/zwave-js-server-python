@@ -2607,11 +2607,9 @@ async def test_set_raw_config_parameter_value(
         "command": "endpoint.set_raw_config_parameter_value",
         "nodeId": node.node_id,
         "endpoint": 0,
-        "options": {
-            "parameter": 101,
-            "bitMask": 1,
-            "value": 1,
-        },
+        "parameter": 101,
+        "bitMask": 1,
+        "value": 1,
         "messageId": uuid4,
     }
 
@@ -2624,10 +2622,8 @@ async def test_set_raw_config_parameter_value(
         "command": "endpoint.set_raw_config_parameter_value",
         "nodeId": node.node_id,
         "endpoint": 0,
-        "options": {
-            "parameter": 0,
-            "value": 2,
-        },
+        "parameter": 0,
+        "value": 2,
         "messageId": uuid4,
     }
 
@@ -2648,12 +2644,10 @@ async def test_set_raw_config_parameter_value(
         "command": "endpoint.set_raw_config_parameter_value",
         "nodeId": node.node_id,
         "endpoint": 0,
-        "options": {
-            "parameter": 2,
-            "valueSize": 1,
-            "valueFormat": 0,
-            "value": 1,
-        },
+        "parameter": 2,
+        "valueSize": 1,
+        "valueFormat": 0,
+        "value": 1,
         "messageId": uuid4,
     }
 
@@ -2691,7 +2685,7 @@ async def test_get_raw_config_parameter_value(
         "command": "endpoint.get_raw_config_parameter_value",
         "nodeId": node.node_id,
         "endpoint": 0,
-        "options": {"parameter": 101},
+        "parameter": 101,
         "messageId": uuid4,
     }
 
