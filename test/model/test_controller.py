@@ -796,6 +796,21 @@ async def test_stop_inclusion(controller, uuid4, mock_command):
     }
 
 
+async def test_cancel_secure_bootstrap_s2(controller, uuid4, mock_command):
+    """Test cancel secure bootstrap S2."""
+    ack_commands = mock_command(
+        {"command": "controller.cancel_secure_bootstrap_s2"},
+        {},
+    )
+    assert await controller.async_cancel_secure_bootstrap_s2() is None
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.cancel_secure_bootstrap_s2",
+        "messageId": uuid4,
+    }
+
+
 async def test_begin_exclusion(controller, uuid4, mock_command):
     """Test begin exclusion."""
     ack_commands = mock_command(
