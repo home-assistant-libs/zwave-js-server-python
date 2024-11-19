@@ -13,7 +13,7 @@ __version__ = "0.59.1"
 # minimal server schema version we can handle
 MIN_SERVER_SCHEMA_VERSION = 39
 # max server schema version we can handle (and our code is compatible with)
-MAX_SERVER_SCHEMA_VERSION = 39
+MAX_SERVER_SCHEMA_VERSION = 40
 
 VALUE_UNKNOWN = "unknown"
 
