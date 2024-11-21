@@ -410,6 +410,12 @@ class Controller(EventBase):
         )
         return cast(bool, data["success"])
 
+    async def async_cancel_secure_bootstrap_s2(self) -> None:
+        """Send cancelSecureBootstrapS2 command to Controller."""
+        await self.client.async_send_command(
+            {"command": "controller.cancel_secure_bootstrap_s2"}, require_schema=40
+        )
+
     async def async_begin_exclusion(
         self, strategy: ExclusionStrategy | None = None
     ) -> bool:
