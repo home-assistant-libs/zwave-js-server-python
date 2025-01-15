@@ -330,6 +330,7 @@ class RFRegion(IntEnum):
     RUSSIA = 7
     CHINA = 8
     USA_LONG_RANGE = 9
+    EUROPE_LONG_RANGE = 11
     JAPAN = 32
     KOREA = 33
     UNKNOWN = 254
