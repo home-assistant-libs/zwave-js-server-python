@@ -320,7 +320,7 @@ class InclusionState(IntEnum):
 class RFRegion(IntEnum):
     """Enum for all known RF regions."""
 
-    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/serialapi/misc/SerialAPISetupMessages.ts#L41
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/definitions/RFRegion.ts#L1
     EUROPE = 0
     USA = 1
     AUSTRALIA_AND_NEW_ZEALAND = 2
