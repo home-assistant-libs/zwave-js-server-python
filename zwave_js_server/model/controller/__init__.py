@@ -261,6 +261,10 @@ class Controller(EventBase):
                 self.data["rebuildRoutesProgress"]
             )
 
+    def update_inclusion_state(self, state: InclusionState) -> None:
+        """Update inclusion state."""
+        self.data["inclusionState"] = state
+
     async def async_begin_inclusion(
         self,
         inclusion_strategy: Literal[
