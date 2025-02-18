@@ -2293,3 +2293,18 @@ async def test_identify(client, multisensor_6):
     )
     client.driver.controller.receive_event(event)
     assert event.data["node"] == multisensor_6
+
+
+async def test_inclusion_state_changed(controller):
+    """Test that inclusion state is updated after receiving inclusion state changed event."""
+    assert controller.inclusion_state == InclusionState.IDLE
+    event = Event(
+        "inclusion state changed",
+        {
+            "source": "controller",
+            "event": "inclusion state changed",
+            "state": InclusionState.INCLUDING.value,
+        },
+    )
+    controller.receive_event(event)
+    assert controller.inclusion_state == InclusionState.INCLUDING
