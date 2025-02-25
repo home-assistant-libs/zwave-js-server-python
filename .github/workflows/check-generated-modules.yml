@@ -44,7 +44,7 @@ jobs:
         uses: UnicornGlobal/has-changes-action@v1.0.12
       - name: Create Pull Request
         if: steps.changes.outputs.changed == 1
-        uses: peter-evans/create-pull-request@v7.0.6
+        uses: peter-evans/create-pull-request@v7.0.7
         with:
           commit-message: "Update auto-generated constants"
           delete-branch: true
