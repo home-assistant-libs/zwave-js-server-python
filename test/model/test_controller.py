@@ -1780,6 +1780,37 @@ async def test_restore_nvm(controller, uuid4, mock_command):
     }
 
 
+async def test_backup_nvm_raw_base64(controller, uuid4, mock_command):
+    """Test backup NVM raw with base64 return."""
+    ack_commands = mock_command(
+        {"command": "controller.backup_nvm_raw"},
+        {"nvmData": "AAAAAAAAAAAAAA=="},
+    )
+    assert await controller.async_backup_nvm_raw_base64() == "AAAAAAAAAAAAAA=="
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.backup_nvm_raw",
+        "messageId": uuid4,
+    }
+
+
+async def test_restore_nvm_base64(controller, uuid4, mock_command):
+    """Test restore NVM with base64 input."""
+    ack_commands = mock_command(
+        {"command": "controller.restore_nvm"},
+        {},
+    )
+    await controller.async_restore_nvm_base64("AAAAAAAAAAAAAA==")
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.restore_nvm",
+        "nvmData": "AAAAAAAAAAAAAA==",
+        "messageId": uuid4,
+    }
+
+
 async def test_set_power_level(controller, uuid4, mock_command):
     """Test set powerlevel."""
     ack_commands = mock_command(
