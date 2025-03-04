@@ -753,6 +753,23 @@ class Controller(EventBase):
             require_schema=14,
         )
 
+    async def async_backup_nvm_raw_base64(self) -> str:
+        """Send backupNVMRaw command to Controller and return base64 string directly."""
+        data = await self.client.async_send_command(
+            {"command": "controller.backup_nvm_raw"}, require_schema=14
+        )
+        return data["nvmData"]
+
+    async def async_restore_nvm_base64(self, base64_data: str) -> None:
+        """Send restoreNVM command to Controller with base64 data directly."""
+        await self.client.async_send_command(
+            {
+                "command": "controller.restore_nvm",
+                "nvmData": base64_data,
+            },
+            require_schema=14,
+        )
+
     async def async_get_power_level(self) -> dict[str, int]:
         """Send getPowerlevel command to Controller."""
         data = await self.client.async_send_command(
