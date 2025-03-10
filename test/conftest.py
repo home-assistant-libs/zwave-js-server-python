@@ -26,7 +26,7 @@ TEST_URL = "ws://test.org:3000"
 
 
 @pytest.fixture(name="controller_state", scope="session")
-def controller_state_fixture():
+def controller_state_fixture() -> dict[str, Any]:
     """Load the controller state fixture data."""
     return json.loads(load_fixture("controller_state.json"))
 
@@ -128,14 +128,14 @@ def lock_ultraloq_ubolt_pro_state_fixture():
 
 
 @pytest.fixture(name="client_session")
-def client_session_fixture(ws_client):
+def client_session_fixture(ws_client: AsyncMock) -> AsyncMock:
     """Mock an aiohttp client session."""
     client_session = AsyncMock(spec_set=ClientSession)
     client_session.ws_connect.side_effect = AsyncMock(return_value=ws_client)
     return client_session
 
 
-def create_ws_message(result):
+def create_ws_message(result: dict[str, Any]) -> Mock:
     """Return a mock WSMessage."""
     message = Mock(spec_set=WSMessage)
     message.type = WSMsgType.TEXT
@@ -145,20 +145,20 @@ def create_ws_message(result):
 
 
 @pytest.fixture(name="messages")
-def messages_fixture():
+def messages_fixture() -> deque[Mock]:
     """Return a message buffer for the WS client."""
     return deque()
 
 
 @pytest.fixture(name="ws_client")
 async def ws_client_fixture(
-    version_data,
-    ws_message,
-    result,
-    messages,
-    initialize_data,
-    get_log_config_data,
-):
+    version_data: dict[str, Any],
+    ws_message: Mock,
+    result: dict[str, Any],
+    messages: deque[Mock],
+    initialize_data: dict[str, Any],
+    get_log_config_data: dict[str, Any],
+) -> AsyncMock:
     """Mock a websocket client.
 
     This fixture only allows a single message to be received.
@@ -173,7 +173,7 @@ async def ws_client_fixture(
     for data in (version_data, initialize_data, get_log_config_data, result):
         messages.append(create_ws_message(data))
 
-    async def receive():
+    async def receive() -> Mock:
         """Return a websocket message."""
         await asyncio.sleep(0)
 
@@ -187,7 +187,7 @@ async def ws_client_fixture(
 
     ws_client.receive.side_effect = receive
 
-    async def close_client(msg):
+    async def close_client(msg: dict[str, Any]) -> None:
         """Close the client."""
         if msg["command"] in ("initialize", "start_listening"):
             return
@@ -204,7 +204,7 @@ async def ws_client_fixture(
 
     ws_client.send_json.side_effect = close_client
 
-    async def reset_close():
+    async def reset_close() -> None:
         """Reset the websocket client close method."""
         ws_client.closed = True
 
@@ -232,7 +232,7 @@ async def driver_ready_fixture():
 
 
 @pytest.fixture(name="version_data")
-def version_data_fixture():
+def version_data_fixture() -> dict[str, Any]:
     """Return mock version data."""
     return {
         "type": "version",
@@ -245,7 +245,7 @@ def version_data_fixture():
 
 
 @pytest.fixture(name="initialize_data")
-def initialize_data_fixture():
+def initialize_data_fixture() -> dict[str, Any]:
     """Return mock initialize data."""
     return {
         "type": "result",
@@ -256,7 +256,7 @@ def initialize_data_fixture():
 
 
 @pytest.fixture(name="log_config")
-def log_config_fixture():
+def log_config_fixture() -> dict[str, Any]:
     """Return log config."""
     return {
         "enabled": True,
@@ -268,7 +268,7 @@ def log_config_fixture():
 
 
 @pytest.fixture(name="get_log_config_data")
-def get_log_config_data_fixture(log_config):
+def get_log_config_data_fixture(log_config: dict[str, Any]) -> dict[str, Any]:
     """Return mock get_log_config data."""
     return {
         "type": "result",
@@ -285,7 +285,7 @@ def url_fixture():
 
 
 @pytest.fixture(name="result")
-def result_fixture(controller_state, uuid4):
+def result_fixture(controller_state: dict[str, Any], uuid4: str) -> dict[str, Any]:
     """Return a server result message."""
     return {
         "type": "result",
@@ -296,7 +296,7 @@ def result_fixture(controller_state, uuid4):
 
 
 @pytest.fixture(name="ws_message")
-def ws_message_fixture(result):
+def ws_message_fixture(result: dict[str, Any]) -> Mock:
     """Return a mock WSMessage."""
     return create_ws_message(result)
 
@@ -311,7 +311,11 @@ def mock_uuid_fixture() -> Generator[str, None, None]:
 
 
 @pytest.fixture(name="client")
-async def client_fixture(client_session, ws_client, uuid4):
+async def client_fixture(
+    client_session: AsyncMock,
+    ws_client: AsyncMock,
+    uuid4: str,
+) -> Client:
     """Return a client with a mock websocket transport.
 
     This fixture needs to be a coroutine function to get an event loop
@@ -365,7 +369,11 @@ def mock_command_fixture(
 
 
 @pytest.fixture(name="driver")
-def driver_fixture(client, controller_state, log_config):
+def driver_fixture(
+    client: Client,
+    controller_state: dict[str, Any],
+    log_config: dict[str, Any],
+) -> Driver:
     """Return a driver instance with a supporting client."""
     client.driver = Driver(client, deepcopy(controller_state), log_config)
     return client.driver

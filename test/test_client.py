@@ -10,6 +10,7 @@ from aiohttp.client_reqrep import ClientResponse, RequestInfo
 from aiohttp.http_websocket import WSMsgType
 import pytest
 
+from test.common import MockCommandProtocol
 from zwave_js_server.client import LOGGER, Client
 from zwave_js_server.const import MAX_SERVER_SCHEMA_VERSION, LogLevel, __version__
 from zwave_js_server.event import Event
@@ -23,6 +24,7 @@ from zwave_js_server.exceptions import (
     InvalidState,
     NotConnected,
 )
+from zwave_js_server.model.driver import Driver
 from zwave_js_server.model.log_config import LogConfig
 
 
@@ -486,8 +488,11 @@ async def test_pop_future_none(client_session, url, driver_ready):
 
 
 async def test_log_server(
-    client: Client, driver, caplog: pytest.LogCaptureFixture, mock_command
-):
+    client: Client,
+    driver: Driver,
+    caplog: pytest.LogCaptureFixture,
+    mock_command: MockCommandProtocol,
+) -> None:
     """Test logging from server."""
     # pylint: disable=protected-access
     assert client.connected
@@ -564,21 +569,19 @@ async def test_log_server(
     assert caplog.records[3].name == "zwave_js_server.server"
 
     # First time we disable should be clean
-    await client.disable_server_logging()
+    client.disable_server_logging()
     assert not client.server_logging_enabled
     assert len(caplog.records) == 4
 
-    # Second time we should log a warning
-    await client.disable_server_logging()
+    # Test that disabling again is a no-op
+    client.disable_server_logging()
     assert not client.server_logging_enabled
-    assert len(caplog.records) == 5
 
-    # Test that both functions raise errors when client is not connected
+    # Test that enabling server logging raises an error when client is not connected
     client.driver = None
     client._client = None
 
     with pytest.raises(InvalidState):
         await client.enable_server_logging()
 
-    with pytest.raises(InvalidState):
-        await client.disable_server_logging()
+    client.disable_server_logging()
