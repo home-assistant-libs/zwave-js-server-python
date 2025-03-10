@@ -419,14 +419,9 @@ class Client:
 
         await self.async_start_listening_logs()
 
-    async def disable_server_logging(self) -> None:
+    def disable_server_logging(self) -> None:
         """Disable logging from the server."""
-        if not self.connected or not self.driver:
-            raise InvalidState(
-                "Can't disable server logging when not connected to server"
-            )
         if not self._server_logging_enabled or not self._server_logger_unsubs:
-            LOGGER.info("Server logging is already disabled")
             return
 
         for unsub in self._server_logger_unsubs:
