@@ -1,9 +1,15 @@
 """Test the config manager."""
 
+from collections.abc import Callable
+
+from zwave_js_server.client import Client
 from zwave_js_server.model.config_manager import ConfigManager
+from zwave_js_server.model.device_config import DeviceConfigDataType
 
 
-async def test_lookup_device(client, mock_command, device_config):
+async def test_lookup_device(
+    client: Client, mock_command: Callable, device_config: DeviceConfigDataType
+) -> None:
     """Test the lookup_device command."""
     # Test successful lookup
     mock_command(

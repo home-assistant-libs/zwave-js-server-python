@@ -8,10 +8,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Optional
 
+from ..device_config import DeviceConfig
+
 if TYPE_CHECKING:
     from ...client import Client
-
-from ..device_config import DeviceConfig
 
 
 class ConfigManager:
@@ -19,7 +19,7 @@ class ConfigManager:
 
     def __init__(self, client: Client) -> None:
         """Initialize."""
-        self.client = client
+        self._client = client
 
     async def lookup_device(
         self,
@@ -27,7 +27,7 @@ class ConfigManager:
         product_type: int,
         product_id: int,
         firmware_version: Optional[str] = None,
-    ) -> Optional[DeviceConfig]:
+    ) -> DeviceConfig | None:
         """Look up the definition of a given device in the configuration DB."""
         cmd: dict[str, Any] = {
             "command": "config_manager.lookup_device",
@@ -39,9 +39,9 @@ class ConfigManager:
         if firmware_version is not None:
             cmd["firmwareVersion"] = firmware_version
 
-        data = await self.client.async_send_command(cmd)
+        data = await self._client.async_send_command(cmd)
 
-        if not data or not data.get("config"):
+        if not data or not (config := data.get("config")):
             return None
 
-        return DeviceConfig(data["config"])
+        return DeviceConfig(config)

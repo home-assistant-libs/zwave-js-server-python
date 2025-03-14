@@ -395,4 +395,4 @@ async def test_all_nodes_ready_event(driver):
 def test_config_manager(driver):
     """Test the driver has the config manager property."""
     assert driver.config_manager is not None
-    assert driver.config_manager.client is driver.client
+    assert driver.config_manager._client is driver.client
