@@ -222,3 +222,7 @@ class DeviceConfig:
     def is_embedded(self) -> bool | None:
         """Return whether device config is embedded in zwave-js-server."""
         return self.data.get("isEmbedded")
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return dict representation of device config."""
+        return self.data

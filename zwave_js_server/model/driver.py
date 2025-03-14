@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Literal, cast
 
 from ..event import BaseEventModel, Event, EventBase
+from .config_manager import ConfigManager
 from .controller import Controller
 from .log_config import LogConfig, LogConfigDataType
 from .log_message import LogMessage, LogMessageDataType
@@ -79,6 +80,7 @@ class Driver(EventBase):
         self.client = client
         self.controller = Controller(client, state)
         self.log_config = LogConfig.from_dict(log_config)
+        self.config_manager = ConfigManager(client)
 
     def __hash__(self) -> int:
         """Return the hash."""
