@@ -14,7 +14,7 @@ async def test_lookup_device(client, mock_command, device_config):
             "productType": 0x5678,
             "productId": 0x9ABC,
         },
-        {"response": device_config},
+        {"config": device_config},
     )
 
     config_manager = ConfigManager(client)
@@ -40,7 +40,7 @@ async def test_lookup_device(client, mock_command, device_config):
             "productId": 0x9ABC,
             "firmwareVersion": "1.5",
         },
-        {"response": device_config},
+        {"config": device_config},
     )
 
     result = await config_manager.lookup_device(0x1234, 0x5678, 0x9ABC, "1.5")
@@ -56,7 +56,7 @@ async def test_lookup_device(client, mock_command, device_config):
             "productType": 0x8765,
             "productId": 0xCBA9,
         },
-        {"response": None},
+        {"config": None},
     )
 
     result = await config_manager.lookup_device(0x4321, 0x8765, 0xCBA9)
