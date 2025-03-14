@@ -1,14 +1,16 @@
 """Test the config manager."""
 
-from collections.abc import Callable
-
 from zwave_js_server.client import Client
 from zwave_js_server.model.config_manager import ConfigManager
 from zwave_js_server.model.device_config import DeviceConfigDataType
 
+from ..common import MockCommandProtocol
+
 
 async def test_lookup_device(
-    client: Client, mock_command: Callable, device_config: DeviceConfigDataType
+    client: Client,
+    mock_command: MockCommandProtocol,
+    device_config: DeviceConfigDataType,
 ) -> None:
     """Test the lookup_device command."""
     # Test successful lookup
@@ -52,6 +54,8 @@ async def test_lookup_device(
 
     assert result is not None
     assert result.manufacturer == "Test Manufacturer"
+
+    assert result.to_dict() == device_config
 
     # Test device not found
     mock_command(
