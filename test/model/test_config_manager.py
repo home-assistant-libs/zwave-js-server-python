@@ -1,6 +1,5 @@
 """Test the config manager."""
 
-
 from zwave_js_server.model.config_manager import ConfigManager
 
 
