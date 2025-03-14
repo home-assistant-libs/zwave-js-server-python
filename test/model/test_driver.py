@@ -390,3 +390,9 @@ async def test_all_nodes_ready_event(driver):
     """Test that the all nodes ready event is succesfully validated by pydantic."""
     event = Event("all nodes ready", {"source": "driver", "event": "all nodes ready"})
     driver.receive_event(event)
+
+
+def test_config_manager(driver):
+    """Test the driver has the config manager property."""
+    assert driver.config_manager is not None
+    assert driver.config_manager._client is driver.client

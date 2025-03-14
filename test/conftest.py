@@ -127,6 +127,12 @@ def lock_ultraloq_ubolt_pro_state_fixture():
     return json.loads(load_fixture("lock_ultraloq_ubolt_pro_state.json"))
 
 
+@pytest.fixture(name="device_config", scope="session")
+def device_config_fixture() -> dict[str, Any]:
+    """Load the device config fixture data."""
+    return json.loads(load_fixture("device_config.json"))
+
+
 @pytest.fixture(name="client_session")
 def client_session_fixture(ws_client: AsyncMock) -> AsyncMock:
     """Mock an aiohttp client session."""

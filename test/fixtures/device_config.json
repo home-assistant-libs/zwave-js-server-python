@@ -1,0 +1,22 @@
+{
+  "filename": "test_device.json",
+  "manufacturer": "Test Manufacturer",
+  "manufacturerId": "0x1234",
+  "label": "Test Device",
+  "description": "Test Device Description",
+  "devices": [
+    {
+      "productType": "0x5678",
+      "productId": "0x9ABC"
+    }
+  ],
+  "firmwareVersion": {
+    "min": "1.0",
+    "max": "2.0"
+  },
+  "associations": {},
+  "paramInformation": {},
+  "supportsZWavePlus": true,
+  "proprietary": {},
+  "compat": {}
+}
