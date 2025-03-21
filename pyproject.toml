@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=77.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,7 +8,7 @@ authors = [{ name = "Home Assistant Team", email = "hello@home-assistant.io" }]
 description = "Python wrapper for zwave-js-server"
 readme = "README.md"
 requires-python = ">=3.12"
-license = { text = "Apache-2.0" }
+license = "Apache-2.0"
 keywords = ["home", "automation", "zwave", "zwave-js"]
 classifiers = [
     "Development Status :: 4 - Beta",
