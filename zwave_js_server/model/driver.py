@@ -207,3 +207,6 @@ class Driver(EventBase):
 
     def handle_all_nodes_ready(self, event: Event) -> None:
         """Process a driver all nodes ready event."""
+
+    def handle_driver_ready(self, event: Event) -> None:
+        """Process a driver ready event."""
