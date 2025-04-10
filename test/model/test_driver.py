@@ -398,7 +398,7 @@ async def test_driver_ready_event(driver):
     event_data = {"source": "driver", "event": event_type}
     event = Event(event_type, event_data)
 
-    def callback(data: dict[str, Any]) -> None:
+    def callback(data: dict) -> None:
         assert data == event_data
 
     driver.on(event_type, callback)
