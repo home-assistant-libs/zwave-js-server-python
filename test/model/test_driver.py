@@ -392,6 +392,19 @@ async def test_all_nodes_ready_event(driver):
     driver.receive_event(event)
 
 
+async def test_driver_ready_event(driver):
+    """Test that the driver ready event is succesfully validated by pydantic."""
+    event_type = "driver ready"
+    event_data = {"source": "driver", "event": event_type}
+    event = Event(event_type, event_data)
+
+    def callback(data: dict) -> None:
+        assert data == event_data
+
+    driver.on(event_type, callback)
+    driver.receive_event(event)
+
+
 def test_config_manager(driver):
     """Test the driver has the config manager property."""
     assert driver.config_manager is not None

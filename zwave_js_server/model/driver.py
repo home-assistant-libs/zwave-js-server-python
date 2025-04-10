@@ -52,10 +52,17 @@ LoggingEventModel = create_model_from_typeddict(
 )
 
 
+class DriverReadyEventModel(BaseDriverEventModel):
+    """Model for `driver ready` event data."""
+
+    event: Literal["driver ready"]
+
+
 DRIVER_EVENT_MODEL_MAP: dict[str, type[BaseDriverEventModel]] = {
     "all nodes ready": AllNodesReadyEventModel,
     "log config updated": LogConfigUpdatedEventModel,
     "logging": LoggingEventModel,
+    "driver ready": DriverReadyEventModel,
 }
 
 
@@ -200,3 +207,6 @@ class Driver(EventBase):
 
     def handle_all_nodes_ready(self, event: Event) -> None:
         """Process a driver all nodes ready event."""
+
+    def handle_driver_ready(self, event: Event) -> None:
+        """Process a driver ready event."""
