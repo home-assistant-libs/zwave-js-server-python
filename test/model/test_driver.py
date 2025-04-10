@@ -394,7 +394,14 @@ async def test_all_nodes_ready_event(driver):
 
 async def test_driver_ready_event(driver):
     """Test that the driver ready event is succesfully validated by pydantic."""
-    event = Event("driver ready", {"source": "driver", "event": "driver ready"})
+    event_type = "driver ready"
+    event_data = {"source": "driver", "event": event_type}
+    event = Event(event_type, event_data)
+
+    def callback(data: dict[str, Any]) -> None:
+        assert data == event_data
+
+    driver.on(event_type, callback)
     driver.receive_event(event)
 
 
