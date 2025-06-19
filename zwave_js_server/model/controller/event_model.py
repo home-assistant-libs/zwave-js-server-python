@@ -7,10 +7,6 @@ from typing import Literal, TypedDict
 from ...const import InclusionState, InclusionStrategy, RemoveNodeReason
 from ...event import BaseEventModel
 from ..node.data_model import FoundNodeDataType, NodeDataType
-from .firmware import (
-    ControllerFirmwareUpdateProgressDataType,
-    ControllerFirmwareUpdateResultDataType,
-)
 from .inclusion_and_provisioning import InclusionGrantDataType
 from .statistics import ControllerStatisticsDataType
 
@@ -44,38 +40,6 @@ class ExclusionStoppedEventModel(BaseControllerEventModel):
     """Model for `exclusion stopped` event data."""
 
     event: Literal["exclusion stopped"]
-
-
-class FirmwareUpdateFinishedEventModel(BaseControllerEventModel):
-    """Model for `firmware update finished` event data."""
-
-    event: Literal["firmware update finished"]
-    result: ControllerFirmwareUpdateResultDataType
-
-    @classmethod
-    def from_dict(cls, data: dict) -> FirmwareUpdateFinishedEventModel:
-        """Initialize from dict."""
-        return cls(
-            source=data["source"],
-            event=data["event"],
-            result=data["result"],
-        )
-
-
-class FirmwareUpdateProgressEventModel(BaseControllerEventModel):
-    """Model for `firmware update progress` event data."""
-
-    event: Literal["firmware update progress"]
-    progress: ControllerFirmwareUpdateProgressDataType
-
-    @classmethod
-    def from_dict(cls, data: dict) -> FirmwareUpdateProgressEventModel:
-        """Initialize from dict."""
-        return cls(
-            source=data["source"],
-            event=data["event"],
-            progress=data["progress"],
-        )
 
 
 class GrantSecurityClassesEventModel(BaseControllerEventModel):
@@ -343,8 +307,6 @@ CONTROLLER_EVENT_MODEL_MAP: dict[str, type[BaseControllerEventModel]] = {
     "exclusion failed": ExclusionFailedEventModel,
     "exclusion started": ExclusionStartedEventModel,
     "exclusion stopped": ExclusionStoppedEventModel,
-    "firmware update finished": FirmwareUpdateFinishedEventModel,
-    "firmware update progress": FirmwareUpdateProgressEventModel,
     "grant security classes": GrantSecurityClassesEventModel,
     "rebuild routes done": RebuildRoutesDoneEventModel,
     "rebuild routes progress": RebuildRoutesProgressEventModel,

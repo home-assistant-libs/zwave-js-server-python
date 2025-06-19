@@ -28,7 +28,6 @@ from zwave_js_server.model import (
     controller as controller_pkg,
 )
 from zwave_js_server.model.controller import Controller
-from zwave_js_server.model.controller.firmware import ControllerFirmwareUpdateStatus
 from zwave_js_server.model.controller.rebuild_routes import (
     RebuildRoutesOptions,
     RebuildRoutesStatus,
@@ -2225,48 +2224,6 @@ async def test_inclusion_aborted(controller):
 
     # Ensure that the handler doesn't modify the event
     assert {k: v for k, v in event.data.items() if k != "controller"} == event_data
-
-
-async def test_firmware_events(controller):
-    """Test firmware events."""
-    assert controller.firmware_update_progress is None
-    event = Event(
-        type="firmware update progress",
-        data={
-            "source": "controller",
-            "event": "firmware update progress",
-            "progress": {
-                "sentFragments": 1,
-                "totalFragments": 10,
-                "progress": 10.0,
-            },
-        },
-    )
-
-    controller.receive_event(event)
-    progress = event.data["firmware_update_progress"]
-    assert progress.sent_fragments == 1
-    assert progress.total_fragments == 10
-    assert progress.progress == 10.0
-    assert controller.firmware_update_progress
-    assert controller.firmware_update_progress.sent_fragments == 1
-    assert controller.firmware_update_progress.total_fragments == 10
-    assert controller.firmware_update_progress.progress == 10.0
-
-    event = Event(
-        type="firmware update finished",
-        data={
-            "source": "controller",
-            "event": "firmware update finished",
-            "result": {"status": 255, "success": True},
-        },
-    )
-
-    controller.receive_event(event)
-    result = event.data["firmware_update_finished"]
-    assert result.status == ControllerFirmwareUpdateStatus.OK
-    assert result.success
-    assert controller.firmware_update_progress is None
 
 
 async def test_unknown_event(controller):

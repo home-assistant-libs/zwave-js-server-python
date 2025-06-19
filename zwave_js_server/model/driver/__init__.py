@@ -4,11 +4,17 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal, cast
 
-from ..event import BaseEventModel, Event, EventBase
-from .config_manager import ConfigManager
-from .controller import Controller
-from .log_config import LogConfig, LogConfigDataType
-from .log_message import LogMessage, LogMessageDataType
+from ...event import BaseEventModel, Event, EventBase
+from ..config_manager import ConfigManager
+from ..controller import Controller
+from ..log_config import LogConfig, LogConfigDataType
+from ..log_message import LogMessage, LogMessageDataType
+from .firmware import (
+    DriverFirmwareUpdateProgress,
+    DriverFirmwareUpdateProgressDataType,
+    DriverFirmwareUpdateResult,
+    DriverFirmwareUpdateResultDataType,
+)
 
 try:
     from pydantic.v1 import create_model_from_typeddict
@@ -16,7 +22,7 @@ except ImportError:
     from pydantic import create_model_from_typeddict
 
 if TYPE_CHECKING:
-    from ..client import Client
+    from ...client import Client
 
 
 class BaseDriverEventModel(BaseEventModel):
@@ -58,11 +64,45 @@ class DriverReadyEventModel(BaseDriverEventModel):
     event: Literal["driver ready"]
 
 
+class FirmwareUpdateFinishedEventModel(BaseDriverEventModel):
+    """Model for `firmware update finished` event data."""
+
+    event: Literal["firmware update finished"]
+    result: DriverFirmwareUpdateResultDataType
+
+    @classmethod
+    def from_dict(cls, data: dict) -> FirmwareUpdateFinishedEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            result=data["result"],
+        )
+
+
+class FirmwareUpdateProgressEventModel(BaseDriverEventModel):
+    """Model for `firmware update progress` event data."""
+
+    event: Literal["firmware update progress"]
+    progress: DriverFirmwareUpdateProgressDataType
+
+    @classmethod
+    def from_dict(cls, data: dict) -> FirmwareUpdateProgressEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            progress=data["progress"],
+        )
+
+
 DRIVER_EVENT_MODEL_MAP: dict[str, type[BaseDriverEventModel]] = {
     "all nodes ready": AllNodesReadyEventModel,
     "log config updated": LogConfigUpdatedEventModel,
     "logging": LoggingEventModel,
     "driver ready": DriverReadyEventModel,
+    "firmware update finished": FirmwareUpdateFinishedEventModel,
+    "firmware update progress": FirmwareUpdateProgressEventModel,
 }
 
 
@@ -88,6 +128,7 @@ class Driver(EventBase):
         self.controller = Controller(client, state)
         self.log_config = LogConfig.from_dict(log_config)
         self.config_manager = ConfigManager(client)
+        self._firmware_update_progress: DriverFirmwareUpdateProgress | None = None
 
     def __hash__(self) -> int:
         """Return the hash."""
@@ -98,6 +139,11 @@ class Driver(EventBase):
         if not isinstance(other, Driver):
             return False
         return self.controller == other.controller
+
+    @property
+    def firmware_update_progress(self) -> DriverFirmwareUpdateProgress | None:
+        """Return firmware update progress."""
+        return self._firmware_update_progress
 
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
@@ -210,3 +256,16 @@ class Driver(EventBase):
 
     def handle_driver_ready(self, event: Event) -> None:
         """Process a driver ready event."""
+
+    def handle_firmware_update_progress(self, event: Event) -> None:
+        """Process a firmware update progress event."""
+        self._firmware_update_progress = event.data["firmware_update_progress"] = (
+            DriverFirmwareUpdateProgress(event.data["progress"])
+        )
+
+    def handle_firmware_update_finished(self, event: Event) -> None:
+        """Process a firmware update finished event."""
+        self._firmware_update_progress = None
+        event.data["firmware_update_finished"] = DriverFirmwareUpdateResult(
+            event.data["result"]
+        )

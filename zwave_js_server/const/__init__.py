@@ -11,9 +11,9 @@ PACKAGE_NAME = "zwave-js-server-python"
 __version__ = "0.63.0"
 
 # minimal server schema version we can handle
-MIN_SERVER_SCHEMA_VERSION = 39
+MIN_SERVER_SCHEMA_VERSION = 41
 # max server schema version we can handle (and our code is compatible with)
-MAX_SERVER_SCHEMA_VERSION = 40
+MAX_SERVER_SCHEMA_VERSION = 42
 
 VALUE_UNKNOWN = "unknown"
 
