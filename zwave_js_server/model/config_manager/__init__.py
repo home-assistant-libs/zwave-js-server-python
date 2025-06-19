@@ -26,7 +26,7 @@ class ConfigManager:
         manufacturer_id: int,
         product_type: int,
         product_id: int,
-        firmware_version: str | None = None,
+        firmware_version: Optional[str] = None,
     ) -> DeviceConfig | None:
         """Look up the definition of a given device in the configuration DB."""
         cmd: dict[str, Any] = {
