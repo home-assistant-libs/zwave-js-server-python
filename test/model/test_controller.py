@@ -1891,6 +1891,7 @@ async def test_toggle_rf(controller, uuid4, mock_command):
         "messageId": uuid4,
     }
 
+
 async def test_get_known_lifeline_routes(
     multisensor_6, ring_keypad, wallmote_central_scene, uuid4, mock_command
 ):
