@@ -122,9 +122,7 @@ async def test_driver_firmware_update_otw_guess_format(url, client_session):
         disconnect_mock.assert_called_once()
 
 
-async def test_driver_firmware_update_otw_known_format_and_target(
-    url, client_session
-):
+async def test_driver_firmware_update_otw_known_format_and_target(url, client_session):
     """Test driver_firmware_update_otw with known format."""
     with (
         patch("zwave_js_server.firmware.Client.connect") as connect_mock,
