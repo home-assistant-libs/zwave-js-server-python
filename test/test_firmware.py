@@ -2,10 +2,10 @@
 
 from unittest.mock import patch
 
-from zwave_js_server.firmware import controller_firmware_update_otw, update_firmware
-from zwave_js_server.model.controller.firmware import (
-    ControllerFirmwareUpdateData,
-    ControllerFirmwareUpdateStatus,
+from zwave_js_server.firmware import driver_firmware_update_otw, update_firmware
+from zwave_js_server.model.driver.firmware import (
+    DriverFirmwareUpdateData,
+    DriverFirmwareUpdateStatus,
 )
 from zwave_js_server.model.node.firmware import (
     NodeFirmwareUpdateData,
@@ -94,8 +94,8 @@ async def test_update_firmware_known_format_and_target(
         disconnect_mock.assert_called_once()
 
 
-async def test_controller_firmware_update_otw_guess_format(url, client_session):
-    """Test controller_firmware_update_otw with guessed format."""
+async def test_driver_firmware_update_otw_guess_format(url, client_session):
+    """Test driver_firmware_update_otw with guessed format."""
     with (
         patch("zwave_js_server.firmware.Client.connect") as connect_mock,
         patch("zwave_js_server.firmware.Client.initialize") as initialize_mock,
@@ -103,17 +103,17 @@ async def test_controller_firmware_update_otw_guess_format(url, client_session):
         patch("zwave_js_server.firmware.Client.disconnect") as disconnect_mock,
     ):
         cmd_mock.return_value = {"result": {"status": 255, "success": True}}
-        result = await controller_firmware_update_otw(
-            url, ControllerFirmwareUpdateData("test", bytes(10)), client_session
+        result = await driver_firmware_update_otw(
+            url, DriverFirmwareUpdateData("test", bytes(10)), client_session
         )
-        assert result.status == ControllerFirmwareUpdateStatus.OK
+        assert result.status == DriverFirmwareUpdateStatus.OK
         assert result.success
 
         connect_mock.assert_called_once()
         initialize_mock.assert_called_once()
         cmd_mock.assert_called_once_with(
             {
-                "command": "controller.firmware_update_otw",
+                "command": "driver.firmware_update_otw",
                 "filename": "test",
                 "file": "AAAAAAAAAAAAAA==",
             },
@@ -122,10 +122,10 @@ async def test_controller_firmware_update_otw_guess_format(url, client_session):
         disconnect_mock.assert_called_once()
 
 
-async def test_controller_firmware_update_otw_known_format_and_target(
+async def test_driver_firmware_update_otw_known_format_and_target(
     url, client_session
 ):
-    """Test controller_firmware_update_otw with known format."""
+    """Test driver_firmware_update_otw with known format."""
     with (
         patch("zwave_js_server.firmware.Client.connect") as connect_mock,
         patch("zwave_js_server.firmware.Client.initialize") as initialize_mock,
@@ -133,19 +133,19 @@ async def test_controller_firmware_update_otw_known_format_and_target(
         patch("zwave_js_server.firmware.Client.disconnect") as disconnect_mock,
     ):
         cmd_mock.return_value = {"result": {"status": 255, "success": True}}
-        result = await controller_firmware_update_otw(
+        result = await driver_firmware_update_otw(
             url=url,
-            firmware_file=ControllerFirmwareUpdateData("test", bytes(10), "test"),
+            firmware_file=DriverFirmwareUpdateData("test", bytes(10), "test"),
             session=client_session,
         )
-        assert result.status == ControllerFirmwareUpdateStatus.OK
+        assert result.status == DriverFirmwareUpdateStatus.OK
         assert result.success
 
         connect_mock.assert_called_once()
         initialize_mock.assert_called_once()
         cmd_mock.assert_called_once_with(
             {
-                "command": "controller.firmware_update_otw",
+                "command": "driver.firmware_update_otw",
                 "filename": "test",
                 "file": "AAAAAAAAAAAAAA==",
                 "fileFormat": "test",

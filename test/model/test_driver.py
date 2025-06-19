@@ -1,7 +1,6 @@
 """Test the driver model."""
 
 import json
-from unittest.mock import patch
 
 import pytest
 
@@ -12,6 +11,7 @@ from zwave_js_server.model import (
     log_config as log_config_pkg,
     log_message as log_message_pkg,
 )
+from zwave_js_server.model.driver.firmware import DriverFirmwareUpdateStatus
 
 from .. import load_fixture
 
@@ -414,7 +414,7 @@ def test_config_manager(driver):
 
 async def test_firmware_events(driver):
     """Test firmware events."""
-    assert driver.controller.firmware_update_progress is None
+    assert driver.firmware_update_progress is None
     event = Event(
         type="firmware update progress",
         data={
@@ -428,11 +428,15 @@ async def test_firmware_events(driver):
         },
     )
 
-    with patch(
-        "zwave_js_server.model.controller.Controller.handle_firmware_update_progress"
-    ) as mock:
-        driver.receive_event(event)
-        assert mock.called
+    driver.receive_event(event)
+    progress = event.data["firmware_update_progress"]
+    assert progress.sent_fragments == 1
+    assert progress.total_fragments == 10
+    assert progress.progress == 10.0
+    assert driver.firmware_update_progress
+    assert driver.firmware_update_progress.sent_fragments == 1
+    assert driver.firmware_update_progress.total_fragments == 10
+    assert driver.firmware_update_progress.progress == 10.0
 
     event = Event(
         type="firmware update finished",
@@ -443,8 +447,8 @@ async def test_firmware_events(driver):
         },
     )
 
-    with patch(
-        "zwave_js_server.model.controller.Controller.handle_firmware_update_finished"
-    ) as mock:
-        driver.receive_event(event)
-        assert mock.called
+    driver.receive_event(event)
+    result = event.data["firmware_update_finished"]
+    assert result.status == DriverFirmwareUpdateStatus.OK
+    assert result.success
+    assert driver.firmware_update_progress is None

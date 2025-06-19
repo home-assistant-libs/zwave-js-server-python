@@ -4,15 +4,17 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal, cast
 
-from ..event import BaseEventModel, Event, EventBase
-from .config_manager import ConfigManager
-from .controller import Controller
-from .controller.firmware import (
-    ControllerFirmwareUpdateProgressDataType,
-    ControllerFirmwareUpdateResultDataType,
+from ...event import BaseEventModel, Event, EventBase
+from ..config_manager import ConfigManager
+from ..controller import Controller
+from .firmware import (
+    DriverFirmwareUpdateProgress,
+    DriverFirmwareUpdateProgressDataType,
+    DriverFirmwareUpdateResult,
+    DriverFirmwareUpdateResultDataType,
 )
-from .log_config import LogConfig, LogConfigDataType
-from .log_message import LogMessage, LogMessageDataType
+from ..log_config import LogConfig, LogConfigDataType
+from ..log_message import LogMessage, LogMessageDataType
 
 try:
     from pydantic.v1 import create_model_from_typeddict
@@ -20,7 +22,7 @@ except ImportError:
     from pydantic import create_model_from_typeddict
 
 if TYPE_CHECKING:
-    from ..client import Client
+    from ...client import Client
 
 
 class BaseDriverEventModel(BaseEventModel):
@@ -66,7 +68,7 @@ class FirmwareUpdateFinishedEventModel(BaseDriverEventModel):
     """Model for `firmware update finished` event data."""
 
     event: Literal["firmware update finished"]
-    result: ControllerFirmwareUpdateResultDataType
+    result: DriverFirmwareUpdateResultDataType
 
     @classmethod
     def from_dict(cls, data: dict) -> FirmwareUpdateFinishedEventModel:
@@ -82,7 +84,7 @@ class FirmwareUpdateProgressEventModel(BaseDriverEventModel):
     """Model for `firmware update progress` event data."""
 
     event: Literal["firmware update progress"]
-    progress: ControllerFirmwareUpdateProgressDataType
+    progress: DriverFirmwareUpdateProgressDataType
 
     @classmethod
     def from_dict(cls, data: dict) -> FirmwareUpdateProgressEventModel:
@@ -126,6 +128,7 @@ class Driver(EventBase):
         self.controller = Controller(client, state)
         self.log_config = LogConfig.from_dict(log_config)
         self.config_manager = ConfigManager(client)
+        self._firmware_update_progress: DriverFirmwareUpdateProgress | None = None
 
     def __hash__(self) -> int:
         """Return the hash."""
@@ -136,6 +139,11 @@ class Driver(EventBase):
         if not isinstance(other, Driver):
             return False
         return self.controller == other.controller
+
+    @property
+    def firmware_update_progress(self) -> DriverFirmwareUpdateProgress | None:
+        """Return firmware update progress."""
+        return self._firmware_update_progress
 
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
@@ -251,8 +259,13 @@ class Driver(EventBase):
 
     def handle_firmware_update_progress(self, event: Event) -> None:
         """Process a firmware update progress event."""
-        self.controller.handle_firmware_update_progress(event)
+        self._firmware_update_progress = event.data["firmware_update_progress"] = (
+            DriverFirmwareUpdateProgress(event.data["progress"])
+        )
 
     def handle_firmware_update_finished(self, event: Event) -> None:
         """Process a firmware update finished event."""
-        self.controller.handle_firmware_update_finished(event)
+        self._firmware_update_progress = None
+        event.data["firmware_update_finished"] = DriverFirmwareUpdateResult(
+            event.data["result"]
+        )
