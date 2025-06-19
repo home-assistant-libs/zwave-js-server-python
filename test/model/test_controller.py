@@ -1876,6 +1876,22 @@ async def test_get_rf_region(controller, uuid4, mock_command):
     }
 
 
+async def test_toggle_rf(controller, uuid4, mock_command):
+    """Test toggle RF."""
+    ack_commands = mock_command(
+        {"command": "controller.toggle_rf"},
+        {"success": True},
+    )
+    assert await controller.async_toggle_rf(True)
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.toggle_rf",
+        "enable": True,
+        "messageId": uuid4,
+    }
+
+
 async def test_get_known_lifeline_routes(
     multisensor_6, ring_keypad, wallmote_central_scene, uuid4, mock_command
 ):
