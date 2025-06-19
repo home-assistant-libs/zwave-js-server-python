@@ -7,10 +7,7 @@ import asyncio
 import aiohttp
 
 from .client import Client
-from .model.driver.firmware import (
-    DriverFirmwareUpdateData,
-    DriverFirmwareUpdateResult,
-)
+from .model.driver.firmware import DriverFirmwareUpdateData, DriverFirmwareUpdateResult
 from .model.node import Node
 from .model.node.firmware import NodeFirmwareUpdateData, NodeFirmwareUpdateResult
 

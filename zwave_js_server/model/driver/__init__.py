@@ -7,14 +7,14 @@ from typing import TYPE_CHECKING, Any, Literal, cast
 from ...event import BaseEventModel, Event, EventBase
 from ..config_manager import ConfigManager
 from ..controller import Controller
+from ..log_config import LogConfig, LogConfigDataType
+from ..log_message import LogMessage, LogMessageDataType
 from .firmware import (
     DriverFirmwareUpdateProgress,
     DriverFirmwareUpdateProgressDataType,
     DriverFirmwareUpdateResult,
     DriverFirmwareUpdateResultDataType,
 )
-from ..log_config import LogConfig, LogConfigDataType
-from ..log_message import LogMessage, LogMessageDataType
 
 try:
     from pydantic.v1 import create_model_from_typeddict
