@@ -1,6 +1,7 @@
 """Test the driver model."""
 
 import json
+from unittest.mock import patch
 
 import pytest
 
@@ -409,3 +410,41 @@ def test_config_manager(driver):
     """Test the driver has the config manager property."""
     assert driver.config_manager is not None
     assert driver.config_manager._client is driver.client
+
+
+async def test_firmware_events(driver):
+    """Test firmware events."""
+    assert driver.controller.firmware_update_progress is None
+    event = Event(
+        type="firmware update progress",
+        data={
+            "source": "driver",
+            "event": "firmware update progress",
+            "progress": {
+                "sentFragments": 1,
+                "totalFragments": 10,
+                "progress": 10.0,
+            },
+        },
+    )
+
+    with patch(
+        "zwave_js_server.model.controller.Controller.handle_firmware_update_progress"
+    ) as mock:
+        driver.receive_event(event)
+        assert mock.called
+
+    event = Event(
+        type="firmware update finished",
+        data={
+            "source": "driver",
+            "event": "firmware update finished",
+            "result": {"status": 255, "success": True},
+        },
+    )
+
+    with patch(
+        "zwave_js_server.model.controller.Controller.handle_firmware_update_finished"
+    ) as mock:
+        driver.receive_event(event)
+        assert mock.called

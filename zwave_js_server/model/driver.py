@@ -7,6 +7,10 @@ from typing import TYPE_CHECKING, Any, Literal, cast
 from ..event import BaseEventModel, Event, EventBase
 from .config_manager import ConfigManager
 from .controller import Controller
+from .controller.firmware import (
+    ControllerFirmwareUpdateProgressDataType,
+    ControllerFirmwareUpdateResultDataType,
+)
 from .log_config import LogConfig, LogConfigDataType
 from .log_message import LogMessage, LogMessageDataType
 
@@ -58,11 +62,45 @@ class DriverReadyEventModel(BaseDriverEventModel):
     event: Literal["driver ready"]
 
 
+class FirmwareUpdateFinishedEventModel(BaseDriverEventModel):
+    """Model for `firmware update finished` event data."""
+
+    event: Literal["firmware update finished"]
+    result: ControllerFirmwareUpdateResultDataType
+
+    @classmethod
+    def from_dict(cls, data: dict) -> FirmwareUpdateFinishedEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            result=data["result"],
+        )
+
+
+class FirmwareUpdateProgressEventModel(BaseDriverEventModel):
+    """Model for `firmware update progress` event data."""
+
+    event: Literal["firmware update progress"]
+    progress: ControllerFirmwareUpdateProgressDataType
+
+    @classmethod
+    def from_dict(cls, data: dict) -> FirmwareUpdateProgressEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            progress=data["progress"],
+        )
+
+
 DRIVER_EVENT_MODEL_MAP: dict[str, type[BaseDriverEventModel]] = {
     "all nodes ready": AllNodesReadyEventModel,
     "log config updated": LogConfigUpdatedEventModel,
     "logging": LoggingEventModel,
     "driver ready": DriverReadyEventModel,
+    "firmware update finished": FirmwareUpdateFinishedEventModel,
+    "firmware update progress": FirmwareUpdateProgressEventModel,
 }
 
 
@@ -210,3 +248,11 @@ class Driver(EventBase):
 
     def handle_driver_ready(self, event: Event) -> None:
         """Process a driver ready event."""
+
+    def handle_firmware_update_progress(self, event: Event) -> None:
+        """Process a firmware update progress event."""
+        self.controller.handle_firmware_update_progress(event)
+
+    def handle_firmware_update_finished(self, event: Event) -> None:
+        """Process a firmware update finished event."""
+        self.controller.handle_firmware_update_finished(event)
