@@ -804,7 +804,7 @@ class Controller(EventBase):
             require_schema=14,
         )
         return cast(bool, data["success"])
-    
+
     async def async_toggle_rf(self, enable: bool) -> bool:
         """Send toggleRF command to Controller."""
         data = await self.client.async_send_command(
