@@ -27,7 +27,6 @@ from ..node import Node
 from ..node.firmware import NodeFirmwareUpdateResult
 from .data_model import ControllerDataType
 from .event_model import CONTROLLER_EVENT_MODEL_MAP
-from .firmware import ControllerFirmwareUpdateProgress, ControllerFirmwareUpdateResult
 from .inclusion_and_provisioning import (
     InclusionGrant,
     ProvisioningEntry,
@@ -80,7 +79,6 @@ class Controller(EventBase):
         self._rebuild_routes_progress: dict[Node, RebuildRoutesStatus] | None = None
         self._last_rebuild_routes_result: dict[Node, RebuildRoutesStatus] | None = None
         self._statistics = ControllerStatistics(DEFAULT_CONTROLLER_STATISTICS)
-        self._firmware_update_progress: ControllerFirmwareUpdateProgress | None = None
         for node_state in state["nodes"]:
             node = Node(client, node_state)
             self.nodes[node.node_id] = node
@@ -234,11 +232,6 @@ class Controller(EventBase):
         if (rf_region := self.data.get("rfRegion")) is None:
             return None
         return RFRegion(rf_region)
-
-    @property
-    def firmware_update_progress(self) -> ControllerFirmwareUpdateProgress | None:
-        """Return firmware update progress."""
-        return self._firmware_update_progress
 
     @property
     def status(self) -> ControllerStatus:
@@ -908,19 +901,6 @@ class Controller(EventBase):
 
         event.data["controller"] = self
         self.emit(event.type, event.data)
-
-    def handle_firmware_update_progress(self, event: Event) -> None:
-        """Process a firmware update progress event."""
-        self._firmware_update_progress = event.data["firmware_update_progress"] = (
-            ControllerFirmwareUpdateProgress(event.data["progress"])
-        )
-
-    def handle_firmware_update_finished(self, event: Event) -> None:
-        """Process a firmware update finished event."""
-        self._firmware_update_progress = None
-        event.data["firmware_update_finished"] = ControllerFirmwareUpdateResult(
-            event.data["result"]
-        )
 
     def handle_inclusion_failed(self, event: Event) -> None:
         """Process an inclusion failed event."""

@@ -7,10 +7,7 @@ import asyncio
 import aiohttp
 
 from .client import Client
-from .model.controller.firmware import (
-    ControllerFirmwareUpdateData,
-    ControllerFirmwareUpdateResult,
-)
+from .model.driver.firmware import DriverFirmwareUpdateData, DriverFirmwareUpdateResult
 from .model.node import Node
 from .model.node.firmware import NodeFirmwareUpdateData, NodeFirmwareUpdateResult
 
@@ -45,16 +42,16 @@ async def update_firmware(
     return NodeFirmwareUpdateResult(node, data["result"])
 
 
-async def controller_firmware_update_otw(
+async def driver_firmware_update_otw(
     url: str,
-    firmware_file: ControllerFirmwareUpdateData,
+    firmware_file: DriverFirmwareUpdateData,
     session: aiohttp.ClientSession,
     additional_user_agent_components: dict[str, str] | None = None,
-) -> ControllerFirmwareUpdateResult:
+) -> DriverFirmwareUpdateResult:
     """
-    Send firmwareUpdateOTW command to Controller.
+    Send firmwareUpdateOTW command to Driver.
 
-    Sending the wrong firmware to a controller can brick it and make it unrecoverable.
+    Sending the wrong firmware to a driver can brick it and make it unrecoverable.
     Consumers of this library should build mechanisms to ensure that users understand
     the risks.
     """
@@ -68,7 +65,7 @@ async def controller_firmware_update_otw(
 
     data = await client.async_send_command(
         {
-            "command": "controller.firmware_update_otw",
+            "command": "driver.firmware_update_otw",
             **firmware_file.to_dict(),
         },
         require_schema=29,
@@ -77,4 +74,4 @@ async def controller_firmware_update_otw(
     if not receive_task.done():
         receive_task.cancel()
 
-    return ControllerFirmwareUpdateResult(data["result"])
+    return DriverFirmwareUpdateResult(data["result"])

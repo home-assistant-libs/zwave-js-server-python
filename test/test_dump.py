@@ -106,7 +106,7 @@ async def test_dump_additional_user_agent_components(
         {
             "command": "initialize",
             "messageId": "initialize",
-            "schemaVersion": 40,
+            "schemaVersion": 42,
             "additionalUserAgentComponents": {
                 "zwave-js-server-python": __version__,
                 "foo": "bar",

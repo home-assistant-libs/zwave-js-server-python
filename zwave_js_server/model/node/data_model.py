@@ -67,3 +67,4 @@ class NodeDataType(TypedDict, total=False):
     defaultVolume: int | float | None
     defaultTransitionDuration: int | float | None
     protocol: int
+    sdkVersion: str | None
