@@ -736,12 +736,13 @@ class Controller(EventBase):
         )
         return convert_base64_to_bytes(data["nvmData"])
 
-    async def async_restore_nvm(self, file: bytes) -> None:
+    async def async_restore_nvm(self, file: bytes, options: dict[str, bool] = {}) -> None:
         """Send restoreNVM command to Controller."""
         await self.client.async_send_command(
             {
                 "command": "controller.restore_nvm",
                 "nvmData": convert_bytes_to_base64(file),
+                "migrateOptions": options,
             },
             require_schema=14,
         )
@@ -753,12 +754,13 @@ class Controller(EventBase):
         )
         return data["nvmData"]
 
-    async def async_restore_nvm_base64(self, base64_data: str) -> None:
+    async def async_restore_nvm_base64(self, base64_data: str, options: dict[str, bool] = {}) -> None:
         """Send restoreNVM command to Controller with base64 data directly."""
         await self.client.async_send_command(
             {
                 "command": "controller.restore_nvm",
                 "nvmData": base64_data,
+                "migrateOptions": options,
             },
             require_schema=14,
         )
