@@ -744,7 +744,7 @@ class Controller(EventBase):
                 "nvmData": convert_bytes_to_base64(file),
                 "migrateOptions": options,
             },
-            require_schema=14,
+            require_schema=42,
         )
 
     async def async_backup_nvm_raw_base64(self) -> str:
@@ -762,7 +762,7 @@ class Controller(EventBase):
                 "nvmData": base64_data,
                 "migrateOptions": options,
             },
-            require_schema=14,
+            require_schema=42,
         )
 
     async def async_get_power_level(self) -> dict[str, int]:
