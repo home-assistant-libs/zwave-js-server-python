@@ -1769,13 +1769,24 @@ async def test_restore_nvm(controller, uuid4, mock_command):
         {"command": "controller.restore_nvm"},
         {},
     )
-    await controller.async_restore_nvm(bytes(10))
+    await controller.async_restore_nvm(bytes(10), {})
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.restore_nvm",
         "nvmData": "AAAAAAAAAAAAAA==",
         "messageId": uuid4,
+        "migrateOptions": {},
+    }
+
+    await controller.async_restore_nvm(bytes(10), {"preserveRoutes": False})
+
+    assert len(ack_commands) == 2
+    assert ack_commands[1] == {
+        "command": "controller.restore_nvm",
+        "nvmData": "AAAAAAAAAAAAAA==",
+        "messageId": uuid4,
+        "migrateOptions": {"preserveRoutes": False},
     }
 
 
@@ -1807,6 +1818,7 @@ async def test_restore_nvm_base64(controller, uuid4, mock_command):
         "command": "controller.restore_nvm",
         "nvmData": "AAAAAAAAAAAAAA==",
         "messageId": uuid4,
+        "migrateOptions": {},
     }
 
 
