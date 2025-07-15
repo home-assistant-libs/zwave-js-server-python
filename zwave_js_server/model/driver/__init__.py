@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import sys
 from typing import TYPE_CHECKING, Any, Literal, cast
+
+from pydantic import create_model
 
 from ...event import BaseEventModel, Event, EventBase
 from ..config_manager import ConfigManager
@@ -16,10 +19,10 @@ from .firmware import (
     DriverFirmwareUpdateResultDataType,
 )
 
-try:
-    from pydantic.v1 import create_model_from_typeddict
-except ImportError:
-    from pydantic import create_model_from_typeddict
+if sys.version_info >= (3, 14):
+    from annotationlib import get_annotations
+else:
+    from typing_extensions import get_annotations
 
 if TYPE_CHECKING:
     from ...client import Client
@@ -53,8 +56,10 @@ class AllNodesReadyEventModel(BaseDriverEventModel):
     event: Literal["all nodes ready"]
 
 
-LoggingEventModel = create_model_from_typeddict(
-    LogMessageDataType, __base__=BaseDriverEventModel
+LoggingEventModel = create_model(
+    "LoggingEventModel",
+    **{k: (v, None) for k, v in get_annotations(LogMessageDataType).items()},
+    __base__=BaseDriverEventModel,
 )
 
 
