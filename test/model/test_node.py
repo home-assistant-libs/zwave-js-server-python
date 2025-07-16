@@ -407,6 +407,25 @@ async def test_set_value_node_status_change(driver, multisensor_6_state):
     assert task_2.done()
     assert task_2.result() is None
 
+    # mark node as alive
+    event = Event(type="alive")
+    node.handle_alive(event)
+    task = asyncio.create_task(node.async_send_command("mock_cmd"))
+    task_2 = asyncio.create_task(node.endpoints[0].async_send_command("mock_cmd"))
+    await asyncio.sleep(0.01)
+    # we are waiting for the response
+    assert not task.done()
+    assert not task_2.done()
+    # node is marked dead
+    event = Event(type="dead")
+    node.handle_dead(event)
+    await asyncio.sleep(0.01)
+    # we are no longer waiting for the response
+    assert task.done()
+    assert task.result() is None
+    assert task_2.done()
+    assert task_2.result() is None
+
 
 async def test_poll_value(multisensor_6, uuid4, mock_command):
     """Test poll value."""
