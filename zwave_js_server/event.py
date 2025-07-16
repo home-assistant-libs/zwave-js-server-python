@@ -7,10 +7,7 @@ from dataclasses import dataclass, field
 import logging
 from typing import Literal
 
-try:
-    from pydantic.v1 import BaseModel
-except ImportError:
-    from pydantic import BaseModel
+from pydantic import BaseModel
 
 LOGGER = logging.getLogger(__package__)
 

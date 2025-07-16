@@ -2211,7 +2211,7 @@ async def test_node_added(controller, multisensor_6_state):
             "source": "controller",
             "event": "node added",
             "node": multisensor_6_state,
-            "result": "",
+            "result": {},
         },
     )
     controller.receive_event(event)

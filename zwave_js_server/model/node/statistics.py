@@ -25,7 +25,7 @@ class NodeStatisticsDataType(TypedDict, total=False):
     commandsDroppedTX: int  # required
     commandsDroppedRX: int  # required
     timeoutResponse: int  # required
-    rtt: int
+    rtt: float
     rssi: int
     lwr: RouteStatisticsDataType
     nlwr: RouteStatisticsDataType
@@ -43,7 +43,7 @@ class NodeStatistics:
     commands_dropped_rx: int = field(init=False)
     commands_dropped_tx: int = field(init=False)
     timeout_response: int = field(init=False)
-    rtt: int | None = field(init=False)
+    rtt: float | None = field(init=False)
     lwr: RouteStatistics | None = field(init=False, default=None)
     nlwr: RouteStatistics | None = field(init=False, default=None)
     last_seen: datetime | None = field(init=False, default=None)

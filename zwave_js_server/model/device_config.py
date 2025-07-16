@@ -12,8 +12,8 @@ from typing import Any, Literal, TypedDict
 class DeviceDeviceDataType(TypedDict, total=False):
     """Represent a device device data dict type."""
 
-    productType: str
-    productId: str
+    productType: str | int
+    productId: str | int
 
 
 class DeviceDevice:
@@ -24,12 +24,12 @@ class DeviceDevice:
         self.data = data
 
     @property
-    def product_type(self) -> str | None:
+    def product_type(self) -> str | int | None:
         """Return product type."""
         return self.data.get("productType")
 
     @property
-    def product_id(self) -> str | None:
+    def product_id(self) -> str | int | None:
         """Return product id."""
         return self.data.get("productId")
 
@@ -125,7 +125,7 @@ class DeviceConfigDataType(TypedDict, total=False):
 
     filename: str
     manufacturer: str
-    manufacturerId: str
+    manufacturerId: int
     label: str
     description: str
     devices: list[DeviceDeviceDataType]
@@ -164,8 +164,8 @@ class DeviceConfig:
         return self.data.get("manufacturer")
 
     @property
-    def manufacturer_id(self) -> str | None:  # TODO: In the dump this is an int.
-        """Return manufacturer id (as defined in specs) as a 4-digit hex string."""
+    def manufacturer_id(self) -> int | None:
+        """Return manufacturer id (as defined in specs)."""
         return self.data.get("manufacturerId")
 
     @property

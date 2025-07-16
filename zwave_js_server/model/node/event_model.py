@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Literal
 
+from pydantic import BaseModel
+
 from ...const import CommandClass
 from ...event import BaseEventModel
 from ..notification import (
@@ -19,11 +21,6 @@ from .firmware import (
     NodeFirmwareUpdateResultDataType,
 )
 from .statistics import NodeStatisticsDataType
-
-try:
-    from pydantic.v1 import BaseModel
-except ImportError:
-    from pydantic import BaseModel
 
 
 class BaseNodeEventModel(BaseEventModel):
@@ -101,8 +98,8 @@ class InterviewFailedEventArgsModel(BaseModel):
 
     errorMessage: str
     isFinal: bool
-    attempt: int | None
-    maxAttempts: int | None
+    attempt: int | None = None
+    maxAttempts: int | None = None
 
     @classmethod
     def from_dict(cls, data: dict) -> InterviewFailedEventArgsModel:
