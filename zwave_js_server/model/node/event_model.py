@@ -98,8 +98,8 @@ class InterviewFailedEventArgsModel(BaseModel):
 
     errorMessage: str
     isFinal: bool
-    attempt: int | None
-    maxAttempts: int | None
+    attempt: int | None = None
+    maxAttempts: int | None = None
 
     @classmethod
     def from_dict(cls, data: dict) -> InterviewFailedEventArgsModel:

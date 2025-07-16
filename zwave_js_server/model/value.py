@@ -40,7 +40,7 @@ class MetaDataType(TypedDict, total=False):
     label: str
     min: int | None
     max: int | None
-    unit: str
+    unit: str | None
     states: dict[str, str]
     ccSpecific: dict[str, Any]
     valueChangeOptions: list[str]
