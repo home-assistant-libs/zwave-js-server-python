@@ -53,6 +53,7 @@ class BackgroundRSSIDataType(TypedDict, total=False):
     channel0: ChannelRSSIDataType  # required
     channel1: ChannelRSSIDataType  # required
     channel2: ChannelRSSIDataType
+    channel3: ChannelRSSIDataType
 
 
 class ControllerStatisticsDataType(TypedDict, total=False):
@@ -94,16 +95,20 @@ class BackgroundRSSI:
     channel_0: ChannelRSSI = field(init=False)
     channel_1: ChannelRSSI = field(init=False)
     channel_2: ChannelRSSI | None = field(init=False)
+    channel_3: ChannelRSSI | None = field(init=False)
 
     def __post_init__(self) -> None:
         """Post initialize."""
         self.timestamp = self.data["timestamp"]
         self.channel_0 = ChannelRSSI(self.data["channel0"])
         self.channel_1 = ChannelRSSI(self.data["channel1"])
-        if not (channel_2 := self.data.get("channel2")):
-            self.channel_2 = None
-            return
-        self.channel_2 = ChannelRSSI(channel_2)
+        # Channels 2 and 3 may not be present, but 3 requires 2 to be present
+        self.channel_2 = None
+        self.channel_3 = None
+        if channel_2 := self.data.get("channel2"):
+            self.channel_2 = ChannelRSSI(channel_2)
+            if channel_3 := self.data.get("channel3"):
+                self.channel_3 = ChannelRSSI(channel_3)
 
 
 @dataclass

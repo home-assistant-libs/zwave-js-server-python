@@ -1617,6 +1617,7 @@ async def test_statistics_updated(controller):
     assert event_stats.background_rssi.channel_1.average == -93
     assert event_stats.background_rssi.channel_1.current == -94
     assert event_stats.background_rssi.channel_2 is None
+    assert event_stats.background_rssi.channel_3 is None
 
     statistics_data = {
         "messagesTX": 1,
@@ -1663,6 +1664,52 @@ async def test_statistics_updated(controller):
     assert event_stats.background_rssi.channel_1.current == -84
     assert event_stats.background_rssi.channel_2.average == -85
     assert event_stats.background_rssi.channel_2.current == -86
+    assert event_stats.background_rssi.channel_3 is None
+
+    statistics_data = {
+        "messagesTX": 1,
+        "messagesRX": 1,
+        "messagesDroppedRX": 1,
+        "NAK": 1,
+        "CAN": 1,
+        "timeoutACK": 1,
+        "timeoutResponse": 1,
+        "timeoutCallback": 1,
+        "messagesDroppedTX": 1,
+        "backgroundRSSI": {
+            "timestamp": 1234567890,
+            "channel0": {
+                "average": -81,
+                "current": -82,
+            },
+            "channel1": {
+                "average": -83,
+                "current": -84,
+            },
+            "channel2": {
+                "average": -85,
+                "current": -86,
+            },
+            "channel3": {
+                "average": -87,
+                "current": -88,
+            },
+        },
+    }
+    event = Event(
+        "statistics updated",
+        {
+            "source": "controller",
+            "event": "statistics updated",
+            "statistics": statistics_data,
+        },
+    )
+    controller.receive_event(event)
+    event_stats = event.data["statistics_updated"]
+    assert isinstance(event_stats, ControllerStatistics)
+    assert event_stats.background_rssi
+    assert event_stats.background_rssi.channel_3.average == -87
+    assert event_stats.background_rssi.channel_3.current == -88
 
 
 async def test_grant_security_classes(controller, uuid4, mock_command) -> None:
