@@ -876,13 +876,6 @@ class Controller(EventBase):
         )
         return NodeFirmwareUpdateResult(node, data["result"])
 
-    async def async_is_firmware_update_in_progress(self) -> bool:
-        """Send isFirmwareUpdateInProgress command to Controller."""
-        data = await self.client.async_send_command(
-            {"command": "controller.is_firmware_update_in_progress"}, require_schema=26
-        )
-        return cast(bool, data["progress"])
-
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
         if event.data["source"] == "node":

@@ -7,23 +7,22 @@ import pytest
 from zwave_js_server.const import LogLevel
 from zwave_js_server.event import Event
 from zwave_js_server.model import (
-    driver as driver_pkg,
     log_config as log_config_pkg,
     log_message as log_message_pkg,
 )
+from zwave_js_server.model.driver import Driver
 from zwave_js_server.model.driver.firmware import DriverFirmwareUpdateStatus
 
 from .. import load_fixture
+from ..common import MockCommandProtocol
 
 
 def test_from_state(client, log_config):
     """Test from_state method."""
     ws_msgs = load_fixture("basic_dump.txt").strip().split("\n")
 
-    driver = driver_pkg.Driver(
-        client, json.loads(ws_msgs[0])["result"]["state"], log_config
-    )
-    assert driver == driver_pkg.Driver(
+    driver = Driver(client, json.loads(ws_msgs[0])["result"]["state"], log_config)
+    assert driver == Driver(
         client, json.loads(ws_msgs[0])["result"]["state"], log_config
     )
     assert driver != driver.controller.home_id
@@ -452,3 +451,49 @@ async def test_firmware_events(driver):
     assert result.status == DriverFirmwareUpdateStatus.OK
     assert result.success
     assert driver.firmware_update_progress is None
+
+
+@pytest.mark.parametrize("progress", [True, False])
+async def test_is_otw_firmware_update_in_progress(
+    driver: Driver,
+    uuid4: str,
+    mock_command: MockCommandProtocol,
+    progress: bool,
+) -> None:
+    """Test is_otw_firmware_update_in_progress command."""
+    ack_commands = mock_command(
+        {"command": "driver.is_otw_firmware_update_in_progress"},
+        {"progress": progress},
+    )
+    assert await driver.async_is_otw_firmware_update_in_progress() is progress
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.is_otw_firmware_update_in_progress",
+        "messageId": uuid4,
+    }
+
+
+@pytest.mark.parametrize(("status", "success"), [(1, True), (0, False)])
+async def test_firmware_update_otw(
+    driver: Driver,
+    uuid4: str,
+    mock_command: MockCommandProtocol,
+    status: int,
+    success: bool,
+) -> None:
+    """Test firmware_update_otw command."""
+    ack_commands = mock_command(
+        {"command": "driver.firmware_update_otw"},
+        {"result": {"status": status, "success": success}},
+    )
+    result = await driver.async_firmware_update_otw()
+
+    assert result.status == status
+    assert result.success is success
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.firmware_update_otw",
+        "messageId": uuid4,
+    }
