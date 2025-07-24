@@ -242,6 +242,18 @@ class Driver(EventBase):
         )
         return cast(bool, result["success"])
 
+    async def async_firmware_update_otw(self) -> DriverFirmwareUpdateResult:
+        """Send firmwareUpdateOTW command to Driver."""
+        data = await self._async_send_command("firmware_update_otw", require_schema=41)
+        return DriverFirmwareUpdateResult(data["result"])
+
+    async def async_is_otw_firmware_update_in_progress(self) -> bool:
+        """Send isOTWFirmwareUpdateInProgress command to Driver."""
+        result = await self._async_send_command(
+            "is_otw_firmware_update_in_progress", require_schema=41
+        )
+        return cast(bool, result["progress"])
+
     async def async_set_preferred_scales(
         self, scales: dict[str | int, str | int]
     ) -> None:
