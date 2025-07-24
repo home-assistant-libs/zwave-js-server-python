@@ -39,11 +39,9 @@ from zwave_js_server.exceptions import (
     UnwriteableValue,
 )
 from zwave_js_server.model import endpoint as endpoint_pkg, node as node_pkg
+from zwave_js_server.model.firmware import FirmwareUpdateInfo
 from zwave_js_server.model.node import Node
-from zwave_js_server.model.node.firmware import (
-    NodeFirmwareUpdateInfo,
-    NodeFirmwareUpdateStatus,
-)
+from zwave_js_server.model.node.firmware import NodeFirmwareUpdateStatus
 from zwave_js_server.model.node.health_check import (
     LifelineHealthCheckResultDataType,
     RouteHealthCheckResultDataType,
@@ -78,8 +76,8 @@ FIRMWARE_UPDATE_INFO = {
 
 
 def test_firmware():
-    """Test NodeFirmwareUpdateInfo."""
-    firmware_update_info = NodeFirmwareUpdateInfo.from_dict(FIRMWARE_UPDATE_INFO)
+    """Test FirmwareUpdateInfo."""
+    firmware_update_info = FirmwareUpdateInfo.from_dict(FIRMWARE_UPDATE_INFO)
     assert firmware_update_info.version == "1.0.0"
     assert firmware_update_info.changelog == "changelog"
     assert firmware_update_info.channel == "stable"

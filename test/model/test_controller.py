@@ -33,8 +33,8 @@ from zwave_js_server.model.controller.rebuild_routes import (
     RebuildRoutesStatus,
 )
 from zwave_js_server.model.controller.statistics import ControllerStatistics
+from zwave_js_server.model.firmware import FirmwareUpdateInfo
 from zwave_js_server.model.node import Node
-from zwave_js_server.model.node.firmware import NodeFirmwareUpdateInfo
 
 from .. import load_fixture
 
@@ -2113,7 +2113,7 @@ async def test_begin_ota_firmware_update(multisensor_6, uuid4, mock_command):
         {"result": {"status": 255, "success": True, "reInterview": False}},
     )
     result = await multisensor_6.client.driver.controller.async_firmware_update_ota(
-        multisensor_6, NodeFirmwareUpdateInfo.from_dict(FIRMWARE_UPDATE_INFO)
+        multisensor_6, FirmwareUpdateInfo.from_dict(FIRMWARE_UPDATE_INFO)
     )
     assert result.status == 255
     assert result.success
