@@ -7,7 +7,8 @@ import asyncio
 import aiohttp
 
 from .client import Client
-from .model.driver.firmware import DriverFirmwareUpdateData, DriverFirmwareUpdateResult
+from .model.driver.firmware import DriverFirmwareUpdateResult
+from .model.firmware import FirmwareUpdateData
 from .model.node import Node
 from .model.node.firmware import NodeFirmwareUpdateData, NodeFirmwareUpdateResult
 
@@ -44,7 +45,7 @@ async def update_firmware(
 
 async def driver_firmware_update_otw(
     url: str,
-    firmware_file: DriverFirmwareUpdateData,
+    firmware_file: FirmwareUpdateData,
     session: aiohttp.ClientSession,
     additional_user_agent_components: dict[str, str] | None = None,
 ) -> DriverFirmwareUpdateResult:

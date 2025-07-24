@@ -12,9 +12,11 @@ from zwave_js_server.model import (
 )
 from zwave_js_server.model.driver import Driver
 from zwave_js_server.model.driver.firmware import DriverFirmwareUpdateStatus
+from zwave_js_server.model.firmware import FirmwareUpdateData, FirmwareUpdateInfo
 
 from .. import load_fixture
 from ..common import MockCommandProtocol
+from .common import FIRMWARE_UPDATE_INFO
 
 
 def test_from_state(client, log_config):
@@ -474,6 +476,17 @@ async def test_is_otw_firmware_update_in_progress(
     }
 
 
+@pytest.mark.parametrize(
+    "firmware_update_param",
+    [
+        {
+            "update_data": FirmwareUpdateData(
+                filename="test-file", file=b"test", file_format=None
+            )
+        },
+        {"update_info": FirmwareUpdateInfo.from_dict(FIRMWARE_UPDATE_INFO)},
+    ],
+)
 @pytest.mark.parametrize(("status", "success"), [(1, True), (0, False)])
 async def test_firmware_update_otw(
     driver: Driver,
@@ -481,13 +494,15 @@ async def test_firmware_update_otw(
     mock_command: MockCommandProtocol,
     status: int,
     success: bool,
+    firmware_update_param: dict[str, FirmwareUpdateData | FirmwareUpdateInfo],
 ) -> None:
     """Test firmware_update_otw command."""
+    firmware_update = next(iter(firmware_update_param.values()))
     ack_commands = mock_command(
-        {"command": "driver.firmware_update_otw"},
+        {"command": "driver.firmware_update_otw", **firmware_update.to_dict()},
         {"result": {"status": status, "success": success}},
     )
-    result = await driver.async_firmware_update_otw()
+    result = await driver.async_firmware_update_otw(**firmware_update_param)
 
     assert result.status == status
     assert result.success is success
@@ -496,4 +511,27 @@ async def test_firmware_update_otw(
     assert ack_commands[0] == {
         "command": "driver.firmware_update_otw",
         "messageId": uuid4,
+        **firmware_update.to_dict(),
     }
+
+
+@pytest.mark.parametrize(
+    "firmware_update_param",
+    [
+        {},  # No parameters
+        {
+            "update_data": FirmwareUpdateData(
+                filename="test-file", file=b"test", file_format=None
+            ),
+            "update_info": FirmwareUpdateInfo.from_dict(FIRMWARE_UPDATE_INFO),
+        },  # Invalid parameters
+    ],
+)
+async def test_firmware_update_otw_invalid_params(
+    driver: Driver,
+    firmware_update_param: dict[str, FirmwareUpdateData | FirmwareUpdateInfo],
+) -> None:
+    """Test firmware_update_otw command invalid parameters."""
+    with pytest.raises(ValueError):
+        # Should raise ValueError if no parameters are provided or both are provided
+        await driver.async_firmware_update_otw(**firmware_update_param)

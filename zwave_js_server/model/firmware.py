@@ -6,6 +6,7 @@ from dataclasses import asdict, dataclass
 from typing import Literal, TypedDict, cast
 
 from zwave_js_server.const import RFRegion
+from zwave_js_server.util.helpers import convert_bytes_to_base64
 
 
 class FirmwareUpdateFileInfoDataType(TypedDict):
@@ -133,3 +134,30 @@ class FirmwareUpdateInfo:
                 "device": self.device.to_dict(),
             },
         )
+
+
+class FirmwareUpdateDataDataType(TypedDict, total=False):
+    """Represent a firmware update data dict type."""
+
+    filename: str  # required
+    file: str  # required
+    fileFormat: str
+
+
+@dataclass
+class FirmwareUpdateData:
+    """Firmware update data."""
+
+    filename: str
+    file: bytes
+    file_format: str | None = None
+
+    def to_dict(self) -> FirmwareUpdateDataDataType:
+        """Convert firmware update data to dict."""
+        data: FirmwareUpdateDataDataType = {
+            "filename": self.filename,
+            "file": convert_bytes_to_base64(self.file),
+        }
+        if self.file_format is not None:
+            data["fileFormat"] = self.file_format
+        return data

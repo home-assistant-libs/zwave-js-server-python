@@ -4,41 +4,34 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import IntEnum
-from typing import TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING, TypedDict, cast
+
+from zwave_js_server.model.firmware import (
+    FirmwareUpdateData,
+    FirmwareUpdateDataDataType,
+)
 
 from ...const import VALUE_UNKNOWN
-from ...util.helpers import convert_bytes_to_base64
 
 if TYPE_CHECKING:
     from . import Node
 
 
-class NodeFirmwareUpdateDataDataType(TypedDict, total=False):
+class NodeFirmwareUpdateDataDataType(FirmwareUpdateDataDataType):
     """Represent a firmware update data dict type."""
 
-    filename: str  # required
-    file: str  # required
-    fileFormat: str
     firmwareTarget: int
 
 
 @dataclass
-class NodeFirmwareUpdateData:
+class NodeFirmwareUpdateData(FirmwareUpdateData):
     """Firmware update data."""
 
-    filename: str
-    file: bytes
-    file_format: str | None = None
     firmware_target: int | None = None
 
     def to_dict(self) -> NodeFirmwareUpdateDataDataType:
         """Convert firmware update data to dict."""
-        data: NodeFirmwareUpdateDataDataType = {
-            "filename": self.filename,
-            "file": convert_bytes_to_base64(self.file),
-        }
-        if self.file_format is not None:
-            data["fileFormat"] = self.file_format
+        data = cast(NodeFirmwareUpdateDataDataType, super().to_dict())
         if self.firmware_target is not None:
             data["firmwareTarget"] = self.firmware_target
         return data
