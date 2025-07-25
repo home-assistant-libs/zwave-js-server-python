@@ -20,7 +20,6 @@ DATEFMT = "%Y-%m-%d %H:%M:%S"
 FMT = "%(asctime)s [%(levelname)s] %(message)s"
 
 try:
-    # pylint: disable=import-outside-toplevel
     from colorlog import ColoredFormatter
 
     logging_formatter = ColoredFormatter(
