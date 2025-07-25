@@ -6,7 +6,7 @@ https://zwave-js.github.io/node-zwave-js/#/api/config-manager
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
 from ..device_config import DeviceConfig
 
@@ -26,7 +26,7 @@ class ConfigManager:
         manufacturer_id: int,
         product_type: int,
         product_id: int,
-        firmware_version: Optional[str] = None,
+        firmware_version: str | None = None,
     ) -> DeviceConfig | None:
         """Look up the definition of a given device in the configuration DB."""
         cmd: dict[str, Any] = {
