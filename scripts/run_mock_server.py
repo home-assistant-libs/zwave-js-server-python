@@ -19,6 +19,24 @@ from zwave_js_server.model.version import VersionInfoDataType
 DATEFMT = "%Y-%m-%d %H:%M:%S"
 FMT = "%(asctime)s [%(levelname)s] %(message)s"
 
+try:
+    # pylint: disable=import-outside-toplevel
+    from colorlog import ColoredFormatter
+
+    logging_formatter = ColoredFormatter(
+        f"%(log_color)s{FMT}%(reset)s",
+        datefmt=DATEFMT,
+        log_colors={
+            "DEBUG": "cyan",
+            "INFO": "green",
+            "WARNING": "yellow",
+            "ERROR": "red",
+            "CRITICAL": "red",
+        },
+    )
+except ImportError:
+    logging_formatter = logging.Formatter(fmt=FMT, datefmt=DATEFMT)
+
 
 class ExitException(Exception):
     """Represent an exit error."""
@@ -357,28 +375,7 @@ def main() -> None:
 
     # adapted from homeassistant.bootstrap.async_enable_logging
     logging.basicConfig(level=args.log_level)
-    try:
-        # pylint: disable=import-outside-toplevel
-        from colorlog import ColoredFormatter
-
-        colorfmt = f"%(log_color)s{FMT}%(reset)s"
-        logging.getLogger().handlers[0].setFormatter(
-            ColoredFormatter(
-                colorfmt,
-                datefmt=DATEFMT,
-                log_colors={
-                    "DEBUG": "cyan",
-                    "INFO": "green",
-                    "WARNING": "yellow",
-                    "ERROR": "red",
-                    "CRITICAL": "red",
-                },
-            )
-        )
-    except ImportError:
-        logging.getLogger().handlers[0].setFormatter(
-            logging.Formatter(fmt=FMT, datefmt=DATEFMT)
-        )
+    logging.getLogger().handlers[0].setFormatter(logging_formatter)
 
     server = MockZwaveJsServer(network_state_dump, events_to_replay, command_results)
     web.run_app(server.app, host=args.host, port=args.port)
