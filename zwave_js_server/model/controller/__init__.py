@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal, cast
 
-from zwave_js_server.model.node.firmware import NodeFirmwareUpdateInfo
+from zwave_js_server.model.firmware import FirmwareUpdateInfo
 
 from ...const import (
     MINIMUM_QR_STRING_LENGTH,
@@ -848,7 +848,7 @@ class Controller(EventBase):
 
     async def async_get_available_firmware_updates(
         self, node: Node, api_key: str, include_prereleases: bool = True
-    ) -> list[NodeFirmwareUpdateInfo]:
+    ) -> list[FirmwareUpdateInfo]:
         """Send getAvailableFirmwareUpdates command to Controller."""
         data = await self.client.async_send_command(
             {
@@ -860,10 +860,10 @@ class Controller(EventBase):
             require_schema=32,
         )
         assert data
-        return [NodeFirmwareUpdateInfo.from_dict(update) for update in data["updates"]]
+        return [FirmwareUpdateInfo.from_dict(update) for update in data["updates"]]
 
     async def async_firmware_update_ota(
-        self, node: Node, update_info: NodeFirmwareUpdateInfo
+        self, node: Node, update_info: FirmwareUpdateInfo
     ) -> NodeFirmwareUpdateResult:
         """Send firmwareUpdateOTA command to Controller."""
         data = await self.client.async_send_command(

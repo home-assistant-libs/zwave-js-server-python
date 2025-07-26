@@ -6,35 +6,6 @@ from dataclasses import dataclass, field
 from enum import IntEnum
 from typing import TypedDict
 
-from ...util.helpers import convert_bytes_to_base64
-
-
-class DriverFirmwareUpdateDataDataType(TypedDict, total=False):
-    """Represent a driver firmware update data dict type."""
-
-    filename: str  # required
-    file: str  # required
-    fileFormat: str
-
-
-@dataclass
-class DriverFirmwareUpdateData:
-    """Driver firmware update data."""
-
-    filename: str
-    file: bytes
-    file_format: str | None = None
-
-    def to_dict(self) -> DriverFirmwareUpdateDataDataType:
-        """Convert firmware update data to dict."""
-        data: DriverFirmwareUpdateDataDataType = {
-            "filename": self.filename,
-            "file": convert_bytes_to_base64(self.file),
-        }
-        if self.file_format is not None:
-            data["fileFormat"] = self.file_format
-        return data
-
 
 class DriverFirmwareUpdateStatus(IntEnum):
     """Enum with all driver firmware update status values.

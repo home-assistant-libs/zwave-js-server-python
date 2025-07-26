@@ -3,10 +3,8 @@
 from unittest.mock import patch
 
 from zwave_js_server.firmware import driver_firmware_update_otw, update_firmware
-from zwave_js_server.model.driver.firmware import (
-    DriverFirmwareUpdateData,
-    DriverFirmwareUpdateStatus,
-)
+from zwave_js_server.model.driver.firmware import DriverFirmwareUpdateStatus
+from zwave_js_server.model.firmware import FirmwareUpdateData
 from zwave_js_server.model.node.firmware import (
     NodeFirmwareUpdateData,
     NodeFirmwareUpdateStatus,
@@ -104,7 +102,7 @@ async def test_driver_firmware_update_otw_guess_format(url, client_session):
     ):
         cmd_mock.return_value = {"result": {"status": 255, "success": True}}
         result = await driver_firmware_update_otw(
-            url, DriverFirmwareUpdateData("test", bytes(10)), client_session
+            url, FirmwareUpdateData("test", bytes(10)), client_session
         )
         assert result.status == DriverFirmwareUpdateStatus.OK
         assert result.success
@@ -133,7 +131,7 @@ async def test_driver_firmware_update_otw_known_format_and_target(url, client_se
         cmd_mock.return_value = {"result": {"status": 255, "success": True}}
         result = await driver_firmware_update_otw(
             url=url,
-            firmware_file=DriverFirmwareUpdateData("test", bytes(10), "test"),
+            firmware_file=FirmwareUpdateData("test", bytes(10), "test"),
             session=client_session,
         )
         assert result.status == DriverFirmwareUpdateStatus.OK

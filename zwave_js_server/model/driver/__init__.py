@@ -7,6 +7,13 @@ from typing import TYPE_CHECKING, Any, Literal, cast
 
 from pydantic import create_model
 
+from zwave_js_server.model.firmware import (
+    FirmwareUpdateData,
+    FirmwareUpdateDataDataType,
+    FirmwareUpdateInfo,
+    FirmwareUpdateInfoDataType,
+)
+
 from ...event import BaseEventModel, Event, EventBase
 from ..config_manager import ConfigManager
 from ..controller import Controller
@@ -220,6 +227,38 @@ class Driver(EventBase):
             "install_config_update", require_schema=5
         )
         return cast(bool, result["success"])
+
+    async def async_firmware_update_otw(
+        self,
+        *,
+        update_data: FirmwareUpdateData | None = None,
+        update_info: FirmwareUpdateInfo | None = None,
+    ) -> DriverFirmwareUpdateResult:
+        """Send firmwareUpdateOTW command to Driver."""
+        if update_data is None and update_info is None:
+            raise ValueError(
+                "Either update_data or update_info must be provided for firmware update."
+            )
+        if update_data is not None and update_info is not None:
+            raise ValueError(
+                "Only one of update_data or update_info can be provided for firmware update."
+            )
+        params: FirmwareUpdateDataDataType | FirmwareUpdateInfoDataType
+        if update_data is not None:
+            params = update_data.to_dict()
+        elif update_info is not None:
+            params = update_info.to_dict()
+        data = await self._async_send_command(
+            "firmware_update_otw", require_schema=41, **params
+        )
+        return DriverFirmwareUpdateResult(data["result"])
+
+    async def async_is_otw_firmware_update_in_progress(self) -> bool:
+        """Send isOTWFirmwareUpdateInProgress command to Driver."""
+        result = await self._async_send_command(
+            "is_otw_firmware_update_in_progress", require_schema=41
+        )
+        return cast(bool, result["progress"])
 
     async def async_set_preferred_scales(
         self, scales: dict[str | int, str | int]
