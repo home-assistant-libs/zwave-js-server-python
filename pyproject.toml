@@ -22,7 +22,6 @@ classifiers = [
 dependencies = [
     "aiohttp>3",
     "pydantic>=2.0.0",
-    "typing_extensions>=4.13.0;python_version<'3.14'",
 ]
 dynamic = ["version"]
 
@@ -44,8 +43,6 @@ zwave_js_server = ["py.typed"]
 
 [tool.mypy]
 plugins = ["pydantic.mypy"]
-follow_imports = "skip"
-ignore_missing_imports = true
 check_untyped_defs = true
 disallow_incomplete_defs = true
 disallow_untyped_calls = true
