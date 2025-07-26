@@ -2,27 +2,19 @@
 
 from __future__ import annotations
 
-import sys
 from typing import TYPE_CHECKING, Any, Literal, cast
-
-from pydantic import create_model
 
 from ...event import BaseEventModel, Event, EventBase
 from ..config_manager import ConfigManager
 from ..controller import Controller
 from ..log_config import LogConfig, LogConfigDataType
-from ..log_message import LogMessage, LogMessageDataType
+from ..log_message import LogMessage, LogMessageContextDataType, LogMessageDataType
 from .firmware import (
     DriverFirmwareUpdateProgress,
     DriverFirmwareUpdateProgressDataType,
     DriverFirmwareUpdateResult,
     DriverFirmwareUpdateResultDataType,
 )
-
-if sys.version_info >= (3, 14):
-    from annotationlib import get_annotations
-else:
-    from typing_extensions import get_annotations
 
 if TYPE_CHECKING:
     from ...client import Client
@@ -56,11 +48,40 @@ class AllNodesReadyEventModel(BaseDriverEventModel):
     event: Literal["all nodes ready"]
 
 
-LoggingEventModel = create_model(
-    "LoggingEventModel",
-    **{k: (v, None) for k, v in get_annotations(LogMessageDataType).items()},
-    __base__=BaseDriverEventModel,
-)
+class LoggingEventModel(BaseDriverEventModel):
+    """Model for `logging` event data."""
+
+    event: Literal["logging"]
+    message: str | list[str]  # required
+    formattedMessage: str | list[str]  # required
+    direction: str  # required
+    level: str  # required
+    context: LogMessageContextDataType  # required
+    primaryTags: str | None = None
+    secondaryTags: str | None = None
+    secondaryTagPadding: int | None = None
+    multiline: bool | None = None
+    timestamp: str | None = None
+    label: str | None = None
+
+    @classmethod
+    def from_dict(cls, data: dict) -> LoggingEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            message=data["message"],
+            formattedMessage=data["formattedMessage"],
+            direction=data["direction"],
+            level=data["level"],
+            context=data["context"],
+            primaryTags=data.get("primaryTags"),
+            secondaryTags=data.get("secondaryTags"),
+            secondaryTagPadding=data.get("secondaryTagPadding"),
+            multiline=data.get("multiline"),
+            timestamp=data.get("timestamp"),
+            label=data.get("label"),
+        )
 
 
 class DriverReadyEventModel(BaseDriverEventModel):
