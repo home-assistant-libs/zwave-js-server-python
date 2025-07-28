@@ -270,7 +270,7 @@ class Driver(EventBase):
         elif update_info is not None:
             params = {"updateInfo": update_info.to_dict()}
         data = await self._async_send_command(
-            "firmware_update_otw", require_schema=41, **params
+            "firmware_update_otw", require_schema=44, **params
         )
         return DriverFirmwareUpdateResult(data["result"])
 
