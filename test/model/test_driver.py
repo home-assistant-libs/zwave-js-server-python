@@ -1,6 +1,7 @@
 """Test the driver model."""
 
 import json
+from typing import Any
 
 import pytest
 
@@ -477,14 +478,22 @@ async def test_is_otw_firmware_update_in_progress(
 
 
 @pytest.mark.parametrize(
-    "firmware_update_param",
+    ("firmware_update_param", "expected_params"),
     [
-        {
-            "update_data": FirmwareUpdateData(
+        (
+            {
+                "update_data": FirmwareUpdateData(
+                    filename="test-file", file=b"test", file_format=None
+                )
+            },
+            FirmwareUpdateData(
                 filename="test-file", file=b"test", file_format=None
-            )
-        },
-        {"update_info": FirmwareUpdateInfo.from_dict(FIRMWARE_UPDATE_INFO)},
+            ).to_dict(),
+        ),
+        (
+            {"update_info": FirmwareUpdateInfo.from_dict(FIRMWARE_UPDATE_INFO)},
+            {"updateInfo": FIRMWARE_UPDATE_INFO},
+        ),
     ],
 )
 @pytest.mark.parametrize(("status", "success"), [(1, True), (0, False)])
@@ -494,12 +503,12 @@ async def test_firmware_update_otw(
     mock_command: MockCommandProtocol,
     status: int,
     success: bool,
-    firmware_update_param: dict[str, FirmwareUpdateData | FirmwareUpdateInfo],
+    firmware_update_param: dict[str, Any],
+    expected_params: dict[str, Any],
 ) -> None:
     """Test firmware_update_otw command."""
-    firmware_update = next(iter(firmware_update_param.values()))
     ack_commands = mock_command(
-        {"command": "driver.firmware_update_otw", **firmware_update.to_dict()},
+        {"command": "driver.firmware_update_otw", **expected_params},
         {"result": {"status": status, "success": success}},
     )
     result = await driver.async_firmware_update_otw(**firmware_update_param)
@@ -511,7 +520,7 @@ async def test_firmware_update_otw(
     assert ack_commands[0] == {
         "command": "driver.firmware_update_otw",
         "messageId": uuid4,
-        **firmware_update.to_dict(),
+        **expected_params,
     }
 
 

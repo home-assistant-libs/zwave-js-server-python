@@ -264,11 +264,11 @@ class Driver(EventBase):
             raise ValueError(
                 "Only one of update_data or update_info can be provided for firmware update."
             )
-        params: FirmwareUpdateDataDataType | FirmwareUpdateInfoDataType
+        params: FirmwareUpdateDataDataType | dict[str, FirmwareUpdateInfoDataType]
         if update_data is not None:
             params = update_data.to_dict()
         elif update_info is not None:
-            params = update_info.to_dict()
+            params = {"updateInfo": update_info.to_dict()}
         data = await self._async_send_command(
             "firmware_update_otw", require_schema=41, **params
         )
