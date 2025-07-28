@@ -37,22 +37,7 @@ from zwave_js_server.model.node import Node
 from zwave_js_server.model.node.firmware import NodeFirmwareUpdateInfo
 
 from .. import load_fixture
-
-FIRMWARE_UPDATE_INFO = {
-    "version": "1.0.0",
-    "changelog": "changelog",
-    "channel": "stable",
-    "files": [{"target": 0, "url": "http://example.com", "integrity": "test"}],
-    "downgrade": True,
-    "normalizedVersion": "1.0.0",
-    "device": {
-        "manufacturerId": 1,
-        "productType": 2,
-        "productId": 3,
-        "firmwareVersion": "0.4.4",
-        "rfRegion": 1,
-    },
-}
+from .common import FIRMWARE_UPDATE_INFO
 
 
 def test_from_state():
