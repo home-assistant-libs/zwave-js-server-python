@@ -15,7 +15,7 @@ import pytest
 from zwave_js_server.client import Client
 from zwave_js_server.model.controller import Controller
 from zwave_js_server.model.driver import Driver
-from zwave_js_server.model.node import Node
+from zwave_js_server.model.node import Node, NodeDataType
 
 from . import load_fixture
 from .common import MockCommandProtocol
@@ -101,6 +101,22 @@ def inovelli_switch_state_fixture():
 def ring_keypad_state_fixture():
     """Load the ring keypad node state fixture data."""
     return json.loads(load_fixture("ring_keypad_state.json"))
+
+
+@pytest.fixture(name="shelly_wave_shutter_state", scope="session")
+def shelly_wave_shutter_state_fixture() -> NodeDataType:
+    """Load the shelly wave shutter node state fixture data."""
+    return json.loads(load_fixture("shelly_eu_wave_shutter_state.json"))
+
+
+@pytest.fixture(name="shelly_wave_shutter")
+def shelly_wave_shutter_fixture(
+    driver: Driver, shelly_wave_shutter_state: NodeDataType
+) -> Node:
+    """Mock a shelly wave shutter node."""
+    node = Node(driver.client, deepcopy(shelly_wave_shutter_state))
+    driver.controller.nodes[node.node_id] = node
+    return node
 
 
 @pytest.fixture(name="endpoints_with_command_classes_state", scope="session")
