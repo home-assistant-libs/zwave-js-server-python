@@ -395,7 +395,7 @@ class Node(EventBase):
             values = {
                 value_id: value
                 for value_id, value in self.values.items()
-                if self.index == value.endpoint
+                if endpoint_idx == value.endpoint
             }
             if endpoint_idx in self.endpoints:
                 self.endpoints[endpoint_idx].update(endpoint, values)

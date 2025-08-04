@@ -2115,6 +2115,55 @@ async def test_get_state(
     }
 
 
+async def test_update_endpoints(
+    shelly_wave_shutter_state: node_pkg.NodeDataType,
+    shelly_wave_shutter: node_pkg.Node,
+) -> None:
+    """Test updating endpoints of a node."""
+    node = shelly_wave_shutter
+    assert len(node.endpoints) == 3
+    for endpoint_idx, endpoint in node.endpoints.items():
+        assert endpoint.node_id == node.node_id
+        assert endpoint.index == endpoint_idx
+        for value in endpoint.values.values():
+            assert value.node.node_id == node.node_id
+            assert value.endpoint == endpoint_idx
+
+    node_data = deepcopy(shelly_wave_shutter_state)
+    new_endpoints = [
+        endpoint_pkg.EndpointDataType(
+            nodeId=node.node_id,
+            index=0,
+            commandClasses=[],
+        ),
+        endpoint_pkg.EndpointDataType(
+            nodeId=node.node_id,
+            index=1,
+            commandClasses=[],
+        ),
+        endpoint_pkg.EndpointDataType(
+            nodeId=node.node_id,
+            index=3,
+            commandClasses=[],
+        ),
+    ]
+    node_data["endpoints"] = new_endpoints
+
+    node.update(node_data)
+
+    assert len(node.endpoints) == 3
+    for endpoint_data in new_endpoints:
+        assert endpoint_data["index"] in node.endpoints
+        assert node.endpoints[endpoint_data["index"]].node_id == node.node_id
+        assert node.endpoints[endpoint_data["index"]].index == endpoint_data["index"]
+    for endpoint_idx, endpoint in node.endpoints.items():
+        assert endpoint.node_id == node.node_id
+        assert endpoint.index == endpoint_idx
+        for value in endpoint.values.values():
+            assert value.node.node_id == node.node_id
+            assert value.endpoint == endpoint_idx
+
+
 async def test_set_name(multisensor_6: node_pkg.Node, uuid4, mock_command):
     """Test node.set_name command."""
     node = multisensor_6
