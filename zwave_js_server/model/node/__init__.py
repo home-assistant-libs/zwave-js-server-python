@@ -73,7 +73,7 @@ if TYPE_CHECKING:
 # pylint: disable=too-many-lines
 _LOGGER = logging.getLogger(__package__)
 
-DEFAULT_NODE_STATISTICS = NodeStatisticsDataType(
+DEFAULT_NODE_STATISTICS = NodeStatisticsDataType(  # pylint: disable=invalid-name
     commandsTX=0,
     commandsRX=0,
     commandsDroppedTX=0,
