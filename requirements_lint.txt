@@ -2,5 +2,5 @@ black==25.11.0
 mypy==1.18.2
 pylint==4.0.2
 pylint-strict-informational==0.1
-pre-commit==4.3.0
+pre-commit==4.4.0
 ruff==0.14.3
