@@ -1,4 +1,4 @@
-black==25.9.0
+black==25.11.0
 mypy==1.18.2
 pylint==4.0.2
 pylint-strict-informational==0.1
