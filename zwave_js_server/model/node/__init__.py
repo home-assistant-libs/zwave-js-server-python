@@ -1123,6 +1123,10 @@ class Node(EventBase):
                     "Unhandled notification command class: %s", command_class.name
                 )
 
+    def handle_node_info_received(self, event: Event) -> None:
+        """Process a node info received event."""
+        # Nothing to do for now
+
     def handle_firmware_update_progress(self, event: Event) -> None:
         """Process a node firmware update progress event."""
         self._firmware_update_progress = event.data["firmware_update_progress"] = (
