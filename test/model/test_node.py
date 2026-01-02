@@ -2786,3 +2786,17 @@ async def test_supervision_result_invalid(
 
     with pytest.raises(ValueError):
         await node.async_set_raw_config_parameter_value(1, 1)
+
+
+async def test_node_info_received_event(multisensor_6: node_pkg.Node):
+    """Test that the node info received event is successfully validated by pydantic."""
+    node = multisensor_6
+    event_type = "node info received"
+    event_data = {"source": "node", "event": event_type, "nodeId": node.node_id}
+    event = Event(event_type, event_data)
+
+    def callback(data: dict) -> None:
+        assert data == event_data
+
+    node.on(event_type, callback)
+    node.receive_event(event)
