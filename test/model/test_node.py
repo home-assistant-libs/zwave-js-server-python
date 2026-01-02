@@ -4,6 +4,7 @@ import asyncio
 from copy import deepcopy
 from datetime import UTC, datetime
 import json
+import logging
 from typing import Any
 from unittest.mock import AsyncMock, patch
 
@@ -39,7 +40,7 @@ from zwave_js_server.exceptions import (
     UnwriteableValue,
 )
 from zwave_js_server.model import endpoint as endpoint_pkg, node as node_pkg
-from zwave_js_server.model.node import Node
+from zwave_js_server.model.node import LOGGER, Node
 from zwave_js_server.model.node.firmware import (
     NodeFirmwareUpdateInfo,
     NodeFirmwareUpdateStatus,
@@ -2565,10 +2566,14 @@ async def test_abort_health_check(multisensor_6: node_pkg.Node, uuid4, mock_comm
     }
 
 
-async def test_unknown_event(multisensor_6: node_pkg.Node):
-    """Test that an unknown event type causes an exception."""
-    with pytest.raises(KeyError):
-        assert multisensor_6.receive_event(Event("unknown_event", {"source": "node"}))
+async def test_unknown_event(multisensor_6: node_pkg.Node, caplog):
+    """Test that an unknown event type logs a message but does not raise."""
+    LOGGER.setLevel(logging.INFO)
+    event = Event("unknown_event", {"source": "node", "event": "unknown_event"})
+    multisensor_6.receive_event(event)
+    assert len(caplog.records) == 1
+    assert "Unhandled node event: unknown_event" in caplog.records[0].message
+    assert caplog.records[0].levelno == logging.INFO
 
 
 async def test_default_volume(multisensor_6: node_pkg.Node, uuid4, mock_command):

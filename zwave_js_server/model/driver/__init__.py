@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING, Any, Literal, cast
 
 from zwave_js_server.model.firmware import (
@@ -25,6 +26,8 @@ from .firmware import (
 
 if TYPE_CHECKING:
     from ...client import Client
+
+LOGGER = logging.getLogger(__package__)
 
 
 class BaseDriverEventModel(BaseEventModel):
@@ -184,8 +187,11 @@ class Driver(EventBase):
             self.controller.receive_event(event)
             return
 
-        DRIVER_EVENT_MODEL_MAP[event.type].from_dict(event.data)
+        if event.type not in DRIVER_EVENT_MODEL_MAP:
+            LOGGER.info("Unhandled driver event: %s", event.type)
+            return
 
+        DRIVER_EVENT_MODEL_MAP[event.type].from_dict(event.data)
         self._handle_event_protocol(event)
 
         self.emit(event.type, event.data)

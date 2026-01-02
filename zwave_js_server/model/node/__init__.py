@@ -71,7 +71,7 @@ if TYPE_CHECKING:
 
 
 # pylint: disable=too-many-lines
-_LOGGER = logging.getLogger(__package__)
+LOGGER = logging.getLogger(__package__)
 
 DEFAULT_NODE_STATISTICS = NodeStatisticsDataType(  # pylint: disable=invalid-name
     commandsTX=0,
@@ -475,8 +475,11 @@ class Node(EventBase):
 
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
-        NODE_EVENT_MODEL_MAP[event.type].from_dict(event.data)
+        if event.type not in NODE_EVENT_MODEL_MAP:
+            LOGGER.info("Unhandled node event: %s", event.type)
+            return
 
+        NODE_EVENT_MODEL_MAP[event.type].from_dict(event.data)
         self._handle_event_protocol(event)
         event.data["node"] = self
 
@@ -1119,7 +1122,7 @@ class Node(EventBase):
                     self, cast(PowerLevelNotificationDataType, event.data)
                 )
             case _:
-                _LOGGER.info(
+                LOGGER.info(
                     "Unhandled notification command class: %s", command_class.name
                 )
 
