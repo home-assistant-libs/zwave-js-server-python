@@ -87,6 +87,12 @@ class DeadEventModel(BaseNodeEventModel):
     event: Literal["dead"]
 
 
+class NodeInfoReceivedEventModel(BaseNodeEventModel):
+    """Model for `node info received` event data."""
+
+    event: Literal["node info received"]
+
+
 class InterviewCompletedEventModel(BaseNodeEventModel):
     """Model for `interview completed` event data."""
 
@@ -344,6 +350,7 @@ NODE_EVENT_MODEL_MAP: dict[str, type[BaseNodeEventModel]] = {
     "interview stage completed": InterviewStageCompletedEventModel,
     "interview started": InterviewStartedEventModel,
     "metadata updated": MetadataUpdatedEventModel,
+    "node info received": NodeInfoReceivedEventModel,
     "notification": NotificationEventModel,
     "ready": ReadyEventModel,
     "sleep": SleepEventModel,
