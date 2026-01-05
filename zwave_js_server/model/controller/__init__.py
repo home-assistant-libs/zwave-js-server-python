@@ -47,7 +47,7 @@ from .statistics import (
 if TYPE_CHECKING:
     from ...client import Client
 
-LOGGER = logging.getLogger(__package__)
+_LOGGER = logging.getLogger(__package__)
 
 DEFAULT_CONTROLLER_STATISTICS = (  # pylint: disable=invalid-name
     ControllerStatisticsDataType(
@@ -905,15 +905,15 @@ class Controller(EventBase):
                 f"{event.data}"
             )
 
-        if event.type not in CONTROLLER_EVENT_MODEL_MAP:
-            LOGGER.info("Unhandled controller event: %s", event.type)
+        if (event_type := event.type) not in CONTROLLER_EVENT_MODEL_MAP:
+            _LOGGER.info("Unhandled controller event: %s", event_type)
             return
 
-        CONTROLLER_EVENT_MODEL_MAP[event.type].from_dict(event.data)
+        CONTROLLER_EVENT_MODEL_MAP[event_type].from_dict(event.data)
         self._handle_event_protocol(event)
 
         event.data["controller"] = self
-        self.emit(event.type, event.data)
+        self.emit(event_type, event.data)
 
     def handle_inclusion_failed(self, event: Event) -> None:
         """Process an inclusion failed event."""

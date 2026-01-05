@@ -12,7 +12,7 @@ from zwave_js_server.model import (
     log_config as log_config_pkg,
     log_message as log_message_pkg,
 )
-from zwave_js_server.model.driver import LOGGER, Driver
+from zwave_js_server.model.driver import Driver
 from zwave_js_server.model.driver.firmware import DriverFirmwareUpdateStatus
 from zwave_js_server.model.firmware import FirmwareUpdateData, FirmwareUpdateInfo
 
@@ -386,7 +386,7 @@ async def test_shutdown(driver, uuid4, mock_command):
 
 async def test_unknown_event(driver, caplog):
     """Test that an unknown event type logs a message but does not raise."""
-    LOGGER.setLevel(logging.INFO)
+    caplog.set_level(logging.INFO)
     event = Event("unknown_event", {"source": "driver", "event": "unknown_event"})
     driver.receive_event(event)
     assert len(caplog.records) == 1

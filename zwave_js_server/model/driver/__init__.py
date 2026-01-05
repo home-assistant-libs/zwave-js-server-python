@@ -27,7 +27,7 @@ from .firmware import (
 if TYPE_CHECKING:
     from ...client import Client
 
-LOGGER = logging.getLogger(__package__)
+_LOGGER = logging.getLogger(__package__)
 
 
 class BaseDriverEventModel(BaseEventModel):
@@ -187,14 +187,14 @@ class Driver(EventBase):
             self.controller.receive_event(event)
             return
 
-        if event.type not in DRIVER_EVENT_MODEL_MAP:
-            LOGGER.info("Unhandled driver event: %s", event.type)
+        if (event_type := event.type) not in DRIVER_EVENT_MODEL_MAP:
+            _LOGGER.info("Unhandled driver event: %s", event_type)
             return
 
-        DRIVER_EVENT_MODEL_MAP[event.type].from_dict(event.data)
+        DRIVER_EVENT_MODEL_MAP[event_type].from_dict(event.data)
         self._handle_event_protocol(event)
 
-        self.emit(event.type, event.data)
+        self.emit(event_type, event.data)
 
     async def _async_send_command(
         self, command: str, require_schema: int | None = None, **kwargs: Any

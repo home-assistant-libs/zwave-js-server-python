@@ -40,7 +40,7 @@ from zwave_js_server.exceptions import (
     UnwriteableValue,
 )
 from zwave_js_server.model import endpoint as endpoint_pkg, node as node_pkg
-from zwave_js_server.model.node import LOGGER, Node
+from zwave_js_server.model.node import Node
 from zwave_js_server.model.node.firmware import (
     NodeFirmwareUpdateInfo,
     NodeFirmwareUpdateStatus,
@@ -2568,7 +2568,7 @@ async def test_abort_health_check(multisensor_6: node_pkg.Node, uuid4, mock_comm
 
 async def test_unknown_event(multisensor_6: node_pkg.Node, caplog):
     """Test that an unknown event type logs a message but does not raise."""
-    LOGGER.setLevel(logging.INFO)
+    caplog.set_level(logging.INFO)
     event = Event("unknown_event", {"source": "node", "event": "unknown_event"})
     multisensor_6.receive_event(event)
     assert len(caplog.records) == 1

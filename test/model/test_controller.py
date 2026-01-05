@@ -28,7 +28,7 @@ from zwave_js_server.model import (
     association as association_pkg,
     controller as controller_pkg,
 )
-from zwave_js_server.model.controller import LOGGER, Controller
+from zwave_js_server.model.controller import Controller
 from zwave_js_server.model.controller.rebuild_routes import (
     RebuildRoutesOptions,
     RebuildRoutesStatus,
@@ -2289,7 +2289,7 @@ async def test_inclusion_aborted(controller):
 
 async def test_unknown_event(controller, caplog):
     """Test that an unknown event type logs a message but does not raise."""
-    LOGGER.setLevel(logging.INFO)
+    caplog.set_level(logging.INFO)
     event = Event("unknown_event", {"source": "controller", "event": "unknown_event"})
     controller.receive_event(event)
     assert len(caplog.records) == 1
