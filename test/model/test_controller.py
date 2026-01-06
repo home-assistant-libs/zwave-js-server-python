@@ -2,6 +2,7 @@
 
 from copy import deepcopy
 import json
+import logging
 from unittest.mock import patch
 
 import pytest
@@ -2286,12 +2287,14 @@ async def test_inclusion_aborted(controller):
     assert {k: v for k, v in event.data.items() if k != "controller"} == event_data
 
 
-async def test_unknown_event(controller):
-    """Test that an unknown event type causes an exception."""
-    with pytest.raises(KeyError):
-        assert controller.receive_event(
-            Event("unknown_event", {"source": "controller"})
-        )
+async def test_unknown_event(controller, caplog):
+    """Test that an unknown event type logs a message but does not raise."""
+    caplog.set_level(logging.INFO)
+    event = Event("unknown_event", {"source": "controller", "event": "unknown_event"})
+    controller.receive_event(event)
+    assert len(caplog.records) == 1
+    assert "Unhandled controller event: unknown_event" in caplog.records[0].message
+    assert caplog.records[0].levelno == logging.INFO
 
 
 async def test_additional_events(controller: Controller) -> None:

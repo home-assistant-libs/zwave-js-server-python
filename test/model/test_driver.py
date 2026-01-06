@@ -1,6 +1,7 @@
 """Test the driver model."""
 
 import json
+import logging
 from typing import Any
 
 import pytest
@@ -383,10 +384,14 @@ async def test_shutdown(driver, uuid4, mock_command):
     }
 
 
-async def test_unknown_event(driver):
-    """Test that an unknown event type causes an exception."""
-    with pytest.raises(KeyError):
-        assert driver.receive_event(Event("unknown_event", {"source": "driver"}))
+async def test_unknown_event(driver, caplog):
+    """Test that an unknown event type logs a message but does not raise."""
+    caplog.set_level(logging.INFO)
+    event = Event("unknown_event", {"source": "driver", "event": "unknown_event"})
+    driver.receive_event(event)
+    assert len(caplog.records) == 1
+    assert "Unhandled driver event: unknown_event" in caplog.records[0].message
+    assert caplog.records[0].levelno == logging.INFO
 
 
 async def test_all_nodes_ready_event(driver):

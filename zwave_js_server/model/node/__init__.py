@@ -475,12 +475,15 @@ class Node(EventBase):
 
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
-        NODE_EVENT_MODEL_MAP[event.type].from_dict(event.data)
+        if (event_type := event.type) not in NODE_EVENT_MODEL_MAP:
+            _LOGGER.info("Unhandled node event: %s", event_type)
+            return
 
+        NODE_EVENT_MODEL_MAP[event_type].from_dict(event.data)
         self._handle_event_protocol(event)
         event.data["node"] = self
 
-        self.emit(event.type, event.data)
+        self.emit(event_type, event.data)
 
     async def async_send_command(
         self,
