@@ -1,5 +1,6 @@
 """Test the controller model."""
 
+import base64
 from copy import deepcopy
 import json
 import logging
@@ -2405,8 +2406,6 @@ async def test_get_long_range_nodes(controller, uuid4, mock_command):
 
 async def test_get_dsk(controller, uuid4, mock_command):
     """Test get_dsk command."""
-    import base64
-
     dsk_bytes = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
     dsk_base64 = base64.b64encode(dsk_bytes).decode("utf-8")
 
