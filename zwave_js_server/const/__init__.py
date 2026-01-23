@@ -222,6 +222,18 @@ class ConfigurationValueType(str, Enum):
     UNDEFINED = "undefined"
 
 
+class FirmwareFileFormat(str, Enum):
+    """Enum for firmware file formats."""
+
+    AEOTEC = "aeotec"
+    OTZ = "otz"
+    OTA = "ota"
+    HEX = "hex"
+    HEC = "hec"
+    GECKO = "gecko"
+    BIN = "bin"
+
+
 class NodeType(IntEnum):
     """Enum with all Node types."""
 

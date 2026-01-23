@@ -1085,6 +1085,11 @@ class Node(EventBase):
             RouteHealthCheckResult(event.data["lastResult"]),
         )
 
+    def handle_check_link_reliability_progress(self, event: Event) -> None:
+        """Process a check link reliability progress event."""
+        # Progress data is passed through as-is
+        event.data["check_link_reliability_progress"] = event.data["progress"]
+
     def handle_wake_up(self, event: Event) -> None:
         """Process a node wake up event."""
         # pylint: disable=unused-argument

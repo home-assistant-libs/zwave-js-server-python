@@ -2961,6 +2961,29 @@ async def test_abort_link_reliability_check(
     }
 
 
+async def test_check_link_reliability_progress_event(multisensor_6: node_pkg.Node):
+    """Test check link reliability progress event."""
+    node = multisensor_6
+    progress_data = {
+        "rounds": 3,
+        "commandsSent": 6,
+        "commandErrors": 0,
+        "rtt": {"min": 15, "max": 80, "average": 45.0},
+        "ackRSSI": {"min": -72, "max": -62, "average": -67.0},
+    }
+    event = Event(
+        "check link reliability progress",
+        {
+            "source": "node",
+            "event": "check link reliability progress",
+            "nodeId": node.node_id,
+            "progress": progress_data,
+        },
+    )
+    node.receive_event(event)
+    assert event.data["check_link_reliability_progress"] == progress_data
+
+
 async def test_node_state_properties_schema_45(client, multisensor_6_state):
     """Test node state properties from schema 45."""
     node_state = deepcopy(multisensor_6_state)

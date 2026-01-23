@@ -81,6 +81,23 @@ class CheckRouteHealthProgressEventModel(CheckHealthProgressEventModel):
     event: Literal["check route health progress"]
 
 
+class CheckLinkReliabilityProgressEventModel(BaseNodeEventModel):
+    """Model for `check link reliability progress` event data."""
+
+    event: Literal["check link reliability progress"]
+    progress: dict
+
+    @classmethod
+    def from_dict(cls, data: dict) -> CheckLinkReliabilityProgressEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            nodeId=data["nodeId"],
+            progress=data["progress"],
+        )
+
+
 class DeadEventModel(BaseNodeEventModel):
     """Model for `dead` event data."""
 
@@ -341,6 +358,7 @@ class FirmwareUpdateProgressEventModel(BaseNodeEventModel):
 NODE_EVENT_MODEL_MAP: dict[str, type[BaseNodeEventModel]] = {
     "alive": AliveEventModel,
     "check lifeline health progress": CheckLifelineHealthProgressEventModel,
+    "check link reliability progress": CheckLinkReliabilityProgressEventModel,
     "check route health progress": CheckRouteHealthProgressEventModel,
     "dead": DeadEventModel,
     "firmware update finished": FirmwareUpdateFinishedEventModel,
