@@ -697,7 +697,6 @@ async def test_driver_state_properties(client, log_config):
             "configVersion": "1.2.3",
         },
     }
-    from zwave_js_server.model.driver import Driver
 
     driver = Driver(client, state, log_config)
 
@@ -715,7 +714,6 @@ async def test_driver_state_properties_missing(client, log_config):
             "ownNodeId": 1,
         },
     }
-    from zwave_js_server.model.driver import Driver
 
     driver = Driver(client, state, log_config)
 

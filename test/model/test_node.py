@@ -14,6 +14,7 @@ from zwave_js_server.const import (
     INTERVIEW_FAILED,
     CommandClass,
     CommandStatus,
+    LinkReliabilityCheckMode,
     NodeStatus,
     PowerLevel,
     ProtocolDataRate,
@@ -2814,8 +2815,6 @@ async def test_check_link_reliability(
     multisensor_6: node_pkg.Node, uuid4, mock_command
 ):
     """Test check_link_reliability command."""
-    from zwave_js_server.const import LinkReliabilityCheckMode
-
     node = multisensor_6
 
     ack_commands = mock_command(
@@ -2872,8 +2871,6 @@ async def test_check_link_reliability_minimal(
     multisensor_6: node_pkg.Node, uuid4, mock_command
 ):
     """Test check_link_reliability command with minimal result."""
-    from zwave_js_server.const import LinkReliabilityCheckMode
-
     node = multisensor_6
 
     ack_commands = mock_command(
