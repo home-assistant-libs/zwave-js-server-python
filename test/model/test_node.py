@@ -2805,3 +2805,274 @@ async def test_node_info_received_event(multisensor_6: node_pkg.Node):
 
     node.on(event_type, callback)
     node.receive_event(event)
+
+
+# Schema 45+ tests
+
+
+async def test_check_link_reliability(
+    multisensor_6: node_pkg.Node, uuid4, mock_command
+):
+    """Test check_link_reliability command."""
+    from zwave_js_server.const import LinkReliabilityCheckMode
+
+    node = multisensor_6
+
+    ack_commands = mock_command(
+        {"command": "node.check_link_reliability", "nodeId": node.node_id},
+        {
+            "result": {
+                "rounds": 5,
+                "commandsSent": 10,
+                "commandErrors": 1,
+                "missingResponses": 0,
+                "rtt": {"min": 10, "max": 100, "average": 50.5},
+                "ackRSSI": {"min": -70, "max": -60, "average": -65.0},
+                "latency": {"min": 5, "max": 50, "average": 25.5},
+                "responseRSSI": {"min": -75, "max": -65, "average": -70.0},
+            }
+        },
+    )
+
+    result = await node.async_check_link_reliability(
+        mode=LinkReliabilityCheckMode.BASIC_SET_ON_OFF,
+        interval=100,
+        rounds=5,
+    )
+
+    assert result.rounds == 5
+    assert result.commands_sent == 10
+    assert result.command_errors == 1
+    assert result.missing_responses == 0
+    assert result.rtt.min == 10
+    assert result.rtt.max == 100
+    assert result.rtt.average == 50.5
+    assert result.ack_rssi.min == -70
+    assert result.ack_rssi.max == -60
+    assert result.ack_rssi.average == -65.0
+    assert result.latency.min == 5
+    assert result.latency.max == 50
+    assert result.latency.average == 25.5
+    assert result.response_rssi.min == -75
+    assert result.response_rssi.max == -65
+    assert result.response_rssi.average == -70.0
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.check_link_reliability",
+        "nodeId": node.node_id,
+        "mode": LinkReliabilityCheckMode.BASIC_SET_ON_OFF,
+        "interval": 100,
+        "rounds": 5,
+        "messageId": uuid4,
+    }
+
+
+async def test_check_link_reliability_minimal(
+    multisensor_6: node_pkg.Node, uuid4, mock_command
+):
+    """Test check_link_reliability command with minimal result."""
+    from zwave_js_server.const import LinkReliabilityCheckMode
+
+    node = multisensor_6
+
+    ack_commands = mock_command(
+        {"command": "node.check_link_reliability", "nodeId": node.node_id},
+        {
+            "result": {
+                "rounds": 3,
+                "commandsSent": 6,
+                "commandErrors": 0,
+                "rtt": {"min": 15, "max": 80, "average": 45.0},
+                "ackRSSI": {"min": -72, "max": -62, "average": -67.0},
+            }
+        },
+    )
+
+    result = await node.async_check_link_reliability(
+        mode=LinkReliabilityCheckMode.BASIC_SET_ON_OFF,
+        interval=50,
+    )
+
+    assert result.rounds == 3
+    assert result.commands_sent == 6
+    assert result.command_errors == 0
+    assert result.missing_responses is None
+    assert result.latency is None
+    assert result.response_rssi is None
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.check_link_reliability",
+        "nodeId": node.node_id,
+        "mode": LinkReliabilityCheckMode.BASIC_SET_ON_OFF,
+        "interval": 50,
+        "messageId": uuid4,
+    }
+
+
+@pytest.mark.parametrize("progress", [True, False])
+async def test_is_link_reliability_check_in_progress(
+    multisensor_6: node_pkg.Node,
+    uuid4,
+    mock_command,
+    progress: bool,
+):
+    """Test is_link_reliability_check_in_progress command."""
+    node = multisensor_6
+
+    ack_commands = mock_command(
+        {
+            "command": "node.is_link_reliability_check_in_progress",
+            "nodeId": node.node_id,
+        },
+        {"progress": progress},
+    )
+
+    result = await node.async_is_link_reliability_check_in_progress()
+    assert result is progress
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.is_link_reliability_check_in_progress",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }
+
+
+async def test_abort_link_reliability_check(
+    multisensor_6: node_pkg.Node, uuid4, mock_command
+):
+    """Test abort_link_reliability_check command."""
+    node = multisensor_6
+
+    ack_commands = mock_command(
+        {"command": "node.abort_link_reliability_check", "nodeId": node.node_id},
+        {},
+    )
+
+    await node.async_abort_link_reliability_check()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.abort_link_reliability_check",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }
+
+
+async def test_node_state_properties_schema_45(client, multisensor_6_state):
+    """Test node state properties from schema 45."""
+    node_state = deepcopy(multisensor_6_state)
+    node_state["canSleep"] = True
+    node_state["supportsWakeUpOnDemand"] = False
+    node_state["hardwareVersion"] = 5
+    node_state["hasSUCReturnRoute"] = True
+    node_state["manufacturer"] = "AEON Labs"
+    node_state["dsk"] = "12345-67890-12345-67890-12345-67890-12345-67890"
+
+    node = node_pkg.Node(client, node_state)
+
+    assert node.can_sleep is True
+    assert node.supports_wake_up_on_demand is False
+    assert node.hardware_version == 5
+    assert node.has_suc_return_route is True
+    assert node.manufacturer == "AEON Labs"
+    assert node.dsk == "12345-67890-12345-67890-12345-67890-12345-67890"
+
+
+async def test_node_state_properties_schema_45_missing(client, multisensor_6_state):
+    """Test node state properties from schema 45 when not present."""
+    node = node_pkg.Node(client, multisensor_6_state)
+
+    assert node.can_sleep is None
+    assert node.supports_wake_up_on_demand is None
+    assert node.hardware_version is None
+    assert node.has_suc_return_route is None
+    assert node.manufacturer is None
+    assert node.dsk is None
+
+
+async def test_endpoint_get_ccs(multisensor_6: node_pkg.Node, uuid4, mock_command):
+    """Test endpoint get_ccs command."""
+    node = multisensor_6
+    endpoint = node.endpoints[0]
+
+    ack_commands = mock_command(
+        {"command": "endpoint.get_ccs", "nodeId": node.node_id},
+        {
+            "commandClasses": {
+                "37": {"isSecure": False, "version": 2},
+                "38": {"isSecure": True, "version": 3},
+            }
+        },
+    )
+
+    result = await endpoint.async_get_ccs()
+
+    assert len(result) == 2
+    assert CommandClass(37) in result
+    assert CommandClass(38) in result
+    assert result[CommandClass(37)].is_secure is False
+    assert result[CommandClass(37)].version == 2
+    assert result[CommandClass(38)].is_secure is True
+    assert result[CommandClass(38)].version == 3
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "endpoint.get_ccs",
+        "nodeId": node.node_id,
+        "endpoint": 0,
+        "messageId": uuid4,
+    }
+
+
+@pytest.mark.parametrize("may_support", [True, False])
+async def test_endpoint_may_support_basic_cc(
+    multisensor_6: node_pkg.Node, uuid4, mock_command, may_support: bool
+):
+    """Test endpoint may_support_basic_cc command."""
+    node = multisensor_6
+    endpoint = node.endpoints[0]
+
+    ack_commands = mock_command(
+        {"command": "endpoint.may_support_basic_cc", "nodeId": node.node_id},
+        {"maySupport": may_support},
+    )
+
+    result = await endpoint.async_may_support_basic_cc()
+    assert result is may_support
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "endpoint.may_support_basic_cc",
+        "nodeId": node.node_id,
+        "endpoint": 0,
+        "messageId": uuid4,
+    }
+
+
+@pytest.mark.parametrize("removed", [True, False])
+async def test_endpoint_was_cc_removed_via_config(
+    multisensor_6: node_pkg.Node, uuid4, mock_command, removed: bool
+):
+    """Test endpoint was_cc_removed_via_config command."""
+    node = multisensor_6
+    endpoint = node.endpoints[0]
+
+    ack_commands = mock_command(
+        {"command": "endpoint.was_cc_removed_via_config", "nodeId": node.node_id},
+        {"removed": removed},
+    )
+
+    result = await endpoint.async_was_cc_removed_via_config(CommandClass.SWITCH_BINARY)
+    assert result is removed
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "endpoint.was_cc_removed_via_config",
+        "nodeId": node.node_id,
+        "endpoint": 0,
+        "commandClass": CommandClass.SWITCH_BINARY.value,
+        "messageId": uuid4,
+    }
