@@ -2847,3 +2847,98 @@ async def test_network_events(controller):
         {"source": "controller", "event": "leaving network failed"},
     )
     controller.receive_event(event)
+
+
+async def test_get_all_associations_with_endpoint_colon(
+    controller, multisensor_6, uuid4, mock_command
+):
+    """Test get_all_associations with endpoint key containing colon."""
+    ack_commands = mock_command(
+        {"command": "controller.get_all_associations"},
+        {"associations": {"52:1": {"1": [{"nodeId": 1}]}}},
+    )
+
+    result = await controller.async_get_all_associations(multisensor_6)
+    # The endpoint_key "52:1" is parsed as endpoint 1
+    assert 1 in result
+    assert 1 in result[1]
+    associations = result[1][1]
+    assert len(associations) == 1
+    assert associations[0].node_id == 1
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_all_associations",
+        "nodeId": multisensor_6.node_id,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_all_available_firmware_updates_with_rf_region(
+    controller, uuid4, mock_command
+):
+    """Test get_all_available_firmware_updates with rf_region parameter."""
+    ack_commands = mock_command(
+        {"command": "controller.get_all_available_firmware_updates"},
+        {"updates": {}},
+    )
+
+    result = await controller.async_get_all_available_firmware_updates(
+        api_key="test-api-key", rf_region=RFRegion.USA
+    )
+    assert result == {}
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_all_available_firmware_updates",
+        "apiKey": "test-api-key",
+        "includePrereleases": True,
+        "rfRegion": RFRegion.USA.value,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_supported_rf_regions_returns_none(controller, uuid4, mock_command):
+    """Test get_supported_rf_regions when regions is None."""
+    ack_commands = mock_command(
+        {"command": "controller.get_supported_rf_regions"},
+        {},
+    )
+
+    result = await controller.async_get_supported_rf_regions()
+    assert result is None
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_supported_rf_regions",
+        "filterSubsets": False,
+        "messageId": uuid4,
+    }
+
+
+async def test_query_rf_region_info_with_includes_region(
+    controller, uuid4, mock_command
+):
+    """Test query_rf_region_info when includesRegion is present."""
+    ack_commands = mock_command(
+        {"command": "controller.query_rf_region_info"},
+        {
+            "region": 1,
+            "supportsZWave": True,
+            "supportsLongRange": True,
+            "includesRegion": 0,
+        },
+    )
+
+    result = await controller.async_query_rf_region_info(RFRegion.USA)
+    assert result["region"] == RFRegion.USA
+    assert result["supportsZWave"] is True
+    assert result["supportsLongRange"] is True
+    assert result["includesRegion"] == RFRegion.EUROPE
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.query_rf_region_info",
+        "region": RFRegion.USA.value,
+        "messageId": uuid4,
+    }
