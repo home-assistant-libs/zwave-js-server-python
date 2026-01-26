@@ -13,6 +13,8 @@ from ...const import (
     NOT_INTERVIEWED,
     CommandClass,
     DateAndTime,
+    LinkReliabilityCheckMode,
+    LinkReliabilityCheckResult,
     NodeStatus,
     PowerLevel,
     Protocols,
@@ -378,6 +380,38 @@ class Node(EventBase):
         if "protocol" in self.data:
             return Protocols(self.data["protocol"])
         return None
+
+    # Schema 45+ properties
+
+    @property
+    def can_sleep(self) -> bool | None:
+        """Return whether the node can sleep."""
+        return self.data.get("canSleep")
+
+    @property
+    def supports_wake_up_on_demand(self) -> bool | None:
+        """Return whether the node supports wake-up on demand."""
+        return self.data.get("supportsWakeUpOnDemand")
+
+    @property
+    def hardware_version(self) -> int | None:
+        """Return hardware version number."""
+        return self.data.get("hardwareVersion")
+
+    @property
+    def has_suc_return_route(self) -> bool | None:
+        """Return whether the node has a SUC return route configured."""
+        return self.data.get("hasSUCReturnRoute")
+
+    @property
+    def manufacturer(self) -> str | None:
+        """Return manufacturer name string."""
+        return self.data.get("manufacturer")
+
+    @property
+    def dsk(self) -> str | None:
+        """Return Device Specific Key for S2 (hex encoded string)."""
+        return self.data.get("dsk")
 
     def _update_endpoints(self, endpoints: list[EndpointDataType]) -> None:
         """Update the endpoints data."""
@@ -987,6 +1021,46 @@ class Node(EventBase):
             property_, property_key, allow_unexpected_response
         )
 
+    async def async_check_link_reliability(
+        self,
+        mode: LinkReliabilityCheckMode,
+        interval: int,
+        rounds: int | None = None,
+    ) -> LinkReliabilityCheckResult:
+        """Run an extended link reliability check on the node."""
+        cmd_kwargs: dict[str, Any] = {
+            "mode": mode,
+            "interval": interval,
+        }
+        if rounds is not None:
+            cmd_kwargs["rounds"] = rounds
+        data = await self.async_send_command(
+            "check_link_reliability",
+            require_schema=45,
+            wait_for_result=True,
+            **cmd_kwargs,
+        )
+        assert data
+        return LinkReliabilityCheckResult(data["result"])
+
+    async def async_is_link_reliability_check_in_progress(self) -> bool:
+        """Check if a link reliability check is running."""
+        data = await self.async_send_command(
+            "is_link_reliability_check_in_progress",
+            require_schema=45,
+            wait_for_result=True,
+        )
+        assert data
+        return cast(bool, data["progress"])
+
+    async def async_abort_link_reliability_check(self) -> None:
+        """Abort an ongoing link reliability check."""
+        await self.async_send_command(
+            "abort_link_reliability_check",
+            require_schema=45,
+            wait_for_result=False,
+        )
+
     def handle_test_powerlevel_progress(self, event: Event) -> None:
         """Process a test power level progress event."""
         event.data["test_power_level_progress"] = TestPowerLevelProgress(
@@ -1010,6 +1084,11 @@ class Node(EventBase):
             event.data["lastRating"],
             RouteHealthCheckResult(event.data["lastResult"]),
         )
+
+    def handle_check_link_reliability_progress(self, event: Event) -> None:
+        """Process a check link reliability progress event."""
+        # Progress data is passed through as-is
+        event.data["check_link_reliability_progress"] = event.data["progress"]
 
     def handle_wake_up(self, event: Event) -> None:
         """Process a node wake up event."""

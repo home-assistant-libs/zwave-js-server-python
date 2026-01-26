@@ -132,8 +132,32 @@ class FirmwareUpdateProgressEventModel(BaseDriverEventModel):
         )
 
 
+class ErrorEventModel(BaseDriverEventModel):
+    """Model for `error` event data."""
+
+    event: Literal["error"]
+    error: str
+
+    @classmethod
+    def from_dict(cls, data: dict) -> ErrorEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            error=data["error"],
+        )
+
+
+class BootloaderReadyEventModel(BaseDriverEventModel):
+    """Model for `bootloader ready` event data."""
+
+    event: Literal["bootloader ready"]
+
+
 DRIVER_EVENT_MODEL_MAP: dict[str, type[BaseDriverEventModel]] = {
     "all nodes ready": AllNodesReadyEventModel,
+    "bootloader ready": BootloaderReadyEventModel,
+    "error": ErrorEventModel,
     "log config updated": LogConfigUpdatedEventModel,
     "logging": LoggingEventModel,
     "driver ready": DriverReadyEventModel,
@@ -161,6 +185,7 @@ class Driver(EventBase):
         """Initialize driver."""
         super().__init__()
         self.client = client
+        self._state = state
         self.controller = Controller(client, state)
         self.log_config = LogConfig.from_dict(log_config)
         self.config_manager = ConfigManager(client)
@@ -180,6 +205,23 @@ class Driver(EventBase):
     def firmware_update_progress(self) -> DriverFirmwareUpdateProgress | None:
         """Return firmware update progress."""
         return self._firmware_update_progress
+
+    # Schema 45+ state properties
+
+    @property
+    def ready(self) -> bool | None:
+        """Return whether the driver is ready."""
+        return self._state.get("driver", {}).get("ready")
+
+    @property
+    def all_nodes_ready(self) -> bool | None:
+        """Return whether all nodes are ready."""
+        return self._state.get("driver", {}).get("allNodesReady")
+
+    @property
+    def config_version(self) -> str | None:
+        """Return device config database version."""
+        return self._state.get("driver", {}).get("configVersion")
 
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
@@ -312,6 +354,52 @@ class Driver(EventBase):
         data = await self._async_send_command("shutdown", require_schema=27)
         return cast(bool, data["success"])
 
+    async def async_soft_reset_and_restart(self) -> None:
+        """Soft reset the controller and restart the driver."""
+        await self._async_send_command("soft_reset_and_restart", require_schema=45)
+
+    async def async_enter_bootloader(self) -> None:
+        """Put the controller into bootloader mode."""
+        await self._async_send_command("enter_bootloader", require_schema=45)
+
+    async def async_leave_bootloader(self) -> None:
+        """Exit bootloader mode."""
+        await self._async_send_command("leave_bootloader", require_schema=45)
+
+    async def async_get_supported_cc_version(
+        self, node_id: int, cc: int, endpoint: int = 0
+    ) -> int | None:
+        """Get the supported CC version for a node/endpoint."""
+        data = await self._async_send_command(
+            "get_supported_cc_version",
+            nodeId=node_id,
+            commandClass=cc,
+            endpointIndex=endpoint,
+            require_schema=45,
+        )
+        return cast(int | None, data.get("version"))
+
+    async def async_get_safe_cc_version(
+        self, node_id: int, cc: int, endpoint: int = 0
+    ) -> int | None:
+        """Get a safe CC version (returns 1 if unknown, None if not implemented)."""
+        data = await self._async_send_command(
+            "get_safe_cc_version",
+            nodeId=node_id,
+            commandClass=cc,
+            endpointIndex=endpoint,
+            require_schema=45,
+        )
+        return cast(int | None, data.get("version"))
+
+    async def async_update_user_agent(self, components: dict[str, str]) -> None:
+        """Update user agent components for service requests."""
+        await self._async_send_command(
+            "update_user_agent",
+            components=components,
+            require_schema=45,
+        )
+
     def handle_logging(self, event: Event) -> None:
         """Process a driver logging event."""
         event.data["log_message"] = LogMessage(cast(LogMessageDataType, event.data))
@@ -340,3 +428,11 @@ class Driver(EventBase):
         event.data["firmware_update_finished"] = DriverFirmwareUpdateResult(
             event.data["result"]
         )
+
+    def handle_error(self, event: Event) -> None:
+        """Process a driver error event."""
+        # Error message is already in event.data["error"]
+
+    def handle_bootloader_ready(self, event: Event) -> None:
+        """Process a bootloader ready event."""
+        # No additional processing needed

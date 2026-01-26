@@ -26,7 +26,11 @@ from ...util.helpers import convert_base64_to_bytes, convert_bytes_to_base64
 from ..association import AssociationAddress, AssociationGroup
 from ..node import Node
 from ..node.firmware import NodeFirmwareUpdateResult
-from .data_model import ControllerDataType
+from .data_model import (
+    ControllerDataType,
+    ZWaveApiVersionDataType,
+    ZWaveChipTypeDataType,
+)
 from .event_model import CONTROLLER_EVENT_MODEL_MAP
 from .inclusion_and_provisioning import (
     InclusionGrant,
@@ -246,6 +250,33 @@ class Controller(EventBase):
     def supports_long_range(self) -> bool | None:
         """Return whether controller supports long range or not."""
         return self.data.get("supportsLongRange")
+
+    # Schema 45+ properties
+
+    @property
+    def is_sis(self) -> bool | None:
+        """Return whether this controller is the SIS (Static Information Station)."""
+        return self.data.get("isSIS")
+
+    @property
+    def max_payload_size(self) -> int | None:
+        """Return maximum Z-Wave payload size."""
+        return self.data.get("maxPayloadSize")
+
+    @property
+    def max_payload_size_lr(self) -> int | None:
+        """Return maximum Long Range payload size."""
+        return self.data.get("maxPayloadSizeLR")
+
+    @property
+    def zwave_api_version(self) -> ZWaveApiVersionDataType | None:
+        """Return Z-Wave API version info (kind, version)."""
+        return self.data.get("zwaveApiVersion")
+
+    @property
+    def zwave_chip_type(self) -> ZWaveChipTypeDataType | None:
+        """Return controller chip type info."""
+        return self.data.get("zwaveChipType")
 
     def update(self, data: ControllerDataType) -> None:
         """Update controller data."""
@@ -887,6 +918,269 @@ class Controller(EventBase):
         )
         return cast(bool, data["progress"])
 
+    # Schema 45+ commands
+
+    async def async_get_background_rssi(
+        self,
+    ) -> dict[str, int | None]:
+        """Get background RSSI noise levels for all channels."""
+        data = await self.client.async_send_command(
+            {"command": "controller.get_background_rssi"}, require_schema=45
+        )
+        return {
+            "rssiChannel0": data["rssiChannel0"],
+            "rssiChannel1": data["rssiChannel1"],
+            "rssiChannel2": data.get("rssiChannel2"),
+            "rssiChannel3": data.get("rssiChannel3"),
+        }
+
+    async def async_get_long_range_nodes(self) -> list[int]:
+        """Get list of nodes using Z-Wave Long Range."""
+        data = await self.client.async_send_command(
+            {"command": "controller.get_long_range_nodes"}, require_schema=45
+        )
+        return list(data["nodeIds"])
+
+    async def async_get_dsk(self) -> bytes:
+        """Get the controller's DSK."""
+        data = await self.client.async_send_command(
+            {"command": "controller.get_dsk"}, require_schema=45
+        )
+        return convert_base64_to_bytes(data["dsk"])
+
+    async def async_get_all_association_groups(
+        self, node: Node
+    ) -> dict[int, dict[int, AssociationGroup]]:
+        """Get all association groups for a node and all its endpoints."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.get_all_association_groups",
+                "nodeId": node.node_id,
+            },
+            require_schema=45,
+        )
+        # Result is a nested map: endpoint -> group_id -> AssociationGroup
+        result: dict[int, dict[int, AssociationGroup]] = {}
+        for endpoint_str, groups in data["groups"].items():
+            endpoint = int(endpoint_str)
+            result[endpoint] = {}
+            for group_id_str, group_data in groups.items():
+                group_id = int(group_id_str)
+                result[endpoint][group_id] = AssociationGroup(
+                    max_nodes=group_data["maxNodes"],
+                    is_lifeline=group_data["isLifeline"],
+                    multi_channel=group_data["multiChannel"],
+                    label=group_data["label"],
+                    profile=group_data.get("profile"),
+                    issued_commands=group_data.get("issuedCommands", {}),
+                )
+        return result
+
+    async def async_get_all_associations(
+        self, node: Node
+    ) -> dict[int, dict[int, list[AssociationAddress]]]:
+        """Get all associations for a node and all its endpoints."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.get_all_associations",
+                "nodeId": node.node_id,
+            },
+            require_schema=45,
+        )
+        # Result is a nested map: endpoint -> group_id -> [AssociationAddress]
+        result: dict[int, dict[int, list[AssociationAddress]]] = {}
+        for endpoint_key, groups in data["associations"].items():
+            # endpoint_key can be "nodeId" or "nodeId:endpoint"
+            if ":" in endpoint_key:
+                endpoint = int(endpoint_key.split(":")[1])
+            else:
+                endpoint = 0
+            result[endpoint] = {}
+            for group_id_str, addrs in groups.items():
+                group_id = int(group_id_str)
+                result[endpoint][group_id] = [
+                    AssociationAddress(
+                        controller=self,
+                        node_id=addr["nodeId"],
+                        endpoint=addr.get("endpoint"),
+                    )
+                    for addr in addrs
+                ]
+        return result
+
+    async def async_get_all_available_firmware_updates(
+        self,
+        api_key: str | None = None,
+        include_prereleases: bool = True,
+        rf_region: RFRegion | None = None,
+    ) -> dict[int, list[NodeFirmwareUpdateInfo]]:
+        """Get all available firmware updates for all nodes."""
+        payload: dict[str, Any] = {
+            "command": "controller.get_all_available_firmware_updates",
+            "includePrereleases": include_prereleases,
+        }
+        if api_key is not None:
+            payload["apiKey"] = api_key
+        if rf_region is not None:
+            payload["rfRegion"] = rf_region.value
+
+        data = await self.client.async_send_command(payload, require_schema=45)
+        return {
+            int(node_id): [
+                NodeFirmwareUpdateInfo.from_dict(update) for update in updates
+            ]
+            for node_id, updates in data["updates"].items()
+        }
+
+    # Network join/leave operations
+
+    async def async_begin_joining_network(self) -> dict[str, Any]:
+        """Begin joining another network (learn mode)."""
+        data = await self.client.async_send_command(
+            {"command": "controller.begin_joining_network"}, require_schema=45
+        )
+        return dict(data["result"])
+
+    async def async_stop_joining_network(self) -> bool:
+        """Stop the join network process."""
+        data = await self.client.async_send_command(
+            {"command": "controller.stop_joining_network"}, require_schema=45
+        )
+        return cast(bool, data["success"])
+
+    async def async_begin_leaving_network(self) -> dict[str, Any]:
+        """Begin leaving the network."""
+        data = await self.client.async_send_command(
+            {"command": "controller.begin_leaving_network"}, require_schema=45
+        )
+        return dict(data["result"])
+
+    async def async_stop_leaving_network(self) -> bool:
+        """Stop the leave network process."""
+        data = await self.client.async_send_command(
+            {"command": "controller.stop_leaving_network"}, require_schema=45
+        )
+        return cast(bool, data["success"])
+
+    # Watchdog operations
+
+    async def async_start_watchdog(self) -> bool:
+        """Start the hardware watchdog."""
+        data = await self.client.async_send_command(
+            {"command": "controller.start_watchdog"}, require_schema=45
+        )
+        return cast(bool, data["success"])
+
+    async def async_stop_watchdog(self) -> bool:
+        """Stop the hardware watchdog."""
+        data = await self.client.async_send_command(
+            {"command": "controller.stop_watchdog"}, require_schema=45
+        )
+        return cast(bool, data["success"])
+
+    # RF region extended operations
+
+    async def async_get_supported_rf_regions(
+        self, filter_subsets: bool = False
+    ) -> list[RFRegion] | None:
+        """Get list of supported RF regions (cached)."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.get_supported_rf_regions",
+                "filterSubsets": filter_subsets,
+            },
+            require_schema=45,
+        )
+        regions = data.get("regions")
+        if regions is None:
+            return None
+        return [RFRegion(r) for r in regions]
+
+    async def async_query_supported_rf_regions(self) -> list[RFRegion]:
+        """Query all supported RF regions."""
+        data = await self.client.async_send_command(
+            {"command": "controller.query_supported_rf_regions"}, require_schema=45
+        )
+        return [RFRegion(r) for r in data["regions"]]
+
+    async def async_query_rf_region_info(self, region: RFRegion) -> dict[str, Any]:
+        """Get detailed info about a specific RF region."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.query_rf_region_info",
+                "region": region.value,
+            },
+            require_schema=45,
+        )
+        result = {
+            "region": RFRegion(data["region"]),
+            "supportsZWave": data["supportsZWave"],
+            "supportsLongRange": data["supportsLongRange"],
+        }
+        if "includesRegion" in data:
+            result["includesRegion"] = RFRegion(data["includesRegion"])
+        return result
+
+    # Routing operations
+
+    async def async_assign_return_routes(
+        self, node: Node, destination_node: Node
+    ) -> bool:
+        """Assign optimized return routes from a node to a destination."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.assign_return_routes",
+                "nodeId": node.node_id,
+                "destinationNodeId": destination_node.node_id,
+            },
+            require_schema=45,
+        )
+        return cast(bool, data["success"])
+
+    async def async_delete_return_routes(self, node: Node) -> bool:
+        """Delete return routes from a node."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.delete_return_routes",
+                "nodeId": node.node_id,
+            },
+            require_schema=45,
+        )
+        return cast(bool, data["success"])
+
+    async def async_assign_suc_return_routes(self, node: Node) -> bool:
+        """Assign optimized return routes from a node to the SUC."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.assign_suc_return_routes",
+                "nodeId": node.node_id,
+            },
+            require_schema=45,
+        )
+        return cast(bool, data["success"])
+
+    async def async_delete_suc_return_routes(self, node: Node) -> bool:
+        """Delete SUC return routes from a node."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.delete_suc_return_routes",
+                "nodeId": node.node_id,
+            },
+            require_schema=45,
+        )
+        return cast(bool, data["success"])
+
+    async def async_discover_node_neighbors(self, node: Node) -> bool:
+        """Trigger neighbor discovery for a node."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.discover_node_neighbors",
+                "nodeId": node.node_id,
+            },
+            require_schema=45,
+        )
+        return cast(bool, data["success"])
+
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
         if event.data["source"] == "node":
@@ -1014,3 +1308,21 @@ class Controller(EventBase):
         """Process a status changed event."""
         self.data["status"] = event.data["status"]
         event.data["status"] = ControllerStatus(event.data["status"])
+
+    # Schema 45+ event handlers
+
+    def handle_network_found(self, event: Event) -> None:
+        """Process a network found event."""
+        # Event data already contains homeId and ownNodeId
+
+    def handle_network_joined(self, event: Event) -> None:
+        """Process a network joined event."""
+
+    def handle_network_left(self, event: Event) -> None:
+        """Process a network left event."""
+
+    def handle_joining_network_failed(self, event: Event) -> None:
+        """Process a joining network failed event."""
+
+    def handle_leaving_network_failed(self, event: Event) -> None:
+        """Process a leaving network failed event."""

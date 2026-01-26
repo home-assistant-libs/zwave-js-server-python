@@ -549,3 +549,174 @@ async def test_firmware_update_otw_invalid_params(
     with pytest.raises(ValueError):
         # Should raise ValueError if no parameters are provided or both are provided
         await driver.async_firmware_update_otw(**firmware_update_param)
+
+
+# Schema 45+ tests
+
+
+async def test_soft_reset_and_restart(driver, uuid4, mock_command):
+    """Test driver soft reset and restart command."""
+    ack_commands = mock_command({"command": "driver.soft_reset_and_restart"}, {})
+
+    assert not await driver.async_soft_reset_and_restart()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.soft_reset_and_restart",
+        "messageId": uuid4,
+    }
+
+
+async def test_enter_bootloader(driver, uuid4, mock_command):
+    """Test driver enter bootloader command."""
+    ack_commands = mock_command({"command": "driver.enter_bootloader"}, {})
+
+    assert not await driver.async_enter_bootloader()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.enter_bootloader",
+        "messageId": uuid4,
+    }
+
+
+async def test_leave_bootloader(driver, uuid4, mock_command):
+    """Test driver leave bootloader command."""
+    ack_commands = mock_command({"command": "driver.leave_bootloader"}, {})
+
+    assert not await driver.async_leave_bootloader()
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.leave_bootloader",
+        "messageId": uuid4,
+    }
+
+
+@pytest.mark.parametrize("version", [1, 2, None])
+async def test_get_supported_cc_version(
+    driver: Driver,
+    uuid4: str,
+    mock_command: MockCommandProtocol,
+    version: int | None,
+) -> None:
+    """Test get_supported_cc_version command."""
+    ack_commands = mock_command(
+        {"command": "driver.get_supported_cc_version"},
+        {"version": version},
+    )
+    result = await driver.async_get_supported_cc_version(node_id=52, cc=37, endpoint=0)
+    assert result == version
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.get_supported_cc_version",
+        "nodeId": 52,
+        "commandClass": 37,
+        "endpointIndex": 0,
+        "messageId": uuid4,
+    }
+
+
+@pytest.mark.parametrize("version", [1, None])
+async def test_get_safe_cc_version(
+    driver: Driver,
+    uuid4: str,
+    mock_command: MockCommandProtocol,
+    version: int | None,
+) -> None:
+    """Test get_safe_cc_version command."""
+    ack_commands = mock_command(
+        {"command": "driver.get_safe_cc_version"},
+        {"version": version},
+    )
+    result = await driver.async_get_safe_cc_version(node_id=52, cc=37, endpoint=1)
+    assert result == version
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.get_safe_cc_version",
+        "nodeId": 52,
+        "commandClass": 37,
+        "endpointIndex": 1,
+        "messageId": uuid4,
+    }
+
+
+async def test_update_user_agent(driver, uuid4, mock_command):
+    """Test update_user_agent command."""
+    ack_commands = mock_command({"command": "driver.update_user_agent"}, {})
+
+    await driver.async_update_user_agent({"app": "test-app", "version": "1.0.0"})
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.update_user_agent",
+        "components": {"app": "test-app", "version": "1.0.0"},
+        "messageId": uuid4,
+    }
+
+
+async def test_error_event(driver):
+    """Test driver error event."""
+    event = Event(
+        type="error",
+        data={
+            "source": "driver",
+            "event": "error",
+            "error": "Test error message",
+        },
+    )
+    driver.receive_event(event)
+    assert event.data["error"] == "Test error message"
+
+
+async def test_bootloader_ready_event(driver):
+    """Test driver bootloader ready event."""
+    event = Event(
+        type="bootloader ready",
+        data={
+            "source": "driver",
+            "event": "bootloader ready",
+        },
+    )
+    driver.receive_event(event)
+
+
+async def test_driver_state_properties(client, log_config):
+    """Test driver state properties from schema 45."""
+    state = {
+        "nodes": [],
+        "controller": {
+            "homeId": 12345,
+            "ownNodeId": 1,
+        },
+        "driver": {
+            "ready": True,
+            "allNodesReady": True,
+            "configVersion": "1.2.3",
+        },
+    }
+
+    driver = Driver(client, state, log_config)
+
+    assert driver.ready is True
+    assert driver.all_nodes_ready is True
+    assert driver.config_version == "1.2.3"
+
+
+async def test_driver_state_properties_missing(client, log_config):
+    """Test driver state properties when not present."""
+    state = {
+        "nodes": [],
+        "controller": {
+            "homeId": 12345,
+            "ownNodeId": 1,
+        },
+    }
+
+    driver = Driver(client, state, log_config)
+
+    assert driver.ready is None
+    assert driver.all_nodes_ready is None
+    assert driver.config_version is None

@@ -13,7 +13,7 @@ __version__ = "0.68.0"
 # minimal server schema version we can handle
 MIN_SERVER_SCHEMA_VERSION = 44
 # max server schema version we can handle (and our code is compatible with)
-MAX_SERVER_SCHEMA_VERSION = 44
+MAX_SERVER_SCHEMA_VERSION = 45
 
 VALUE_UNKNOWN = "unknown"
 
@@ -220,6 +220,18 @@ class ConfigurationValueType(str, Enum):
     MANUAL_ENTRY = "manual_entry"
     RANGE = "range"
     UNDEFINED = "undefined"
+
+
+class FirmwareFileFormat(str, Enum):
+    """Enum for firmware file formats."""
+
+    AEOTEC = "aeotec"
+    OTZ = "otz"
+    OTA = "ota"
+    HEX = "hex"
+    HEC = "hec"
+    GECKO = "gecko"
+    BIN = "bin"
 
 
 class NodeType(IntEnum):
@@ -519,3 +531,81 @@ class AssociationCheckResult(IntEnum):
     FORBIDDEN_SECURITY_CLASS_MISMATCH = 5
     FORBIDDEN_DESTINATION_SECURITY_CLASS_NOT_GRANTED = 6
     FORBIDDEN_NO_SUPPORTED_CCS = 7
+
+
+class LinkReliabilityCheckMode(IntEnum):
+    """Enum for all known link reliability check modes."""
+
+    # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/node/_Types.ts
+    BASIC_SET_ON_OFF = 0
+
+
+class LinkReliabilityStatisticsDataType(TypedDict):
+    """Represent link reliability statistics data type."""
+
+    min: int
+    max: int
+    average: float
+
+
+class _LinkReliabilityCheckResultDataTypeRequired(TypedDict):
+    """Required fields for link reliability check result data type."""
+
+    rounds: int
+    commandsSent: int
+    commandErrors: int
+    rtt: LinkReliabilityStatisticsDataType
+    ackRSSI: LinkReliabilityStatisticsDataType
+
+
+class LinkReliabilityCheckResultDataType(
+    _LinkReliabilityCheckResultDataTypeRequired, total=False
+):
+    """Represent link reliability check result data type."""
+
+    missingResponses: int
+    latency: LinkReliabilityStatisticsDataType
+    responseRSSI: LinkReliabilityStatisticsDataType
+
+
+@dataclass
+class LinkReliabilityStatistics:
+    """Represent link reliability statistics."""
+
+    min: int
+    max: int
+    average: float
+
+
+@dataclass
+class LinkReliabilityCheckResult:
+    """Represent link reliability check result."""
+
+    data: LinkReliabilityCheckResultDataType = field(repr=False)
+    rounds: int = field(init=False)
+    commands_sent: int = field(init=False)
+    command_errors: int = field(init=False)
+    missing_responses: int | None = field(init=False)
+    latency: LinkReliabilityStatistics | None = field(init=False)
+    rtt: LinkReliabilityStatistics = field(init=False)
+    ack_rssi: LinkReliabilityStatistics = field(init=False)
+    response_rssi: LinkReliabilityStatistics | None = field(init=False)
+
+    def __post_init__(self) -> None:
+        """Post initialization."""
+        self.rounds = self.data["rounds"]
+        self.commands_sent = self.data["commandsSent"]
+        self.command_errors = self.data["commandErrors"]
+        self.missing_responses = self.data.get("missingResponses")
+        if latency := self.data.get("latency"):
+            self.latency = LinkReliabilityStatistics(**latency)
+        else:
+            self.latency = None
+        rtt = self.data["rtt"]
+        self.rtt = LinkReliabilityStatistics(**rtt)
+        ack_rssi = self.data["ackRSSI"]
+        self.ack_rssi = LinkReliabilityStatistics(**ack_rssi)
+        if response_rssi := self.data.get("responseRSSI"):
+            self.response_rssi = LinkReliabilityStatistics(**response_rssi)
+        else:
+            self.response_rssi = None
