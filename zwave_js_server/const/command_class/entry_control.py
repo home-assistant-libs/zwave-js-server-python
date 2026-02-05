@@ -9,7 +9,6 @@ class EntryControlEventType(IntEnum):
     """Entry control event types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/EntryControlCC.ts#L54
-    UNKNOWN = -1
     CACHING = 0
     CACHED_KEYS = 1
     ENTER = 2
@@ -37,29 +36,12 @@ class EntryControlEventType(IntEnum):
     TEST = 24
     CANCEL = 25
 
-    @classmethod
-    def _missing_(
-        cls: type,
-        value: object,  # noqa: ARG003
-    ) -> EntryControlEventType:
-        """Set default enum member if an unknown value is provided."""
-        return EntryControlEventType.UNKNOWN
-
 
 class EntryControlDataType(IntEnum):
     """Entry control data types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/EntryControlCC.ts#L83
-    UNKNOWN = -1
     NONE = 0
     RAW = 1
     ASCII = 2
     MD5 = 3
-
-    @classmethod
-    def _missing_(
-        cls: type,
-        value: object,  # noqa: ARG003
-    ) -> EntryControlDataType:
-        """Set default enum member if an unknown value is provided."""
-        return EntryControlDataType.UNKNOWN
