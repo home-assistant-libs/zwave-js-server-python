@@ -9,18 +9,12 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Literal, TypedDict
 
-from ..const.command_class.battery import (
-    BatteryNotificationEventType,
-    BatteryReplacementStatus,
-)
+from ..const.command_class.battery import BatteryReplacementStatus
 from ..const.command_class.entry_control import (
     EntryControlDataType,
     EntryControlEventType,
 )
-from ..const.command_class.multilevel_switch import (
-    MultilevelSwitchCommand,
-    MultilevelSwitchStartLevelChangeDirection,
-)
+from ..const.command_class.multilevel_switch import MultilevelSwitchCommand
 from ..const.command_class.notification import (
     NOTIFICATION_TYPE_TO_EVENT_MAP,
     NotificationEvent,
@@ -78,13 +72,13 @@ class BatteryNotification(BaseNotification):
     """Model for a Zwave Node's Battery CC notification event."""
 
     data: BatteryNotificationDataType = field(repr=False)
-    event_type: BatteryNotificationEventType = field(init=False)
+    event_type: str = field(init=False)
     urgency: BatteryReplacementStatus = field(init=False)
 
     def __post_init__(self) -> None:
         """Post initialize."""
         super().__post_init__()
-        self.event_type = BatteryNotificationEventType(self.data["args"]["eventType"])
+        self.event_type = self.data["args"]["eventType"]
         self.urgency = BatteryReplacementStatus(self.data["args"]["urgency"])
 
 
@@ -217,14 +211,11 @@ class MultilevelSwitchNotification(BaseNotification):
     data: MultilevelSwitchNotificationDataType = field(repr=False)
     event_type: MultilevelSwitchCommand = field(init=False)
     event_type_label: str = field(init=False)
-    direction: MultilevelSwitchStartLevelChangeDirection | None = field(
-        default=None, init=False
-    )
+    direction: str | None = field(init=False)
 
     def __post_init__(self) -> None:
         """Post initialize."""
         super().__post_init__()
         self.event_type = MultilevelSwitchCommand(self.data["args"]["eventType"])
         self.event_type_label = self.data["args"]["eventTypeLabel"]
-        if direction := self.data["args"].get("direction"):
-            self.direction = MultilevelSwitchStartLevelChangeDirection(direction)
+        self.direction = self.data["args"].get("direction")
