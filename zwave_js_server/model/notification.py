@@ -9,7 +9,23 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Literal, TypedDict
 
-from ..const.command_class.multilevel_switch import MultilevelSwitchCommand
+from ..const.command_class.battery import (
+    BatteryNotificationEventType,
+    BatteryReplacementStatus,
+)
+from ..const.command_class.entry_control import (
+    EntryControlDataType,
+    EntryControlEventType,
+)
+from ..const.command_class.multilevel_switch import (
+    MultilevelSwitchCommand,
+    MultilevelSwitchStartLevelChangeDirection,
+)
+from ..const.command_class.notification import (
+    NOTIFICATION_TYPE_TO_EVENT_MAP,
+    NotificationEvent,
+    NotificationType,
+)
 from ..const.command_class.power_level import PowerLevelTestStatus
 from ..util.helpers import parse_buffer
 
@@ -44,6 +60,34 @@ class BaseNotification:
         self.command_class = self.data["ccId"]
 
 
+class BatteryNotificationArgsDataType(TypedDict):
+    """Represent args for a Battery CC notification event data dict type."""
+
+    eventType: Literal["battery low"]  # required
+    urgency: int  # required
+
+
+class BatteryNotificationDataType(BaseNotificationDataType):
+    """Represent a Battery CC notification event data dict type."""
+
+    args: BatteryNotificationArgsDataType  # required
+
+
+@dataclass
+class BatteryNotification(BaseNotification):
+    """Model for a Zwave Node's Battery CC notification event."""
+
+    data: BatteryNotificationDataType = field(repr=False)
+    event_type: BatteryNotificationEventType = field(init=False)
+    urgency: BatteryReplacementStatus = field(init=False)
+
+    def __post_init__(self) -> None:
+        """Post initialize."""
+        super().__post_init__()
+        self.event_type = BatteryNotificationEventType(self.data["args"]["eventType"])
+        self.urgency = BatteryReplacementStatus(self.data["args"]["urgency"])
+
+
 class EntryControlNotificationArgsDataType(TypedDict, total=False):
     """Represent args for a Entry Control CC notification event data dict type."""
 
@@ -65,18 +109,18 @@ class EntryControlNotification(BaseNotification):
     """Model for a Zwave Node's Entry Control CC notification event."""
 
     data: EntryControlNotificationDataType = field(repr=False)
-    event_type: int = field(init=False)
+    event_type: EntryControlEventType = field(init=False)
     event_type_label: str = field(init=False)
-    data_type: int = field(init=False)
+    data_type: EntryControlDataType = field(init=False)
     data_type_label: str = field(init=False)
     event_data: str | dict[str, Any] | None = field(init=False, default=None)
 
     def __post_init__(self) -> None:
         """Post initialize."""
         super().__post_init__()
-        self.event_type = self.data["args"]["eventType"]
+        self.event_type = EntryControlEventType(self.data["args"]["eventType"])
         self.event_type_label = self.data["args"]["eventTypeLabel"]
-        self.data_type = self.data["args"]["dataType"]
+        self.data_type = EntryControlDataType(self.data["args"]["dataType"])
         self.data_type_label = self.data["args"]["dataTypeLabel"]
         if event_data := self.data["args"].get("eventData"):
             self.event_data = parse_buffer(event_data)
@@ -103,18 +147,20 @@ class NotificationNotification(BaseNotification):
     """Model for a Zwave Node's Notification CC notification event."""
 
     data: NotificationNotificationDataType = field(repr=False)
-    type_: int = field(init=False)
+    type_: NotificationType = field(init=False)
     label: str = field(init=False)
-    event: int = field(init=False)
+    event: NotificationEvent = field(init=False)
     event_label: str = field(init=False)
     parameters: dict[str, Any] = field(init=False)
 
     def __post_init__(self) -> None:
         """Post initialize."""
         super().__post_init__()
-        self.type_ = self.data["args"]["type"]
+        self.type_ = NotificationType(self.data["args"]["type"])
         self.label = self.data["args"]["label"]
-        self.event = self.data["args"]["event"]
+        self.event = NOTIFICATION_TYPE_TO_EVENT_MAP[self.type_](
+            self.data["args"]["event"]
+        )
         self.event_label = self.data["args"]["eventLabel"]
         self.parameters = self.data["args"].get("parameters", {})
 
@@ -171,11 +217,14 @@ class MultilevelSwitchNotification(BaseNotification):
     data: MultilevelSwitchNotificationDataType = field(repr=False)
     event_type: MultilevelSwitchCommand = field(init=False)
     event_type_label: str = field(init=False)
-    direction: str | None = field(init=False)
+    direction: MultilevelSwitchStartLevelChangeDirection | None = field(
+        default=None, init=False
+    )
 
     def __post_init__(self) -> None:
         """Post initialize."""
         super().__post_init__()
         self.event_type = MultilevelSwitchCommand(self.data["args"]["eventType"])
         self.event_type_label = self.data["args"]["eventTypeLabel"]
-        self.direction = self.data["args"].get("direction")
+        if direction := self.data["args"].get("direction"):
+            self.direction = MultilevelSwitchStartLevelChangeDirection(direction)

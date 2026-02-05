@@ -24,12 +24,21 @@ from zwave_js_server.const import (
     SupervisionStatus,
     Weekday,
 )
+from zwave_js_server.const.command_class.battery import (
+    BatteryNotificationEventType,
+    BatteryReplacementStatus,
+)
 from zwave_js_server.const.command_class.entry_control import (
     EntryControlDataType,
     EntryControlEventType,
 )
 from zwave_js_server.const.command_class.multilevel_switch import (
     MultilevelSwitchCommand,
+    MultilevelSwitchStartLevelChangeDirection,
+)
+from zwave_js_server.const.command_class.notification import (
+    AccessControlNotificationEvent,
+    NotificationType,
 )
 from zwave_js_server.const.command_class.power_level import PowerLevelTestStatus
 from zwave_js_server.event import Event
@@ -1039,8 +1048,11 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
     assert event.data["notification"].command_class == CommandClass.NOTIFICATION
     assert event.data["notification"].node_id == 23
     assert event.data["notification"].endpoint_idx == 0
-    assert event.data["notification"].type_ == 6
-    assert event.data["notification"].event == 5
+    assert event.data["notification"].type_ == NotificationType.ACCESS_CONTROL
+    assert (
+        event.data["notification"].event
+        == AccessControlNotificationEvent.KEYPAD_LOCK_OPERATION
+    )
     assert event.data["notification"].label == "Access Control"
     assert event.data["notification"].event_label == "Keypad lock operation"
     assert event.data["notification"].parameters == {"userId": 1}
@@ -1053,7 +1065,7 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
             "event": "notification",
             "nodeId": 23,
             "endpointIndex": 0,
-            "ccId": CommandClass.POWERLEVEL.value,
+            "ccId": 115,
             "args": {"testNodeId": 1, "status": 0, "acknowledgedFrames": 2},
         },
     )
@@ -1074,7 +1086,7 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
             "event": "notification",
             "nodeId": 23,
             "endpointIndex": 0,
-            "ccId": CommandClass.SWITCH_MULTILEVEL.value,
+            "ccId": 38,
             "args": {"direction": "up", "eventType": 4, "eventTypeLabel": "c"},
         },
     )
@@ -1083,7 +1095,10 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
     assert event.data["notification"].command_class == CommandClass.SWITCH_MULTILEVEL
     assert event.data["notification"].node_id == 23
     assert event.data["notification"].endpoint_idx == 0
-    assert event.data["notification"].direction == "up"
+    assert (
+        event.data["notification"].direction
+        == MultilevelSwitchStartLevelChangeDirection.UP
+    )
     assert (
         event.data["notification"].event_type
         == MultilevelSwitchCommand.START_LEVEL_CHANGE
@@ -1098,7 +1113,7 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
             "event": "notification",
             "nodeId": 23,
             "endpointIndex": 0,
-            "ccId": CommandClass.SWITCH_MULTILEVEL.value,
+            "ccId": 38,
             "args": {"eventType": 4, "eventTypeLabel": "c"},
         },
     )
@@ -1113,6 +1128,31 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
         == MultilevelSwitchCommand.START_LEVEL_CHANGE
     )
     assert event.data["notification"].event_type_label == "c"
+
+    # Validate that Battery CC notification event is received as expected
+    event = Event(
+        type="notification",
+        data={
+            "source": "node",
+            "event": "notification",
+            "nodeId": 23,
+            "ccId": 128,
+            "endpointIndex": 0,
+            "args": {
+                "eventType": "battery low",
+                "urgency": 1,
+            },
+        },
+    )
+
+    node.handle_notification(event)
+    assert event.data["notification"].command_class == CommandClass.BATTERY
+    assert event.data["notification"].node_id == 23
+    assert event.data["notification"].endpoint_idx == 0
+    assert event.data["notification"].event_type == BatteryNotificationEventType(
+        "battery low"
+    )
+    assert event.data["notification"].urgency == BatteryReplacementStatus.SOON
 
 
 async def test_notification_unknown(lock_schlage_be469: node_pkg.Node, caplog):

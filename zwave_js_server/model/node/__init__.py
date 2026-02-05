@@ -25,6 +25,8 @@ from ..device_class import DeviceClass
 from ..device_config import DeviceConfig
 from ..endpoint import Endpoint, EndpointDataType
 from ..notification import (
+    BatteryNotification,
+    BatteryNotificationDataType,
     EntryControlNotification,
     EntryControlNotificationDataType,
     MultilevelSwitchNotification,
@@ -1105,21 +1107,25 @@ class Node(EventBase):
     def handle_notification(self, event: Event) -> None:
         """Process a node notification event."""
         match command_class := CommandClass(event.data["ccId"]):
-            case CommandClass.NOTIFICATION:
-                event.data["notification"] = NotificationNotification(
-                    self, cast(NotificationNotificationDataType, event.data)
-                )
-            case CommandClass.SWITCH_MULTILEVEL:
-                event.data["notification"] = MultilevelSwitchNotification(
-                    self, cast(MultilevelSwitchNotificationDataType, event.data)
+            case CommandClass.BATTERY:
+                event.data["notification"] = BatteryNotification(
+                    self, cast(BatteryNotificationDataType, event.data)
                 )
             case CommandClass.ENTRY_CONTROL:
                 event.data["notification"] = EntryControlNotification(
                     self, cast(EntryControlNotificationDataType, event.data)
                 )
+            case CommandClass.NOTIFICATION:
+                event.data["notification"] = NotificationNotification(
+                    self, cast(NotificationNotificationDataType, event.data)
+                )
             case CommandClass.POWERLEVEL:
                 event.data["notification"] = PowerLevelNotification(
                     self, cast(PowerLevelNotificationDataType, event.data)
+                )
+            case CommandClass.SWITCH_MULTILEVEL:
+                event.data["notification"] = MultilevelSwitchNotification(
+                    self, cast(MultilevelSwitchNotificationDataType, event.data)
                 )
             case _:
                 _LOGGER.info(

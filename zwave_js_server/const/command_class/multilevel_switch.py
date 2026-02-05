@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from enum import IntEnum
+from enum import IntEnum, StrEnum
 
 SET_TO_PREVIOUS_VALUE = 255
 
@@ -26,3 +26,10 @@ class MultilevelSwitchCommand(IntEnum):
 
     START_LEVEL_CHANGE = 4
     STOP_LEVEL_CHANGE = 5
+
+
+class MultilevelSwitchStartLevelChangeDirection(StrEnum):
+    """Enum for known multilevel switch start level change directions."""
+
+    UP = "up"
+    DOWN = "down"
