@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum, IntEnum
+from enum import IntEnum, StrEnum
 import logging
 from typing import TypedDict
 
@@ -30,7 +30,7 @@ TRANSITION_DURATION_OPTION = "transitionDuration"
 VOLUME_OPTION = "volume"
 
 
-class CommandStatus(str, Enum):
+class CommandStatus(StrEnum):
     """Status of a command sent to zwave-js-server."""
 
     ACCEPTED = "accepted"
@@ -39,7 +39,7 @@ class CommandStatus(str, Enum):
 
 # Multiple inheritance so that LogLevel will JSON serialize properly
 # Reference: https://stackoverflow.com/a/51976841
-class LogLevel(str, Enum):
+class LogLevel(StrEnum):
     """Enum for log levels used by node-zwave-js."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/log/shared.ts#L12
@@ -212,7 +212,7 @@ class NodeStatus(IntEnum):
     ALIVE = 4
 
 
-class ConfigurationValueType(str, Enum):
+class ConfigurationValueType(StrEnum):
     """Enum for configuration value types."""
 
     BOOLEAN = "boolean"

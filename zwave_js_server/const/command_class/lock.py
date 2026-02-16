@@ -7,7 +7,7 @@ Includes Door Lock and Lock CCs.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum, IntEnum
+from enum import IntEnum, StrEnum
 from typing import TypedDict
 
 from .. import CommandClass
@@ -49,7 +49,7 @@ DOOR_LOCK_CC_UNSECURED_MAP = {
 }
 
 
-class LatchStatus(str, Enum):
+class LatchStatus(StrEnum):
     """Enum with all (known/used) Z-Wave latch statuses."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/cc/src/cc/DoorLockCC.ts#L854
@@ -57,7 +57,7 @@ class LatchStatus(str, Enum):
     CLOSED = "closed"
 
 
-class BoltStatus(str, Enum):
+class BoltStatus(StrEnum):
     """Enum with all (known/used) Z-Wave bolt statuses."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/cc/src/cc/DoorLockCC.ts#L854
@@ -65,7 +65,7 @@ class BoltStatus(str, Enum):
     UNLOCKED = "unlocked"
 
 
-class DoorStatus(str, Enum):
+class DoorStatus(StrEnum):
     """Enum with all (known/used) Z-Wave door statuses."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/cc/src/cc/DoorLockCC.ts#L854
