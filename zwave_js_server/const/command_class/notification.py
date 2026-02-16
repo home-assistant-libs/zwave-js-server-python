@@ -89,6 +89,7 @@ class AccessControlNotificationEvent(NotificationEvent):
     DOOR_HANDLE_STATE_WINDOW_DOOR_HANDLE_IS_OPEN = 24
     DOOR_STATE_WINDOW_DOOR_IS_CLOSED = 23
     DOOR_STATE_WINDOW_DOOR_IS_OPEN = 22
+    IDLE = 0
     INVALID_CREDENTIAL_USED = 50
     KEYPAD_LOCK_OPERATION = 5
     KEYPAD_STATE_KEYPAD_BUSY = 17
@@ -212,6 +213,7 @@ class ApplianceNotificationEvent(NotificationEvent):
     DRAINING_FAILURE = 15
     DRYING_FAILURE = 19
     FAN_FAILURE = 20
+    IDLE = 0
     MAINTENANCE_STATUS_REPLACE_MAIN_FILTER = 4
     PROGRAM_STATUS_PROGRAM_COMPLETED = 3
     PROGRAM_STATUS_PROGRAM_IN_PROGRESS = 2
@@ -235,6 +237,7 @@ class ClockNotificationEvent(NotificationEvent):
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
     UNKNOWN = -1
+    IDLE = 0
     TIME_REMAINING = 3
     TIMER_ENDED = 2
     WAKE_UP_ALERT = 1
@@ -251,6 +254,7 @@ class CoAlarmNotificationEvent(NotificationEvent):
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
     UNKNOWN = -1
     ALARM_STATUS_ALARM_SILENCED = 6
+    IDLE = 0
     MAINTENANCE_STATUS_REPLACEMENT_REQUIRED = 4
     MAINTENANCE_STATUS_REPLACEMENT_REQUIRED_END_OF_LIFE = 5
     PERIODIC_INSPECTION_STATUS_MAINTENANCE_REQUIRED_PLANNED_PERIODIC_INSPECTION = 7
@@ -286,6 +290,7 @@ class Co2AlarmNotificationEvent(NotificationEvent):
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
     UNKNOWN = -1
     ALARM_STATUS_ALARM_SILENCED = 6
+    IDLE = 0
     MAINTENANCE_STATUS_REPLACEMENT_REQUIRED = 4
     MAINTENANCE_STATUS_REPLACEMENT_REQUIRED_END_OF_LIFE = 5
     PERIODIC_INSPECTION_STATUS_MAINTENANCE_REQUIRED_PLANNED_PERIODIC_INSPECTION = 7
@@ -325,6 +330,7 @@ class EmergencyAlarmNotificationEvent(NotificationEvent):
     CONTACT_FIRE_SERVICE = 2
     CONTACT_MEDICAL_SERVICE = 3
     CONTACT_POLICE = 1
+    IDLE = 0
 
     @classmethod
     def _missing_(
@@ -342,6 +348,7 @@ class GasAlarmNotificationEvent(NotificationEvent):
     ALARM_STATUS_GAS_ALARM_TEST = 5
     COMBUSTIBLE_GAS_STATUS_COMBUSTIBLE_GAS_DETECTED = 2
     COMBUSTIBLE_GAS_STATUS_COMBUSTIBLE_GAS_DETECTED_LOCATION_PROVIDED = 1
+    IDLE = 0
     MAINTENANCE_STATUS_REPLACEMENT_REQUIRED = 6
     TOXIC_GAS_STATUS_TOXIC_GAS_DETECTED = 4
     TOXIC_GAS_STATUS_TOXIC_GAS_DETECTED_LOCATION_PROVIDED = 3
@@ -366,6 +373,7 @@ class HeatAlarmNotificationEvent(NotificationEvent):
     HEAT_SENSOR_STATUS_OVERHEAT_DETECTED_LOCATION_PROVIDED = 1
     HEAT_SENSOR_STATUS_UNDERHEAT_DETECTED = 6
     HEAT_SENSOR_STATUS_UNDERHEAT_DETECTED_LOCATION_PROVIDED = 5
+    IDLE = 0
     MAINTENANCE_STATUS_REPLACEMENT_REQUIRED_END_OF_LIFE = 8
     PERIODIC_INSPECTION_STATUS_MAINTENANCE_REQUIRED_PLANNED_PERIODIC_INSPECTION = 11
     RAPID_TEMPERATURE_FALL = 13
@@ -387,6 +395,7 @@ class HomeHealthNotificationEvent(NotificationEvent):
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
     UNKNOWN = -1
     FALL_DETECTED = 12
+    IDLE = 0
     POSITION_STATUS_LEAVING_BED = 1
     POSITION_STATUS_LYING_ON_BED = 3
     POSITION_STATUS_SITTING_ON_BED = 2
@@ -452,6 +461,7 @@ class HomeMonitoringNotificationEvent(NotificationEvent):
     UNKNOWN = -1
     HOME_OCCUPANCY_STATUS_HOME_OCCUPIED = 2
     HOME_OCCUPANCY_STATUS_HOME_OCCUPIED_LOCATION_PROVIDED = 1
+    IDLE = 0
 
     @classmethod
     def _missing_(
@@ -469,6 +479,7 @@ class HomeSecurityNotificationEvent(NotificationEvent):
     COVER_STATUS_TAMPERING_PRODUCT_COVER_REMOVED = 3
     GLASS_BREAKAGE = 6
     GLASS_BREAKAGE_LOCATION_PROVIDED = 5
+    IDLE = 0
     IMPACT_DETECTED = 10
     MAGNETIC_INTERFERENCE_STATUS_MAGNETIC_FIELD_INTERFERENCE_DETECTED = 11
     MOTION_SENSOR_STATUS_MOTION_DETECTION = 8
@@ -493,6 +504,7 @@ class IrrigationNotificationEvent(NotificationEvent):
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
     UNKNOWN = -1
     DEVICE_CONFIGURATION_STATUS_DEVICE_IS_NOT_CONFIGURED = 5
+    IDLE = 0
     SCHEDULE_ID_STATUS_SCHEDULE_FINISHED = 2
     SCHEDULE_ID_STATUS_SCHEDULE_STARTED = 1
     VALVE_ID_RUN_STATUS_VALVE_TABLE_RUN_FINISHED = 4
@@ -511,6 +523,7 @@ class LightSensorNotificationEvent(NotificationEvent):
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
     UNKNOWN = -1
+    IDLE = 0
     LIGHT_COLOR_TRANSITION_DETECTED = 2
     LIGHT_DETECTION_STATUS_LIGHT_DETECTED = 1
 
@@ -527,6 +540,7 @@ class PestControlNotificationEvent(NotificationEvent):
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
     UNKNOWN = -1
+    IDLE = 0
     PEST_DETECTED = 6
     PEST_DETECTED_LOCATION_PROVIDED = 5
     PEST_EXTERMINATED = 8
@@ -558,6 +572,7 @@ class PowerManagementNotificationEvent(NotificationEvent):
     BATTERY_MAINTENANCE_STATUS_BATTERY_FLUID_IS_LOW = 17
     BATTERY_MAINTENANCE_STATUS_REPLACE_BATTERY_NOW = 11
     BATTERY_MAINTENANCE_STATUS_REPLACE_BATTERY_SOON = 10
+    IDLE = 0
     LOAD_ERROR = 9
     MAINS_STATUS_AC_MAINS_DISCONNECTED = 2
     MAINS_STATUS_AC_MAINS_RE_CONNECTED = 3
@@ -581,6 +596,7 @@ class SirenNotificationEvent(NotificationEvent):
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
     UNKNOWN = -1
+    IDLE = 0
     SIREN_STATUS_SIREN_ACTIVE = 1
 
     @classmethod
@@ -597,6 +613,7 @@ class SmokeAlarmNotificationEvent(NotificationEvent):
     ALARM_STATUS_ALARM_SILENCED = 6
     ALARM_STATUS_SMOKE_ALARM_TEST = 3
     DUST_IN_DEVICE_STATUS_MAINTENANCE_REQUIRED_DUST_IN_DEVICE = 8
+    IDLE = 0
     MAINTENANCE_STATUS_REPLACEMENT_REQUIRED = 4
     MAINTENANCE_STATUS_REPLACEMENT_REQUIRED_END_OF_LIFE = 5
     PERIODIC_INSPECTION_STATUS_MAINTENANCE_REQUIRED_PLANNED_PERIODIC_INSPECTION = 7
@@ -621,6 +638,7 @@ class SystemNotificationEvent(NotificationEvent):
     HARDWARE_STATUS_SYSTEM_HARDWARE_FAILURE = 1
     HARDWARE_STATUS_SYSTEM_HARDWARE_FAILURE_WITH_FAILURE_CODE = 3
     HEARTBEAT = 5
+    IDLE = 0
     SOFTWARE_STATUS_SYSTEM_SOFTWARE_FAILURE = 2
     SOFTWARE_STATUS_SYSTEM_SOFTWARE_FAILURE_WITH_FAILURE_CODE = 4
 
@@ -635,6 +653,7 @@ class WaterAlarmNotificationEvent(NotificationEvent):
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
     UNKNOWN = -1
+    IDLE = 0
     MAINTENANCE_STATUS_REPLACE_WATER_FILTER = 5
     PUMP_STATUS_SUMP_PUMP_ACTIVE = 10
     PUMP_STATUS_SUMP_PUMP_FAILURE = 11
@@ -741,6 +760,7 @@ class WaterQualityMonitoringNotificationEvent(NotificationEvent):
     FILTER_PUMP_STATUS_FILTER_PUMP_OPERATION_ONGOING = 11
     FRESHWATER_FLOW_STATUS_FRESHWATER_OPERATION_ONGOING = 12
     HEATING_STATUS_HEATING_OPERATION_ONGOING = 10
+    IDLE = 0
     WATER_OXIDATION_ALARM = 3
     WATER_TANK_STATUS_WATER_TANK_IS_EMPTY = 14
     WATER_TANK_STATUS_WATER_TANK_IS_FULL = 16
@@ -811,6 +831,7 @@ class WaterValveNotificationEvent(NotificationEvent):
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
     UNKNOWN = -1
+    IDLE = 0
     MASTER_VALVE_CURRENT_ALARM = 6
     MASTER_VALVE_OPERATION = 2
     MASTER_VALVE_SHORT_CIRCUIT = 4
@@ -901,6 +922,7 @@ class WeatherAlarmNotificationEvent(NotificationEvent):
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
     UNKNOWN = -1
     FREEZE_ALARM = 3
+    IDLE = 0
     MOISTURE_ALARM = 2
     RAIN_ALARM = 1
 
