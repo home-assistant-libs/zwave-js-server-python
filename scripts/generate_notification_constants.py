@@ -145,10 +145,11 @@ _notification_type_to_notification_event_map = {}
 _notification_event_to_event_value_map = {}
 for notification_type, event_map in notifications.items():
     notification_event_name = f"{notification_type} Notification Event"
+    events = {"Idle": 0, **event_map["events"]}
     lines.extend(
         generate_int_enum_class_definition(
             format_for_class_name(notification_event_name),
-            event_map["events"],
+            events,
             NOTIFICATIONS_URL,
             docstring_info=notification_event_name.lower(),
             base_class="NotificationEvent",
