@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import IntEnum, StrEnum
-from typing import TYPE_CHECKING, Any, TypedDict
+from typing import TYPE_CHECKING, Any, NotRequired, TypedDict
 
 from ..const import (
     VALUE_UNKNOWN,
@@ -30,20 +30,37 @@ class ValueType(StrEnum):
     STRING = "string"
 
 
+class AllowedValueSingleDataType(TypedDict):
+    """Represent a single value in a list of allowed values."""
+
+    value: int
+
+
+AllowedValueRangeDataType = TypedDict(
+    "AllowedValueRangeDataType",
+    # not using class based definition as `from` is a reserved keyword
+    {"from": int, "to": int, "step": NotRequired[int]},
+)
+
+AllowedValueDataType = AllowedValueSingleDataType | AllowedValueRangeDataType
+
+
 class MetaDataType(TypedDict, total=False):
     """Represent a metadata data dict type."""
 
     type: str  # required
+    purpose: str
     readable: bool  # required
     writeable: bool  # required
-    description: str
     label: str
+    description: str  # further clarifies the label
     min: int | None
     max: int | None
     unit: str | None
     states: dict[str, str]
     ccSpecific: dict[str, Any]
     valueChangeOptions: list[str]
+    allowed: list[AllowedValueDataType]
     allowManualEntry: bool
     stateful: bool
     secret: bool
@@ -165,6 +182,11 @@ class ValueMetadata:
         return self.data.get("valueChangeOptions", [])
 
     @property
+    def allowed(self) -> list[AllowedValueDataType] | None:
+        """Return allowed."""
+        return self.data.get("allowed")
+
+    @property
     def allow_manual_entry(self) -> bool | None:
         """Return allowManualEntry."""
         return self.data.get("allowManualEntry")
@@ -215,6 +237,11 @@ class ValueMetadata:
     def is_from_config(self) -> bool | None:
         """Return isFromConfig."""
         return self.data.get("isFromConfig")
+
+    @property
+    def purpose(self) -> str | None:
+        """Return purpose."""
+        return self.data.get("purpose")
 
     def update(self, data: MetaDataType) -> None:
         """Update data."""

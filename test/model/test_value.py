@@ -252,6 +252,8 @@ def test_configuration_value_metadata(inovelli_switch_state):
     assert metadata.no_bulk_support is None
     assert metadata.value_size is None
     assert metadata.format is None
+    assert metadata.allowed is None
+    assert metadata.purpose is None
 
     value = ConfigurationValue(
         inovelli_switch_state,
@@ -273,6 +275,8 @@ def test_configuration_value_metadata(inovelli_switch_state):
                 noBulkSupport=True,
                 valueSize=1,
                 format=0,
+                allowed=[{"value": 0}, {"from": 5, "to": 10, "step": 1}],
+                purpose="state_after_power_failure",
             ),
         ),
     )
@@ -284,3 +288,5 @@ def test_configuration_value_metadata(inovelli_switch_state):
     assert metadata.no_bulk_support
     assert metadata.value_size == 1
     assert metadata.format == ConfigurationValueFormat.SIGNED_INTEGER
+    assert metadata.allowed == [{"value": 0}, {"from": 5, "to": 10, "step": 1}]
+    assert metadata.purpose == "state_after_power_failure"
