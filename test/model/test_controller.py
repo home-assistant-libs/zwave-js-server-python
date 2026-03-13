@@ -1,5 +1,6 @@
 """Test the controller model."""
 
+import base64
 from copy import deepcopy
 import json
 import logging
@@ -2359,3 +2360,585 @@ async def test_inclusion_state_changed(controller):
     )
     controller.receive_event(event)
     assert controller.inclusion_state == InclusionState.INCLUDING
+
+
+# Schema 45+ tests
+
+
+async def test_get_background_rssi(controller, uuid4, mock_command):
+    """Test get_background_rssi command."""
+    ack_commands = mock_command(
+        {"command": "controller.get_background_rssi"},
+        {"rssiChannel0": -90, "rssiChannel1": -85, "rssiChannel2": -80},
+    )
+
+    result = await controller.async_get_background_rssi()
+    assert result == {
+        "rssiChannel0": -90,
+        "rssiChannel1": -85,
+        "rssiChannel2": -80,
+        "rssiChannel3": None,
+    }
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_background_rssi",
+        "messageId": uuid4,
+    }
+
+
+async def test_get_long_range_nodes(controller, uuid4, mock_command):
+    """Test get_long_range_nodes command."""
+    ack_commands = mock_command(
+        {"command": "controller.get_long_range_nodes"},
+        {"nodeIds": [52, 53, 54]},
+    )
+
+    result = await controller.async_get_long_range_nodes()
+    assert result == [52, 53, 54]
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_long_range_nodes",
+        "messageId": uuid4,
+    }
+
+
+async def test_get_dsk(controller, uuid4, mock_command):
+    """Test get_dsk command."""
+    dsk_bytes = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
+    dsk_base64 = base64.b64encode(dsk_bytes).decode("utf-8")
+
+    ack_commands = mock_command(
+        {"command": "controller.get_dsk"},
+        {"dsk": dsk_base64},
+    )
+
+    result = await controller.async_get_dsk()
+    assert result == dsk_bytes
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_dsk",
+        "messageId": uuid4,
+    }
+
+
+async def test_get_all_association_groups(
+    controller, multisensor_6, uuid4, mock_command
+):
+    """Test get_all_association_groups command."""
+    ack_commands = mock_command(
+        {"command": "controller.get_all_association_groups"},
+        {
+            "groups": {
+                "0": {
+                    "1": {
+                        "maxNodes": 5,
+                        "isLifeline": True,
+                        "multiChannel": True,
+                        "label": "Lifeline",
+                    }
+                }
+            }
+        },
+    )
+
+    result = await controller.async_get_all_association_groups(multisensor_6)
+    assert 0 in result
+    assert 1 in result[0]
+    group = result[0][1]
+    assert group.max_nodes == 5
+    assert group.is_lifeline is True
+    assert group.multi_channel is True
+    assert group.label == "Lifeline"
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_all_association_groups",
+        "nodeId": multisensor_6.node_id,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_all_associations(controller, multisensor_6, uuid4, mock_command):
+    """Test get_all_associations command."""
+    ack_commands = mock_command(
+        {"command": "controller.get_all_associations"},
+        {"associations": {"52": {"1": [{"nodeId": 1}, {"nodeId": 5, "endpoint": 0}]}}},
+    )
+
+    result = await controller.async_get_all_associations(multisensor_6)
+    # The endpoint_key "52" is parsed as endpoint 0 (no colon)
+    assert 0 in result
+    assert 1 in result[0]
+    associations = result[0][1]
+    assert len(associations) == 2
+    assert associations[0].node_id == 1
+    assert associations[0].endpoint is None
+    assert associations[1].node_id == 5
+    assert associations[1].endpoint == 0
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_all_associations",
+        "nodeId": multisensor_6.node_id,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_all_available_firmware_updates(
+    controller, multisensor_6, uuid4, mock_command
+):
+    """Test get_all_available_firmware_updates command."""
+    ack_commands = mock_command(
+        {"command": "controller.get_all_available_firmware_updates"},
+        {
+            "updates": {
+                "52": [FIRMWARE_UPDATE_INFO],
+            }
+        },
+    )
+
+    result = await controller.async_get_all_available_firmware_updates("test-api-key")
+    assert 52 in result
+    assert len(result[52]) == 1
+    update = result[52][0]
+    assert update.version == "1.0.0"
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_all_available_firmware_updates",
+        "apiKey": "test-api-key",
+        "includePrereleases": True,
+        "messageId": uuid4,
+    }
+
+
+async def test_begin_joining_network(controller, uuid4, mock_command):
+    """Test begin_joining_network command."""
+    ack_commands = mock_command(
+        {"command": "controller.begin_joining_network"},
+        {"result": {"status": "started"}},
+    )
+
+    result = await controller.async_begin_joining_network()
+    assert result == {"status": "started"}
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.begin_joining_network",
+        "messageId": uuid4,
+    }
+
+
+async def test_stop_joining_network(controller, uuid4, mock_command):
+    """Test stop_joining_network command."""
+    ack_commands = mock_command(
+        {"command": "controller.stop_joining_network"},
+        {"success": True},
+    )
+
+    result = await controller.async_stop_joining_network()
+    assert result is True
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.stop_joining_network",
+        "messageId": uuid4,
+    }
+
+
+async def test_begin_leaving_network(controller, uuid4, mock_command):
+    """Test begin_leaving_network command."""
+    ack_commands = mock_command(
+        {"command": "controller.begin_leaving_network"},
+        {"result": {"status": "started"}},
+    )
+
+    result = await controller.async_begin_leaving_network()
+    assert result == {"status": "started"}
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.begin_leaving_network",
+        "messageId": uuid4,
+    }
+
+
+async def test_stop_leaving_network(controller, uuid4, mock_command):
+    """Test stop_leaving_network command."""
+    ack_commands = mock_command(
+        {"command": "controller.stop_leaving_network"},
+        {"success": True},
+    )
+
+    result = await controller.async_stop_leaving_network()
+    assert result is True
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.stop_leaving_network",
+        "messageId": uuid4,
+    }
+
+
+async def test_start_watchdog(controller, uuid4, mock_command):
+    """Test start_watchdog command."""
+    ack_commands = mock_command(
+        {"command": "controller.start_watchdog"},
+        {"success": True},
+    )
+
+    result = await controller.async_start_watchdog()
+    assert result is True
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.start_watchdog",
+        "messageId": uuid4,
+    }
+
+
+async def test_stop_watchdog(controller, uuid4, mock_command):
+    """Test stop_watchdog command."""
+    ack_commands = mock_command(
+        {"command": "controller.stop_watchdog"},
+        {"success": True},
+    )
+
+    result = await controller.async_stop_watchdog()
+    assert result is True
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.stop_watchdog",
+        "messageId": uuid4,
+    }
+
+
+async def test_get_supported_rf_regions(controller, uuid4, mock_command):
+    """Test get_supported_rf_regions command."""
+    ack_commands = mock_command(
+        {"command": "controller.get_supported_rf_regions"},
+        {"regions": [0, 1, 2]},
+    )
+
+    result = await controller.async_get_supported_rf_regions()
+    assert result == [
+        RFRegion.EUROPE,
+        RFRegion.USA,
+        RFRegion.AUSTRALIA_AND_NEW_ZEALAND,
+    ]
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_supported_rf_regions",
+        "filterSubsets": False,
+        "messageId": uuid4,
+    }
+
+
+async def test_query_supported_rf_regions(controller, uuid4, mock_command):
+    """Test query_supported_rf_regions command."""
+    ack_commands = mock_command(
+        {"command": "controller.query_supported_rf_regions"},
+        {"regions": [0, 1]},
+    )
+
+    result = await controller.async_query_supported_rf_regions()
+    assert result == [RFRegion.EUROPE, RFRegion.USA]
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.query_supported_rf_regions",
+        "messageId": uuid4,
+    }
+
+
+async def test_query_rf_region_info(controller, uuid4, mock_command):
+    """Test query_rf_region_info command."""
+    ack_commands = mock_command(
+        {"command": "controller.query_rf_region_info"},
+        {
+            "region": 1,
+            "supportsZWave": True,
+            "supportsLongRange": True,
+        },
+    )
+
+    result = await controller.async_query_rf_region_info(RFRegion.USA)
+    assert result["region"] == 1
+    assert result["supportsZWave"] is True
+    assert result["supportsLongRange"] is True
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.query_rf_region_info",
+        "region": RFRegion.USA.value,
+        "messageId": uuid4,
+    }
+
+
+async def test_assign_return_routes(
+    controller, multisensor_6, lock_schlage_be469, uuid4, mock_command
+):
+    """Test assign_return_routes command."""
+    ack_commands = mock_command(
+        {"command": "controller.assign_return_routes"},
+        {"success": True},
+    )
+
+    result = await controller.async_assign_return_routes(
+        multisensor_6, lock_schlage_be469
+    )
+    assert result is True
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.assign_return_routes",
+        "nodeId": multisensor_6.node_id,
+        "destinationNodeId": lock_schlage_be469.node_id,
+        "messageId": uuid4,
+    }
+
+
+async def test_delete_return_routes(controller, multisensor_6, uuid4, mock_command):
+    """Test delete_return_routes command."""
+    ack_commands = mock_command(
+        {"command": "controller.delete_return_routes"},
+        {"success": True},
+    )
+
+    result = await controller.async_delete_return_routes(multisensor_6)
+    assert result is True
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.delete_return_routes",
+        "nodeId": multisensor_6.node_id,
+        "messageId": uuid4,
+    }
+
+
+async def test_assign_suc_return_routes(controller, multisensor_6, uuid4, mock_command):
+    """Test assign_suc_return_routes command."""
+    ack_commands = mock_command(
+        {"command": "controller.assign_suc_return_routes"},
+        {"success": True},
+    )
+
+    result = await controller.async_assign_suc_return_routes(multisensor_6)
+    assert result is True
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.assign_suc_return_routes",
+        "nodeId": multisensor_6.node_id,
+        "messageId": uuid4,
+    }
+
+
+async def test_delete_suc_return_routes(controller, multisensor_6, uuid4, mock_command):
+    """Test delete_suc_return_routes command."""
+    ack_commands = mock_command(
+        {"command": "controller.delete_suc_return_routes"},
+        {"success": True},
+    )
+
+    result = await controller.async_delete_suc_return_routes(multisensor_6)
+    assert result is True
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.delete_suc_return_routes",
+        "nodeId": multisensor_6.node_id,
+        "messageId": uuid4,
+    }
+
+
+async def test_discover_node_neighbors(controller, multisensor_6, uuid4, mock_command):
+    """Test discover_node_neighbors command."""
+    ack_commands = mock_command(
+        {"command": "controller.discover_node_neighbors"},
+        {"success": True},
+    )
+
+    result = await controller.async_discover_node_neighbors(multisensor_6)
+    assert result is True
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.discover_node_neighbors",
+        "nodeId": multisensor_6.node_id,
+        "messageId": uuid4,
+    }
+
+
+async def test_controller_state_properties_schema_45(controller_state):
+    """Test controller state properties from schema 45."""
+    state = deepcopy(controller_state)
+    state["controller"]["isSIS"] = True
+    state["controller"]["maxPayloadSize"] = 48
+    state["controller"]["maxPayloadSizeLR"] = 96
+    state["controller"]["zwaveApiVersion"] = {"kind": 1, "version": "1.2.3"}
+    state["controller"]["zwaveChipType"] = {"type": 7, "version": 1}
+
+    ctrl = controller_pkg.Controller(None, state)
+
+    assert ctrl.is_sis is True
+    assert ctrl.max_payload_size == 48
+    assert ctrl.max_payload_size_lr == 96
+    assert ctrl.zwave_api_version == {"kind": 1, "version": "1.2.3"}
+    assert ctrl.zwave_chip_type == {"type": 7, "version": 1}
+
+
+async def test_controller_state_properties_schema_45_missing(controller_state):
+    """Test controller state properties from schema 45 when not present."""
+    ctrl = controller_pkg.Controller(None, controller_state)
+
+    assert ctrl.is_sis is None
+    assert ctrl.max_payload_size is None
+    assert ctrl.max_payload_size_lr is None
+    assert ctrl.zwave_api_version is None
+    assert ctrl.zwave_chip_type is None
+
+
+async def test_network_events(controller):
+    """Test network-related events from schema 45."""
+    # Test network found event
+    event = Event(
+        "network found",
+        {
+            "source": "controller",
+            "event": "network found",
+            "homeId": 12345678,
+            "ownNodeId": 1,
+        },
+    )
+    controller.receive_event(event)
+    assert event.data["homeId"] == 12345678
+    assert event.data["ownNodeId"] == 1
+
+    # Test network joined event
+    event = Event(
+        "network joined",
+        {"source": "controller", "event": "network joined"},
+    )
+    controller.receive_event(event)
+
+    # Test network left event
+    event = Event(
+        "network left",
+        {"source": "controller", "event": "network left"},
+    )
+    controller.receive_event(event)
+
+    # Test joining network failed event
+    event = Event(
+        "joining network failed",
+        {"source": "controller", "event": "joining network failed"},
+    )
+    controller.receive_event(event)
+
+    # Test leaving network failed event
+    event = Event(
+        "leaving network failed",
+        {"source": "controller", "event": "leaving network failed"},
+    )
+    controller.receive_event(event)
+
+
+async def test_get_all_associations_with_endpoint_colon(
+    controller, multisensor_6, uuid4, mock_command
+):
+    """Test get_all_associations with endpoint key containing colon."""
+    ack_commands = mock_command(
+        {"command": "controller.get_all_associations"},
+        {"associations": {"52:1": {"1": [{"nodeId": 1}]}}},
+    )
+
+    result = await controller.async_get_all_associations(multisensor_6)
+    # The endpoint_key "52:1" is parsed as endpoint 1
+    assert 1 in result
+    assert 1 in result[1]
+    associations = result[1][1]
+    assert len(associations) == 1
+    assert associations[0].node_id == 1
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_all_associations",
+        "nodeId": multisensor_6.node_id,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_all_available_firmware_updates_with_rf_region(
+    controller, uuid4, mock_command
+):
+    """Test get_all_available_firmware_updates with rf_region parameter."""
+    ack_commands = mock_command(
+        {"command": "controller.get_all_available_firmware_updates"},
+        {"updates": {}},
+    )
+
+    result = await controller.async_get_all_available_firmware_updates(
+        api_key="test-api-key", rf_region=RFRegion.USA
+    )
+    assert result == {}
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_all_available_firmware_updates",
+        "apiKey": "test-api-key",
+        "includePrereleases": True,
+        "rfRegion": RFRegion.USA.value,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_supported_rf_regions_returns_none(controller, uuid4, mock_command):
+    """Test get_supported_rf_regions when regions is None."""
+    ack_commands = mock_command(
+        {"command": "controller.get_supported_rf_regions"},
+        {},
+    )
+
+    result = await controller.async_get_supported_rf_regions()
+    assert result is None
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_supported_rf_regions",
+        "filterSubsets": False,
+        "messageId": uuid4,
+    }
+
+
+async def test_query_rf_region_info_with_includes_region(
+    controller, uuid4, mock_command
+):
+    """Test query_rf_region_info when includesRegion is present."""
+    ack_commands = mock_command(
+        {"command": "controller.query_rf_region_info"},
+        {
+            "region": 1,
+            "supportsZWave": True,
+            "supportsLongRange": True,
+            "includesRegion": 0,
+        },
+    )
+
+    result = await controller.async_query_rf_region_info(RFRegion.USA)
+    assert result["region"] == RFRegion.USA
+    assert result["supportsZWave"] is True
+    assert result["supportsLongRange"] is True
+    assert result["includesRegion"] == RFRegion.EUROPE
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.query_rf_region_info",
+        "region": RFRegion.USA.value,
+        "messageId": uuid4,
+    }
