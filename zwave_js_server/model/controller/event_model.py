@@ -303,6 +303,51 @@ class StatusChangedEventModel(BaseControllerEventModel):
         )
 
 
+# Schema 45+ events
+
+
+class NetworkFoundEventModel(BaseControllerEventModel):
+    """Model for `network found` event data."""
+
+    event: Literal["network found"]
+    homeId: int
+    ownNodeId: int
+
+    @classmethod
+    def from_dict(cls, data: dict) -> NetworkFoundEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            homeId=data["homeId"],
+            ownNodeId=data["ownNodeId"],
+        )
+
+
+class NetworkJoinedEventModel(BaseControllerEventModel):
+    """Model for `network joined` event data."""
+
+    event: Literal["network joined"]
+
+
+class NetworkLeftEventModel(BaseControllerEventModel):
+    """Model for `network left` event data."""
+
+    event: Literal["network left"]
+
+
+class JoiningNetworkFailedEventModel(BaseControllerEventModel):
+    """Model for `joining network failed` event data."""
+
+    event: Literal["joining network failed"]
+
+
+class LeavingNetworkFailedEventModel(BaseControllerEventModel):
+    """Model for `leaving network failed` event data."""
+
+    event: Literal["leaving network failed"]
+
+
 CONTROLLER_EVENT_MODEL_MAP: dict[str, type[BaseControllerEventModel]] = {
     "exclusion failed": ExclusionFailedEventModel,
     "exclusion started": ExclusionStartedEventModel,
@@ -316,6 +361,11 @@ CONTROLLER_EVENT_MODEL_MAP: dict[str, type[BaseControllerEventModel]] = {
     "inclusion started": InclusionStartedEventModel,
     "inclusion state changed": InclusionStateChangedEventModel,
     "inclusion stopped": InclusionStoppedEventModel,
+    "joining network failed": JoiningNetworkFailedEventModel,
+    "leaving network failed": LeavingNetworkFailedEventModel,
+    "network found": NetworkFoundEventModel,
+    "network joined": NetworkJoinedEventModel,
+    "network left": NetworkLeftEventModel,
     "node added": NodeAddedEventModel,
     "node found": NodeFoundEventModel,
     "node removed": NodeRemovedEventModel,

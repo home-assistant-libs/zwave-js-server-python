@@ -68,3 +68,10 @@ class NodeDataType(TypedDict, total=False):
     defaultTransitionDuration: int | float | None
     protocol: int
     sdkVersion: str | None
+    # Schema 45+ properties
+    canSleep: bool
+    supportsWakeUpOnDemand: bool
+    hardwareVersion: int
+    hasSUCReturnRoute: bool
+    manufacturer: str
+    dsk: str  # hex encoded string

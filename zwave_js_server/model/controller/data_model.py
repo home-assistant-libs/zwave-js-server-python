@@ -7,6 +7,20 @@ from typing import TypedDict
 from .statistics import ControllerStatisticsDataType
 
 
+class ZWaveApiVersionDataType(TypedDict, total=False):
+    """Represent the Z-Wave API version info."""
+
+    kind: int
+    version: str
+
+
+class ZWaveChipTypeDataType(TypedDict, total=False):
+    """Represent the Z-Wave chip type info."""
+
+    type: int
+    version: int
+
+
 class ControllerDataType(TypedDict, total=False):
     """Represent a controller data dict type."""
 
@@ -34,3 +48,9 @@ class ControllerDataType(TypedDict, total=False):
     status: int
     rebuildRoutesProgress: dict[str, str]
     supportsLongRange: bool
+    # Schema 45+ properties
+    isSIS: bool
+    maxPayloadSize: int
+    maxPayloadSizeLR: int
+    zwaveApiVersion: ZWaveApiVersionDataType
+    zwaveChipType: ZWaveChipTypeDataType
