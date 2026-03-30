@@ -2,6 +2,6 @@
 -r requirements_lint.txt
 -r requirements_scripts.txt
 -r requirements_test.txt
-tox==4.50.3
+tox==4.51.0
 
 -e .
