@@ -390,10 +390,10 @@ class Driver(EventBase):
         """Process a driver ready event."""
         self.data["ready"] = True
 
-    def handle_error(self, event: Event) -> None:
+    def handle_error(self, _event: Event) -> None:
         """Process a driver error event."""
 
-    def handle_bootloader_ready(self, event: Event) -> None:
+    def handle_bootloader_ready(self, _event: Event) -> None:
         """Process a driver bootloader ready event."""
 
     def handle_firmware_update_progress(self, event: Event) -> None:

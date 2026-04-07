@@ -1049,14 +1049,10 @@ class Controller(EventBase):
         self.data["status"] = event.data["status"]
         event.data["status"] = ControllerStatus(event.data["status"])
 
-    def handle_network_found(self, event: Event) -> None:
-        """Process a `network found` event (schema 47+).
-
-        Payload includes `homeId` and `ownNodeId`. Currently a no-op —
-        whether we should mutate `self.data["homeId"]` / `["ownNodeId"]`
-        from this event (vs. waiting for `network joined` or a fresh state
-        dump) is an open question for upstream review.
-        """
+    def handle_network_found(self, _event: Event) -> None:
+        """Process a `network found` event without mutating controller identity."""
+        # TODO: Revisit whether `homeId` / `ownNodeId` from this event should
+        # update `self.data` once upstream semantics are confirmed.
 
     def handle_network_joined(self, event: Event) -> None:
         """Process a `network joined` event (schema 47+)."""
