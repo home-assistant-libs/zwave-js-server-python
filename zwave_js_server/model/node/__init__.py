@@ -360,6 +360,40 @@ class Node(EventBase):
         return self.data["keepAwake"]
 
     @property
+    def can_sleep(self) -> bool | None:
+        """Return whether the node can sleep (schema 47+)."""
+        return self.data.get("canSleep")
+
+    @property
+    def supports_wake_up_on_demand(self) -> bool | None:
+        """Return whether the node supports wake up on demand (schema 47+)."""
+        return self.data.get("supportsWakeUpOnDemand")
+
+    @property
+    def hardware_version(self) -> int | None:
+        """Return the hardware version (schema 47+)."""
+        return self.data.get("hardwareVersion")
+
+    @property
+    def has_suc_return_route(self) -> bool | None:
+        """Return whether the node has a SUC return route (schema 47+)."""
+        return self.data.get("hasSUCReturnRoute")
+
+    @property
+    def manufacturer(self) -> str | None:
+        """Return the resolved manufacturer name (schema 47+).
+
+        This is the human-readable name resolved from the device config files,
+        distinct from `manufacturer_id` (the numeric Z-Wave manufacturer ID).
+        """
+        return self.data.get("manufacturer")
+
+    @property
+    def dsk(self) -> str | None:
+        """Return the human-readable DSK string (schema 47+)."""
+        return self.data.get("dsk")
+
+    @property
     def last_seen(self) -> datetime | None:
         """Return when the node was last seen."""
         return self._last_seen

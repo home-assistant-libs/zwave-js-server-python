@@ -2,9 +2,23 @@
 
 from __future__ import annotations
 
-from typing import TypedDict
+from typing import Literal, TypedDict
 
 from .statistics import ControllerStatisticsDataType
+
+
+class ZWaveApiVersionDataType(TypedDict):
+    """Represent a Z-Wave API version (schema 47+)."""
+
+    kind: Literal["official", "legacy"]
+    version: int
+
+
+class UnknownZWaveChipTypeDataType(TypedDict):
+    """Represent an unknown Z-Wave chip type descriptor (schema 47+)."""
+
+    type: int
+    version: int
 
 
 class ControllerDataType(TypedDict, total=False):
@@ -34,3 +48,9 @@ class ControllerDataType(TypedDict, total=False):
     status: int
     rebuildRoutesProgress: dict[str, str]
     supportsLongRange: bool
+    # Schema 47+ properties
+    isSIS: bool
+    maxPayloadSize: int
+    maxPayloadSizeLR: int
+    zwaveApiVersion: ZWaveApiVersionDataType
+    zwaveChipType: str | UnknownZWaveChipTypeDataType

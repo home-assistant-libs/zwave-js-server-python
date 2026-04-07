@@ -395,13 +395,15 @@ async def test_unknown_event(driver, caplog):
 
 
 async def test_all_nodes_ready_event(driver):
-    """Test that the all nodes ready event is succesfully validated by pydantic."""
+    """`all nodes ready` event marks the driver as having all nodes ready."""
+    assert driver.all_nodes_ready is None  # not set yet
     event = Event("all nodes ready", {"source": "driver", "event": "all nodes ready"})
     driver.receive_event(event)
+    assert driver.all_nodes_ready is True
 
 
 async def test_driver_ready_event(driver):
-    """Test that the driver ready event is succesfully validated by pydantic."""
+    """`driver ready` event marks the driver as ready and fires listeners."""
     event_type = "driver ready"
     event_data = {"source": "driver", "event": event_type}
     event = Event(event_type, event_data)
@@ -410,7 +412,69 @@ async def test_driver_ready_event(driver):
         assert data == event_data
 
     driver.on(event_type, callback)
+    assert driver.ready is None  # not set yet
     driver.receive_event(event)
+    assert driver.ready is True
+
+
+async def test_schema_47_driver_state_properties(client, controller_state, log_config):
+    """Schema 47+ driver state properties read from state["driver"]."""
+    from zwave_js_server.model.driver import Driver
+
+    state = {
+        **controller_state,
+        "driver": {
+            "ready": True,
+            "allNodesReady": False,
+            "configVersion": "2026.3.0",
+        },
+    }
+    driver = Driver(client, state, log_config)
+    assert driver.ready is True
+    assert driver.all_nodes_ready is False
+    assert driver.config_version == "2026.3.0"
+
+    # Properties default to None when state["driver"] is absent.
+    bare = Driver(client, controller_state, log_config)
+    assert bare.ready is None
+    assert bare.all_nodes_ready is None
+    assert bare.config_version is None
+
+
+async def test_driver_update_replaces_data(driver):
+    """`Driver.update()` replaces the data dict, mirroring Controller.update()."""
+    driver.update({"ready": True, "allNodesReady": True, "configVersion": "2026.4.0"})
+    assert driver.ready is True
+    assert driver.all_nodes_ready is True
+    assert driver.config_version == "2026.4.0"
+
+
+async def test_error_event(driver):
+    """`error` event fires listeners and exposes the error string."""
+    received: list[str] = []
+    driver.on("error", lambda data: received.append(data["error"]))
+    driver.receive_event(
+        Event(
+            "error",
+            {"source": "driver", "event": "error", "error": "boom"},
+        )
+    )
+    assert received == ["boom"]
+
+
+async def test_bootloader_ready_event(driver):
+    """`bootloader ready` event fires listeners (observable only, no state)."""
+    fired = False
+
+    def cb(_data: dict) -> None:
+        nonlocal fired
+        fired = True
+
+    driver.on("bootloader ready", cb)
+    driver.receive_event(
+        Event("bootloader ready", {"source": "driver", "event": "bootloader ready"})
+    )
+    assert fired
 
 
 def test_config_manager(driver):
