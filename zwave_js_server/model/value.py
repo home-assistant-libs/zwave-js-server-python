@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import IntEnum, StrEnum
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, NotRequired, TypedDict
+from typing import TYPE_CHECKING, Any, NotRequired, TypedDict, cast
 
 from ..const import (
     VALUE_UNKNOWN,
@@ -237,13 +237,15 @@ class ValueMetadata:
             return None
         result: list[AllowedValue] = []
         for entry in raw:
-            data: dict[str, int] = dict(entry)  # type: ignore[arg-type]
-            if "value" in data:
-                result.append(AllowedSingleValue(value=data["value"]))
+            if "value" in entry:
+                single = cast("AllowedSingleValueDataType", entry)
+                result.append(AllowedSingleValue(value=single["value"]))
             else:
                 result.append(
                     AllowedRangeValue(
-                        from_=data["from"], to=data["to"], step=data.get("step")
+                        from_=entry["from"],
+                        to=entry["to"],
+                        step=entry.get("step"),
                     )
                 )
         return result
