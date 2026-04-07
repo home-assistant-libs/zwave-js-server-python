@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import IntEnum, StrEnum
-from typing import TYPE_CHECKING, Any, TypedDict
+from functools import cached_property
+from typing import TYPE_CHECKING, Any, NotRequired, TypedDict
 
 from ..const import (
     VALUE_UNKNOWN,
@@ -30,6 +31,44 @@ class ValueType(StrEnum):
     STRING = "string"
 
 
+class AllowedSingleValueDataType(TypedDict):
+    """Represent a single allowed value entry (`{value: number}`)."""
+
+    value: int
+
+
+# `from` is a Python keyword, so the functional TypedDict form is required.
+AllowedRangeValueDataType = TypedDict(
+    "AllowedRangeValueDataType",
+    {"from": int, "to": int, "step": NotRequired[int]},
+)
+
+
+# AllowedValue is a discriminated union: either a single value or an inclusive range.
+# The TypeScript type is `{ value: number } | { from: number; to: number; step?: number }`.
+AllowedValueDataType = AllowedSingleValueDataType | AllowedRangeValueDataType
+
+
+@dataclass(frozen=True)
+class AllowedSingleValue:
+    """A single allowed value for a numeric metadata field (schema 46+)."""
+
+    value: int
+
+
+@dataclass(frozen=True)
+class AllowedRangeValue:
+    """An inclusive allowed value range for a numeric metadata field (schema 46+)."""
+
+    from_: int
+    to: int
+    step: int | None = None
+
+
+# Discriminated union — use isinstance() to differentiate.
+AllowedValue = AllowedSingleValue | AllowedRangeValue
+
+
 class MetaDataType(TypedDict, total=False):
     """Represent a metadata data dict type."""
 
@@ -48,6 +87,7 @@ class MetaDataType(TypedDict, total=False):
     stateful: bool
     secret: bool
     default: int
+    allowed: list[AllowedValueDataType]  # schema 46+
     # Configuration Value specific attributes
     valueSize: int
     format: int
@@ -55,6 +95,7 @@ class MetaDataType(TypedDict, total=False):
     isAdvanced: bool
     requiresReInclusion: bool
     isFromConfig: bool
+    purpose: str  # schema 46+, configuration metadata only
 
 
 class ValueDataType(TypedDict, total=False):
@@ -184,6 +225,29 @@ class ValueMetadata:
         """Return secret."""
         return self.data.get("secret")
 
+    @cached_property
+    def allowed(self) -> list[AllowedValue] | None:
+        """Return allowed values.
+
+        Each entry is either an `AllowedSingleValue` or an `AllowedRangeValue`;
+        use ``isinstance`` to discriminate. Cached because parsing allocates
+        new dataclass instances; the cache is invalidated by `update()`.
+        """
+        if (raw := self.data.get("allowed")) is None:
+            return None
+        result: list[AllowedValue] = []
+        for entry in raw:
+            data: dict[str, int] = dict(entry)  # type: ignore[arg-type]
+            if "value" in data:
+                result.append(AllowedSingleValue(value=data["value"]))
+            else:
+                result.append(
+                    AllowedRangeValue(
+                        from_=data["from"], to=data["to"], step=data.get("step")
+                    )
+                )
+        return result
+
     @property
     def default(self) -> int | None:
         """Return default."""
@@ -216,9 +280,17 @@ class ValueMetadata:
         """Return isFromConfig."""
         return self.data.get("isFromConfig")
 
+    @property
+    def purpose(self) -> str | None:
+        """Return purpose."""
+        return self.data.get("purpose")
+
     def update(self, data: MetaDataType) -> None:
         """Update data."""
         self.data.update(data)
+        # Invalidate cached_property entries when their backing key changed.
+        if "allowed" in data:
+            self.__dict__.pop("allowed", None)
 
 
 class Value:
