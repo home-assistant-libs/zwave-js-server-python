@@ -55,6 +55,11 @@ class AllowedSingleValue:
 
     value: int
 
+    @classmethod
+    def from_dict(cls, data: AllowedSingleValueDataType) -> AllowedSingleValue:
+        """Initialize from dict."""
+        return cls(value=data["value"])
+
 
 @dataclass(frozen=True)
 class AllowedRangeValue:
@@ -63,6 +68,11 @@ class AllowedRangeValue:
     from_: int
     to: int
     step: int | None = None
+
+    @classmethod
+    def from_dict(cls, data: AllowedRangeValueDataType) -> AllowedRangeValue:
+        """Initialize from dict."""
+        return cls(from_=data["from"], to=data["to"], step=data.get("step"))
 
 
 # Discriminated union — use isinstance() to differentiate.
@@ -235,20 +245,14 @@ class ValueMetadata:
         """
         if (raw := self.data.get("allowed")) is None:
             return None
-        result: list[AllowedValue] = []
-        for entry in raw:
-            if "value" in entry:
-                single = cast("AllowedSingleValueDataType", entry)
-                result.append(AllowedSingleValue(value=single["value"]))
-            else:
-                result.append(
-                    AllowedRangeValue(
-                        from_=entry["from"],
-                        to=entry["to"],
-                        step=entry.get("step"),
-                    )
-                )
-        return result
+        return [
+            (
+                AllowedSingleValue.from_dict(cast("AllowedSingleValueDataType", entry))
+                if "value" in entry
+                else AllowedRangeValue.from_dict(entry)
+            )
+            for entry in raw
+        ]
 
     @property
     def default(self) -> int | None:
