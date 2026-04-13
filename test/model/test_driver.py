@@ -7,7 +7,7 @@ from typing import Any
 import pytest
 
 from zwave_js_server.client import Client
-from zwave_js_server.const import LogLevel
+from zwave_js_server.const import CommandClass, LogLevel
 from zwave_js_server.event import Event
 from zwave_js_server.model import (
     log_config as log_config_pkg,
@@ -381,6 +381,143 @@ async def test_shutdown(driver, uuid4, mock_command):
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "driver.shutdown",
+        "messageId": uuid4,
+    }
+
+
+async def test_soft_reset_and_restart(
+    driver: Driver, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test soft reset and restart command."""
+    ack_commands = mock_command({"command": "driver.soft_reset_and_restart"}, {})
+    await driver.async_soft_reset_and_restart()
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.soft_reset_and_restart",
+        "messageId": uuid4,
+    }
+
+
+async def test_enter_bootloader(
+    driver: Driver, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test enter bootloader command."""
+    ack_commands = mock_command({"command": "driver.enter_bootloader"}, {})
+    await driver.async_enter_bootloader()
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.enter_bootloader",
+        "messageId": uuid4,
+    }
+
+
+async def test_leave_bootloader(
+    driver: Driver, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test leave bootloader command."""
+    ack_commands = mock_command({"command": "driver.leave_bootloader"}, {})
+    await driver.async_leave_bootloader()
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.leave_bootloader",
+        "messageId": uuid4,
+    }
+
+
+async def test_get_supported_cc_version(
+    driver: Driver, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test get supported CC version command."""
+    ack_commands = mock_command(
+        {"command": "driver.get_supported_cc_version"}, {"version": 3}
+    )
+    result = await driver.async_get_supported_cc_version(
+        CommandClass.SWITCH_BINARY, node_id=52
+    )
+    assert result == 3
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.get_supported_cc_version",
+        "messageId": uuid4,
+        "cc": CommandClass.SWITCH_BINARY.value,
+        "nodeId": 52,
+        "endpointIndex": 0,
+    }
+
+
+async def test_get_safe_cc_version(
+    driver: Driver, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test get safe CC version command."""
+    ack_commands = mock_command(
+        {"command": "driver.get_safe_cc_version"}, {"version": 2}
+    )
+    result = await driver.async_get_safe_cc_version(
+        CommandClass.SWITCH_BINARY, node_id=52, endpoint_index=1
+    )
+    assert result == 2
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.get_safe_cc_version",
+        "messageId": uuid4,
+        "cc": CommandClass.SWITCH_BINARY.value,
+        "nodeId": 52,
+        "endpointIndex": 1,
+    }
+
+
+async def test_get_safe_cc_version_none(
+    driver: Driver, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test get safe CC version returns None when version is absent."""
+    mock_command({"command": "driver.get_safe_cc_version"}, {})
+    result = await driver.async_get_safe_cc_version(
+        CommandClass.SWITCH_BINARY, node_id=52
+    )
+    assert result is None
+
+
+async def test_update_user_agent(
+    driver: Driver, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test update user agent command."""
+    ack_commands = mock_command({"command": "driver.update_user_agent"}, {})
+    await driver.async_update_user_agent({"my-app": "1.0.0"})
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.update_user_agent",
+        "messageId": uuid4,
+        "components": {"my-app": "1.0.0"},
+    }
+
+
+async def test_enable_frequent_rssi_monitoring(
+    driver: Driver, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test enable frequent RSSI monitoring command."""
+    ack_commands = mock_command(
+        {"command": "driver.enable_frequent_rssi_monitoring"}, {}
+    )
+    await driver.async_enable_frequent_rssi_monitoring(duration_ms=60000)
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.enable_frequent_rssi_monitoring",
+        "messageId": uuid4,
+        "durationMs": 60000,
+    }
+
+
+async def test_disable_frequent_rssi_monitoring(
+    driver: Driver, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test disable frequent RSSI monitoring command."""
+    ack_commands = mock_command(
+        {"command": "driver.disable_frequent_rssi_monitoring"}, {}
+    )
+    await driver.async_disable_frequent_rssi_monitoring()
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.disable_frequent_rssi_monitoring",
         "messageId": uuid4,
     }
 
