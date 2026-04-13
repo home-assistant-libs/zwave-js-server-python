@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import IntEnum, StrEnum
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, NotRequired, TypedDict, cast
+from typing import TYPE_CHECKING, Any, NotRequired, Self, TypedDict, cast
 
 from ..const import (
     VALUE_UNKNOWN,
@@ -70,7 +70,7 @@ class AllowedRangeValue:
     step: int | None = None
 
     @classmethod
-    def from_dict(cls, data: AllowedRangeValueDataType) -> AllowedRangeValue:
+    def from_dict(cls, data: AllowedRangeValueDataType) -> Self:
         """Initialize from dict."""
         return cls(from_=data["from"], to=data["to"], step=data.get("step"))
 
