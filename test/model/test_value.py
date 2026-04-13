@@ -5,11 +5,14 @@ from copy import deepcopy
 from zwave_js_server.const import ConfigurationValueType, SetValueStatus
 from zwave_js_server.model.node import Node
 from zwave_js_server.model.value import (
+    AllowedRangeValue,
+    AllowedSingleValue,
     ConfigurationValue,
     ConfigurationValueFormat,
     MetaDataType,
     SetValueResult,
     ValueDataType,
+    ValueMetadata,
     get_value_id_str,
 )
 
@@ -75,6 +78,55 @@ def test_secret(lock_schlage_be469):
     node = lock_schlage_be469
     zwave_value = node.values["20-112-0-3"]
     assert zwave_value.metadata.stateful
+
+
+def test_metadata_purpose():
+    """`purpose` is None by default and exposes the raw string when set."""
+    assert ValueMetadata(MetaDataType(type="number")).purpose is None
+    metadata = ValueMetadata(MetaDataType(type="number", purpose="dimmer ramp rate"))
+    assert metadata.purpose == "dimmer ramp rate"
+
+
+def test_metadata_allowed_parsing():
+    """`allowed` returns None by default and parses both shapes via isinstance."""
+    assert ValueMetadata(MetaDataType(type="number")).allowed is None
+
+    metadata = ValueMetadata(
+        MetaDataType(
+            type="number",
+            allowed=[
+                {"value": 0},
+                {"from": 10, "to": 20, "step": 2},
+                {"from": -5, "to": 5},
+            ],
+        )
+    )
+    allowed = metadata.allowed
+    assert allowed is not None
+    assert allowed == [
+        AllowedSingleValue(value=0),
+        AllowedRangeValue(from_=10, to=20, step=2),
+        AllowedRangeValue(from_=-5, to=5, step=None),
+    ]
+    # Discrimination via isinstance is the public API.
+    assert isinstance(allowed[0], AllowedSingleValue)
+    assert isinstance(allowed[1], AllowedRangeValue)
+
+
+def test_metadata_allowed_cache_invalidation():
+    """`allowed` is cached and only re-parsed when `update()` touches the key."""
+    metadata = ValueMetadata(MetaDataType(type="number", allowed=[{"value": 1}]))
+    first = metadata.allowed
+    assert metadata.allowed is first  # cache hit
+
+    # Updating an unrelated field keeps the cached list.
+    metadata.update(MetaDataType(label="renamed"))
+    assert metadata.allowed is first
+
+    # Updating the `allowed` key invalidates the cache.
+    metadata.update(MetaDataType(allowed=[{"from": 0, "to": 5}]))
+    assert metadata.allowed is not first
+    assert metadata.allowed == [AllowedRangeValue(from_=0, to=5, step=None)]
 
 
 def test_configuration_value_type(inovelli_switch_state):
