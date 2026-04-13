@@ -10,6 +10,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
+from zwave_js_server.client import Client
 from zwave_js_server.const import (
     INTERVIEW_FAILED,
     CommandClass,
@@ -2838,7 +2839,9 @@ async def test_node_info_received_event(multisensor_6: node_pkg.Node):
     node.receive_event(event)
 
 
-async def test_schema_47_node_state_properties(client, multisensor_6_state):
+async def test_schema_47_node_state_properties(
+    client: Client, multisensor_6_state: dict[str, Any]
+) -> None:
     """Schema 47+ node state properties read from the node data dict."""
     enriched_state = {
         **multisensor_6_state,

@@ -6,6 +6,7 @@ from typing import Any
 
 import pytest
 
+from zwave_js_server.client import Client
 from zwave_js_server.const import LogLevel
 from zwave_js_server.event import Event
 from zwave_js_server.model import (
@@ -394,7 +395,7 @@ async def test_unknown_event(driver, caplog):
     assert caplog.records[0].levelno == logging.INFO
 
 
-async def test_all_nodes_ready_event(driver):
+async def test_all_nodes_ready_event(driver: Driver) -> None:
     """`all nodes ready` event marks the driver as having all nodes ready."""
     assert driver.all_nodes_ready is None  # not set yet
     event = Event("all nodes ready", {"source": "driver", "event": "all nodes ready"})
@@ -402,7 +403,7 @@ async def test_all_nodes_ready_event(driver):
     assert driver.all_nodes_ready is True
 
 
-async def test_driver_ready_event(driver):
+async def test_driver_ready_event(driver: Driver) -> None:
     """`driver ready` event marks the driver as ready and fires listeners."""
     event_type = "driver ready"
     event_data = {"source": "driver", "event": event_type}
@@ -417,9 +418,10 @@ async def test_driver_ready_event(driver):
     assert driver.ready is True
 
 
-async def test_schema_47_driver_state_properties(client, controller_state, log_config):
+async def test_schema_47_driver_state_properties(
+    client: Client, controller_state: dict[str, Any], log_config: dict[str, Any]
+) -> None:
     """Schema 47+ driver state properties read from state["driver"]."""
-    from zwave_js_server.model.driver import Driver
 
     state = {
         **controller_state,
@@ -441,7 +443,7 @@ async def test_schema_47_driver_state_properties(client, controller_state, log_c
     assert bare.config_version is None
 
 
-async def test_driver_update_replaces_data(driver):
+async def test_driver_update_replaces_data(driver: Driver) -> None:
     """`Driver.update()` replaces the data dict, mirroring Controller.update()."""
     driver.update({"ready": True, "allNodesReady": True, "configVersion": "2026.4.0"})
     assert driver.ready is True
@@ -449,7 +451,7 @@ async def test_driver_update_replaces_data(driver):
     assert driver.config_version == "2026.4.0"
 
 
-async def test_error_event(driver):
+async def test_error_event(driver: Driver) -> None:
     """`error` event fires listeners and exposes the error string."""
     received: list[str] = []
     driver.on("error", lambda data: received.append(data["error"]))
@@ -462,7 +464,7 @@ async def test_error_event(driver):
     assert received == ["boom"]
 
 
-async def test_bootloader_ready_event(driver):
+async def test_bootloader_ready_event(driver: Driver) -> None:
     """`bootloader ready` event fires listeners (observable only, no state)."""
     fired = False
 

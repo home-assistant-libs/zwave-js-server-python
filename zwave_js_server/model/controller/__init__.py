@@ -26,11 +26,7 @@ from ...util.helpers import convert_base64_to_bytes, convert_bytes_to_base64
 from ..association import AssociationAddress, AssociationGroup
 from ..node import Node
 from ..node.firmware import NodeFirmwareUpdateResult
-from .data_model import (
-    ControllerDataType,
-    UnknownZWaveChipTypeDataType,
-    ZWaveApiVersionDataType,
-)
+from .data_model import ControllerDataType, ZWaveApiVersionDataType, ZWaveChipType
 from .event_model import CONTROLLER_EVENT_MODEL_MAP
 from .inclusion_and_provisioning import (
     InclusionGrant,
@@ -272,14 +268,11 @@ class Controller(EventBase):
         return self.data.get("zwaveApiVersion")
 
     @property
-    def zwave_chip_type(self) -> str | UnknownZWaveChipTypeDataType | None:
-        """Return the Z-Wave chip type.
-
-        Either a known chip name (str) or an `UnknownZWaveChipTypeDataType`
-        descriptor with `type` and `version` fields. Use ``isinstance(x, str)``
-        to discriminate.
-        """
-        return self.data.get("zwaveChipType")
+    def zwave_chip_type(self) -> ZWaveChipType | None:
+        """Return the Z-Wave chip type."""
+        if (raw := self.data.get("zwaveChipType")) is None:
+            return None
+        return ZWaveChipType.from_dict(raw)
 
     def update(self, data: ControllerDataType) -> None:
         """Update controller data."""

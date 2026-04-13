@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Literal, TypedDict
 
 from .statistics import ControllerStatisticsDataType
@@ -19,6 +20,26 @@ class UnknownZWaveChipTypeDataType(TypedDict):
 
     type: int
     version: int
+
+
+@dataclass(frozen=True)
+class ZWaveChipType:
+    """Z-Wave chip type descriptor (schema 47+).
+
+    For known chips, `name` is set (e.g. ``"ZW0700"``).
+    For unknown chips, `type` and `version` are set instead.
+    """
+
+    name: str | None = None
+    type: int | None = None
+    version: int | None = None
+
+    @classmethod
+    def from_dict(cls, data: str | UnknownZWaveChipTypeDataType) -> ZWaveChipType:
+        """Initialize from dict."""
+        if isinstance(data, str):
+            return cls(name=data)
+        return cls(type=data["type"], version=data["version"])
 
 
 class ControllerDataType(TypedDict, total=False):
