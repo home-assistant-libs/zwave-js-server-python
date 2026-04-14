@@ -1023,6 +1023,43 @@ class Node(EventBase):
             property_, property_key, allow_unexpected_response
         )
 
+    async def async_check_link_reliability(
+        self,
+        mode: int,
+        interval: int,
+        rounds: int | None = None,
+    ) -> dict:
+        """Send checkLinkReliability command to Node."""
+        kwargs: dict[str, Any] = {"mode": mode, "interval": interval}
+        if rounds is not None:
+            kwargs["rounds"] = rounds
+        data = await self.async_send_command(
+            "check_link_reliability",
+            require_schema=47,
+            wait_for_result=True,
+            **kwargs,
+        )
+        assert data
+        return data["result"]
+
+    async def async_is_link_reliability_check_in_progress(self) -> bool:
+        """Send isLinkReliabilityCheckInProgress command to Node."""
+        data = await self.async_send_command(
+            "is_link_reliability_check_in_progress",
+            require_schema=47,
+            wait_for_result=True,
+        )
+        assert data
+        return cast(bool, data["progress"])
+
+    async def async_abort_link_reliability_check(self) -> None:
+        """Send abortLinkReliabilityCheck command to Node."""
+        await self.async_send_command(
+            "abort_link_reliability_check",
+            require_schema=47,
+            wait_for_result=False,
+        )
+
     def handle_test_powerlevel_progress(self, event: Event) -> None:
         """Process a test power level progress event."""
         event.data["test_power_level_progress"] = TestPowerLevelProgress(
@@ -1046,6 +1083,10 @@ class Node(EventBase):
             event.data["lastRating"],
             RouteHealthCheckResult(event.data["lastResult"]),
         )
+
+    def handle_check_link_reliability_progress(self, event: Event) -> None:
+        """Process a check link reliability progress event."""
+        event.data["check_link_reliability_progress"] = event.data["progress"]
 
     def handle_wake_up(self, event: Event) -> None:
         """Process a node wake up event."""

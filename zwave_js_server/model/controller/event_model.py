@@ -345,12 +345,36 @@ class LeavingNetworkFailedEventModel(BaseControllerEventModel):
     event: Literal["leaving network failed"]
 
 
+class JoiningNetworkShowDSKEventModel(BaseControllerEventModel):
+    """Model for `joining network show dsk` event data (schema 47+)."""
+
+    event: Literal["joining network show dsk"]
+    dsk: str
+
+    @classmethod
+    def from_dict(cls, data: dict) -> JoiningNetworkShowDSKEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            dsk=data["dsk"],
+        )
+
+
+class JoiningNetworkDoneEventModel(BaseControllerEventModel):
+    """Model for `joining network done` event data (schema 47+)."""
+
+    event: Literal["joining network done"]
+
+
 CONTROLLER_EVENT_MODEL_MAP: dict[str, type[BaseControllerEventModel]] = {
     "exclusion failed": ExclusionFailedEventModel,
     "exclusion started": ExclusionStartedEventModel,
     "exclusion stopped": ExclusionStoppedEventModel,
     "grant security classes": GrantSecurityClassesEventModel,
+    "joining network done": JoiningNetworkDoneEventModel,
     "joining network failed": JoiningNetworkFailedEventModel,
+    "joining network show dsk": JoiningNetworkShowDSKEventModel,
     "leaving network failed": LeavingNetworkFailedEventModel,
     "network found": NetworkFoundEventModel,
     "network joined": NetworkJoinedEventModel,

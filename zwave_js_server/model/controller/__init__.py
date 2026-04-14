@@ -914,6 +914,582 @@ class Controller(EventBase):
         )
         return cast(bool, data["progress"])
 
+    async def async_restore_nvm_raw(self, nvm_data: bytes) -> None:
+        """Send restoreNVMRaw command to Controller."""
+        await self.client.async_send_command(
+            {
+                "command": "controller.restore_nvm_raw",
+                "nvmData": convert_bytes_to_base64(nvm_data),
+            },
+            require_schema=47,
+        )
+
+    async def async_assign_return_routes(
+        self, node_id: int, destination_node_id: int
+    ) -> bool:
+        """Send assignReturnRoutes command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.assign_return_routes",
+                "nodeId": node_id,
+                "destinationNodeId": destination_node_id,
+            },
+            require_schema=47,
+        )
+        return cast(bool, data["success"])
+
+    async def async_delete_return_routes(self, node_id: int) -> bool:
+        """Send deleteReturnRoutes command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.delete_return_routes",
+                "nodeId": node_id,
+            },
+            require_schema=47,
+        )
+        return cast(bool, data["success"])
+
+    async def async_assign_suc_return_routes(self, node_id: int) -> bool:
+        """Send assignSUCReturnRoutes command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.assign_suc_return_routes",
+                "nodeId": node_id,
+            },
+            require_schema=47,
+        )
+        return cast(bool, data["success"])
+
+    async def async_delete_suc_return_routes(self, node_id: int) -> bool:
+        """Send deleteSUCReturnRoutes command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.delete_suc_return_routes",
+                "nodeId": node_id,
+            },
+            require_schema=47,
+        )
+        return cast(bool, data["success"])
+
+    async def async_assign_priority_return_route(
+        self,
+        node_id: int,
+        destination_node_id: int,
+        repeaters: list[int],
+        route_speed: int,
+    ) -> bool:
+        """Send assignPriorityReturnRoute command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.assign_priority_return_route",
+                "nodeId": node_id,
+                "destinationNodeId": destination_node_id,
+                "repeaters": repeaters,
+                "routeSpeed": route_speed,
+            },
+            require_schema=47,
+        )
+        return cast(bool, data["success"])
+
+    async def async_assign_priority_suc_return_route(
+        self,
+        node_id: int,
+        repeaters: list[int],
+        route_speed: int,
+    ) -> bool:
+        """Send assignPrioritySUCReturnRoute command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.assign_priority_suc_return_route",
+                "nodeId": node_id,
+                "repeaters": repeaters,
+                "routeSpeed": route_speed,
+            },
+            require_schema=47,
+        )
+        return cast(bool, data["success"])
+
+    async def async_assign_custom_return_routes(
+        self,
+        node_id: int,
+        destination_node_id: int,
+        routes: list[dict],
+        priority_route: dict | None = None,
+    ) -> bool:
+        """Send assignCustomReturnRoutes command to Controller."""
+        cmd: dict[str, Any] = {
+            "command": "controller.assign_custom_return_routes",
+            "nodeId": node_id,
+            "destinationNodeId": destination_node_id,
+            "routes": routes,
+        }
+        if priority_route is not None:
+            cmd["priorityRoute"] = priority_route
+        data = await self.client.async_send_command(cmd, require_schema=47)
+        return cast(bool, data["success"])
+
+    async def async_assign_custom_suc_return_routes(
+        self,
+        node_id: int,
+        routes: list[dict],
+        priority_route: dict | None = None,
+    ) -> bool:
+        """Send assignCustomSUCReturnRoutes command to Controller."""
+        cmd: dict[str, Any] = {
+            "command": "controller.assign_custom_suc_return_routes",
+            "nodeId": node_id,
+            "routes": routes,
+        }
+        if priority_route is not None:
+            cmd["priorityRoute"] = priority_route
+        data = await self.client.async_send_command(cmd, require_schema=47)
+        return cast(bool, data["success"])
+
+    async def async_set_priority_route(
+        self,
+        destination_node_id: int,
+        repeaters: list[int],
+        route_speed: int,
+    ) -> bool:
+        """Send setPriorityRoute command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.set_priority_route",
+                "destinationNodeId": destination_node_id,
+                "repeaters": repeaters,
+                "routeSpeed": route_speed,
+            },
+            require_schema=47,
+        )
+        return cast(bool, data["success"])
+
+    async def async_remove_priority_route(self, destination_node_id: int) -> bool:
+        """Send removePriorityRoute command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.remove_priority_route",
+                "destinationNodeId": destination_node_id,
+            },
+            require_schema=47,
+        )
+        return cast(bool, data["success"])
+
+    async def async_get_priority_route(self, destination_node_id: int) -> dict | None:
+        """Send getPriorityRoute command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.get_priority_route",
+                "destinationNodeId": destination_node_id,
+            },
+            require_schema=47,
+        )
+        return data.get("route")
+
+    async def async_discover_node_neighbors(self, node_id: int) -> bool:
+        """Send discoverNodeNeighbors command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.discover_node_neighbors",
+                "nodeId": node_id,
+            },
+            require_schema=47,
+        )
+        return cast(bool, data["success"])
+
+    async def async_get_background_rssi(self) -> dict:
+        """Send getBackgroundRSSI command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.get_background_rssi"},
+            require_schema=47,
+        )
+        return {
+            "rssi_channel_0": data["rssiChannel0"],
+            "rssi_channel_1": data["rssiChannel1"],
+            "rssi_channel_2": data.get("rssiChannel2"),
+            "rssi_channel_3": data.get("rssiChannel3"),
+        }
+
+    async def async_get_long_range_nodes(self) -> list[int]:
+        """Send getLongRangeNodes command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.get_long_range_nodes"},
+            require_schema=47,
+        )
+        return cast(list[int], data["nodeIds"])
+
+    async def async_get_dsk(self) -> bytes:
+        """Send getDSK command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.get_dsk"},
+            require_schema=47,
+        )
+        return convert_base64_to_bytes(data["dsk"])
+
+    async def async_get_nvm_id(self) -> dict:
+        """Send getNVMId command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.get_nvm_id"},
+            require_schema=47,
+        )
+        return data["nvmId"]
+
+    async def async_get_supported_rf_regions(
+        self, filter_subsets: bool = False
+    ) -> list[int] | None:
+        """Send getSupportedRFRegions command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.get_supported_rf_regions",
+                "filterSubsets": filter_subsets,
+            },
+            require_schema=47,
+        )
+        return data.get("regions")
+
+    async def async_query_supported_rf_regions(self) -> list[int]:
+        """Send querySupportedRFRegions command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.query_supported_rf_regions"},
+            require_schema=47,
+        )
+        return cast(list[int], data["regions"])
+
+    async def async_query_rf_region_info(self, region: RFRegion) -> dict:
+        """Send queryRFRegionInfo command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.query_rf_region_info",
+                "region": region.value,
+            },
+            require_schema=47,
+        )
+        result: dict[str, Any] = {
+            "region": data["region"],
+            "supports_zwave": data["supportsZWave"],
+            "supports_long_range": data["supportsLongRange"],
+        }
+        if "includesRegion" in data:
+            result["includes_region"] = data["includesRegion"]
+        return result
+
+    async def async_external_nvm_open(self) -> int:
+        """Send externalNVMOpen command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.external_nvm_open"},
+            require_schema=47,
+        )
+        return cast(int, data["size"])
+
+    async def async_external_nvm_close(self) -> None:
+        """Send externalNVMClose command to Controller."""
+        await self.client.async_send_command(
+            {"command": "controller.external_nvm_close"},
+            require_schema=47,
+        )
+
+    async def async_external_nvm_read_byte(self, offset: int) -> int:
+        """Send externalNVMReadByte command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.external_nvm_read_byte",
+                "offset": offset,
+            },
+            require_schema=47,
+        )
+        return cast(int, data["byte"])
+
+    async def async_external_nvm_write_byte(self, offset: int, data_byte: int) -> bool:
+        """Send externalNVMWriteByte command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.external_nvm_write_byte",
+                "offset": offset,
+                "data": data_byte,
+            },
+            require_schema=47,
+        )
+        return cast(bool, data["success"])
+
+    async def async_external_nvm_read_buffer(self, offset: int, length: int) -> bytes:
+        """Send externalNVMReadBuffer command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.external_nvm_read_buffer",
+                "offset": offset,
+                "length": length,
+            },
+            require_schema=47,
+        )
+        return convert_base64_to_bytes(data["buffer"])
+
+    async def async_external_nvm_write_buffer(self, offset: int, buffer: bytes) -> bool:
+        """Send externalNVMWriteBuffer command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.external_nvm_write_buffer",
+                "offset": offset,
+                "buffer": convert_bytes_to_base64(buffer),
+            },
+            require_schema=47,
+        )
+        return cast(bool, data["success"])
+
+    async def async_external_nvm_read_buffer_700(
+        self, offset: int, length: int
+    ) -> dict:
+        """Send externalNVMReadBuffer700 command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.external_nvm_read_buffer_700",
+                "offset": offset,
+                "length": length,
+            },
+            require_schema=47,
+        )
+        return {
+            "buffer": convert_base64_to_bytes(data["buffer"]),
+            "end_of_file": data["endOfFile"],
+        }
+
+    async def async_external_nvm_write_buffer_700(
+        self, offset: int, buffer: bytes
+    ) -> bool:
+        """Send externalNVMWriteBuffer700 command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.external_nvm_write_buffer_700",
+                "offset": offset,
+                "buffer": convert_bytes_to_base64(buffer),
+            },
+            require_schema=47,
+        )
+        return cast(bool, data["endOfFile"])
+
+    async def async_external_nvm_open_ext(self) -> dict:
+        """Send externalNVMOpenExt command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.external_nvm_open_ext"},
+            require_schema=47,
+        )
+        return {
+            "size": data["size"],
+            "supported_operations": data["supportedOperations"],
+        }
+
+    async def async_external_nvm_close_ext(self) -> None:
+        """Send externalNVMCloseExt command to Controller."""
+        await self.client.async_send_command(
+            {"command": "controller.external_nvm_close_ext"},
+            require_schema=47,
+        )
+
+    async def async_external_nvm_read_buffer_ext(
+        self, offset: int, length: int
+    ) -> dict:
+        """Send externalNVMReadBufferExt command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.external_nvm_read_buffer_ext",
+                "offset": offset,
+                "length": length,
+            },
+            require_schema=47,
+        )
+        return {
+            "buffer": convert_base64_to_bytes(data["buffer"]),
+            "end_of_file": data["endOfFile"],
+        }
+
+    async def async_external_nvm_write_buffer_ext(
+        self, offset: int, buffer: bytes
+    ) -> bool:
+        """Send externalNVMWriteBufferExt command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.external_nvm_write_buffer_ext",
+                "offset": offset,
+                "buffer": convert_bytes_to_base64(buffer),
+            },
+            require_schema=47,
+        )
+        return cast(bool, data["endOfFile"])
+
+    async def async_begin_joining_network(self, strategy: int | None = None) -> dict:
+        """Send beginJoiningNetwork command to Controller."""
+        cmd: dict[str, Any] = {
+            "command": "controller.begin_joining_network",
+        }
+        if strategy is not None:
+            cmd["strategy"] = strategy
+        data = await self.client.async_send_command(cmd, require_schema=47)
+        return data["result"]
+
+    async def async_stop_joining_network(self) -> bool:
+        """Send stopJoiningNetwork command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.stop_joining_network"},
+            require_schema=47,
+        )
+        return cast(bool, data["success"])
+
+    async def async_begin_leaving_network(self) -> dict:
+        """Send beginLeavingNetwork command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.begin_leaving_network"},
+            require_schema=47,
+        )
+        return data["result"]
+
+    async def async_stop_leaving_network(self) -> bool:
+        """Send stopLeavingNetwork command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.stop_leaving_network"},
+            require_schema=47,
+        )
+        return cast(bool, data["success"])
+
+    async def async_get_all_association_groups(
+        self, node: Node
+    ) -> dict[int, dict[int, AssociationGroup]]:
+        """Send getAllAssociationGroups command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.get_all_association_groups",
+                "nodeId": node.node_id,
+            },
+            require_schema=47,
+        )
+        result: dict[int, dict[int, AssociationGroup]] = {}
+        for endpoint_id, groups in data["groups"].items():
+            result[int(endpoint_id)] = {
+                int(group_id): AssociationGroup(
+                    max_nodes=group["maxNodes"],
+                    is_lifeline=group["isLifeline"],
+                    multi_channel=group["multiChannel"],
+                    label=group["label"],
+                    profile=group.get("profile"),
+                    issued_commands=group.get("issuedCommands", {}),
+                )
+                for group_id, group in groups.items()
+            }
+        return result
+
+    async def async_get_all_associations(
+        self, node: Node
+    ) -> dict[int, dict[int, dict[int, list[AssociationAddress]]]]:
+        """Send getAllAssociations command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.get_all_associations",
+                "nodeId": node.node_id,
+            },
+            require_schema=47,
+        )
+        result: dict[int, dict[int, dict[int, list[AssociationAddress]]]] = {}
+        for node_id_str, endpoints in data["associations"].items():
+            node_id_int = int(node_id_str)
+            result[node_id_int] = {}
+            for endpoint_id, groups in endpoints.items():
+                result[node_id_int][int(endpoint_id)] = {
+                    int(group_id): [
+                        AssociationAddress(
+                            self,
+                            node_id=addr["nodeId"],
+                            endpoint=addr.get("endpoint"),
+                        )
+                        for addr in addresses
+                    ]
+                    for group_id, addresses in groups.items()
+                }
+        return result
+
+    async def async_get_priority_return_route_cached(
+        self, node_id: int, destination_node_id: int
+    ) -> dict | None:
+        """Send getPriorityReturnRouteCached command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.get_priority_return_route_cached",
+                "nodeId": node_id,
+                "destinationNodeId": destination_node_id,
+            },
+            require_schema=47,
+        )
+        return data.get("route")
+
+    async def async_get_priority_return_routes_cached(self, node_id: int) -> dict:
+        """Send getPriorityReturnRoutesCached command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.get_priority_return_routes_cached",
+                "nodeId": node_id,
+            },
+            require_schema=47,
+        )
+        return data["routes"]
+
+    async def async_get_priority_suc_return_route_cached(
+        self, node_id: int
+    ) -> dict | None:
+        """Send getPrioritySUCReturnRouteCached command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.get_priority_suc_return_route_cached",
+                "nodeId": node_id,
+            },
+            require_schema=47,
+        )
+        return data.get("route")
+
+    async def async_get_custom_return_routes_cached(
+        self, node_id: int, destination_node_id: int
+    ) -> list[dict]:
+        """Send getCustomReturnRoutesCached command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.get_custom_return_routes_cached",
+                "nodeId": node_id,
+                "destinationNodeId": destination_node_id,
+            },
+            require_schema=47,
+        )
+        return cast(list[dict], data["routes"])
+
+    async def async_get_custom_suc_return_routes_cached(
+        self, node_id: int
+    ) -> list[dict]:
+        """Send getCustomSUCReturnRoutesCached command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.get_custom_suc_return_routes_cached",
+                "nodeId": node_id,
+            },
+            require_schema=47,
+        )
+        return cast(list[dict], data["routes"])
+
+    async def async_get_all_available_firmware_updates(
+        self,
+        api_key: str,
+        include_prereleases: bool = True,
+        rf_region: RFRegion | None = None,
+    ) -> dict[int, list[NodeFirmwareUpdateInfo]]:
+        """Send getAllAvailableFirmwareUpdates command to Controller."""
+        cmd: dict[str, Any] = {
+            "command": "controller.get_all_available_firmware_updates",
+            "apiKey": api_key,
+            "includePrereleases": include_prereleases,
+        }
+        if rf_region is not None:
+            cmd["rfRegion"] = rf_region.value
+        data = await self.client.async_send_command(cmd, require_schema=47)
+        return {
+            int(node_id): [
+                NodeFirmwareUpdateInfo.from_dict(update) for update in updates
+            ]
+            for node_id, updates in data["updates"].items()
+        }
+
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
         if event.data["source"] == "node":
@@ -1055,6 +1631,12 @@ class Controller(EventBase):
 
     def handle_joining_network_failed(self, event: Event) -> None:
         """Process a `joining network failed` event (schema 47+)."""
+
+    def handle_joining_network_show_dsk(self, event: Event) -> None:
+        """Process a `joining network show dsk` event (schema 47+)."""
+
+    def handle_joining_network_done(self, event: Event) -> None:
+        """Process a `joining network done` event (schema 47+)."""
 
     def handle_leaving_network_failed(self, event: Event) -> None:
         """Process a `leaving network failed` event (schema 47+)."""

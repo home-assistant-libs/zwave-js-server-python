@@ -360,3 +360,36 @@ class Endpoint(EventBase):
         )
         assert result
         return result["value"]
+
+    async def async_get_ccs(self) -> dict:
+        """Call endpoint.get_ccs command."""
+        result = await self.async_send_command(
+            "get_ccs",
+            require_schema=47,
+            wait_for_result=True,
+        )
+        assert result
+        return result["commandClasses"]
+
+    async def async_may_support_basic_cc(self) -> bool:
+        """Call endpoint.may_support_basic_cc command."""
+        result = await self.async_send_command(
+            "may_support_basic_cc",
+            require_schema=47,
+            wait_for_result=True,
+        )
+        assert result
+        return cast(bool, result["maySupport"])
+
+    async def async_was_cc_removed_via_config(
+        self, command_class: CommandClass
+    ) -> bool:
+        """Call endpoint.was_cc_removed_via_config command."""
+        result = await self.async_send_command(
+            "was_cc_removed_via_config",
+            commandClass=command_class.value,
+            require_schema=47,
+            wait_for_result=True,
+        )
+        assert result
+        return cast(bool, result["removed"])
