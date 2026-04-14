@@ -470,11 +470,19 @@ async def test_get_safe_cc_version_none(
     driver: Driver, uuid4: str, mock_command: MockCommandProtocol
 ) -> None:
     """Test get safe CC version returns None when version is absent."""
-    mock_command({"command": "driver.get_safe_cc_version"}, {})
+    ack_commands = mock_command({"command": "driver.get_safe_cc_version"}, {})
     result = await driver.async_get_safe_cc_version(
         CommandClass.SWITCH_BINARY, node_id=52
     )
     assert result is None
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "driver.get_safe_cc_version",
+        "messageId": uuid4,
+        "cc": CommandClass.SWITCH_BINARY.value,
+        "nodeId": 52,
+        "endpointIndex": 0,
+    }
 
 
 async def test_update_user_agent(
