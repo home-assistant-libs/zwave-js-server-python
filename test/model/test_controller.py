@@ -30,6 +30,7 @@ from zwave_js_server.model import (
     association as association_pkg,
     controller as controller_pkg,
 )
+from zwave_js_server.model.association import AssociationGroup
 from zwave_js_server.model.controller import Controller
 from zwave_js_server.model.controller.data_model import ZWaveChipType
 from zwave_js_server.model.controller.rebuild_routes import (
@@ -41,6 +42,7 @@ from zwave_js_server.model.node import Node
 from zwave_js_server.model.node.firmware import NodeFirmwareUpdateInfo
 
 from .. import load_fixture
+from ..common import MockCommandProtocol
 from .common import FIRMWARE_UPDATE_INFO
 
 
@@ -2441,3 +2443,1085 @@ async def test_schema_47_network_lifecycle_events(controller: Controller) -> Non
         "joining network failed",
         "leaving network failed",
     ]
+
+
+async def test_restore_nvm_raw(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test restore NVM raw command."""
+    ack_commands = mock_command(
+        {"command": "controller.restore_nvm_raw"},
+        {},
+    )
+    await controller.async_restore_nvm_raw(bytes(10))
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.restore_nvm_raw",
+        "nvmData": "AAAAAAAAAAAAAA==",
+        "messageId": uuid4,
+    }
+
+
+async def test_assign_return_routes(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test assign return routes command."""
+    ack_commands = mock_command(
+        {"command": "controller.assign_return_routes"},
+        {"success": True},
+    )
+    result = await controller.async_assign_return_routes(52, 1)
+    assert result is True
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.assign_return_routes",
+        "nodeId": 52,
+        "destinationNodeId": 1,
+        "messageId": uuid4,
+    }
+
+
+async def test_delete_return_routes(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test delete return routes command."""
+    ack_commands = mock_command(
+        {"command": "controller.delete_return_routes"},
+        {"success": True},
+    )
+    result = await controller.async_delete_return_routes(52)
+    assert result is True
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.delete_return_routes",
+        "nodeId": 52,
+        "messageId": uuid4,
+    }
+
+
+async def test_assign_suc_return_routes(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test assign SUC return routes command."""
+    ack_commands = mock_command(
+        {"command": "controller.assign_suc_return_routes"},
+        {"success": True},
+    )
+    result = await controller.async_assign_suc_return_routes(52)
+    assert result is True
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.assign_suc_return_routes",
+        "nodeId": 52,
+        "messageId": uuid4,
+    }
+
+
+async def test_delete_suc_return_routes(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test delete SUC return routes command."""
+    ack_commands = mock_command(
+        {"command": "controller.delete_suc_return_routes"},
+        {"success": True},
+    )
+    result = await controller.async_delete_suc_return_routes(52)
+    assert result is True
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.delete_suc_return_routes",
+        "nodeId": 52,
+        "messageId": uuid4,
+    }
+
+
+async def test_assign_priority_return_route(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test assign priority return route command."""
+    ack_commands = mock_command(
+        {"command": "controller.assign_priority_return_route"},
+        {"success": True},
+    )
+    result = await controller.async_assign_priority_return_route(52, 1, [3, 4], 100)
+    assert result is True
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.assign_priority_return_route",
+        "nodeId": 52,
+        "destinationNodeId": 1,
+        "repeaters": [3, 4],
+        "routeSpeed": 100,
+        "messageId": uuid4,
+    }
+
+
+async def test_assign_priority_suc_return_route(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test assign priority SUC return route command."""
+    ack_commands = mock_command(
+        {"command": "controller.assign_priority_suc_return_route"},
+        {"success": True},
+    )
+    result = await controller.async_assign_priority_suc_return_route(52, [3, 4], 100)
+    assert result is True
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.assign_priority_suc_return_route",
+        "nodeId": 52,
+        "repeaters": [3, 4],
+        "routeSpeed": 100,
+        "messageId": uuid4,
+    }
+
+
+async def test_assign_custom_return_routes(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test assign custom return routes command."""
+    ack_commands = mock_command(
+        {"command": "controller.assign_custom_return_routes"},
+        {"success": True},
+    )
+    routes = [{"repeaters": [3, 4], "routeSpeed": 100}]
+    priority_route = {"repeaters": [5], "routeSpeed": 200}
+
+    # Test without priority route
+    result = await controller.async_assign_custom_return_routes(52, 1, routes)
+    assert result is True
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.assign_custom_return_routes",
+        "nodeId": 52,
+        "destinationNodeId": 1,
+        "routes": routes,
+        "messageId": uuid4,
+    }
+
+    # Test with priority route
+    result = await controller.async_assign_custom_return_routes(
+        52, 1, routes, priority_route
+    )
+    assert len(ack_commands) == 2
+    assert ack_commands[1] == {
+        "command": "controller.assign_custom_return_routes",
+        "nodeId": 52,
+        "destinationNodeId": 1,
+        "routes": routes,
+        "priorityRoute": priority_route,
+        "messageId": uuid4,
+    }
+
+
+async def test_assign_custom_suc_return_routes(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test assign custom SUC return routes command."""
+    ack_commands = mock_command(
+        {"command": "controller.assign_custom_suc_return_routes"},
+        {"success": True},
+    )
+    routes = [{"repeaters": [3, 4], "routeSpeed": 100}]
+    priority_route = {"repeaters": [5], "routeSpeed": 200}
+
+    # Test without priority route
+    result = await controller.async_assign_custom_suc_return_routes(52, routes)
+    assert result is True
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.assign_custom_suc_return_routes",
+        "nodeId": 52,
+        "routes": routes,
+        "messageId": uuid4,
+    }
+
+    # Test with priority route
+    result = await controller.async_assign_custom_suc_return_routes(
+        52, routes, priority_route
+    )
+    assert len(ack_commands) == 2
+    assert ack_commands[1] == {
+        "command": "controller.assign_custom_suc_return_routes",
+        "nodeId": 52,
+        "routes": routes,
+        "priorityRoute": priority_route,
+        "messageId": uuid4,
+    }
+
+
+async def test_set_priority_route(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test set priority route command."""
+    ack_commands = mock_command(
+        {"command": "controller.set_priority_route"},
+        {"success": True},
+    )
+    result = await controller.async_set_priority_route(1, [3, 4], 100)
+    assert result is True
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.set_priority_route",
+        "destinationNodeId": 1,
+        "repeaters": [3, 4],
+        "routeSpeed": 100,
+        "messageId": uuid4,
+    }
+
+
+async def test_remove_priority_route(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test remove priority route command."""
+    ack_commands = mock_command(
+        {"command": "controller.remove_priority_route"},
+        {"success": True},
+    )
+    result = await controller.async_remove_priority_route(1)
+    assert result is True
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.remove_priority_route",
+        "destinationNodeId": 1,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_priority_route(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test get priority route command."""
+    route_data = {"repeaters": [3, 4], "routeSpeed": 100}
+    ack_commands = mock_command(
+        {"command": "controller.get_priority_route"},
+        {"route": route_data},
+    )
+    result = await controller.async_get_priority_route(1)
+    assert result == route_data
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_priority_route",
+        "destinationNodeId": 1,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_priority_route_none(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test get priority route command when no route exists."""
+    ack_commands = mock_command(
+        {"command": "controller.get_priority_route"},
+        {},
+    )
+    result = await controller.async_get_priority_route(1)
+    assert result is None
+    assert len(ack_commands) == 1
+
+
+async def test_discover_node_neighbors(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test discover node neighbors command."""
+    ack_commands = mock_command(
+        {"command": "controller.discover_node_neighbors"},
+        {"success": True},
+    )
+    result = await controller.async_discover_node_neighbors(52)
+    assert result is True
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.discover_node_neighbors",
+        "nodeId": 52,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_background_rssi(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test get background RSSI command."""
+    ack_commands = mock_command(
+        {"command": "controller.get_background_rssi"},
+        {
+            "rssiChannel0": -80,
+            "rssiChannel1": -75,
+            "rssiChannel2": -90,
+        },
+    )
+    result = await controller.async_get_background_rssi()
+    assert result == {
+        "rssi_channel_0": -80,
+        "rssi_channel_1": -75,
+        "rssi_channel_2": -90,
+        "rssi_channel_3": None,
+    }
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_background_rssi",
+        "messageId": uuid4,
+    }
+
+
+async def test_get_long_range_nodes(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test get long range nodes command."""
+    ack_commands = mock_command(
+        {"command": "controller.get_long_range_nodes"},
+        {"nodeIds": [100, 101, 102]},
+    )
+    result = await controller.async_get_long_range_nodes()
+    assert result == [100, 101, 102]
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_long_range_nodes",
+        "messageId": uuid4,
+    }
+
+
+async def test_get_dsk(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test get DSK command."""
+    ack_commands = mock_command(
+        {"command": "controller.get_dsk"},
+        {"dsk": "AQIDBA=="},
+    )
+    result = await controller.async_get_dsk()
+    assert result == b"\x01\x02\x03\x04"
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_dsk",
+        "messageId": uuid4,
+    }
+
+
+async def test_get_nvm_id(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test get NVM ID command."""
+    nvm_id_data = {
+        "nvmId": 3,
+    }
+    ack_commands = mock_command(
+        {"command": "controller.get_nvm_id"},
+        nvm_id_data,
+    )
+    result = await controller.async_get_nvm_id()
+    assert result == 3
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_nvm_id",
+        "messageId": uuid4,
+    }
+
+
+async def test_get_supported_rf_regions(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test get supported RF regions command."""
+    ack_commands = mock_command(
+        {"command": "controller.get_supported_rf_regions"},
+        {"regions": [0, 1, 2, 3]},
+    )
+    result = await controller.async_get_supported_rf_regions()
+    assert result == [0, 1, 2, 3]
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_supported_rf_regions",
+        "filterSubsets": False,
+        "messageId": uuid4,
+    }
+
+    # Test with filter_subsets=True
+    result = await controller.async_get_supported_rf_regions(filter_subsets=True)
+    assert len(ack_commands) == 2
+    assert ack_commands[1] == {
+        "command": "controller.get_supported_rf_regions",
+        "filterSubsets": True,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_supported_rf_regions_none(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test get supported RF regions when regions is absent."""
+    ack_commands = mock_command(
+        {"command": "controller.get_supported_rf_regions"},
+        {},
+    )
+    result = await controller.async_get_supported_rf_regions()
+    assert result is None
+    assert len(ack_commands) == 1
+
+
+async def test_query_supported_rf_regions(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test query supported RF regions command."""
+    ack_commands = mock_command(
+        {"command": "controller.query_supported_rf_regions"},
+        {"regions": [0, 1, 7]},
+    )
+    result = await controller.async_query_supported_rf_regions()
+    assert result == [0, 1, 7]
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.query_supported_rf_regions",
+        "messageId": uuid4,
+    }
+
+
+async def test_query_rf_region_info(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test query RF region info command."""
+    ack_commands = mock_command(
+        {"command": "controller.query_rf_region_info"},
+        {
+            "region": 0,
+            "supportsZWave": True,
+            "supportsLongRange": False,
+            "includesRegion": 1,
+        },
+    )
+    result = await controller.async_query_rf_region_info(RFRegion.EUROPE)
+    assert result == {
+        "region": 0,
+        "supports_zwave": True,
+        "supports_long_range": False,
+        "includes_region": 1,
+    }
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.query_rf_region_info",
+        "region": RFRegion.EUROPE.value,
+        "messageId": uuid4,
+    }
+
+
+async def test_query_rf_region_info_no_includes(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test query RF region info without includesRegion."""
+    ack_commands = mock_command(
+        {"command": "controller.query_rf_region_info"},
+        {
+            "region": 1,
+            "supportsZWave": True,
+            "supportsLongRange": True,
+        },
+    )
+    result = await controller.async_query_rf_region_info(RFRegion.USA)
+    assert result == {
+        "region": 1,
+        "supports_zwave": True,
+        "supports_long_range": True,
+    }
+    assert "includes_region" not in result
+    assert len(ack_commands) == 1
+
+
+async def test_external_nvm_open(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test external NVM open command."""
+    ack_commands = mock_command(
+        {"command": "controller.external_nvm_open"},
+        {"size": 65536},
+    )
+    result = await controller.async_external_nvm_open()
+    assert result == 65536
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.external_nvm_open",
+        "messageId": uuid4,
+    }
+
+
+async def test_external_nvm_close(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test external NVM close command."""
+    ack_commands = mock_command(
+        {"command": "controller.external_nvm_close"},
+        {},
+    )
+    await controller.async_external_nvm_close()
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.external_nvm_close",
+        "messageId": uuid4,
+    }
+
+
+async def test_external_nvm_read_byte(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test external NVM read byte command."""
+    ack_commands = mock_command(
+        {"command": "controller.external_nvm_read_byte"},
+        {"byte": 42},
+    )
+    result = await controller.async_external_nvm_read_byte(100)
+    assert result == 42
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.external_nvm_read_byte",
+        "offset": 100,
+        "messageId": uuid4,
+    }
+
+
+async def test_external_nvm_write_byte(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test external NVM write byte command."""
+    ack_commands = mock_command(
+        {"command": "controller.external_nvm_write_byte"},
+        {"success": True},
+    )
+    result = await controller.async_external_nvm_write_byte(100, 42)
+    assert result is True
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.external_nvm_write_byte",
+        "offset": 100,
+        "data": 42,
+        "messageId": uuid4,
+    }
+
+
+async def test_external_nvm_read_buffer(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test external NVM read buffer command."""
+    ack_commands = mock_command(
+        {"command": "controller.external_nvm_read_buffer"},
+        {"buffer": "AQIDBA=="},
+    )
+    result = await controller.async_external_nvm_read_buffer(0, 4)
+    assert result == b"\x01\x02\x03\x04"
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.external_nvm_read_buffer",
+        "offset": 0,
+        "length": 4,
+        "messageId": uuid4,
+    }
+
+
+async def test_external_nvm_write_buffer(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test external NVM write buffer command."""
+    ack_commands = mock_command(
+        {"command": "controller.external_nvm_write_buffer"},
+        {"success": True},
+    )
+    result = await controller.async_external_nvm_write_buffer(0, b"\x01\x02\x03\x04")
+    assert result is True
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.external_nvm_write_buffer",
+        "offset": 0,
+        "buffer": "AQIDBA==",
+        "messageId": uuid4,
+    }
+
+
+async def test_external_nvm_read_buffer_700(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test external NVM read buffer 700 command."""
+    ack_commands = mock_command(
+        {"command": "controller.external_nvm_read_buffer_700"},
+        {"buffer": "AQIDBA==", "endOfFile": True},
+    )
+    result = await controller.async_external_nvm_read_buffer_700(0, 4)
+    assert result == {
+        "buffer": b"\x01\x02\x03\x04",
+        "end_of_file": True,
+    }
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.external_nvm_read_buffer_700",
+        "offset": 0,
+        "length": 4,
+        "messageId": uuid4,
+    }
+
+
+async def test_external_nvm_write_buffer_700(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test external NVM write buffer 700 command."""
+    ack_commands = mock_command(
+        {"command": "controller.external_nvm_write_buffer_700"},
+        {"endOfFile": False},
+    )
+    result = await controller.async_external_nvm_write_buffer_700(
+        0, b"\x01\x02\x03\x04"
+    )
+    assert result is False
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.external_nvm_write_buffer_700",
+        "offset": 0,
+        "buffer": "AQIDBA==",
+        "messageId": uuid4,
+    }
+
+
+async def test_external_nvm_open_ext(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test external NVM open ext command."""
+    ack_commands = mock_command(
+        {"command": "controller.external_nvm_open_ext"},
+        {"size": 131072, "supportedOperations": ["read", "write"]},
+    )
+    result = await controller.async_external_nvm_open_ext()
+    assert result == {
+        "size": 131072,
+        "supported_operations": ["read", "write"],
+    }
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.external_nvm_open_ext",
+        "messageId": uuid4,
+    }
+
+
+async def test_external_nvm_close_ext(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test external NVM close ext command."""
+    ack_commands = mock_command(
+        {"command": "controller.external_nvm_close_ext"},
+        {},
+    )
+    await controller.async_external_nvm_close_ext()
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.external_nvm_close_ext",
+        "messageId": uuid4,
+    }
+
+
+async def test_external_nvm_read_buffer_ext(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test external NVM read buffer ext command."""
+    ack_commands = mock_command(
+        {"command": "controller.external_nvm_read_buffer_ext"},
+        {"buffer": "AQIDBA==", "endOfFile": False},
+    )
+    result = await controller.async_external_nvm_read_buffer_ext(0, 4)
+    assert result == {
+        "buffer": b"\x01\x02\x03\x04",
+        "end_of_file": False,
+    }
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.external_nvm_read_buffer_ext",
+        "offset": 0,
+        "length": 4,
+        "messageId": uuid4,
+    }
+
+
+async def test_external_nvm_write_buffer_ext(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test external NVM write buffer ext command."""
+    ack_commands = mock_command(
+        {"command": "controller.external_nvm_write_buffer_ext"},
+        {"endOfFile": True},
+    )
+    result = await controller.async_external_nvm_write_buffer_ext(
+        0, b"\x01\x02\x03\x04"
+    )
+    assert result is True
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.external_nvm_write_buffer_ext",
+        "offset": 0,
+        "buffer": "AQIDBA==",
+        "messageId": uuid4,
+    }
+
+
+async def test_begin_joining_network(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test begin joining network command."""
+    ack_commands = mock_command(
+        {"command": "controller.begin_joining_network"},
+        {"result": {"success": True}},
+    )
+
+    # Test without strategy
+    result = await controller.async_begin_joining_network()
+    assert result == {"success": True}
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.begin_joining_network",
+        "messageId": uuid4,
+    }
+
+    # Test with strategy
+    result = await controller.async_begin_joining_network(strategy=1)
+    assert len(ack_commands) == 2
+    assert ack_commands[1] == {
+        "command": "controller.begin_joining_network",
+        "strategy": 1,
+        "messageId": uuid4,
+    }
+
+
+async def test_stop_joining_network(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test stop joining network command."""
+    ack_commands = mock_command(
+        {"command": "controller.stop_joining_network"},
+        {"success": True},
+    )
+    result = await controller.async_stop_joining_network()
+    assert result is True
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.stop_joining_network",
+        "messageId": uuid4,
+    }
+
+
+async def test_begin_leaving_network(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test begin leaving network command."""
+    ack_commands = mock_command(
+        {"command": "controller.begin_leaving_network"},
+        {"result": {"success": True}},
+    )
+    result = await controller.async_begin_leaving_network()
+    assert result == {"success": True}
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.begin_leaving_network",
+        "messageId": uuid4,
+    }
+
+
+async def test_stop_leaving_network(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test stop leaving network command."""
+    ack_commands = mock_command(
+        {"command": "controller.stop_leaving_network"},
+        {"success": True},
+    )
+    result = await controller.async_stop_leaving_network()
+    assert result is True
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.stop_leaving_network",
+        "messageId": uuid4,
+    }
+
+
+async def test_get_all_association_groups(
+    controller: Controller,
+    multisensor_6: Node,
+    uuid4: str,
+    mock_command: MockCommandProtocol,
+) -> None:
+    """Test get all association groups command."""
+    ack_commands = mock_command(
+        {"command": "controller.get_all_association_groups"},
+        {
+            "groups": {
+                "0": {
+                    "1": {
+                        "maxNodes": 5,
+                        "isLifeline": True,
+                        "multiChannel": True,
+                        "label": "Lifeline",
+                        "profile": 1,
+                        "issuedCommands": {"32": [1]},
+                    },
+                    "2": {
+                        "maxNodes": 5,
+                        "isLifeline": False,
+                        "multiChannel": False,
+                        "label": "Group 2",
+                    },
+                },
+            }
+        },
+    )
+    result = await controller.async_get_all_association_groups(multisensor_6)
+    assert len(result) == 1
+    assert 0 in result
+    assert len(result[0]) == 2
+    assert result[0][1] == AssociationGroup(
+        max_nodes=5,
+        is_lifeline=True,
+        multi_channel=True,
+        label="Lifeline",
+        profile=1,
+        issued_commands={"32": [1]},
+    )
+    assert result[0][2] == AssociationGroup(
+        max_nodes=5,
+        is_lifeline=False,
+        multi_channel=False,
+        label="Group 2",
+        profile=None,
+        issued_commands={},
+    )
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_all_association_groups",
+        "nodeId": 52,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_all_associations(
+    controller: Controller,
+    multisensor_6: Node,
+    uuid4: str,
+    mock_command: MockCommandProtocol,
+) -> None:
+    """Test get all associations command."""
+    ack_commands = mock_command(
+        {"command": "controller.get_all_associations"},
+        {
+            "associations": {
+                "52": {
+                    "0": {
+                        "1": [
+                            {"nodeId": 1},
+                            {"nodeId": 2, "endpoint": 1},
+                        ],
+                    },
+                },
+            }
+        },
+    )
+    result = await controller.async_get_all_associations(multisensor_6)
+    assert len(result) == 1
+    assert 52 in result
+    assert 0 in result[52]
+    assert 1 in result[52][0]
+    addresses = result[52][0][1]
+    assert len(addresses) == 2
+    assert addresses[0].node_id == 1
+    assert addresses[0].endpoint is None
+    assert addresses[1].node_id == 2
+    assert addresses[1].endpoint == 1
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_all_associations",
+        "nodeId": 52,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_priority_return_route_cached(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test get priority return route cached command."""
+    route_data = {"repeaters": [3], "routeSpeed": 100}
+    ack_commands = mock_command(
+        {"command": "controller.get_priority_return_route_cached"},
+        {"route": route_data},
+    )
+    result = await controller.async_get_priority_return_route_cached(52, 1)
+    assert result == route_data
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_priority_return_route_cached",
+        "nodeId": 52,
+        "destinationNodeId": 1,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_priority_return_route_cached_none(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test get priority return route cached when no route exists."""
+    ack_commands = mock_command(
+        {"command": "controller.get_priority_return_route_cached"},
+        {},
+    )
+    result = await controller.async_get_priority_return_route_cached(52, 1)
+    assert result is None
+    assert len(ack_commands) == 1
+
+
+async def test_get_priority_return_routes_cached(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test get priority return routes cached command."""
+    routes_data = {"1": {"repeaters": [3], "routeSpeed": 100}}
+    ack_commands = mock_command(
+        {"command": "controller.get_priority_return_routes_cached"},
+        {"routes": routes_data},
+    )
+    result = await controller.async_get_priority_return_routes_cached(52)
+    assert result == routes_data
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_priority_return_routes_cached",
+        "nodeId": 52,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_priority_suc_return_route_cached(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test get priority SUC return route cached command."""
+    route_data = {"repeaters": [], "routeSpeed": 100}
+    ack_commands = mock_command(
+        {"command": "controller.get_priority_suc_return_route_cached"},
+        {"route": route_data},
+    )
+    result = await controller.async_get_priority_suc_return_route_cached(52)
+    assert result == route_data
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_priority_suc_return_route_cached",
+        "nodeId": 52,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_priority_suc_return_route_cached_none(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test get priority SUC return route cached when no route exists."""
+    ack_commands = mock_command(
+        {"command": "controller.get_priority_suc_return_route_cached"},
+        {},
+    )
+    result = await controller.async_get_priority_suc_return_route_cached(52)
+    assert result is None
+    assert len(ack_commands) == 1
+
+
+async def test_get_custom_return_routes_cached(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test get custom return routes cached command."""
+    routes_data = [{"repeaters": [3], "routeSpeed": 100}]
+    ack_commands = mock_command(
+        {"command": "controller.get_custom_return_routes_cached"},
+        {"routes": routes_data},
+    )
+    result = await controller.async_get_custom_return_routes_cached(52, 1)
+    assert result == routes_data
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_custom_return_routes_cached",
+        "nodeId": 52,
+        "destinationNodeId": 1,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_custom_suc_return_routes_cached(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test get custom SUC return routes cached command."""
+    routes_data = [{"repeaters": [], "routeSpeed": 100}]
+    ack_commands = mock_command(
+        {"command": "controller.get_custom_suc_return_routes_cached"},
+        {"routes": routes_data},
+    )
+    result = await controller.async_get_custom_suc_return_routes_cached(52)
+    assert result == routes_data
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_custom_suc_return_routes_cached",
+        "nodeId": 52,
+        "messageId": uuid4,
+    }
+
+
+async def test_get_all_available_firmware_updates(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test get all available firmware updates command."""
+    ack_commands = mock_command(
+        {"command": "controller.get_all_available_firmware_updates"},
+        {
+            "updates": {
+                "52": [FIRMWARE_UPDATE_INFO],
+            }
+        },
+    )
+    result = await controller.async_get_all_available_firmware_updates("test-api-key")
+    assert len(result) == 1
+    assert 52 in result
+    assert len(result[52]) == 1
+    assert result[52][0] == NodeFirmwareUpdateInfo.from_dict(FIRMWARE_UPDATE_INFO)
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.get_all_available_firmware_updates",
+        "apiKey": "test-api-key",
+        "includePrereleases": True,
+        "messageId": uuid4,
+    }
+
+    # Test with rf_region
+    result = await controller.async_get_all_available_firmware_updates(
+        "test-api-key", include_prereleases=False, rf_region=RFRegion.USA
+    )
+    assert len(ack_commands) == 2
+    assert ack_commands[1] == {
+        "command": "controller.get_all_available_firmware_updates",
+        "apiKey": "test-api-key",
+        "includePrereleases": False,
+        "rfRegion": RFRegion.USA.value,
+        "messageId": uuid4,
+    }
+
+
+async def test_schema_47_joining_network_dsk_and_done_events(
+    controller: Controller,
+) -> None:
+    """Test joining network show dsk and joining network done events."""
+    received: list[str] = []
+    for evt in ("joining network show dsk", "joining network done"):
+        controller.on(evt, lambda data, name=evt: received.append(name))
+
+    controller.receive_event(
+        Event(
+            "joining network show dsk",
+            {
+                "source": "controller",
+                "event": "joining network show dsk",
+                "dsk": "12345-67890-11111-22222-33333-44444-55555-66666",
+            },
+        )
+    )
+    controller.receive_event(
+        Event(
+            "joining network done",
+            {
+                "source": "controller",
+                "event": "joining network done",
+            },
+        )
+    )
+
+    assert received == ["joining network show dsk", "joining network done"]
