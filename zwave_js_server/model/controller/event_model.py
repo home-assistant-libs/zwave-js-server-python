@@ -303,11 +303,58 @@ class StatusChangedEventModel(BaseControllerEventModel):
         )
 
 
+class NetworkFoundEventModel(BaseControllerEventModel):
+    """Model for `network found` event data (schema 47+)."""
+
+    event: Literal["network found"]
+    homeId: int
+    ownNodeId: int
+
+    @classmethod
+    def from_dict(cls, data: dict) -> NetworkFoundEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            homeId=data["homeId"],
+            ownNodeId=data["ownNodeId"],
+        )
+
+
+class NetworkJoinedEventModel(BaseControllerEventModel):
+    """Model for `network joined` event data (schema 47+)."""
+
+    event: Literal["network joined"]
+
+
+class NetworkLeftEventModel(BaseControllerEventModel):
+    """Model for `network left` event data (schema 47+)."""
+
+    event: Literal["network left"]
+
+
+class JoiningNetworkFailedEventModel(BaseControllerEventModel):
+    """Model for `joining network failed` event data (schema 47+)."""
+
+    event: Literal["joining network failed"]
+
+
+class LeavingNetworkFailedEventModel(BaseControllerEventModel):
+    """Model for `leaving network failed` event data (schema 47+)."""
+
+    event: Literal["leaving network failed"]
+
+
 CONTROLLER_EVENT_MODEL_MAP: dict[str, type[BaseControllerEventModel]] = {
     "exclusion failed": ExclusionFailedEventModel,
     "exclusion started": ExclusionStartedEventModel,
     "exclusion stopped": ExclusionStoppedEventModel,
     "grant security classes": GrantSecurityClassesEventModel,
+    "joining network failed": JoiningNetworkFailedEventModel,
+    "leaving network failed": LeavingNetworkFailedEventModel,
+    "network found": NetworkFoundEventModel,
+    "network joined": NetworkJoinedEventModel,
+    "network left": NetworkLeftEventModel,
     "rebuild routes done": RebuildRoutesDoneEventModel,
     "rebuild routes progress": RebuildRoutesProgressEventModel,
     "identify": IdentifyEventModel,

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Any, Literal, cast
+from typing import TYPE_CHECKING, Any, Literal, TypedDict, cast
 
 from zwave_js_server.model.firmware import (
     FirmwareUpdateData,
@@ -132,14 +132,49 @@ class FirmwareUpdateProgressEventModel(BaseDriverEventModel):
         )
 
 
+class ErrorEventModel(BaseDriverEventModel):
+    """Model for `error` event data (schema 47+)."""
+
+    event: Literal["error"]
+    error: str
+
+    @classmethod
+    def from_dict(cls, data: dict) -> ErrorEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            error=data["error"],
+        )
+
+
+class BootloaderReadyEventModel(BaseDriverEventModel):
+    """Model for `bootloader ready` event data (schema 47+)."""
+
+    event: Literal["bootloader ready"]
+
+
 DRIVER_EVENT_MODEL_MAP: dict[str, type[BaseDriverEventModel]] = {
     "all nodes ready": AllNodesReadyEventModel,
+    "bootloader ready": BootloaderReadyEventModel,
+    "error": ErrorEventModel,
     "log config updated": LogConfigUpdatedEventModel,
     "logging": LoggingEventModel,
     "driver ready": DriverReadyEventModel,
     "firmware update finished": FirmwareUpdateFinishedEventModel,
     "firmware update progress": FirmwareUpdateProgressEventModel,
 }
+
+
+class DriverDataType(TypedDict, total=False):
+    """Represent the wire-format driver state dict (schema 47+)."""
+
+    logConfig: LogConfigDataType
+    statisticsEnabled: bool
+    # Schema 47+ fields
+    ready: bool
+    allNodesReady: bool
+    configVersion: str
 
 
 class CheckConfigUpdates:
@@ -161,6 +196,7 @@ class Driver(EventBase):
         """Initialize driver."""
         super().__init__()
         self.client = client
+        self.data: DriverDataType = state.get("driver", {})
         self.controller = Controller(client, state)
         self.log_config = LogConfig.from_dict(log_config)
         self.config_manager = ConfigManager(client)
@@ -180,6 +216,21 @@ class Driver(EventBase):
     def firmware_update_progress(self) -> DriverFirmwareUpdateProgress | None:
         """Return firmware update progress."""
         return self._firmware_update_progress
+
+    @property
+    def ready(self) -> bool | None:
+        """Return whether the driver is ready."""
+        return self.data.get("ready")
+
+    @property
+    def all_nodes_ready(self) -> bool | None:
+        """Return whether all nodes are ready."""
+        return self.data.get("allNodesReady")
+
+    @property
+    def config_version(self) -> str | None:
+        """Return the device-config files version."""
+        return self.data.get("configVersion")
 
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
@@ -322,11 +373,28 @@ class Driver(EventBase):
             event.data["config"]
         )
 
-    def handle_all_nodes_ready(self, event: Event) -> None:
-        """Process a driver all nodes ready event."""
+    def update(self, data: DriverDataType) -> None:
+        """Update driver data.
 
-    def handle_driver_ready(self, event: Event) -> None:
+        Mirrors `Controller.update()`. Currently only called from re-init
+        paths; live state changes are driven by event handlers that mutate
+        `self.data` directly (see `handle_driver_ready`, `handle_all_nodes_ready`).
+        """
+        self.data = data
+
+    def handle_all_nodes_ready(self, _event: Event) -> None:
+        """Process a driver all nodes ready event."""
+        self.data["allNodesReady"] = True
+
+    def handle_driver_ready(self, _event: Event) -> None:
         """Process a driver ready event."""
+        self.data["ready"] = True
+
+    def handle_error(self, _event: Event) -> None:
+        """Process a driver error event."""
+
+    def handle_bootloader_ready(self, _event: Event) -> None:
+        """Process a driver bootloader ready event."""
 
     def handle_firmware_update_progress(self, event: Event) -> None:
         """Process a firmware update progress event."""

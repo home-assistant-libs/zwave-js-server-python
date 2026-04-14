@@ -262,7 +262,7 @@ def version_data_fixture() -> dict[str, Any]:
         "serverVersion": "test_server_version",
         "homeId": "test_home_id",
         "minSchemaVersion": 0,
-        "maxSchemaVersion": 46,
+        "maxSchemaVersion": 47,
     }
 
 

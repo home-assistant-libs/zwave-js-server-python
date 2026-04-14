@@ -10,6 +10,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
+from zwave_js_server.client import Client
 from zwave_js_server.const import (
     INTERVIEW_FAILED,
     CommandClass,
@@ -2836,3 +2837,34 @@ async def test_node_info_received_event(multisensor_6: node_pkg.Node):
 
     node.on(event_type, callback)
     node.receive_event(event)
+
+
+async def test_schema_47_node_state_properties(
+    client: Client, multisensor_6_state: dict[str, Any]
+) -> None:
+    """Schema 47+ node state properties read from the node data dict."""
+    enriched_state = {
+        **multisensor_6_state,
+        "canSleep": True,
+        "supportsWakeUpOnDemand": False,
+        "hardwareVersion": 3,
+        "hasSUCReturnRoute": True,
+        "manufacturer": "Aeotec",
+        "dsk": "12345-67890-12345-67890-12345-67890-12345-67890",
+    }
+    node = node_pkg.Node(client, enriched_state)
+    assert node.can_sleep is True
+    assert node.supports_wake_up_on_demand is False
+    assert node.hardware_version == 3
+    assert node.has_suc_return_route is True
+    assert node.manufacturer == "Aeotec"
+    assert node.dsk == "12345-67890-12345-67890-12345-67890-12345-67890"
+
+    # Properties default to None when absent.
+    bare = node_pkg.Node(client, multisensor_6_state)
+    assert bare.can_sleep is None
+    assert bare.supports_wake_up_on_demand is None
+    assert bare.hardware_version is None
+    assert bare.has_suc_return_route is None
+    assert bare.manufacturer is None
+    assert bare.dsk is None

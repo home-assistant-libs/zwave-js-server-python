@@ -26,7 +26,7 @@ from ...util.helpers import convert_base64_to_bytes, convert_bytes_to_base64
 from ..association import AssociationAddress, AssociationGroup
 from ..node import Node
 from ..node.firmware import NodeFirmwareUpdateResult
-from .data_model import ControllerDataType
+from .data_model import ControllerDataType, ZWaveApiVersionDataType, ZWaveChipType
 from .event_model import CONTROLLER_EVENT_MODEL_MAP
 from .inclusion_and_provisioning import (
     InclusionGrant,
@@ -246,6 +246,33 @@ class Controller(EventBase):
     def supports_long_range(self) -> bool | None:
         """Return whether controller supports long range or not."""
         return self.data.get("supportsLongRange")
+
+    @property
+    def is_sis(self) -> bool | None:
+        """Return whether the controller is the SIS (Static Information Source)."""
+        return self.data.get("isSIS")
+
+    @property
+    def max_payload_size(self) -> int | None:
+        """Return the maximum Z-Wave payload size in bytes."""
+        return self.data.get("maxPayloadSize")
+
+    @property
+    def max_payload_size_lr(self) -> int | None:
+        """Return the maximum Long Range payload size in bytes."""
+        return self.data.get("maxPayloadSizeLR")
+
+    @property
+    def zwave_api_version(self) -> ZWaveApiVersionDataType | None:
+        """Return the Z-Wave API version (kind + version) supported by the controller."""
+        return self.data.get("zwaveApiVersion")
+
+    @property
+    def zwave_chip_type(self) -> ZWaveChipType | None:
+        """Return the Z-Wave chip type."""
+        if (raw := self.data.get("zwaveChipType")) is None:
+            return None
+        return ZWaveChipType.from_dict(raw)
 
     def update(self, data: ControllerDataType) -> None:
         """Update controller data."""
@@ -1014,3 +1041,20 @@ class Controller(EventBase):
         """Process a status changed event."""
         self.data["status"] = event.data["status"]
         event.data["status"] = ControllerStatus(event.data["status"])
+
+    def handle_network_found(self, _event: Event) -> None:
+        """Process a `network found` event without mutating controller identity."""
+        # TODO: Revisit whether `homeId` / `ownNodeId` from this event should
+        # update `self.data` once upstream semantics are confirmed.
+
+    def handle_network_joined(self, event: Event) -> None:
+        """Process a `network joined` event (schema 47+)."""
+
+    def handle_network_left(self, event: Event) -> None:
+        """Process a `network left` event (schema 47+)."""
+
+    def handle_joining_network_failed(self, event: Event) -> None:
+        """Process a `joining network failed` event (schema 47+)."""
+
+    def handle_leaving_network_failed(self, event: Event) -> None:
+        """Process a `leaving network failed` event (schema 47+)."""

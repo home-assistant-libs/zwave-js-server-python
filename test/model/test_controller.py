@@ -3,10 +3,12 @@
 from copy import deepcopy
 import json
 import logging
+from typing import Any
 from unittest.mock import patch
 
 import pytest
 
+from zwave_js_server.client import Client
 from zwave_js_server.const import (
     AssociationCheckResult,
     ControllerStatus,
@@ -29,6 +31,7 @@ from zwave_js_server.model import (
     controller as controller_pkg,
 )
 from zwave_js_server.model.controller import Controller
+from zwave_js_server.model.controller.data_model import ZWaveChipType
 from zwave_js_server.model.controller.rebuild_routes import (
     RebuildRoutesOptions,
     RebuildRoutesStatus,
@@ -2359,3 +2362,82 @@ async def test_inclusion_state_changed(controller):
     )
     controller.receive_event(event)
     assert controller.inclusion_state == InclusionState.INCLUDING
+
+
+async def test_schema_47_controller_state_properties(
+    client: Client, controller_state: dict[str, Any]
+) -> None:
+    """Schema 47+ controller state properties read from the controller state dict."""
+    state = {
+        "controller": {
+            **controller_state["controller"],
+            "isSIS": True,
+            "maxPayloadSize": 46,
+            "maxPayloadSizeLR": 1280,
+            "zwaveApiVersion": {"kind": "official", "version": 11},
+            "zwaveChipType": "ZW0700",
+        },
+        "nodes": [],
+    }
+    ctl = Controller(client, state)
+    assert ctl.is_sis is True
+    assert ctl.max_payload_size == 46
+    assert ctl.max_payload_size_lr == 1280
+    assert ctl.zwave_api_version == {"kind": "official", "version": 11}
+    assert ctl.zwave_chip_type == ZWaveChipType(name="ZW0700")
+
+    # Unknown chip type exposes type/version instead of name.
+    state["controller"]["zwaveChipType"] = {"type": 7, "version": 0}
+    ctl = Controller(client, state)
+    assert ctl.zwave_chip_type == ZWaveChipType(type=7, version=0)
+    assert ctl.zwave_chip_type.name is None
+
+    # All schema-47 properties default to None when absent.
+    bare = Controller(
+        client, {"controller": controller_state["controller"], "nodes": []}
+    )
+    assert bare.is_sis is None
+    assert bare.max_payload_size is None
+    assert bare.max_payload_size_lr is None
+    assert bare.zwave_api_version is None
+    assert bare.zwave_chip_type is None
+
+
+async def test_schema_47_network_lifecycle_events(controller: Controller) -> None:
+    """The new schema-47 network events are dispatched and observable."""
+    received: list[str] = []
+    for evt in (
+        "network found",
+        "network joined",
+        "network left",
+        "joining network failed",
+        "leaving network failed",
+    ):
+        controller.on(evt, lambda data, name=evt: received.append(name))
+
+    controller.receive_event(
+        Event(
+            "network found",
+            {
+                "source": "controller",
+                "event": "network found",
+                "homeId": 12345,
+                "ownNodeId": 1,
+            },
+        )
+    )
+    for evt in (
+        "network joined",
+        "network left",
+        "joining network failed",
+        "leaving network failed",
+    ):
+        controller.receive_event(Event(evt, {"source": "controller", "event": evt}))
+
+    assert received == [
+        "network found",
+        "network joined",
+        "network left",
+        "joining network failed",
+        "leaving network failed",
+    ]
