@@ -2,12 +2,20 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel
 
 from ...const import CommandClass
 from ...event import BaseEventModel
+from ..access_control import (
+    CredentialChangedArgsDataType,
+    CredentialDeletedArgsDataType,
+    CredentialLearnCompletedArgsDataType,
+    CredentialLearnProgressArgsDataType,
+    UserDataDataType,
+    UserDeletedArgsDataType,
+)
 from ..notification import (
     EntryControlNotificationArgsDataType,
     MultilevelSwitchNotificationArgsDataType,
@@ -205,6 +213,80 @@ class NotificationEventModel(BaseNodeEventModel):
         )
 
 
+class BaseNodeEndpointArgsEventModel(BaseNodeEventModel):
+    """Base model for node endpoint events with args payload."""
+
+    endpointIndex: int
+    args: Any
+
+    @classmethod
+    def from_dict(cls, data: dict) -> BaseNodeEndpointArgsEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            nodeId=data["nodeId"],
+            endpointIndex=data["endpointIndex"],
+            args=data["args"],
+        )
+
+
+class UserAddedEventModel(BaseNodeEndpointArgsEventModel):
+    """Model for `user added` event data."""
+
+    event: Literal["user added"]
+    args: UserDataDataType
+
+
+class UserModifiedEventModel(BaseNodeEndpointArgsEventModel):
+    """Model for `user modified` event data."""
+
+    event: Literal["user modified"]
+    args: UserDataDataType
+
+
+class UserDeletedEventModel(BaseNodeEndpointArgsEventModel):
+    """Model for `user deleted` event data."""
+
+    event: Literal["user deleted"]
+    args: UserDeletedArgsDataType
+
+
+class CredentialAddedEventModel(BaseNodeEndpointArgsEventModel):
+    """Model for `credential added` event data."""
+
+    event: Literal["credential added"]
+    args: CredentialChangedArgsDataType
+
+
+class CredentialModifiedEventModel(BaseNodeEndpointArgsEventModel):
+    """Model for `credential modified` event data."""
+
+    event: Literal["credential modified"]
+    args: CredentialChangedArgsDataType
+
+
+class CredentialDeletedEventModel(BaseNodeEndpointArgsEventModel):
+    """Model for `credential deleted` event data."""
+
+    event: Literal["credential deleted"]
+    args: CredentialDeletedArgsDataType
+
+
+class CredentialLearnProgressEventModel(BaseNodeEndpointArgsEventModel):
+    """Model for `credential learn progress` event data."""
+
+    event: Literal["credential learn progress"]
+    args: CredentialLearnProgressArgsDataType
+
+
+class CredentialLearnCompletedEventModel(BaseNodeEndpointArgsEventModel):
+    """Model for `credential learn completed` event data."""
+
+    event: Literal["credential learn completed"]
+    args: CredentialLearnCompletedArgsDataType
+
+
 class ReadyEventModel(BaseNodeEventModel):
     """Model for `ready` event data."""
 
@@ -360,6 +442,11 @@ NODE_EVENT_MODEL_MAP: dict[str, type[BaseNodeEventModel]] = {
     "check lifeline health progress": CheckLifelineHealthProgressEventModel,
     "check link reliability progress": CheckLinkReliabilityProgressEventModel,
     "check route health progress": CheckRouteHealthProgressEventModel,
+    "credential added": CredentialAddedEventModel,
+    "credential deleted": CredentialDeletedEventModel,
+    "credential learn completed": CredentialLearnCompletedEventModel,
+    "credential learn progress": CredentialLearnProgressEventModel,
+    "credential modified": CredentialModifiedEventModel,
     "dead": DeadEventModel,
     "firmware update finished": FirmwareUpdateFinishedEventModel,
     "firmware update progress": FirmwareUpdateProgressEventModel,
@@ -374,6 +461,9 @@ NODE_EVENT_MODEL_MAP: dict[str, type[BaseNodeEventModel]] = {
     "sleep": SleepEventModel,
     "statistics updated": StatisticsUpdatedEventModel,
     "test powerlevel progress": TestPowerLevelProgressEventModel,
+    "user added": UserAddedEventModel,
+    "user deleted": UserDeletedEventModel,
+    "user modified": UserModifiedEventModel,
     "value added": ValueAddedEventModel,
     "value notification": ValueNotificationEventModel,
     "value removed": ValueRemovedEventModel,
