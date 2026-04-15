@@ -20,6 +20,15 @@ from ...const import (
 )
 from ...event import Event, EventBase
 from ...exceptions import NotFoundError, UnparseableValue, UnwriteableValue
+from ..access_control import (
+    AccessControlAPI,
+    CredentialChangedArgs,
+    CredentialDeletedArgs,
+    CredentialLearnCompletedArgs,
+    CredentialLearnProgressArgs,
+    UserData,
+    UserDeletedArgs,
+)
 from ..command_class import CommandClassInfo
 from ..device_class import DeviceClass
 from ..device_config import DeviceConfig
@@ -738,6 +747,11 @@ class Node(EventBase):
         """Call endpoint.get_node_unsafe command."""
         return await self.endpoints[0].async_get_node_unsafe()
 
+    @property
+    def access_control(self) -> AccessControlAPI:
+        """Return the access-control API wrapper for the root endpoint."""
+        return self.endpoints[0].access_control
+
     async def async_has_security_class(
         self, security_class: SecurityClass
     ) -> bool | None:
@@ -1023,6 +1037,25 @@ class Node(EventBase):
             property_, property_key, allow_unexpected_response
         )
 
+    def _handle_access_control_event(
+        self,
+        event: Event,
+        args_factory: type[
+            UserData
+            | UserDeletedArgs
+            | CredentialChangedArgs
+            | CredentialDeletedArgs
+            | CredentialLearnProgressArgs
+            | CredentialLearnCompletedArgs
+        ],
+    ) -> None:
+        """Resolve endpoint and normalize access-control event args."""
+        if (endpoint_index := event.data.get("endpointIndex")) is not None and (
+            endpoint := self.endpoints.get(endpoint_index)
+        ):
+            event.data["endpoint"] = endpoint
+        event.data["args"] = args_factory.from_dict(event.data["args"])
+
     def handle_test_powerlevel_progress(self, event: Event) -> None:
         """Process a test power level progress event."""
         event.data["test_power_level_progress"] = TestPowerLevelProgress(
@@ -1169,6 +1202,38 @@ class Node(EventBase):
     def handle_node_info_received(self, event: Event) -> None:
         """Process a node info received event."""
         # Nothing to do for now
+
+    def handle_user_added(self, event: Event) -> None:
+        """Process a node user added event."""
+        self._handle_access_control_event(event, UserData)
+
+    def handle_user_modified(self, event: Event) -> None:
+        """Process a node user modified event."""
+        self._handle_access_control_event(event, UserData)
+
+    def handle_user_deleted(self, event: Event) -> None:
+        """Process a node user deleted event."""
+        self._handle_access_control_event(event, UserDeletedArgs)
+
+    def handle_credential_added(self, event: Event) -> None:
+        """Process a node credential added event."""
+        self._handle_access_control_event(event, CredentialChangedArgs)
+
+    def handle_credential_modified(self, event: Event) -> None:
+        """Process a node credential modified event."""
+        self._handle_access_control_event(event, CredentialChangedArgs)
+
+    def handle_credential_deleted(self, event: Event) -> None:
+        """Process a node credential deleted event."""
+        self._handle_access_control_event(event, CredentialDeletedArgs)
+
+    def handle_credential_learn_progress(self, event: Event) -> None:
+        """Process a node credential learn progress event."""
+        self._handle_access_control_event(event, CredentialLearnProgressArgs)
+
+    def handle_credential_learn_completed(self, event: Event) -> None:
+        """Process a node credential learn completed event."""
+        self._handle_access_control_event(event, CredentialLearnCompletedArgs)
 
     def handle_firmware_update_progress(self, event: Event) -> None:
         """Process a node firmware update progress event."""

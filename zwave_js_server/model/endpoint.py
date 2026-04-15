@@ -7,11 +7,13 @@ https://zwave-js.github.io/node-zwave-js/#/api/endpoint?id=endpoint-properties
 from __future__ import annotations
 
 import asyncio
+from functools import cached_property
 from typing import TYPE_CHECKING, Any, Literal, TypedDict, cast
 
 from ..const import NodeStatus
 from ..event import EventBase
 from ..exceptions import FailedCommand, NotFoundError
+from .access_control import AccessControlAPI
 from .command_class import CommandClass, CommandClassInfo, CommandClassInfoDataType
 from .device_class import DeviceClass, DeviceClassDataType
 from .value import (
@@ -290,6 +292,11 @@ class Endpoint(EventBase):
         )
         assert result
         return cast("NodeDataType", result["node"])
+
+    @cached_property
+    def access_control(self) -> AccessControlAPI:
+        """Return the access-control API wrapper for this endpoint."""
+        return AccessControlAPI(self)
 
     async def async_set_raw_config_parameter_value(
         self,

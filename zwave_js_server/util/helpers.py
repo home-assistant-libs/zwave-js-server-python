@@ -4,9 +4,36 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Any
+from typing import Any, Literal, TypeGuard, TypedDict
 
 from ..exceptions import UnparseableValue
+
+
+class BufferObjectDataType(TypedDict):
+    """Buffer object representation used by zwave-js-server JSON transport."""
+
+    type: Literal["Buffer"]
+    data: list[int]
+
+
+def is_buffer_object(value: Any) -> TypeGuard[BufferObjectDataType]:
+    """Return whether value matches zwave-js-server buffer transport shape."""
+    return (
+        isinstance(value, dict)
+        and value.get("type") == "Buffer"
+        and isinstance(value.get("data"), list)
+        and all(isinstance(item, int) for item in value["data"])
+    )
+
+
+def bytes_to_buffer_object(data: bytes) -> BufferObjectDataType:
+    """Wrap bytes in the websocket Buffer transport shape."""
+    return {"type": "Buffer", "data": list(data)}
+
+
+def buffer_object_to_bytes(value: BufferObjectDataType) -> bytes:
+    """Unwrap a websocket Buffer transport shape into bytes."""
+    return bytes(value["data"])
 
 
 def is_json_string(value: Any) -> bool:
@@ -38,7 +65,7 @@ def parse_buffer(value: dict[str, Any] | str) -> str:
 
 def parse_buffer_from_dict(value: dict[str, Any]) -> str:
     """Parse value dictionary from a buffer data type."""
-    if value.get("type") != "Buffer" or "data" not in value:
+    if not is_buffer_object(value):
         raise UnparseableValue(f"Unparseable value: {value}") from ValueError(
             "JSON does not match expected schema"
         )
