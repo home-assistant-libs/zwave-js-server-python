@@ -8,6 +8,9 @@ import pytest
 
 from zwave_js_server.const import SupervisionStatus
 from zwave_js_server.const.command_class.access_control import (
+    AssignCredentialStatus,
+    SetCredentialStatus,
+    SetUserStatus,
     UserCredentialLearnStatus,
     UserCredentialRule,
     UserCredentialType,
@@ -203,7 +206,7 @@ async def test_access_control_get_user_and_credential(
 
     user = await node.access_control.async_get_user(3)
     credential = await node.access_control.async_get_credential(
-        3, UserCredentialType.PIN_CODE, 0
+        UserCredentialType.PIN_CODE, 0
     )
 
     assert len(ack_commands) == 2
@@ -218,7 +221,6 @@ async def test_access_control_get_user_and_credential(
         "command": "endpoint.access_control.get_credential",
         "nodeId": node.node_id,
         "endpoint": 0,
-        "userId": 3,
         "credentialType": UserCredentialType.PIN_CODE,
         "credentialSlot": 0,
         "messageId": uuid4,
@@ -240,7 +242,7 @@ async def test_access_control_get_user_and_credential(
 
 
 @pytest.mark.parametrize(
-    ("command", "expected_payload", "call"),
+    ("command", "expected_payload", "call", "status_enum"),
     [
         (
             "set_user",
@@ -254,16 +256,19 @@ async def test_access_control_get_user_and_credential(
                 },
             },
             "set_user",
+            SetUserStatus,
         ),
         (
             "delete_user",
             {"userId": 3},
             "delete_user",
+            SetUserStatus,
         ),
         (
             "delete_all_users",
             {},
             "delete_all_users",
+            SetUserStatus,
         ),
         (
             "set_credential",
@@ -274,6 +279,7 @@ async def test_access_control_get_user_and_credential(
                 "data": {"type": "Buffer", "data": [49, 50, 51, 52]},
             },
             "set_credential",
+            SetCredentialStatus,
         ),
         (
             "delete_credential",
@@ -283,7 +289,101 @@ async def test_access_control_get_user_and_credential(
                 "credentialSlot": 0,
             },
             "delete_credential",
+            SetCredentialStatus,
         ),
+    ],
+)
+async def test_access_control_set_commands(
+    lock_schlage_be469: Node,
+    mock_command: MockCommandProtocol,
+    uuid4: str,
+    command: str,
+    expected_payload: dict[str, Any],
+    call: str,
+    status_enum: type[SetUserStatus] | type[SetCredentialStatus],
+) -> None:
+    """Test access-control set/delete commands return status enum."""
+
+    node = lock_schlage_be469
+    ack_commands = mock_command(
+        {
+            "command": f"endpoint.access_control.{command}",
+            "nodeId": node.node_id,
+            "endpoint": 0,
+        },
+        {"status": status_enum.OK},
+    )
+
+    if call == "set_user":
+        result = await node.access_control.async_set_user(
+            3,
+            SetUserOptions(
+                active=True,
+                user_type=UserCredentialUserType.GENERAL,
+                user_name="Guest",
+                credential_rule=UserCredentialRule.SINGLE,
+            ),
+        )
+    elif call == "delete_user":
+        result = await node.access_control.async_delete_user(3)
+    elif call == "delete_all_users":
+        result = await node.access_control.async_delete_all_users()
+    elif call == "set_credential":
+        result = await node.access_control.async_set_credential(
+            3, UserCredentialType.PIN_CODE, 0, b"1234"
+        )
+    else:
+        result = await node.access_control.async_delete_credential(
+            3, UserCredentialType.PIN_CODE, 0
+        )
+
+    assert result is status_enum.OK
+    assert ack_commands == [
+        {
+            "command": f"endpoint.access_control.{command}",
+            "nodeId": node.node_id,
+            "endpoint": 0,
+            **expected_payload,
+            "messageId": uuid4,
+        }
+    ]
+
+
+async def test_access_control_assign_credential(
+    lock_schlage_be469: Node, mock_command: MockCommandProtocol, uuid4: str
+) -> None:
+    """Test assign_credential returns AssignCredentialStatus."""
+    node = lock_schlage_be469
+    ack_commands = mock_command(
+        {
+            "command": "endpoint.access_control.assign_credential",
+            "nodeId": node.node_id,
+            "endpoint": 0,
+        },
+        {"status": AssignCredentialStatus.OK},
+    )
+
+    result = await node.access_control.async_assign_credential(
+        UserCredentialType.PIN_CODE, 1, 5
+    )
+
+    assert result is AssignCredentialStatus.OK
+    assert ack_commands == [
+        {
+            "command": "endpoint.access_control.assign_credential",
+            "nodeId": node.node_id,
+            "endpoint": 0,
+            "credentialType": UserCredentialType.PIN_CODE,
+            "credentialSlot": 1,
+            "destinationUserId": 5,
+            "messageId": uuid4,
+        }
+    ]
+
+
+@pytest.mark.parametrize(
+    ("command", "expected_payload", "call"),
+    [
         (
             "start_credential_learn",
             {
@@ -306,7 +406,7 @@ async def test_access_control_get_user_and_credential(
         ),
     ],
 )
-async def test_access_control_mutation_commands(
+async def test_access_control_supervised_commands(
     lock_schlage_be469: Node,
     mock_command: MockCommandProtocol,
     uuid4: str,
@@ -314,7 +414,7 @@ async def test_access_control_mutation_commands(
     expected_payload: dict[str, Any],
     call: str,
 ) -> None:
-    """Test access-control mutation commands and supervision parsing."""
+    """Test access-control commands that still return supervision results."""
 
     node = lock_schlage_be469
     ack_commands = mock_command(
@@ -326,29 +426,7 @@ async def test_access_control_mutation_commands(
         {"result": {"status": SupervisionStatus.SUCCESS}},
     )
 
-    if call == "set_user":
-        result = await node.access_control.async_set_user(
-            3,
-            SetUserOptions(
-                active=True,
-                user_type=UserCredentialUserType.GENERAL,
-                user_name="Guest",
-                credential_rule=UserCredentialRule.SINGLE,
-            ),
-        )
-    elif call == "delete_user":
-        result = await node.access_control.async_delete_user(3)
-    elif call == "delete_all_users":
-        result = await node.access_control.async_delete_all_users()
-    elif call == "set_credential":
-        result = await node.access_control.async_set_credential(
-            3, UserCredentialType.PIN_CODE, 0, b"1234"
-        )
-    elif call == "delete_credential":
-        result = await node.access_control.async_delete_credential(
-            3, UserCredentialType.PIN_CODE, 0
-        )
-    elif call == "start_credential_learn":
+    if call == "start_credential_learn":
         result = await node.access_control.async_start_credential_learn(
             3, UserCredentialType.PIN_CODE, 0, 30
         )
@@ -605,6 +683,38 @@ async def test_access_control_list_commands(
         },
         {"credential": credential_payload},
     )
+    mock_command(
+        {
+            "command": "endpoint.access_control.get_credentials_by_type",
+            "nodeId": node.node_id,
+            "endpoint": 0,
+        },
+        {"credentials": [credential_payload]},
+    )
+    mock_command(
+        {
+            "command": "endpoint.access_control.get_credentials_by_type_cached",
+            "nodeId": node.node_id,
+            "endpoint": 0,
+        },
+        {"credentials": [credential_payload]},
+    )
+    mock_command(
+        {
+            "command": "endpoint.access_control.get_all_credentials",
+            "nodeId": node.node_id,
+            "endpoint": 0,
+        },
+        {"credentials": [credential_payload]},
+    )
+    mock_command(
+        {
+            "command": "endpoint.access_control.get_all_credentials_cached",
+            "nodeId": node.node_id,
+            "endpoint": 0,
+        },
+        {"credentials": [credential_payload]},
+    )
 
     assert await node.access_control.async_get_users() == [
         UserData.from_dict(user_payload)
@@ -622,8 +732,20 @@ async def test_access_control_list_commands(
         CredentialData.from_dict(credential_payload)
     ]
     assert await node.access_control.async_get_credential_cached(
-        1, UserCredentialType.PIN_CODE, 0
+        UserCredentialType.PIN_CODE, 0
     ) == CredentialData.from_dict(credential_payload)
+    assert await node.access_control.async_get_credentials_by_type(
+        UserCredentialType.PIN_CODE
+    ) == [CredentialData.from_dict(credential_payload)]
+    assert await node.access_control.async_get_credentials_by_type_cached(
+        UserCredentialType.PIN_CODE
+    ) == [CredentialData.from_dict(credential_payload)]
+    assert await node.access_control.async_get_all_credentials() == [
+        CredentialData.from_dict(credential_payload)
+    ]
+    assert await node.access_control.async_get_all_credentials_cached() == [
+        CredentialData.from_dict(credential_payload)
+    ]
 
 
 async def test_access_control_none_results(
@@ -650,9 +772,7 @@ async def test_access_control_none_results(
 
     assert await node.access_control.async_get_user(1) is None
     assert (
-        await node.access_control.async_get_credential(
-            1, UserCredentialType.PIN_CODE, 0
-        )
+        await node.access_control.async_get_credential(UserCredentialType.PIN_CODE, 0)
         is None
     )
 
@@ -668,14 +788,14 @@ async def test_access_control_set_credential_str_data(
             "nodeId": node.node_id,
             "endpoint": 0,
         },
-        {"result": {"status": SupervisionStatus.SUCCESS}},
+        {"status": SetCredentialStatus.OK},
     )
 
     result = await node.access_control.async_set_credential(
         3, UserCredentialType.PIN_CODE, 0, "1234"
     )
 
-    assert result is not None
+    assert result is SetCredentialStatus.OK
     assert ack_commands == [
         {
             "command": "endpoint.access_control.set_credential",

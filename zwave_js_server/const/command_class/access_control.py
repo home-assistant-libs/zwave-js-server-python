@@ -54,3 +54,34 @@ class UserCredentialLearnStatus(IntEnum):
     STEP_RETRY = 0x05
     INVALID_ADD_OPERATION_TYPE = 0xFE
     INVALID_MODIFY_OPERATION_TYPE = 0xFF
+
+
+class SetUserStatus(IntEnum):
+    """Result status for set_user / delete_user / delete_all_users commands."""
+
+    OK = 0
+    ERROR_ADD_REJECTED_LOCATION_OCCUPIED = 1
+    ERROR_MODIFY_REJECTED_LOCATION_EMPTY = 2
+    ERROR_UNKNOWN = 0xFF
+
+
+class SetCredentialStatus(IntEnum):
+    """Result status for set_credential / delete_credential commands."""
+
+    OK = 0
+    ERROR_ADD_REJECTED_LOCATION_OCCUPIED = 1
+    ERROR_MODIFY_REJECTED_LOCATION_EMPTY = 2
+    ERROR_DUPLICATE_CREDENTIAL = 3
+    ERROR_MANUFACTURER_SECURITY_RULES = 4
+    ERROR_DUPLICATE_ADMIN_PIN_CODE = 5
+    ERROR_WRONG_USER_UNIQUE_IDENTIFIER = 6
+    ERROR_UNKNOWN = 0xFF
+
+
+class AssignCredentialStatus(IntEnum):
+    """Result status for assign_credential commands."""
+
+    OK = 0
+    ERROR_INVALID_CREDENTIAL = 1
+    ERROR_INVALID_USER = 2
+    ERROR_UNKNOWN = 0xFF
