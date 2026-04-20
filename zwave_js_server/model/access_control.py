@@ -6,6 +6,9 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, TypedDict, cast
 
 from ..const.command_class.access_control import (
+    AssignCredentialStatus,
+    SetCredentialStatus,
+    SetUserStatus,
     UserCredentialLearnStatus,
     UserCredentialRule,
     UserCredentialType,
@@ -609,46 +612,47 @@ class AccessControlAPI:
 
     async def async_set_user(
         self, user_id: int, options: SetUserOptions
-    ) -> SupervisionResult | None:
+    ) -> SetUserStatus:
         """Create or update an access-control user."""
         result = await self._endpoint.async_send_command(
             "access_control.set_user",
             userId=user_id,
             options=options.to_dict(),
             require_schema=48,
-            wait_for_result=None,
+            wait_for_result=True,
         )
-        return parse_supervision_result(result)
+        assert result is not None
+        return SetUserStatus(result["status"])
 
-    async def async_delete_user(self, user_id: int) -> SupervisionResult | None:
+    async def async_delete_user(self, user_id: int) -> SetUserStatus:
         """Delete an access-control user."""
         result = await self._endpoint.async_send_command(
             "access_control.delete_user",
             userId=user_id,
             require_schema=48,
-            wait_for_result=None,
+            wait_for_result=True,
         )
-        return parse_supervision_result(result)
+        assert result is not None
+        return SetUserStatus(result["status"])
 
-    async def async_delete_all_users(self) -> SupervisionResult | None:
+    async def async_delete_all_users(self) -> SetUserStatus:
         """Delete all configured access-control users."""
         result = await self._endpoint.async_send_command(
             "access_control.delete_all_users",
             require_schema=48,
-            wait_for_result=None,
+            wait_for_result=True,
         )
-        return parse_supervision_result(result)
+        assert result is not None
+        return SetUserStatus(result["status"])
 
     async def async_get_credential(
         self,
-        user_id: int,
         credential_type: UserCredentialType,
         credential_slot: int,
     ) -> CredentialData | None:
         """Return fresh data for a single access-control credential."""
         result = await self._endpoint.async_send_command(
             "access_control.get_credential",
-            userId=user_id,
             credentialType=credential_type,
             credentialSlot=credential_slot,
             require_schema=48,
@@ -661,14 +665,12 @@ class AccessControlAPI:
 
     async def async_get_credential_cached(
         self,
-        user_id: int,
         credential_type: UserCredentialType,
         credential_slot: int,
     ) -> CredentialData | None:
         """Return cached data for a single access-control credential."""
         result = await self._endpoint.async_send_command(
             "access_control.get_credential_cached",
-            userId=user_id,
             credentialType=credential_type,
             credentialSlot=credential_slot,
             require_schema=48,
@@ -711,13 +713,97 @@ class AccessControlAPI:
             for credential in credentials
         ]
 
+    async def async_get_credentials_by_type(
+        self, credential_type: UserCredentialType
+    ) -> list[CredentialData]:
+        """Return fresh data for all credentials of the given type."""
+        result = await self._endpoint.async_send_command(
+            "access_control.get_credentials_by_type",
+            credentialType=credential_type,
+            require_schema=48,
+            wait_for_result=True,
+        )
+        assert result
+        credentials = result["credentials"]
+        assert credentials is not None
+        return [
+            CredentialData.from_dict(cast(CredentialDataDataType, credential))
+            for credential in credentials
+        ]
+
+    async def async_get_credentials_by_type_cached(
+        self, credential_type: UserCredentialType
+    ) -> list[CredentialData]:
+        """Return cached data for all credentials of the given type."""
+        result = await self._endpoint.async_send_command(
+            "access_control.get_credentials_by_type_cached",
+            credentialType=credential_type,
+            require_schema=48,
+            wait_for_result=True,
+        )
+        assert result
+        credentials = result["credentials"]
+        assert credentials is not None
+        return [
+            CredentialData.from_dict(cast(CredentialDataDataType, credential))
+            for credential in credentials
+        ]
+
+    async def async_get_all_credentials(self) -> list[CredentialData]:
+        """Return fresh data for all credentials regardless of type or user."""
+        result = await self._endpoint.async_send_command(
+            "access_control.get_all_credentials",
+            require_schema=48,
+            wait_for_result=True,
+        )
+        assert result
+        credentials = result["credentials"]
+        assert credentials is not None
+        return [
+            CredentialData.from_dict(cast(CredentialDataDataType, credential))
+            for credential in credentials
+        ]
+
+    async def async_get_all_credentials_cached(self) -> list[CredentialData]:
+        """Return cached data for all credentials regardless of type or user."""
+        result = await self._endpoint.async_send_command(
+            "access_control.get_all_credentials_cached",
+            require_schema=48,
+            wait_for_result=True,
+        )
+        assert result
+        credentials = result["credentials"]
+        assert credentials is not None
+        return [
+            CredentialData.from_dict(cast(CredentialDataDataType, credential))
+            for credential in credentials
+        ]
+
+    async def async_assign_credential(
+        self,
+        credential_type: UserCredentialType,
+        credential_slot: int,
+        destination_user_id: int,
+    ) -> AssignCredentialStatus:
+        """Reassign an existing credential to a different user."""
+        result = await self._endpoint.async_send_command(
+            "access_control.assign_credential",
+            credentialType=credential_type,
+            credentialSlot=credential_slot,
+            destinationUserId=destination_user_id,
+            require_schema=48,
+            wait_for_result=True,
+        )
+        assert result is not None
+        return AssignCredentialStatus(result["status"])
+
     async def async_set_credential(
         self,
         user_id: int,
         credential_type: UserCredentialType,
         credential_slot: int,
         data: str | bytes,
-    ) -> SupervisionResult | None:
+    ) -> SetCredentialStatus:
         """Create or update an access-control credential."""
         result = await self._endpoint.async_send_command(
             "access_control.set_credential",
@@ -726,16 +812,17 @@ class AccessControlAPI:
             credentialSlot=credential_slot,
             data=serialize_credential_data(data),
             require_schema=48,
-            wait_for_result=None,
+            wait_for_result=True,
         )
-        return parse_supervision_result(result)
+        assert result is not None
+        return SetCredentialStatus(result["status"])
 
     async def async_delete_credential(
         self,
         user_id: int,
         credential_type: UserCredentialType,
         credential_slot: int,
-    ) -> SupervisionResult | None:
+    ) -> SetCredentialStatus:
         """Delete an access-control credential."""
         result = await self._endpoint.async_send_command(
             "access_control.delete_credential",
@@ -743,9 +830,10 @@ class AccessControlAPI:
             credentialType=credential_type,
             credentialSlot=credential_slot,
             require_schema=48,
-            wait_for_result=None,
+            wait_for_result=True,
         )
-        return parse_supervision_result(result)
+        assert result is not None
+        return SetCredentialStatus(result["status"])
 
     async def async_start_credential_learn(
         self,
