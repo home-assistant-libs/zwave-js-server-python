@@ -56,8 +56,8 @@ class UserCredentialLearnStatus(IntEnum):
     INVALID_MODIFY_OPERATION_TYPE = 0xFF
 
 
-class SetUserStatus(IntEnum):
-    """Result status for set_user / delete_user / delete_all_users commands."""
+class SetUserResult(IntEnum):
+    """Result for set_user / delete_user / delete_all_users commands."""
 
     OK = 0
     ERROR_ADD_REJECTED_LOCATION_OCCUPIED = 1
@@ -65,8 +65,8 @@ class SetUserStatus(IntEnum):
     ERROR_UNKNOWN = 0xFF
 
 
-class SetCredentialStatus(IntEnum):
-    """Result status for set_credential / delete_credential commands."""
+class SetCredentialResult(IntEnum):
+    """Result for set_credential / delete_credential commands."""
 
     OK = 0
     ERROR_ADD_REJECTED_LOCATION_OCCUPIED = 1
@@ -78,8 +78,8 @@ class SetCredentialStatus(IntEnum):
     ERROR_UNKNOWN = 0xFF
 
 
-class AssignCredentialStatus(IntEnum):
-    """Result status for assign_credential commands."""
+class AssignCredentialResult(IntEnum):
+    """Result for assign_credential commands."""
 
     OK = 0
     ERROR_INVALID_CREDENTIAL = 1

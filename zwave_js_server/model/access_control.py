@@ -6,9 +6,9 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, TypedDict, cast
 
 from ..const.command_class.access_control import (
-    AssignCredentialStatus,
-    SetCredentialStatus,
-    SetUserStatus,
+    AssignCredentialResult,
+    SetCredentialResult,
+    SetUserResult,
     UserCredentialLearnStatus,
     UserCredentialRule,
     UserCredentialType,
@@ -612,7 +612,7 @@ class AccessControlAPI:
 
     async def async_set_user(
         self, user_id: int, options: SetUserOptions
-    ) -> SetUserStatus:
+    ) -> SetUserResult:
         """Create or update an access-control user."""
         result = await self._endpoint.async_send_command(
             "access_control.set_user",
@@ -622,9 +622,9 @@ class AccessControlAPI:
             wait_for_result=True,
         )
         assert result is not None
-        return SetUserStatus(result["status"])
+        return SetUserResult(result["result"])
 
-    async def async_delete_user(self, user_id: int) -> SetUserStatus:
+    async def async_delete_user(self, user_id: int) -> SetUserResult:
         """Delete an access-control user."""
         result = await self._endpoint.async_send_command(
             "access_control.delete_user",
@@ -633,9 +633,9 @@ class AccessControlAPI:
             wait_for_result=True,
         )
         assert result is not None
-        return SetUserStatus(result["status"])
+        return SetUserResult(result["result"])
 
-    async def async_delete_all_users(self) -> SetUserStatus:
+    async def async_delete_all_users(self) -> SetUserResult:
         """Delete all configured access-control users."""
         result = await self._endpoint.async_send_command(
             "access_control.delete_all_users",
@@ -643,7 +643,7 @@ class AccessControlAPI:
             wait_for_result=True,
         )
         assert result is not None
-        return SetUserStatus(result["status"])
+        return SetUserResult(result["result"])
 
     async def async_get_credential(
         self,
@@ -784,7 +784,7 @@ class AccessControlAPI:
         credential_type: UserCredentialType,
         credential_slot: int,
         destination_user_id: int,
-    ) -> AssignCredentialStatus:
+    ) -> AssignCredentialResult:
         """Reassign an existing credential to a different user."""
         result = await self._endpoint.async_send_command(
             "access_control.assign_credential",
@@ -795,7 +795,7 @@ class AccessControlAPI:
             wait_for_result=True,
         )
         assert result is not None
-        return AssignCredentialStatus(result["status"])
+        return AssignCredentialResult(result["result"])
 
     async def async_set_credential(
         self,
@@ -803,7 +803,7 @@ class AccessControlAPI:
         credential_type: UserCredentialType,
         credential_slot: int,
         data: str | bytes,
-    ) -> SetCredentialStatus:
+    ) -> SetCredentialResult:
         """Create or update an access-control credential."""
         result = await self._endpoint.async_send_command(
             "access_control.set_credential",
@@ -815,14 +815,14 @@ class AccessControlAPI:
             wait_for_result=True,
         )
         assert result is not None
-        return SetCredentialStatus(result["status"])
+        return SetCredentialResult(result["result"])
 
     async def async_delete_credential(
         self,
         user_id: int,
         credential_type: UserCredentialType,
         credential_slot: int,
-    ) -> SetCredentialStatus:
+    ) -> SetCredentialResult:
         """Delete an access-control credential."""
         result = await self._endpoint.async_send_command(
             "access_control.delete_credential",
@@ -833,7 +833,7 @@ class AccessControlAPI:
             wait_for_result=True,
         )
         assert result is not None
-        return SetCredentialStatus(result["status"])
+        return SetCredentialResult(result["result"])
 
     async def async_start_credential_learn(
         self,
