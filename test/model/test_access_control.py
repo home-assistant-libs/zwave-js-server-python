@@ -8,9 +8,9 @@ import pytest
 
 from zwave_js_server.const import SupervisionStatus
 from zwave_js_server.const.command_class.access_control import (
-    AssignCredentialStatus,
-    SetCredentialStatus,
-    SetUserStatus,
+    AssignCredentialResult,
+    SetCredentialResult,
+    SetUserResult,
     UserCredentialLearnStatus,
     UserCredentialRule,
     UserCredentialType,
@@ -242,7 +242,7 @@ async def test_access_control_get_user_and_credential(
 
 
 @pytest.mark.parametrize(
-    ("command", "expected_payload", "call", "status_enum"),
+    ("command", "expected_payload", "call", "result_enum"),
     [
         (
             "set_user",
@@ -256,19 +256,19 @@ async def test_access_control_get_user_and_credential(
                 },
             },
             "set_user",
-            SetUserStatus,
+            SetUserResult,
         ),
         (
             "delete_user",
             {"userId": 3},
             "delete_user",
-            SetUserStatus,
+            SetUserResult,
         ),
         (
             "delete_all_users",
             {},
             "delete_all_users",
-            SetUserStatus,
+            SetUserResult,
         ),
         (
             "set_credential",
@@ -279,7 +279,7 @@ async def test_access_control_get_user_and_credential(
                 "data": {"type": "Buffer", "data": [49, 50, 51, 52]},
             },
             "set_credential",
-            SetCredentialStatus,
+            SetCredentialResult,
         ),
         (
             "delete_credential",
@@ -289,7 +289,7 @@ async def test_access_control_get_user_and_credential(
                 "credentialSlot": 0,
             },
             "delete_credential",
-            SetCredentialStatus,
+            SetCredentialResult,
         ),
     ],
 )
@@ -300,9 +300,9 @@ async def test_access_control_set_commands(
     command: str,
     expected_payload: dict[str, Any],
     call: str,
-    status_enum: type[SetUserStatus] | type[SetCredentialStatus],
+    result_enum: type[SetUserResult] | type[SetCredentialResult],
 ) -> None:
-    """Test access-control set/delete commands return status enum."""
+    """Test access-control set/delete commands return result enum."""
 
     node = lock_schlage_be469
     ack_commands = mock_command(
@@ -311,7 +311,7 @@ async def test_access_control_set_commands(
             "nodeId": node.node_id,
             "endpoint": 0,
         },
-        {"status": status_enum.OK},
+        {"result": result_enum.OK},
     )
 
     if call == "set_user":
@@ -337,7 +337,7 @@ async def test_access_control_set_commands(
             3, UserCredentialType.PIN_CODE, 0
         )
 
-    assert result is status_enum.OK
+    assert result is result_enum.OK
     assert ack_commands == [
         {
             "command": f"endpoint.access_control.{command}",
@@ -352,7 +352,7 @@ async def test_access_control_set_commands(
 async def test_access_control_assign_credential(
     lock_schlage_be469: Node, mock_command: MockCommandProtocol, uuid4: str
 ) -> None:
-    """Test assign_credential returns AssignCredentialStatus."""
+    """Test assign_credential returns AssignCredentialResult."""
     node = lock_schlage_be469
     ack_commands = mock_command(
         {
@@ -360,14 +360,14 @@ async def test_access_control_assign_credential(
             "nodeId": node.node_id,
             "endpoint": 0,
         },
-        {"status": AssignCredentialStatus.OK},
+        {"result": AssignCredentialResult.OK},
     )
 
     result = await node.access_control.async_assign_credential(
         UserCredentialType.PIN_CODE, 1, 5
     )
 
-    assert result is AssignCredentialStatus.OK
+    assert result is AssignCredentialResult.OK
     assert ack_commands == [
         {
             "command": "endpoint.access_control.assign_credential",
@@ -788,14 +788,14 @@ async def test_access_control_set_credential_str_data(
             "nodeId": node.node_id,
             "endpoint": 0,
         },
-        {"status": SetCredentialStatus.OK},
+        {"result": SetCredentialResult.OK},
     )
 
     result = await node.access_control.async_set_credential(
         3, UserCredentialType.PIN_CODE, 0, "1234"
     )
 
-    assert result is SetCredentialStatus.OK
+    assert result is SetCredentialResult.OK
     assert ack_commands == [
         {
             "command": "endpoint.access_control.set_credential",
