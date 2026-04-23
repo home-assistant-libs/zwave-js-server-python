@@ -173,7 +173,7 @@ class DoorLockCCConfigurationSetOptions:
             "outside_handles_can_open_door_configuration",
         ):
             if not getattr(self, attr_name):
-                object.__setattr__(self, attr_name, DEFAULT_HANDLE_CONFIGURATION)
+                object.__setattr__(self, attr_name, list(DEFAULT_HANDLE_CONFIGURATION))
 
     def to_dict(self) -> DoorLockCCConfigurationSetOptionsDataType:
         """Convert command options to dict."""

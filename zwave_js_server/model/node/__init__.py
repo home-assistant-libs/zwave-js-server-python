@@ -328,7 +328,7 @@ class Node(EventBase):
         return self.interview_stage in (None, NOT_INTERVIEWED)
 
     @property
-    def command_classes(self) -> list[CommandClassInfo]:
+    def command_classes(self) -> tuple[CommandClassInfo, ...]:
         """Return all CommandClasses supported on this node."""
         return self.endpoints[0].command_classes
 

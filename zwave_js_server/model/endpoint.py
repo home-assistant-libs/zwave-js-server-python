@@ -105,9 +105,9 @@ class Endpoint(EventBase):
         return self.data.get("userIcon")
 
     @cached_property
-    def command_classes(self) -> list[CommandClassInfo]:
+    def command_classes(self) -> tuple[CommandClassInfo, ...]:
         """Return all CommandClasses supported on this node."""
-        return [CommandClassInfo(cc) for cc in self.data["commandClasses"]]
+        return tuple(CommandClassInfo(cc) for cc in self.data["commandClasses"])
 
     @property
     def endpoint_label(self) -> str | None:
