@@ -773,7 +773,11 @@ class Controller(EventBase):
             await self.client.async_send_command_no_wait(cmd)
 
     async def async_get_node_neighbors(self, node: Node) -> list[int]:
-        """Send getNodeNeighbors command to Controller to get node's neighbors."""
+        """Send getNodeNeighbors command to Controller to get node's neighbors.
+
+        Returns raw node IDs because neighbors may include nodes not yet
+        interviewed and therefore not present in ``self.nodes``.
+        """
         data = await self.client.async_send_command(
             {
                 "command": "controller.get_node_neighbors",
@@ -1174,7 +1178,11 @@ class Controller(EventBase):
         )
 
     async def async_get_long_range_nodes(self) -> list[int]:
-        """Send getLongRangeNodes command to Controller."""
+        """Send getLongRangeNodes command to Controller.
+
+        Returns raw node IDs because Long Range nodes may not be present
+        in ``self.nodes``.
+        """
         data = await self.client.async_send_command(
             {"command": "controller.get_long_range_nodes"},
             require_schema=47,
@@ -1444,7 +1452,11 @@ class Controller(EventBase):
     async def async_get_all_associations(
         self, node: Node
     ) -> dict[int, dict[int, dict[int, list[AssociationAddress]]]]:
-        """Send getAllAssociations command to Controller."""
+        """Send getAllAssociations command to Controller.
+
+        The outer dict is keyed by raw node IDs (int) because association
+        targets may reference nodes not present in ``self.nodes``.
+        """
         data = await self.client.async_send_command(
             {
                 "command": "controller.get_all_associations",
@@ -1489,7 +1501,11 @@ class Controller(EventBase):
     async def async_get_priority_return_routes_cached(
         self, node: Node
     ) -> dict[int, Route]:
-        """Send getPriorityReturnRoutesCached command to Controller."""
+        """Send getPriorityReturnRoutesCached command to Controller.
+
+        The dict is keyed by raw destination node IDs because they may
+        reference nodes not present in ``self.nodes``.
+        """
         data = await self.client.async_send_command(
             {
                 "command": "controller.get_priority_return_routes_cached",
