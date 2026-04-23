@@ -52,11 +52,13 @@ def test_credential_capabilities_from_dict() -> None:
             },
             "supportsAdminCode": True,
             "supportsAdminCodeDeactivation": False,
+            "supportsCredentialAssignment": True,
         }
     )
 
     assert capabilities.supports_admin_code
     assert not capabilities.supports_admin_code_deactivation
+    assert capabilities.supports_credential_assignment
     assert UserCredentialType.PIN_CODE in capabilities.supported_credential_types
     pin_code = capabilities.supported_credential_types[UserCredentialType.PIN_CODE]
     assert pin_code.number_of_credential_slots == 2
@@ -119,6 +121,7 @@ async def test_access_control_support_and_capabilities(
                 },
                 "supportsAdminCode": True,
                 "supportsAdminCodeDeactivation": True,
+                "supportsCredentialAssignment": True,
             }
         },
     )
@@ -157,6 +160,7 @@ async def test_access_control_support_and_capabilities(
     )
     assert credential_capabilities.supports_admin_code
     assert credential_capabilities.supports_admin_code_deactivation
+    assert credential_capabilities.supports_credential_assignment
     assert (
         credential_capabilities.supported_credential_types[
             UserCredentialType.PIN_CODE

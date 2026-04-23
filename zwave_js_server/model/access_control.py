@@ -154,6 +154,7 @@ class CredentialCapabilitiesDataType(TypedDict, total=False):
     supportedCredentialTypes: dict[str, UserCredentialCapabilityDataType]
     supportsAdminCode: bool
     supportsAdminCodeDeactivation: bool
+    supportsCredentialAssignment: bool
 
 
 @dataclass
@@ -165,6 +166,7 @@ class CredentialCapabilities:
     )
     supports_admin_code: bool = False
     supports_admin_code_deactivation: bool = False
+    supports_credential_assignment: bool = False
 
     @classmethod
     def from_dict(cls, data: CredentialCapabilitiesDataType) -> CredentialCapabilities:
@@ -183,6 +185,9 @@ class CredentialCapabilities:
             supports_admin_code_deactivation=data.get(
                 "supportsAdminCodeDeactivation", False
             ),
+            supports_credential_assignment=data.get(
+                "supportsCredentialAssignment", False
+            ),
         )
 
     def to_dict(self) -> CredentialCapabilitiesDataType:
@@ -194,6 +199,7 @@ class CredentialCapabilities:
             },
             "supportsAdminCode": self.supports_admin_code,
             "supportsAdminCodeDeactivation": self.supports_admin_code_deactivation,
+            "supportsCredentialAssignment": self.supports_credential_assignment,
         }
 
 
