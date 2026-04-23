@@ -925,14 +925,14 @@ class Controller(EventBase):
         )
 
     async def async_assign_return_routes(
-        self, node: Node, destination_node_id: int
+        self, node: Node, destination_node: Node
     ) -> bool:
         """Send assignReturnRoutes command to Controller."""
         data = await self.client.async_send_command(
             {
                 "command": "controller.assign_return_routes",
                 "nodeId": node.node_id,
-                "destinationNodeId": destination_node_id,
+                "destinationNodeId": destination_node.node_id,
             },
             require_schema=47,
         )
@@ -974,7 +974,7 @@ class Controller(EventBase):
     async def async_assign_priority_return_route(
         self,
         node: Node,
-        destination_node_id: int,
+        destination_node: Node,
         repeaters: list[int],
         route_speed: int,
     ) -> bool:
@@ -983,7 +983,7 @@ class Controller(EventBase):
             {
                 "command": "controller.assign_priority_return_route",
                 "nodeId": node.node_id,
-                "destinationNodeId": destination_node_id,
+                "destinationNodeId": destination_node.node_id,
                 "repeaters": repeaters,
                 "routeSpeed": route_speed,
             },
@@ -1012,7 +1012,7 @@ class Controller(EventBase):
     async def async_assign_custom_return_routes(
         self,
         node: Node,
-        destination_node_id: int,
+        destination_node: Node,
         routes: list[dict],
         priority_route: dict | None = None,
     ) -> bool:
@@ -1020,7 +1020,7 @@ class Controller(EventBase):
         cmd: dict[str, Any] = {
             "command": "controller.assign_custom_return_routes",
             "nodeId": node.node_id,
-            "destinationNodeId": destination_node_id,
+            "destinationNodeId": destination_node.node_id,
             "routes": routes,
         }
         if priority_route is not None:
@@ -1047,7 +1047,7 @@ class Controller(EventBase):
 
     async def async_set_priority_route(
         self,
-        destination_node_id: int,
+        destination_node: Node,
         repeaters: list[int],
         route_speed: int,
     ) -> bool:
@@ -1055,7 +1055,7 @@ class Controller(EventBase):
         data = await self.client.async_send_command(
             {
                 "command": "controller.set_priority_route",
-                "destinationNodeId": destination_node_id,
+                "destinationNodeId": destination_node.node_id,
                 "repeaters": repeaters,
                 "routeSpeed": route_speed,
             },
@@ -1063,23 +1063,23 @@ class Controller(EventBase):
         )
         return cast(bool, data["success"])
 
-    async def async_remove_priority_route(self, destination_node_id: int) -> bool:
+    async def async_remove_priority_route(self, destination_node: Node) -> bool:
         """Send removePriorityRoute command to Controller."""
         data = await self.client.async_send_command(
             {
                 "command": "controller.remove_priority_route",
-                "destinationNodeId": destination_node_id,
+                "destinationNodeId": destination_node.node_id,
             },
             require_schema=47,
         )
         return cast(bool, data["success"])
 
-    async def async_get_priority_route(self, destination_node_id: int) -> dict | None:
+    async def async_get_priority_route(self, destination_node: Node) -> dict | None:
         """Send getPriorityRoute command to Controller."""
         data = await self.client.async_send_command(
             {
                 "command": "controller.get_priority_route",
-                "destinationNodeId": destination_node_id,
+                "destinationNodeId": destination_node.node_id,
             },
             require_schema=47,
         )
@@ -1370,9 +1370,7 @@ class Controller(EventBase):
                     profile=group.get("profile"),
                     issued_commands={
                         int(cc): cmds
-                        for cc, cmds in group.get(
-                            "issuedCommands", {}
-                        ).items()
+                        for cc, cmds in group.get("issuedCommands", {}).items()
                     },
                 )
                 for group_id, group in groups.items()
@@ -1409,14 +1407,14 @@ class Controller(EventBase):
         return result
 
     async def async_get_priority_return_route_cached(
-        self, node: Node, destination_node_id: int
+        self, node: Node, destination_node: Node
     ) -> dict | None:
         """Send getPriorityReturnRouteCached command to Controller."""
         data = await self.client.async_send_command(
             {
                 "command": "controller.get_priority_return_route_cached",
                 "nodeId": node.node_id,
-                "destinationNodeId": destination_node_id,
+                "destinationNodeId": destination_node.node_id,
             },
             require_schema=47,
         )
@@ -1447,14 +1445,14 @@ class Controller(EventBase):
         return data.get("route")
 
     async def async_get_custom_return_routes_cached(
-        self, node: Node, destination_node_id: int
+        self, node: Node, destination_node: Node
     ) -> list[dict]:
         """Send getCustomReturnRoutesCached command to Controller."""
         data = await self.client.async_send_command(
             {
                 "command": "controller.get_custom_return_routes_cached",
                 "nodeId": node.node_id,
-                "destinationNodeId": destination_node_id,
+                "destinationNodeId": destination_node.node_id,
             },
             require_schema=47,
         )

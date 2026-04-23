@@ -2465,12 +2465,6 @@ async def test_restore_nvm_raw(
 @pytest.mark.parametrize(
     ("wire_cmd", "method", "args", "extra_payload"),
     [
-        (
-            "assign_return_routes",
-            "async_assign_return_routes",
-            (1,),
-            {"nodeId": 52, "destinationNodeId": 1},
-        ),
         ("delete_return_routes", "async_delete_return_routes", (), {"nodeId": 52}),
         (
             "assign_suc_return_routes",
@@ -2483,6 +2477,12 @@ async def test_restore_nvm_raw(
             "async_delete_suc_return_routes",
             (),
             {"nodeId": 52},
+        ),
+        (
+            "remove_priority_route",
+            "async_remove_priority_route",
+            (),
+            {"destinationNodeId": 52},
         ),
         (
             "discover_node_neighbors",
@@ -2516,15 +2516,30 @@ async def test_simple_bool_node_commands(
     }
 
 
+async def test_assign_return_routes(
+    controller: Controller,
+    multisensor_6: Node,
+    uuid4: str,
+    mock_command: MockCommandProtocol,
+) -> None:
+    """Test assign return routes command."""
+    ack_commands = mock_command(
+        {"command": "controller.assign_return_routes"}, {"success": True}
+    )
+    result = await controller.async_assign_return_routes(multisensor_6, multisensor_6)
+    assert result is True
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "controller.assign_return_routes",
+        "messageId": uuid4,
+        "nodeId": 52,
+        "destinationNodeId": 52,
+    }
+
+
 @pytest.mark.parametrize(
     ("wire_cmd", "method", "args", "extra_payload"),
     [
-        (
-            "remove_priority_route",
-            "async_remove_priority_route",
-            (1,),
-            {"destinationNodeId": 1},
-        ),
         ("stop_joining_network", "async_stop_joining_network", (), {}),
         ("stop_leaving_network", "async_stop_leaving_network", (), {}),
     ],
@@ -2564,13 +2579,13 @@ async def test_assign_priority_return_route(
         {"success": True},
     )
     result = await controller.async_assign_priority_return_route(
-        multisensor_6, 1, [3, 4], 100
+        multisensor_6, multisensor_6, [3, 4], 100
     )
     assert result is True
     assert ack_commands[0] == {
         "command": "controller.assign_priority_return_route",
         "nodeId": 52,
-        "destinationNodeId": 1,
+        "destinationNodeId": 52,
         "repeaters": [3, 4],
         "routeSpeed": 100,
         "messageId": uuid4,
@@ -2615,14 +2630,14 @@ async def test_assign_custom_return_routes(
     routes = [{"repeaters": [3, 4], "routeSpeed": 100}]
 
     result = await controller.async_assign_custom_return_routes(
-        multisensor_6, 1, routes
+        multisensor_6, multisensor_6, routes
     )
     assert result is True
     assert "priorityRoute" not in ack_commands[0]
 
     priority_route = {"repeaters": [5], "routeSpeed": 200}
     await controller.async_assign_custom_return_routes(
-        multisensor_6, 1, routes, priority_route
+        multisensor_6, multisensor_6, routes, priority_route
     )
     assert ack_commands[1]["priorityRoute"] == priority_route
 
@@ -2654,18 +2669,21 @@ async def test_assign_custom_suc_return_routes(
 
 
 async def test_set_priority_route(
-    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+    controller: Controller,
+    multisensor_6: Node,
+    uuid4: str,
+    mock_command: MockCommandProtocol,
 ) -> None:
     """Test set priority route command."""
     ack_commands = mock_command(
         {"command": "controller.set_priority_route"},
         {"success": True},
     )
-    result = await controller.async_set_priority_route(1, [3, 4], 100)
+    result = await controller.async_set_priority_route(multisensor_6, [3, 4], 100)
     assert result is True
     assert ack_commands[0] == {
         "command": "controller.set_priority_route",
-        "destinationNodeId": 1,
+        "destinationNodeId": 52,
         "repeaters": [3, 4],
         "routeSpeed": 100,
         "messageId": uuid4,
@@ -2673,20 +2691,26 @@ async def test_set_priority_route(
 
 
 async def test_get_priority_route(
-    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+    controller: Controller,
+    multisensor_6: Node,
+    uuid4: str,
+    mock_command: MockCommandProtocol,
 ) -> None:
     """Test get priority route command."""
     route_data = {"repeaters": [3, 4], "routeSpeed": 100}
     mock_command({"command": "controller.get_priority_route"}, {"route": route_data})
-    assert await controller.async_get_priority_route(1) == route_data
+    assert await controller.async_get_priority_route(multisensor_6) == route_data
 
 
 async def test_get_priority_route_none(
-    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+    controller: Controller,
+    multisensor_6: Node,
+    uuid4: str,
+    mock_command: MockCommandProtocol,
 ) -> None:
     """Test get priority route returns None when absent."""
     mock_command({"command": "controller.get_priority_route"}, {})
-    assert await controller.async_get_priority_route(1) is None
+    assert await controller.async_get_priority_route(multisensor_6) is None
 
 
 async def test_get_background_rssi(
@@ -2985,14 +3009,14 @@ async def test_get_all_associations(
         (
             "get_priority_return_route_cached",
             "async_get_priority_return_route_cached",
-            (1,),
+            ("node",),
             {"route": {"repeaters": [3], "routeSpeed": 100}},
             {"repeaters": [3], "routeSpeed": 100},
         ),
         (
             "get_priority_return_route_cached",
             "async_get_priority_return_route_cached",
-            (1,),
+            ("node",),
             {},
             None,
         ),
@@ -3025,7 +3049,8 @@ async def test_cached_route_optional(
 ) -> None:
     """Test cached route queries that may return None."""
     mock_command({"command": f"controller.{wire_cmd}"}, response)
-    assert await getattr(controller, method)(multisensor_6, *args) == expected
+    actual_args = tuple(multisensor_6 if a == "node" else a for a in args)
+    assert await getattr(controller, method)(multisensor_6, *actual_args) == expected
 
 
 async def test_cached_route_list_queries(
@@ -3050,7 +3075,9 @@ async def test_cached_route_list_queries(
         {"command": "controller.get_custom_return_routes_cached"}, {"routes": list_data}
     )
     assert (
-        await controller.async_get_custom_return_routes_cached(multisensor_6, 1)
+        await controller.async_get_custom_return_routes_cached(
+            multisensor_6, multisensor_6
+        )
         == list_data
     )
 
