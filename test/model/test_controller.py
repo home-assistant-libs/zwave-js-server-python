@@ -31,7 +31,7 @@ from zwave_js_server.model import (
     controller as controller_pkg,
 )
 from zwave_js_server.model.association import AssociationGroup
-from zwave_js_server.model.controller import Controller
+from zwave_js_server.model.controller import Controller, Route
 from zwave_js_server.model.controller.data_model import ZWaveChipType
 from zwave_js_server.model.controller.rebuild_routes import (
     RebuildRoutesOptions,
@@ -2627,19 +2627,20 @@ async def test_assign_custom_return_routes(
         {"command": "controller.assign_custom_return_routes"},
         {"success": True},
     )
-    routes = [{"repeaters": [3, 4], "routeSpeed": 100}]
+    routes = [Route(repeaters=[multisensor_6, multisensor_6], route_speed=100)]
 
     result = await controller.async_assign_custom_return_routes(
         multisensor_6, multisensor_6, routes
     )
     assert result is True
+    assert ack_commands[0]["routes"] == [{"repeaters": [52, 52], "routeSpeed": 100}]
     assert "priorityRoute" not in ack_commands[0]
 
-    priority_route = {"repeaters": [5], "routeSpeed": 200}
+    priority_route = Route(repeaters=[multisensor_6], route_speed=200)
     await controller.async_assign_custom_return_routes(
         multisensor_6, multisensor_6, routes, priority_route
     )
-    assert ack_commands[1]["priorityRoute"] == priority_route
+    assert ack_commands[1]["priorityRoute"] == {"repeaters": [52], "routeSpeed": 200}
 
 
 async def test_assign_custom_suc_return_routes(
@@ -2653,7 +2654,7 @@ async def test_assign_custom_suc_return_routes(
         {"command": "controller.assign_custom_suc_return_routes"},
         {"success": True},
     )
-    routes = [{"repeaters": [3, 4], "routeSpeed": 100}]
+    routes = [Route(repeaters=[multisensor_6], route_speed=100)]
 
     result = await controller.async_assign_custom_suc_return_routes(
         multisensor_6, routes
@@ -2661,11 +2662,11 @@ async def test_assign_custom_suc_return_routes(
     assert result is True
     assert "priorityRoute" not in ack_commands[0]
 
-    priority_route = {"repeaters": [5], "routeSpeed": 200}
+    priority_route = Route(repeaters=[multisensor_6], route_speed=200)
     await controller.async_assign_custom_suc_return_routes(
         multisensor_6, routes, priority_route
     )
-    assert ack_commands[1]["priorityRoute"] == priority_route
+    assert ack_commands[1]["priorityRoute"] == {"repeaters": [52], "routeSpeed": 200}
 
 
 async def test_set_priority_route(

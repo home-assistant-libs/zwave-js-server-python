@@ -64,6 +64,21 @@ DEFAULT_CONTROLLER_STATISTICS = (  # pylint: disable=invalid-name
 )
 
 
+@dataclass(frozen=True)
+class Route:
+    """A Z-Wave routing instruction specifying repeaters and speed."""
+
+    repeaters: list[Node]
+    route_speed: int
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return wire-format dict."""
+        return {
+            "repeaters": [n.node_id for n in self.repeaters],
+            "routeSpeed": self.route_speed,
+        }
+
+
 @dataclass
 class NVMProgress:
     """Class to represent an NVM backup/restore progress event."""
@@ -1013,35 +1028,35 @@ class Controller(EventBase):
         self,
         node: Node,
         destination_node: Node,
-        routes: list[dict],
-        priority_route: dict | None = None,
+        routes: list[Route],
+        priority_route: Route | None = None,
     ) -> bool:
         """Send assignCustomReturnRoutes command to Controller."""
         cmd: dict[str, Any] = {
             "command": "controller.assign_custom_return_routes",
             "nodeId": node.node_id,
             "destinationNodeId": destination_node.node_id,
-            "routes": routes,
+            "routes": [r.to_dict() for r in routes],
         }
         if priority_route is not None:
-            cmd["priorityRoute"] = priority_route
+            cmd["priorityRoute"] = priority_route.to_dict()
         data = await self.client.async_send_command(cmd, require_schema=47)
         return cast(bool, data["success"])
 
     async def async_assign_custom_suc_return_routes(
         self,
         node: Node,
-        routes: list[dict],
-        priority_route: dict | None = None,
+        routes: list[Route],
+        priority_route: Route | None = None,
     ) -> bool:
         """Send assignCustomSUCReturnRoutes command to Controller."""
         cmd: dict[str, Any] = {
             "command": "controller.assign_custom_suc_return_routes",
             "nodeId": node.node_id,
-            "routes": routes,
+            "routes": [r.to_dict() for r in routes],
         }
         if priority_route is not None:
-            cmd["priorityRoute"] = priority_route
+            cmd["priorityRoute"] = priority_route.to_dict()
         data = await self.client.async_send_command(cmd, require_schema=47)
         return cast(bool, data["success"])
 
