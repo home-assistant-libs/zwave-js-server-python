@@ -1497,10 +1497,13 @@ async def test_get_node_neighbors(controller, multisensor_6, uuid4, mock_command
     """Test get node neighbors."""
 
     ack_commands = mock_command(
-        {"command": "controller.get_node_neighbors"}, {"neighbors": [1, 2]}
+        {"command": "controller.get_node_neighbors"}, {"neighbors": [52]}
     )
 
-    assert await controller.async_get_node_neighbors(multisensor_6) == [1, 2]
+    result = await multisensor_6.client.driver.controller.async_get_node_neighbors(
+        multisensor_6
+    )
+    assert result == [multisensor_6]
 
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
@@ -2747,13 +2750,17 @@ async def test_get_background_rssi(
 
 
 async def test_get_long_range_nodes(
-    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+    controller: Controller,
+    multisensor_6: Node,
+    uuid4: str,
+    mock_command: MockCommandProtocol,
 ) -> None:
     """Test get long range nodes command."""
-    mock_command(
-        {"command": "controller.get_long_range_nodes"}, {"nodeIds": [100, 101]}
+    mock_command({"command": "controller.get_long_range_nodes"}, {"nodeIds": [52]})
+    assert (
+        await multisensor_6.client.driver.controller.async_get_long_range_nodes()
+        == [multisensor_6]
     )
-    assert await controller.async_get_long_range_nodes() == [100, 101]
 
 
 async def test_get_dsk(
@@ -2865,7 +2872,9 @@ async def test_external_nvm_open_close(
         {"size": 131072, "supportedOperations": ["read", "write"]},
     )
     result = await controller.async_external_nvm_open_ext()
-    assert result == NVMOpenExtResult(size=131072, supported_operations=["read", "write"])
+    assert result == NVMOpenExtResult(
+        size=131072, supported_operations=["read", "write"]
+    )
 
     mock_command({"command": "controller.external_nvm_close_ext"}, {})
     await controller.async_external_nvm_close_ext()
@@ -2946,9 +2955,7 @@ async def test_begin_leaving_network(
     controller: Controller, uuid4: str, mock_command: MockCommandProtocol
 ) -> None:
     """Test begin leaving network command."""
-    mock_command(
-        {"command": "controller.begin_leaving_network"}, {"result": 0}
-    )
+    mock_command({"command": "controller.begin_leaving_network"}, {"result": 0})
     assert await controller.async_begin_leaving_network() == LeaveNetworkResult.OK
 
 
@@ -3010,8 +3017,10 @@ async def test_get_all_associations(
             }
         },
     )
-    result = await controller.async_get_all_associations(multisensor_6)
-    addresses = result[52][0][1]
+    result = await multisensor_6.client.driver.controller.async_get_all_associations(
+        multisensor_6
+    )
+    addresses = result[multisensor_6][0][1]
     assert len(addresses) == 2
     assert addresses[0].node_id == 1
     assert addresses[0].endpoint is None
@@ -3083,22 +3092,23 @@ async def test_cached_route_list_queries(
     mock_command: MockCommandProtocol,
 ) -> None:
     """Test cached route queries that return lists/dicts."""
-    routes_data = {"1": {"repeaters": [], "routeSpeed": 100}}
+    routes_data = {"52": {"repeaters": [], "routeSpeed": 100}}
     mock_command(
         {"command": "controller.get_priority_return_routes_cached"},
         {"routes": routes_data},
     )
-    result = await controller.async_get_priority_return_routes_cached(multisensor_6)
-    assert 1 in result
-    assert isinstance(result[1], Route)
-    assert result[1].repeaters == []
-    assert result[1].route_speed == 100
+    ctrl = multisensor_6.client.driver.controller
+    result = await ctrl.async_get_priority_return_routes_cached(multisensor_6)
+    assert multisensor_6 in result
+    assert isinstance(result[multisensor_6], Route)
+    assert result[multisensor_6].repeaters == []
+    assert result[multisensor_6].route_speed == 100
 
     list_data = [{"repeaters": [], "routeSpeed": 100}]
     mock_command(
         {"command": "controller.get_custom_return_routes_cached"}, {"routes": list_data}
     )
-    result_list = await controller.async_get_custom_return_routes_cached(
+    result_list = await ctrl.async_get_custom_return_routes_cached(
         multisensor_6, multisensor_6
     )
     assert len(result_list) == 1
@@ -3110,9 +3120,7 @@ async def test_cached_route_list_queries(
         {"command": "controller.get_custom_suc_return_routes_cached"},
         {"routes": list_data},
     )
-    result_suc = await controller.async_get_custom_suc_return_routes_cached(
-        multisensor_6
-    )
+    result_suc = await ctrl.async_get_custom_suc_return_routes_cached(multisensor_6)
     assert len(result_suc) == 1
     assert isinstance(result_suc[0], Route)
     assert result_suc[0].repeaters == []

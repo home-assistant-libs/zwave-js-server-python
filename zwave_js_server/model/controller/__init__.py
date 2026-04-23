@@ -772,19 +772,15 @@ class Controller(EventBase):
         else:
             await self.client.async_send_command_no_wait(cmd)
 
-    async def async_get_node_neighbors(self, node: Node) -> list[int]:
-        """Send getNodeNeighbors command to Controller to get node's neighbors.
-
-        Returns raw node IDs because neighbors may include nodes not yet
-        interviewed and therefore not present in ``self.nodes``.
-        """
+    async def async_get_node_neighbors(self, node: Node) -> list[Node]:
+        """Send getNodeNeighbors command to Controller to get node's neighbors."""
         data = await self.client.async_send_command(
             {
                 "command": "controller.get_node_neighbors",
                 "nodeId": node.node_id,
             }
         )
-        return cast(list[int], data["neighbors"])
+        return [self.nodes[nid] for nid in data["neighbors"]]
 
     async def async_grant_security_classes(
         self, inclusion_grant: InclusionGrant
@@ -1177,17 +1173,13 @@ class Controller(EventBase):
             channel_3=data.get("rssiChannel3"),
         )
 
-    async def async_get_long_range_nodes(self) -> list[int]:
-        """Send getLongRangeNodes command to Controller.
-
-        Returns raw node IDs because Long Range nodes may not be present
-        in ``self.nodes``.
-        """
+    async def async_get_long_range_nodes(self) -> list[Node]:
+        """Send getLongRangeNodes command to Controller."""
         data = await self.client.async_send_command(
             {"command": "controller.get_long_range_nodes"},
             require_schema=47,
         )
-        return cast(list[int], data["nodeIds"])
+        return [self.nodes[nid] for nid in data["nodeIds"]]
 
     async def async_get_dsk(self) -> bytes:
         """Send getDSK command to Controller."""
@@ -1451,12 +1443,8 @@ class Controller(EventBase):
 
     async def async_get_all_associations(
         self, node: Node
-    ) -> dict[int, dict[int, dict[int, list[AssociationAddress]]]]:
-        """Send getAllAssociations command to Controller.
-
-        The outer dict is keyed by raw node IDs (int) because association
-        targets may reference nodes not present in ``self.nodes``.
-        """
+    ) -> dict[Node, dict[int, dict[int, list[AssociationAddress]]]]:
+        """Send getAllAssociations command to Controller."""
         data = await self.client.async_send_command(
             {
                 "command": "controller.get_all_associations",
@@ -1464,12 +1452,12 @@ class Controller(EventBase):
             },
             require_schema=47,
         )
-        result: dict[int, dict[int, dict[int, list[AssociationAddress]]]] = {}
+        result: dict[Node, dict[int, dict[int, list[AssociationAddress]]]] = {}
         for node_id_str, endpoints in data["associations"].items():
-            node_id_int = int(node_id_str)
-            result[node_id_int] = {}
+            assoc_node = self.nodes[int(node_id_str)]
+            result[assoc_node] = {}
             for endpoint_id, groups in endpoints.items():
-                result[node_id_int][int(endpoint_id)] = {
+                result[assoc_node][int(endpoint_id)] = {
                     int(group_id): [
                         AssociationAddress(
                             self,
@@ -1500,12 +1488,8 @@ class Controller(EventBase):
 
     async def async_get_priority_return_routes_cached(
         self, node: Node
-    ) -> dict[int, Route]:
-        """Send getPriorityReturnRoutesCached command to Controller.
-
-        The dict is keyed by raw destination node IDs because they may
-        reference nodes not present in ``self.nodes``.
-        """
+    ) -> dict[Node, Route]:
+        """Send getPriorityReturnRoutesCached command to Controller."""
         data = await self.client.async_send_command(
             {
                 "command": "controller.get_priority_return_routes_cached",
@@ -1514,7 +1498,8 @@ class Controller(EventBase):
             require_schema=47,
         )
         return {
-            int(k): Route.from_dict(v, self.nodes) for k, v in data["routes"].items()
+            self.nodes[int(k)]: Route.from_dict(v, self.nodes)
+            for k, v in data["routes"].items()
         }
 
     async def async_get_priority_suc_return_route_cached(
