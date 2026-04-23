@@ -15,6 +15,9 @@ from ...const import (
     ExclusionStrategy,
     InclusionState,
     InclusionStrategy,
+    JoinNetworkResult,
+    JoinNetworkStrategy,
+    LeaveNetworkResult,
     NodeType,
     QRCodeVersion,
     RFRegion,
@@ -77,6 +80,50 @@ class Route:
             "repeaters": [n.node_id for n in self.repeaters],
             "routeSpeed": self.route_speed,
         }
+
+    @classmethod
+    def from_dict(cls, data: dict, nodes: dict[int, Node]) -> Route:
+        """Initialize from wire-format dict."""
+        return cls(
+            repeaters=[nodes[nid] for nid in data["repeaters"]],
+            route_speed=data["routeSpeed"],
+        )
+
+
+@dataclass(frozen=True)
+class BackgroundRSSI:
+    """Background RSSI noise levels for all channels."""
+
+    channel_0: int
+    channel_1: int
+    channel_2: int | None = None
+    channel_3: int | None = None
+
+
+@dataclass(frozen=True)
+class RFRegionInfo:
+    """Information about an RF region."""
+
+    region: int
+    supports_zwave: bool
+    supports_long_range: bool
+    includes_region: int | None = None
+
+
+@dataclass(frozen=True)
+class NVMReadResult:
+    """Result of an NVM buffer read operation."""
+
+    buffer: bytes
+    end_of_file: bool
+
+
+@dataclass(frozen=True)
+class NVMOpenExtResult:
+    """Result of an extended NVM open operation."""
+
+    size: int
+    supported_operations: list
 
 
 @dataclass
@@ -1089,7 +1136,7 @@ class Controller(EventBase):
         )
         return cast(bool, data["success"])
 
-    async def async_get_priority_route(self, destination_node: Node) -> dict | None:
+    async def async_get_priority_route(self, destination_node: Node) -> Route | None:
         """Send getPriorityRoute command to Controller."""
         data = await self.client.async_send_command(
             {
@@ -1098,7 +1145,9 @@ class Controller(EventBase):
             },
             require_schema=47,
         )
-        return data.get("route")
+        if (route := data.get("route")) is None:
+            return None
+        return Route.from_dict(route, self.nodes)
 
     async def async_discover_node_neighbors(self, node: Node) -> bool:
         """Send discoverNodeNeighbors command to Controller."""
@@ -1111,18 +1160,18 @@ class Controller(EventBase):
         )
         return cast(bool, data["success"])
 
-    async def async_get_background_rssi(self) -> dict:
+    async def async_get_background_rssi(self) -> BackgroundRSSI:
         """Send getBackgroundRSSI command to Controller."""
         data = await self.client.async_send_command(
             {"command": "controller.get_background_rssi"},
             require_schema=47,
         )
-        return {
-            "rssi_channel_0": data["rssiChannel0"],
-            "rssi_channel_1": data["rssiChannel1"],
-            "rssi_channel_2": data.get("rssiChannel2"),
-            "rssi_channel_3": data.get("rssiChannel3"),
-        }
+        return BackgroundRSSI(
+            channel_0=data["rssiChannel0"],
+            channel_1=data["rssiChannel1"],
+            channel_2=data.get("rssiChannel2"),
+            channel_3=data.get("rssiChannel3"),
+        )
 
     async def async_get_long_range_nodes(self) -> list[int]:
         """Send getLongRangeNodes command to Controller."""
@@ -1169,7 +1218,7 @@ class Controller(EventBase):
         )
         return cast(list[int], data["regions"])
 
-    async def async_query_rf_region_info(self, region: RFRegion) -> dict:
+    async def async_query_rf_region_info(self, region: RFRegion) -> RFRegionInfo:
         """Send queryRFRegionInfo command to Controller."""
         data = await self.client.async_send_command(
             {
@@ -1178,14 +1227,12 @@ class Controller(EventBase):
             },
             require_schema=47,
         )
-        result: dict[str, Any] = {
-            "region": data["region"],
-            "supports_zwave": data["supportsZWave"],
-            "supports_long_range": data["supportsLongRange"],
-        }
-        if "includesRegion" in data:
-            result["includes_region"] = data["includesRegion"]
-        return result
+        return RFRegionInfo(
+            region=data["region"],
+            supports_zwave=data["supportsZWave"],
+            supports_long_range=data["supportsLongRange"],
+            includes_region=data.get("includesRegion"),
+        )
 
     async def async_external_nvm_open(self) -> int:
         """Send externalNVMOpen command to Controller."""
@@ -1251,7 +1298,7 @@ class Controller(EventBase):
 
     async def async_external_nvm_read_buffer_700(
         self, offset: int, length: int
-    ) -> dict:
+    ) -> NVMReadResult:
         """Send externalNVMReadBuffer700 command to Controller."""
         data = await self.client.async_send_command(
             {
@@ -1261,10 +1308,10 @@ class Controller(EventBase):
             },
             require_schema=47,
         )
-        return {
-            "buffer": convert_base64_to_bytes(data["buffer"]),
-            "end_of_file": data["endOfFile"],
-        }
+        return NVMReadResult(
+            buffer=convert_base64_to_bytes(data["buffer"]),
+            end_of_file=data["endOfFile"],
+        )
 
     async def async_external_nvm_write_buffer_700(
         self, offset: int, buffer: bytes
@@ -1280,16 +1327,16 @@ class Controller(EventBase):
         )
         return cast(bool, data["endOfFile"])
 
-    async def async_external_nvm_open_ext(self) -> dict:
+    async def async_external_nvm_open_ext(self) -> NVMOpenExtResult:
         """Send externalNVMOpenExt command to Controller."""
         data = await self.client.async_send_command(
             {"command": "controller.external_nvm_open_ext"},
             require_schema=47,
         )
-        return {
-            "size": data["size"],
-            "supported_operations": data["supportedOperations"],
-        }
+        return NVMOpenExtResult(
+            size=data["size"],
+            supported_operations=data["supportedOperations"],
+        )
 
     async def async_external_nvm_close_ext(self) -> None:
         """Send externalNVMCloseExt command to Controller."""
@@ -1300,7 +1347,7 @@ class Controller(EventBase):
 
     async def async_external_nvm_read_buffer_ext(
         self, offset: int, length: int
-    ) -> dict:
+    ) -> NVMReadResult:
         """Send externalNVMReadBufferExt command to Controller."""
         data = await self.client.async_send_command(
             {
@@ -1310,10 +1357,10 @@ class Controller(EventBase):
             },
             require_schema=47,
         )
-        return {
-            "buffer": convert_base64_to_bytes(data["buffer"]),
-            "end_of_file": data["endOfFile"],
-        }
+        return NVMReadResult(
+            buffer=convert_base64_to_bytes(data["buffer"]),
+            end_of_file=data["endOfFile"],
+        )
 
     async def async_external_nvm_write_buffer_ext(
         self, offset: int, buffer: bytes
@@ -1329,7 +1376,9 @@ class Controller(EventBase):
         )
         return cast(bool, data["endOfFile"])
 
-    async def async_begin_joining_network(self, strategy: int | None = None) -> dict:
+    async def async_begin_joining_network(
+        self, strategy: JoinNetworkStrategy | None = None
+    ) -> JoinNetworkResult:
         """Send beginJoiningNetwork command to Controller."""
         cmd: dict[str, Any] = {
             "command": "controller.begin_joining_network",
@@ -1337,7 +1386,7 @@ class Controller(EventBase):
         if strategy is not None:
             cmd["strategy"] = strategy
         data = await self.client.async_send_command(cmd, require_schema=47)
-        return data["result"]
+        return JoinNetworkResult(data["result"])
 
     async def async_stop_joining_network(self) -> bool:
         """Send stopJoiningNetwork command to Controller."""
@@ -1347,13 +1396,13 @@ class Controller(EventBase):
         )
         return cast(bool, data["success"])
 
-    async def async_begin_leaving_network(self) -> dict:
+    async def async_begin_leaving_network(self) -> LeaveNetworkResult:
         """Send beginLeavingNetwork command to Controller."""
         data = await self.client.async_send_command(
             {"command": "controller.begin_leaving_network"},
             require_schema=47,
         )
-        return data["result"]
+        return LeaveNetworkResult(data["result"])
 
     async def async_stop_leaving_network(self) -> bool:
         """Send stopLeavingNetwork command to Controller."""
@@ -1423,7 +1472,7 @@ class Controller(EventBase):
 
     async def async_get_priority_return_route_cached(
         self, node: Node, destination_node: Node
-    ) -> dict | None:
+    ) -> Route | None:
         """Send getPriorityReturnRouteCached command to Controller."""
         data = await self.client.async_send_command(
             {
@@ -1433,9 +1482,13 @@ class Controller(EventBase):
             },
             require_schema=47,
         )
-        return data.get("route")
+        if (route := data.get("route")) is None:
+            return None
+        return Route.from_dict(route, self.nodes)
 
-    async def async_get_priority_return_routes_cached(self, node: Node) -> dict:
+    async def async_get_priority_return_routes_cached(
+        self, node: Node
+    ) -> dict[int, Route]:
         """Send getPriorityReturnRoutesCached command to Controller."""
         data = await self.client.async_send_command(
             {
@@ -1444,11 +1497,13 @@ class Controller(EventBase):
             },
             require_schema=47,
         )
-        return data["routes"]
+        return {
+            int(k): Route.from_dict(v, self.nodes) for k, v in data["routes"].items()
+        }
 
     async def async_get_priority_suc_return_route_cached(
         self, node: Node
-    ) -> dict | None:
+    ) -> Route | None:
         """Send getPrioritySUCReturnRouteCached command to Controller."""
         data = await self.client.async_send_command(
             {
@@ -1457,11 +1512,13 @@ class Controller(EventBase):
             },
             require_schema=47,
         )
-        return data.get("route")
+        if (route := data.get("route")) is None:
+            return None
+        return Route.from_dict(route, self.nodes)
 
     async def async_get_custom_return_routes_cached(
         self, node: Node, destination_node: Node
-    ) -> list[dict]:
+    ) -> list[Route]:
         """Send getCustomReturnRoutesCached command to Controller."""
         data = await self.client.async_send_command(
             {
@@ -1471,9 +1528,11 @@ class Controller(EventBase):
             },
             require_schema=47,
         )
-        return cast(list[dict], data["routes"])
+        return [Route.from_dict(r, self.nodes) for r in data["routes"]]
 
-    async def async_get_custom_suc_return_routes_cached(self, node: Node) -> list[dict]:
+    async def async_get_custom_suc_return_routes_cached(
+        self, node: Node
+    ) -> list[Route]:
         """Send getCustomSUCReturnRoutesCached command to Controller."""
         data = await self.client.async_send_command(
             {
@@ -1482,7 +1541,7 @@ class Controller(EventBase):
             },
             require_schema=47,
         )
-        return cast(list[dict], data["routes"])
+        return [Route.from_dict(r, self.nodes) for r in data["routes"]]
 
     async def async_get_all_available_firmware_updates(
         self,

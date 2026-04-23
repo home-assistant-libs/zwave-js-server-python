@@ -15,6 +15,9 @@ from zwave_js_server.const import (
     ExclusionStrategy,
     InclusionState,
     InclusionStrategy,
+    JoinNetworkResult,
+    JoinNetworkStrategy,
+    LeaveNetworkResult,
     NodeType,
     ProtocolDataRate,
     Protocols,
@@ -31,7 +34,14 @@ from zwave_js_server.model import (
     controller as controller_pkg,
 )
 from zwave_js_server.model.association import AssociationGroup
-from zwave_js_server.model.controller import Controller, Route
+from zwave_js_server.model.controller import (
+    BackgroundRSSI,
+    Controller,
+    NVMOpenExtResult,
+    NVMReadResult,
+    RFRegionInfo,
+    Route,
+)
 from zwave_js_server.model.controller.data_model import ZWaveChipType
 from zwave_js_server.model.controller.rebuild_routes import (
     RebuildRoutesOptions,
@@ -2700,9 +2710,12 @@ async def test_get_priority_route(
     mock_command: MockCommandProtocol,
 ) -> None:
     """Test get priority route command."""
-    route_data = {"repeaters": [3, 4], "routeSpeed": 100}
+    route_data = {"repeaters": [], "routeSpeed": 100}
     mock_command({"command": "controller.get_priority_route"}, {"route": route_data})
-    assert await controller.async_get_priority_route(multisensor_6) == route_data
+    result = await controller.async_get_priority_route(multisensor_6)
+    assert isinstance(result, Route)
+    assert result.repeaters == []
+    assert result.route_speed == 100
 
 
 async def test_get_priority_route_none(
@@ -2725,12 +2738,12 @@ async def test_get_background_rssi(
         {"rssiChannel0": -80, "rssiChannel1": -75, "rssiChannel2": -90},
     )
     result = await controller.async_get_background_rssi()
-    assert result == {
-        "rssi_channel_0": -80,
-        "rssi_channel_1": -75,
-        "rssi_channel_2": -90,
-        "rssi_channel_3": None,
-    }
+    assert result == BackgroundRSSI(
+        channel_0=-80,
+        channel_1=-75,
+        channel_2=-90,
+        channel_3=None,
+    )
 
 
 async def test_get_long_range_nodes(
@@ -2805,12 +2818,12 @@ async def test_query_rf_region_info(
         },
     )
     result = await controller.async_query_rf_region_info(RFRegion.EUROPE)
-    assert result == {
-        "region": 0,
-        "supports_zwave": True,
-        "supports_long_range": False,
-        "includes_region": 1,
-    }
+    assert result == RFRegionInfo(
+        region=0,
+        supports_zwave=True,
+        supports_long_range=False,
+        includes_region=1,
+    )
     assert ack_commands[0]["region"] == RFRegion.EUROPE.value
 
 
@@ -2823,7 +2836,7 @@ async def test_query_rf_region_info_no_includes(
         {"region": 1, "supportsZWave": True, "supportsLongRange": True},
     )
     result = await controller.async_query_rf_region_info(RFRegion.USA)
-    assert "includes_region" not in result
+    assert result.includes_region is None
 
 
 async def test_external_nvm_byte_operations(
@@ -2852,7 +2865,7 @@ async def test_external_nvm_open_close(
         {"size": 131072, "supportedOperations": ["read", "write"]},
     )
     result = await controller.async_external_nvm_open_ext()
-    assert result == {"size": 131072, "supported_operations": ["read", "write"]}
+    assert result == NVMOpenExtResult(size=131072, supported_operations=["read", "write"])
 
     mock_command({"command": "controller.external_nvm_close_ext"}, {})
     await controller.async_external_nvm_close_ext()
@@ -2871,19 +2884,19 @@ async def test_external_nvm_buffer_read(
         {"command": "controller.external_nvm_read_buffer_700"},
         {"buffer": "AQIDBA==", "endOfFile": True},
     )
-    assert await controller.async_external_nvm_read_buffer_700(0, 4) == {
-        "buffer": b"\x01\x02\x03\x04",
-        "end_of_file": True,
-    }
+    assert await controller.async_external_nvm_read_buffer_700(0, 4) == NVMReadResult(
+        buffer=b"\x01\x02\x03\x04",
+        end_of_file=True,
+    )
 
     mock_command(
         {"command": "controller.external_nvm_read_buffer_ext"},
         {"buffer": "AQIDBA==", "endOfFile": False},
     )
-    assert await controller.async_external_nvm_read_buffer_ext(0, 4) == {
-        "buffer": b"\x01\x02\x03\x04",
-        "end_of_file": False,
-    }
+    assert await controller.async_external_nvm_read_buffer_ext(0, 4) == NVMReadResult(
+        buffer=b"\x01\x02\x03\x04",
+        end_of_file=False,
+    )
 
 
 async def test_external_nvm_buffer_write(
@@ -2920,13 +2933,13 @@ async def test_begin_joining_network(
 ) -> None:
     """Test begin joining network with and without strategy."""
     ack_commands = mock_command(
-        {"command": "controller.begin_joining_network"}, {"result": {"success": True}}
+        {"command": "controller.begin_joining_network"}, {"result": 0}
     )
-    assert await controller.async_begin_joining_network() == {"success": True}
+    assert await controller.async_begin_joining_network() == JoinNetworkResult.OK
     assert "strategy" not in ack_commands[0]
 
-    await controller.async_begin_joining_network(strategy=1)
-    assert ack_commands[1]["strategy"] == 1
+    await controller.async_begin_joining_network(strategy=JoinNetworkStrategy.DEFAULT)
+    assert ack_commands[1]["strategy"] == JoinNetworkStrategy.DEFAULT
 
 
 async def test_begin_leaving_network(
@@ -2934,9 +2947,9 @@ async def test_begin_leaving_network(
 ) -> None:
     """Test begin leaving network command."""
     mock_command(
-        {"command": "controller.begin_leaving_network"}, {"result": {"success": True}}
+        {"command": "controller.begin_leaving_network"}, {"result": 0}
     )
-    assert await controller.async_begin_leaving_network() == {"success": True}
+    assert await controller.async_begin_leaving_network() == LeaveNetworkResult.OK
 
 
 async def test_get_all_association_groups(
@@ -3007,35 +3020,35 @@ async def test_get_all_associations(
 
 
 @pytest.mark.parametrize(
-    ("wire_cmd", "method", "args", "response", "expected"),
+    ("wire_cmd", "method", "args", "response", "expected_none"),
     [
         (
             "get_priority_return_route_cached",
             "async_get_priority_return_route_cached",
             ("node",),
-            {"route": {"repeaters": [3], "routeSpeed": 100}},
-            {"repeaters": [3], "routeSpeed": 100},
+            {"route": {"repeaters": [], "routeSpeed": 100}},
+            False,
         ),
         (
             "get_priority_return_route_cached",
             "async_get_priority_return_route_cached",
             ("node",),
             {},
-            None,
+            True,
         ),
         (
             "get_priority_suc_return_route_cached",
             "async_get_priority_suc_return_route_cached",
             (),
             {"route": {"repeaters": [], "routeSpeed": 100}},
-            {"repeaters": [], "routeSpeed": 100},
+            False,
         ),
         (
             "get_priority_suc_return_route_cached",
             "async_get_priority_suc_return_route_cached",
             (),
             {},
-            None,
+            True,
         ),
     ],
 )
@@ -3048,12 +3061,19 @@ async def test_cached_route_optional(
     method: str,
     args: tuple[Any, ...],
     response: dict[str, Any],
-    expected: dict[str, Any] | None,
+    expected_none: bool,
 ) -> None:
     """Test cached route queries that may return None."""
     mock_command({"command": f"controller.{wire_cmd}"}, response)
     actual_args = tuple(multisensor_6 if a == "node" else a for a in args)
-    assert await getattr(controller, method)(multisensor_6, *actual_args) == expected
+    result = await getattr(controller, method)(multisensor_6, *actual_args)
+    if expected_none:
+        assert result is None
+    else:
+        assert isinstance(result, Route)
+        route_data = response["route"]
+        assert result.route_speed == route_data["routeSpeed"]
+        assert [n.node_id for n in result.repeaters] == route_data["repeaters"]
 
 
 async def test_cached_route_list_queries(
@@ -3063,35 +3083,40 @@ async def test_cached_route_list_queries(
     mock_command: MockCommandProtocol,
 ) -> None:
     """Test cached route queries that return lists/dicts."""
-    routes_data = {"1": {"repeaters": [3], "routeSpeed": 100}}
+    routes_data = {"1": {"repeaters": [], "routeSpeed": 100}}
     mock_command(
         {"command": "controller.get_priority_return_routes_cached"},
         {"routes": routes_data},
     )
-    assert (
-        await controller.async_get_priority_return_routes_cached(multisensor_6)
-        == routes_data
-    )
+    result = await controller.async_get_priority_return_routes_cached(multisensor_6)
+    assert 1 in result
+    assert isinstance(result[1], Route)
+    assert result[1].repeaters == []
+    assert result[1].route_speed == 100
 
-    list_data = [{"repeaters": [3], "routeSpeed": 100}]
+    list_data = [{"repeaters": [], "routeSpeed": 100}]
     mock_command(
         {"command": "controller.get_custom_return_routes_cached"}, {"routes": list_data}
     )
-    assert (
-        await controller.async_get_custom_return_routes_cached(
-            multisensor_6, multisensor_6
-        )
-        == list_data
+    result_list = await controller.async_get_custom_return_routes_cached(
+        multisensor_6, multisensor_6
     )
+    assert len(result_list) == 1
+    assert isinstance(result_list[0], Route)
+    assert result_list[0].repeaters == []
+    assert result_list[0].route_speed == 100
 
     mock_command(
         {"command": "controller.get_custom_suc_return_routes_cached"},
         {"routes": list_data},
     )
-    assert (
-        await controller.async_get_custom_suc_return_routes_cached(multisensor_6)
-        == list_data
+    result_suc = await controller.async_get_custom_suc_return_routes_cached(
+        multisensor_6
     )
+    assert len(result_suc) == 1
+    assert isinstance(result_suc[0], Route)
+    assert result_suc[0].repeaters == []
+    assert result_suc[0].route_speed == 100
 
 
 async def test_get_all_available_firmware_updates(

@@ -15,6 +15,7 @@ from zwave_js_server.const import (
     INTERVIEW_FAILED,
     CommandClass,
     CommandStatus,
+    LinkReliabilityCheckMode,
     NodeStatus,
     PowerLevel,
     ProtocolDataRate,
@@ -2881,7 +2882,9 @@ async def test_check_link_reliability(
         {"result": {"someKey": "someValue"}},
     )
 
-    result = await node.async_check_link_reliability(mode=1, interval=100, rounds=5)
+    result = await node.async_check_link_reliability(
+        mode=LinkReliabilityCheckMode.BASIC_SET_ON_OFF, interval=100, rounds=5
+    )
 
     assert result == {"someKey": "someValue"}
 
@@ -2889,7 +2892,7 @@ async def test_check_link_reliability(
     assert ack_commands[0] == {
         "command": "node.check_link_reliability",
         "nodeId": node.node_id,
-        "mode": 1,
+        "mode": LinkReliabilityCheckMode.BASIC_SET_ON_OFF,
         "interval": 100,
         "rounds": 5,
         "messageId": uuid4,

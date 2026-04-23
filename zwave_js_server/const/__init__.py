@@ -519,3 +519,33 @@ class AssociationCheckResult(IntEnum):
     FORBIDDEN_SECURITY_CLASS_MISMATCH = 5
     FORBIDDEN_DESTINATION_SECURITY_CLASS_NOT_GRANTED = 6
     FORBIDDEN_NO_SUPPORTED_CCS = 7
+
+
+class JoinNetworkStrategy(IntEnum):
+    """Enum for all known join network strategies."""
+
+    DEFAULT = 0
+
+
+class JoinNetworkResult(IntEnum):
+    """Enum for all known join network results."""
+
+    OK = 0
+    ERROR_BUSY = 1
+    ERROR_NOT_PERMITTED = 2
+    ERROR_FAILED = 3
+
+
+class LeaveNetworkResult(IntEnum):
+    """Enum for all known leave network results."""
+
+    OK = 0
+    ERROR_BUSY = 1
+    ERROR_NOT_PERMITTED = 2
+    ERROR_FAILED = 3
+
+
+class LinkReliabilityCheckMode(IntEnum):
+    """Enum for all known link reliability check modes."""
+
+    BASIC_SET_ON_OFF = 0

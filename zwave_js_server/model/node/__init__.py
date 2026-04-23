@@ -13,6 +13,7 @@ from ...const import (
     NOT_INTERVIEWED,
     CommandClass,
     DateAndTime,
+    LinkReliabilityCheckMode,
     NodeStatus,
     PowerLevel,
     Protocols,
@@ -1025,7 +1026,7 @@ class Node(EventBase):
 
     async def async_check_link_reliability(
         self,
-        mode: int,
+        mode: LinkReliabilityCheckMode,
         interval: int,
         rounds: int | None = None,
     ) -> dict:
