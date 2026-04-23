@@ -7,6 +7,7 @@ https://zwave-js.github.io/node-zwave-js/#/api/endpoint?id=endpoint-properties
 from __future__ import annotations
 
 import asyncio
+from functools import cached_property
 from typing import TYPE_CHECKING, Any, Literal, TypedDict, cast
 
 from ..const import NodeStatus
@@ -103,7 +104,7 @@ class Endpoint(EventBase):
         """Return user icon property."""
         return self.data.get("userIcon")
 
-    @property
+    @cached_property
     def command_classes(self) -> list[CommandClassInfo]:
         """Return all CommandClasses supported on this node."""
         return [CommandClassInfo(cc) for cc in self.data["commandClasses"]]
@@ -118,6 +119,7 @@ class Endpoint(EventBase):
     ) -> None:
         """Update the endpoint data."""
         self.data = data
+        self.__dict__.pop("command_classes", None)
         if (device_class := self.data.get("deviceClass")) is None:
             self._device_class = None
         else:

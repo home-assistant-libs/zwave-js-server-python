@@ -131,7 +131,7 @@ class RouteHealthCheckSummary:
         self.results = [RouteHealthCheckResult(r) for r in self.data.get("results", [])]
 
 
-@dataclass
+@dataclass(frozen=True)
 class TestPowerLevelProgress:
     """Class to represent a test power level progress update."""
 
@@ -139,7 +139,7 @@ class TestPowerLevelProgress:
     total: int
 
 
-@dataclass
+@dataclass(frozen=True)
 class CheckHealthProgress:
     """Represent a check lifeline/route health progress update."""
 

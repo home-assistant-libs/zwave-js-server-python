@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from .node import Node
 
 
-@dataclass
+@dataclass(frozen=True)
 class AssociationGroup:
     """Represent a association group dict type."""
 
@@ -22,7 +22,7 @@ class AssociationGroup:
     issued_commands: dict[int, list[int]] = field(default_factory=dict)
 
 
-@dataclass
+@dataclass(frozen=True)
 class AssociationAddress:
     """Represent a association dict type."""
 
