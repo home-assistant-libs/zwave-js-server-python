@@ -15,17 +15,20 @@ async def _async_send_command(
     command: str,
     nodes: list[Node] | None = None,
     require_schema: int | None = None,
+    long_range: bool = False,
     **kwargs: Any,
 ) -> dict:
     """Send a multicast command."""
     if nodes:
-        cmd = {
+        cmd: dict[str, Any] = {
             "command": f"multicast_group.{command}",
             "nodeIDs": [node.node_id for node in nodes],
             **kwargs,
         }
     else:
         cmd = {"command": f"broadcast_node.{command}", **kwargs}
+        if long_range:
+            cmd["longRange"] = True
 
     return await client.async_send_command(cmd, require_schema)
 

@@ -2,6 +2,7 @@
 
 import pytest
 
+from zwave_js_server.client import Client
 from zwave_js_server.const import (
     Protocols,
     ProvisioningEntryStatus,
@@ -9,9 +10,14 @@ from zwave_js_server.const import (
     SecurityClass,
 )
 from zwave_js_server.model.utils import (
+    async_extract_firmware,
+    async_guess_firmware_file_format,
     async_parse_qr_code_string,
     async_try_parse_dsk_from_qr_code_string,
+    async_try_unzip_firmware_file,
 )
+
+from ..common import MockCommandProtocol
 
 
 async def test_parse_qr_code_string(client, mock_command, uuid4):
@@ -113,3 +119,68 @@ async def test_async_try_parse_dsk_from_qr_code_string_fails(
         "messageId": uuid4,
     }
     assert dsk is None
+
+
+async def test_guess_firmware_file_format(
+    client: Client, mock_command: MockCommandProtocol, uuid4: str
+) -> None:
+    """Test guessing firmware file format."""
+    ack_commands = mock_command(
+        {"command": "utils.guess_firmware_file_format"}, {"format": "hex"}
+    )
+    result = await async_guess_firmware_file_format(client, "test.hex", b"\x00\x01")
+    assert result == "hex"
+    assert ack_commands[0] == {
+        "command": "utils.guess_firmware_file_format",
+        "filename": "test.hex",
+        "file": "AAE=",
+        "messageId": uuid4,
+    }
+
+
+async def test_try_unzip_firmware_file(
+    client: Client, mock_command: MockCommandProtocol, uuid4: str
+) -> None:
+    """Test unzipping firmware file — success and None cases."""
+    mock_command(
+        {"command": "utils.try_unzip_firmware_file"},
+        {"file": {"filename": "fw.bin", "format": "bin", "data": "AQID"}},
+    )
+    result = await async_try_unzip_firmware_file(client, b"\x00")
+    assert result is not None
+    assert result["filename"] == "fw.bin"
+    assert result["format"] == "bin"
+    assert result["data"] == b"\x01\x02\x03"
+
+
+async def test_try_unzip_firmware_file_none(
+    client: Client, mock_command: MockCommandProtocol
+) -> None:
+    """Test unzipping returns None when not a valid ZIP."""
+    mock_command({"command": "utils.try_unzip_firmware_file"}, {"file": None})
+    assert await async_try_unzip_firmware_file(client, b"\x00") is None
+
+
+async def test_extract_firmware(
+    client: Client, mock_command: MockCommandProtocol
+) -> None:
+    """Test extracting firmware with firmwareTarget."""
+    mock_command(
+        {"command": "utils.extract_firmware"},
+        {"firmware": {"data": "AQID", "firmwareTarget": 0}},
+    )
+    result = await async_extract_firmware(client, b"\x00", "hex")
+    assert result["data"] == b"\x01\x02\x03"
+    assert result["firmware_target"] == 0
+
+
+async def test_extract_firmware_no_target(
+    client: Client, mock_command: MockCommandProtocol
+) -> None:
+    """Test extracting firmware without firmwareTarget."""
+    mock_command(
+        {"command": "utils.extract_firmware"},
+        {"firmware": {"data": "AQID"}},
+    )
+    result = await async_extract_firmware(client, b"\x00", "bin")
+    assert "firmware_target" not in result
