@@ -12,6 +12,7 @@ from zwave_js_server.model.firmware import (
     FirmwareUpdateInfoDataType,
 )
 
+from ...const import CommandClass
 from ...event import BaseEventModel, Event, EventBase
 from ..config_manager import ConfigManager
 from ..controller import Controller
@@ -362,6 +363,64 @@ class Driver(EventBase):
         """Send command to shutdown controller."""
         data = await self._async_send_command("shutdown", require_schema=27)
         return cast(bool, data["success"])
+
+    async def async_soft_reset_and_restart(self) -> None:
+        """Send command to soft reset the controller and restart the driver."""
+        await self._async_send_command("soft_reset_and_restart", require_schema=47)
+
+    async def async_enter_bootloader(self) -> None:
+        """Send command to enter the bootloader."""
+        await self._async_send_command("enter_bootloader", require_schema=47)
+
+    async def async_leave_bootloader(self) -> None:
+        """Send command to leave the bootloader."""
+        await self._async_send_command("leave_bootloader", require_schema=47)
+
+    async def async_get_supported_cc_version(
+        self, cc: CommandClass, node_id: int, endpoint_index: int = 0
+    ) -> int:
+        """Get the version of a CC the given node/endpoint supports."""
+        data = await self._async_send_command(
+            "get_supported_cc_version",
+            require_schema=47,
+            cc=cc.value,
+            nodeId=node_id,
+            endpointIndex=endpoint_index,
+        )
+        return cast(int, data["version"])
+
+    async def async_get_safe_cc_version(
+        self, cc: CommandClass, node_id: int, endpoint_index: int = 0
+    ) -> int | None:
+        """Get the safe version of a CC the given node/endpoint supports."""
+        data = await self._async_send_command(
+            "get_safe_cc_version",
+            require_schema=47,
+            cc=cc.value,
+            nodeId=node_id,
+            endpointIndex=endpoint_index,
+        )
+        return data.get("version")
+
+    async def async_update_user_agent(self, components: dict[str, str | None]) -> None:
+        """Update the user agent components sent to the controller."""
+        await self._async_send_command(
+            "update_user_agent", require_schema=47, components=components
+        )
+
+    async def async_enable_frequent_rssi_monitoring(self, duration_ms: int) -> None:
+        """Enable frequent RSSI monitoring for the specified duration."""
+        await self._async_send_command(
+            "enable_frequent_rssi_monitoring",
+            require_schema=47,
+            durationMs=duration_ms,
+        )
+
+    async def async_disable_frequent_rssi_monitoring(self) -> None:
+        """Disable frequent RSSI monitoring."""
+        await self._async_send_command(
+            "disable_frequent_rssi_monitoring", require_schema=47
+        )
 
     def handle_logging(self, event: Event) -> None:
         """Process a driver logging event."""
