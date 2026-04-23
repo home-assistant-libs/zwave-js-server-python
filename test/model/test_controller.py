@@ -2579,14 +2579,14 @@ async def test_assign_priority_return_route(
         {"success": True},
     )
     result = await controller.async_assign_priority_return_route(
-        multisensor_6, multisensor_6, [3, 4], 100
+        multisensor_6, multisensor_6, [multisensor_6, multisensor_6], 100
     )
     assert result is True
     assert ack_commands[0] == {
         "command": "controller.assign_priority_return_route",
         "nodeId": 52,
         "destinationNodeId": 52,
-        "repeaters": [3, 4],
+        "repeaters": [52, 52],
         "routeSpeed": 100,
         "messageId": uuid4,
     }
@@ -2604,13 +2604,13 @@ async def test_assign_priority_suc_return_route(
         {"success": True},
     )
     result = await controller.async_assign_priority_suc_return_route(
-        multisensor_6, [3, 4], 100
+        multisensor_6, [multisensor_6, multisensor_6], 100
     )
     assert result is True
     assert ack_commands[0] == {
         "command": "controller.assign_priority_suc_return_route",
         "nodeId": 52,
-        "repeaters": [3, 4],
+        "repeaters": [52, 52],
         "routeSpeed": 100,
         "messageId": uuid4,
     }
@@ -2679,12 +2679,14 @@ async def test_set_priority_route(
         {"command": "controller.set_priority_route"},
         {"success": True},
     )
-    result = await controller.async_set_priority_route(multisensor_6, [3, 4], 100)
+    result = await controller.async_set_priority_route(
+        multisensor_6, [multisensor_6], 100
+    )
     assert result is True
     assert ack_commands[0] == {
         "command": "controller.set_priority_route",
         "destinationNodeId": 52,
-        "repeaters": [3, 4],
+        "repeaters": [52],
         "routeSpeed": 100,
         "messageId": uuid4,
     }

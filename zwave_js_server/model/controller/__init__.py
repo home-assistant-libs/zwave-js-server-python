@@ -975,7 +975,7 @@ class Controller(EventBase):
         self,
         node: Node,
         destination_node: Node,
-        repeaters: list[int],
+        repeaters: list[Node],
         route_speed: int,
     ) -> bool:
         """Send assignPriorityReturnRoute command to Controller."""
@@ -984,7 +984,7 @@ class Controller(EventBase):
                 "command": "controller.assign_priority_return_route",
                 "nodeId": node.node_id,
                 "destinationNodeId": destination_node.node_id,
-                "repeaters": repeaters,
+                "repeaters": [n.node_id for n in repeaters],
                 "routeSpeed": route_speed,
             },
             require_schema=47,
@@ -994,7 +994,7 @@ class Controller(EventBase):
     async def async_assign_priority_suc_return_route(
         self,
         node: Node,
-        repeaters: list[int],
+        repeaters: list[Node],
         route_speed: int,
     ) -> bool:
         """Send assignPrioritySUCReturnRoute command to Controller."""
@@ -1002,7 +1002,7 @@ class Controller(EventBase):
             {
                 "command": "controller.assign_priority_suc_return_route",
                 "nodeId": node.node_id,
-                "repeaters": repeaters,
+                "repeaters": [n.node_id for n in repeaters],
                 "routeSpeed": route_speed,
             },
             require_schema=47,
@@ -1048,7 +1048,7 @@ class Controller(EventBase):
     async def async_set_priority_route(
         self,
         destination_node: Node,
-        repeaters: list[int],
+        repeaters: list[Node],
         route_speed: int,
     ) -> bool:
         """Send setPriorityRoute command to Controller."""
@@ -1056,7 +1056,7 @@ class Controller(EventBase):
             {
                 "command": "controller.set_priority_route",
                 "destinationNodeId": destination_node.node_id,
-                "repeaters": repeaters,
+                "repeaters": [n.node_id for n in repeaters],
                 "routeSpeed": route_speed,
             },
             require_schema=47,
