@@ -14,7 +14,7 @@ class DurationDataType(TypedDict, total=False):
     value: int | float
 
 
-@dataclass
+@dataclass(frozen=True)
 class Duration:
     """Duration class."""
 
@@ -25,11 +25,11 @@ class Duration:
     def __post_init__(self) -> None:
         """Post init."""
         if isinstance(self.data, str):
-            self.unit = self.data
-            self.value = None
+            object.__setattr__(self, "unit", self.data)
+            object.__setattr__(self, "value", None)
             return
-        self.unit = self.data["unit"]
-        self.value = self.data.get("value")
+        object.__setattr__(self, "unit", self.data["unit"])
+        object.__setattr__(self, "value", self.data.get("value"))
 
     def __repr__(self) -> str:
         """Return the representation."""

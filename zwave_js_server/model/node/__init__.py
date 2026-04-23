@@ -485,7 +485,7 @@ class Node(EventBase):
         if last_seen := data.get("lastSeen"):
             self._last_seen = datetime.fromisoformat(last_seen)
         if not self._statistics.last_seen and self.last_seen:
-            self._statistics.last_seen = self.last_seen
+            object.__setattr__(self._statistics, "last_seen", self.last_seen)
             self._statistics.data["lastSeen"] = self.last_seen.isoformat()
 
         self._update_values(self.data.pop("values"))

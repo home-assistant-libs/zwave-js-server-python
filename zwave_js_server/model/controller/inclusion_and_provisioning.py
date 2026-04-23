@@ -16,7 +16,7 @@ class InclusionGrantDataType(TypedDict):
     clientSideAuth: bool
 
 
-@dataclass
+@dataclass(frozen=True)
 class InclusionGrant:
     """Representation of an inclusion grant."""
 
@@ -41,7 +41,7 @@ class InclusionGrant:
         )
 
 
-@dataclass
+@dataclass(frozen=True)
 class ProvisioningEntry:
     """Class to represent the base fields of a provisioning entry."""
 
@@ -82,19 +82,28 @@ class ProvisioningEntry:
             for k, v in data.items()
             if k not in ("dsk", "securityClasses", "requestedSecurityClasses", "status")
         }:
-            cls_instance.additional_properties = additional_properties
+            object.__setattr__(
+                cls_instance, "additional_properties", additional_properties
+            )
         if "requestedSecurityClasses" in data:
-            cls_instance.requested_security_classes = [
-                SecurityClass(sec_cls) for sec_cls in data["requestedSecurityClasses"]
-            ]
+            object.__setattr__(
+                cls_instance,
+                "requested_security_classes",
+                [
+                    SecurityClass(sec_cls)
+                    for sec_cls in data["requestedSecurityClasses"]
+                ],
+            )
         if "status" in data:
-            cls_instance.status = ProvisioningEntryStatus(data["status"])
+            object.__setattr__(
+                cls_instance, "status", ProvisioningEntryStatus(data["status"])
+            )
         if "protocol" in data:
-            cls_instance.protocol = Protocols(data["protocol"])
+            object.__setattr__(cls_instance, "protocol", Protocols(data["protocol"]))
         return cls_instance
 
 
-@dataclass
+@dataclass(frozen=True)
 class QRProvisioningInformationMixin:
     """Mixin class to represent the base fields of a QR provisioning information."""
 
@@ -111,7 +120,7 @@ class QRProvisioningInformationMixin:
     supported_protocols: list[Protocols] | None
 
 
-@dataclass
+@dataclass(frozen=True)
 class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixin):
     """Representation of provisioning information retrieved from a QR code."""
 
@@ -193,11 +202,20 @@ class QRProvisioningInformation(ProvisioningEntry, QRProvisioningInformationMixi
                 "status",
             )
         }:
-            cls_instance.additional_properties = additional_properties
+            object.__setattr__(
+                cls_instance, "additional_properties", additional_properties
+            )
         if "requestedSecurityClasses" in data:
-            cls_instance.requested_security_classes = [
-                SecurityClass(sec_cls) for sec_cls in data["requestedSecurityClasses"]
-            ]
+            object.__setattr__(
+                cls_instance,
+                "requested_security_classes",
+                [
+                    SecurityClass(sec_cls)
+                    for sec_cls in data["requestedSecurityClasses"]
+                ],
+            )
         if "status" in data:
-            cls_instance.status = ProvisioningEntryStatus(data["status"])
+            object.__setattr__(
+                cls_instance, "status", ProvisioningEntryStatus(data["status"])
+            )
         return cls_instance

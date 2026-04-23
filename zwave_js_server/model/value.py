@@ -437,7 +437,7 @@ class SupervisionResultDataType(TypedDict, total=False):
     remainingDuration: DurationDataType  # not included unless status is 1 (working)
 
 
-@dataclass
+@dataclass(frozen=True)
 class SupervisionResult:
     """Represent a Supervision result type."""
 
@@ -447,9 +447,9 @@ class SupervisionResult:
 
     def __post_init__(self) -> None:
         """Post initialization."""
-        self.status = SupervisionStatus(self.data["status"])
+        object.__setattr__(self, "status", SupervisionStatus(self.data["status"]))
         if remaining_duration := self.data.get("remainingDuration"):
-            self.remaining_duration = Duration(remaining_duration)
+            object.__setattr__(self, "remaining_duration", Duration(remaining_duration))
 
         if self.status == SupervisionStatus.WORKING ^ bool(
             self.remaining_duration is not None
@@ -500,7 +500,7 @@ class SetValueResultDataType(TypedDict, total=False):
     message: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class SetValueResult:
     """Result from setValue command."""
 
@@ -511,13 +511,17 @@ class SetValueResult:
 
     def __post_init__(self) -> None:
         """Post init."""
-        self.status = SetValueStatus(self.data["status"])
-        self.remaining_duration = (
-            Duration(duration_data)
-            if (duration_data := self.data.get("remainingDuration"))
-            else None
+        object.__setattr__(self, "status", SetValueStatus(self.data["status"]))
+        object.__setattr__(
+            self,
+            "remaining_duration",
+            (
+                Duration(duration_data)
+                if (duration_data := self.data.get("remainingDuration"))
+                else None
+            ),
         )
-        self.message = self.data.get("message")
+        object.__setattr__(self, "message", self.data.get("message"))
 
     def __repr__(self) -> str:
         """Return the representation."""

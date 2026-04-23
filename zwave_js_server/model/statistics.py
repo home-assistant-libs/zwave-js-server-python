@@ -35,7 +35,7 @@ class RouteStatisticsDict(TypedDict):
     route_failed_between: tuple[Node, Node] | None
 
 
-@dataclass
+@dataclass(frozen=True)
 class RouteStatistics:
     """Represent route statistics."""
 
@@ -45,7 +45,9 @@ class RouteStatistics:
 
     def __post_init__(self) -> None:
         """Post initialize."""
-        self.protocol_data_rate = ProtocolDataRate(self.data["protocolDataRate"])
+        object.__setattr__(
+            self, "protocol_data_rate", ProtocolDataRate(self.data["protocolDataRate"])
+        )
 
     @cached_property
     def repeaters(self) -> list[Node]:
