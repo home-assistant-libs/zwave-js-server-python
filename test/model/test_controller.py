@@ -34,15 +34,15 @@ from zwave_js_server.model import (
     controller as controller_pkg,
 )
 from zwave_js_server.model.association import AssociationGroup
-from zwave_js_server.model.controller import (
+from zwave_js_server.model.controller import Controller
+from zwave_js_server.model.controller.data_model import (
     BackgroundRSSI,
-    Controller,
     NVMOpenExtResult,
     NVMReadResult,
     RFRegionInfo,
     Route,
+    ZWaveChipType,
 )
-from zwave_js_server.model.controller.data_model import ZWaveChipType
 from zwave_js_server.model.controller.rebuild_routes import (
     RebuildRoutesOptions,
     RebuildRoutesStatus,
