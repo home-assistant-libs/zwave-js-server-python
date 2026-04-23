@@ -1368,7 +1368,12 @@ class Controller(EventBase):
                     multi_channel=group["multiChannel"],
                     label=group["label"],
                     profile=group.get("profile"),
-                    issued_commands=group.get("issuedCommands", {}),
+                    issued_commands={
+                        int(cc): cmds
+                        for cc, cmds in group.get(
+                            "issuedCommands", {}
+                        ).items()
+                    },
                 )
                 for group_id, group in groups.items()
             }

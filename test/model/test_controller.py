@@ -2944,7 +2944,7 @@ async def test_get_all_association_groups(
         multi_channel=True,
         label="Lifeline",
         profile=1,
-        issued_commands={"32": [1]},
+        issued_commands={32: [1]},
     )
 
 
