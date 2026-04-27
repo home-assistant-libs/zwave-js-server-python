@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 import logging
 from typing import TYPE_CHECKING, Any, Literal, cast
 
@@ -28,7 +29,6 @@ from ..node.firmware import NodeFirmwareUpdateResult
 from .data_model import (
     BackgroundRSSI,
     ControllerDataType,
-    NVMProgress,
     ZWaveApiVersionDataType,
     ZWaveChipType,
 )
@@ -67,6 +67,14 @@ DEFAULT_CONTROLLER_STATISTICS = (  # pylint: disable=invalid-name
         timeoutCallback=0,
     )
 )
+
+
+@dataclass
+class NVMProgress:
+    """Class to represent an NVM backup/restore progress event."""
+
+    bytes_read_or_written: int
+    total_bytes: int
 
 
 class Controller(EventBase):

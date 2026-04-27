@@ -52,14 +52,6 @@ class BackgroundRSSI:
     channel_3: int | None = None
 
 
-@dataclass
-class NVMProgress:
-    """Class to represent an NVM backup/restore progress event."""
-
-    bytes_read_or_written: int
-    total_bytes: int
-
-
 class ControllerDataType(TypedDict, total=False):
     """Represent a controller data dict type."""
 
