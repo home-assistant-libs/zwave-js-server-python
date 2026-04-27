@@ -13,7 +13,6 @@ from ...const import (
     NOT_INTERVIEWED,
     CommandClass,
     DateAndTime,
-    LinkReliabilityCheckMode,
     NodeStatus,
     PowerLevel,
     Protocols,
@@ -1022,43 +1021,6 @@ class Node(EventBase):
         """Call getRawConfigParameterValue."""
         return await self.endpoints[0].async_get_raw_config_parameter_value(
             property_, property_key, allow_unexpected_response
-        )
-
-    async def async_check_link_reliability(
-        self,
-        mode: LinkReliabilityCheckMode,
-        interval: int,
-        rounds: int | None = None,
-    ) -> dict:
-        """Send checkLinkReliability command to Node."""
-        kwargs: dict[str, Any] = {"mode": mode, "interval": interval}
-        if rounds is not None:
-            kwargs["rounds"] = rounds
-        data = await self.async_send_command(
-            "check_link_reliability",
-            require_schema=47,
-            wait_for_result=True,
-            **kwargs,
-        )
-        assert data
-        return data["result"]
-
-    async def async_is_link_reliability_check_in_progress(self) -> bool:
-        """Send isLinkReliabilityCheckInProgress command to Node."""
-        data = await self.async_send_command(
-            "is_link_reliability_check_in_progress",
-            require_schema=47,
-            wait_for_result=True,
-        )
-        assert data
-        return cast(bool, data["progress"])
-
-    async def async_abort_link_reliability_check(self) -> None:
-        """Send abortLinkReliabilityCheck command to Node."""
-        await self.async_send_command(
-            "abort_link_reliability_check",
-            require_schema=47,
-            wait_for_result=False,
         )
 
     def handle_test_powerlevel_progress(self, event: Event) -> None:

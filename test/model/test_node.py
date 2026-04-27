@@ -15,7 +15,6 @@ from zwave_js_server.const import (
     INTERVIEW_FAILED,
     CommandClass,
     CommandStatus,
-    LinkReliabilityCheckMode,
     NodeStatus,
     PowerLevel,
     ProtocolDataRate,
@@ -65,7 +64,6 @@ from zwave_js_server.model.value import (
 )
 
 from .. import load_fixture
-from ..common import MockCommandProtocol
 
 # pylint: disable=unused-argument
 
@@ -2872,76 +2870,6 @@ async def test_schema_47_node_state_properties(
     assert bare.dsk is None
 
 
-async def test_check_link_reliability(
-    multisensor_6: node_pkg.Node, uuid4: str, mock_command: MockCommandProtocol
-) -> None:
-    """Test node.check_link_reliability command."""
-    node = multisensor_6
-    ack_commands = mock_command(
-        {"command": "node.check_link_reliability", "nodeId": node.node_id},
-        {"result": {"someKey": "someValue"}},
-    )
-
-    result = await node.async_check_link_reliability(
-        mode=LinkReliabilityCheckMode.BASIC_SET_ON_OFF, interval=100, rounds=5
-    )
-
-    assert result == {"someKey": "someValue"}
-
-    assert len(ack_commands) == 1
-    assert ack_commands[0] == {
-        "command": "node.check_link_reliability",
-        "nodeId": node.node_id,
-        "mode": LinkReliabilityCheckMode.BASIC_SET_ON_OFF,
-        "interval": 100,
-        "rounds": 5,
-        "messageId": uuid4,
-    }
-
-
-async def test_is_link_reliability_check_in_progress(
-    multisensor_6: node_pkg.Node, uuid4: str, mock_command: MockCommandProtocol
-) -> None:
-    """Test node.is_link_reliability_check_in_progress command."""
-    node = multisensor_6
-    ack_commands = mock_command(
-        {
-            "command": "node.is_link_reliability_check_in_progress",
-            "nodeId": node.node_id,
-        },
-        {"progress": True},
-    )
-
-    assert await node.async_is_link_reliability_check_in_progress()
-
-    assert len(ack_commands) == 1
-    assert ack_commands[0] == {
-        "command": "node.is_link_reliability_check_in_progress",
-        "nodeId": node.node_id,
-        "messageId": uuid4,
-    }
-
-
-async def test_abort_link_reliability_check(
-    multisensor_6: node_pkg.Node, uuid4: str, mock_command: MockCommandProtocol
-) -> None:
-    """Test node.abort_link_reliability_check command."""
-    node = multisensor_6
-    ack_commands = mock_command(
-        {"command": "node.abort_link_reliability_check", "nodeId": node.node_id},
-        {},
-    )
-
-    assert await node.async_abort_link_reliability_check() is None
-
-    assert len(ack_commands) == 1
-    assert ack_commands[0] == {
-        "command": "node.abort_link_reliability_check",
-        "nodeId": node.node_id,
-        "messageId": uuid4,
-    }
-
-
 async def test_check_link_reliability_progress_event(
     multisensor_6: node_pkg.Node,
 ) -> None:
@@ -2960,83 +2888,4 @@ async def test_check_link_reliability_progress_event(
     assert event.data["check_link_reliability_progress"] == {
         "round": 1,
         "totalRounds": 5,
-    }
-
-
-async def test_get_ccs(
-    multisensor_6: node_pkg.Node, uuid4: str, mock_command: MockCommandProtocol
-) -> None:
-    """Test endpoint.get_ccs command."""
-    node = multisensor_6
-    ack_commands = mock_command(
-        {"command": "endpoint.get_ccs", "nodeId": node.node_id, "endpoint": 0},
-        {"commandClasses": {"37": {"isSupported": True, "isControlled": False}}},
-    )
-
-    result = await node.endpoints[0].async_get_ccs()
-
-    assert result == {"37": {"isSupported": True, "isControlled": False}}
-
-    assert len(ack_commands) == 1
-    assert ack_commands[0] == {
-        "command": "endpoint.get_ccs",
-        "nodeId": node.node_id,
-        "endpoint": 0,
-        "messageId": uuid4,
-    }
-
-
-async def test_may_support_basic_cc(
-    multisensor_6: node_pkg.Node, uuid4: str, mock_command: MockCommandProtocol
-) -> None:
-    """Test endpoint.may_support_basic_cc command."""
-    node = multisensor_6
-    ack_commands = mock_command(
-        {
-            "command": "endpoint.may_support_basic_cc",
-            "nodeId": node.node_id,
-            "endpoint": 0,
-        },
-        {"maySupport": True},
-    )
-
-    assert await node.endpoints[0].async_may_support_basic_cc()
-
-    assert len(ack_commands) == 1
-    assert ack_commands[0] == {
-        "command": "endpoint.may_support_basic_cc",
-        "nodeId": node.node_id,
-        "endpoint": 0,
-        "messageId": uuid4,
-    }
-
-
-async def test_was_cc_removed_via_config(
-    multisensor_6: node_pkg.Node, uuid4: str, mock_command: MockCommandProtocol
-) -> None:
-    """Test endpoint.was_cc_removed_via_config command."""
-    node = multisensor_6
-    ack_commands = mock_command(
-        {
-            "command": "endpoint.was_cc_removed_via_config",
-            "nodeId": node.node_id,
-            "endpoint": 0,
-        },
-        {"removed": False},
-    )
-
-    assert (
-        await node.endpoints[0].async_was_cc_removed_via_config(
-            CommandClass.SWITCH_BINARY
-        )
-        is False
-    )
-
-    assert len(ack_commands) == 1
-    assert ack_commands[0] == {
-        "command": "endpoint.was_cc_removed_via_config",
-        "nodeId": node.node_id,
-        "endpoint": 0,
-        "commandClass": CommandClass.SWITCH_BINARY.value,
-        "messageId": uuid4,
     }

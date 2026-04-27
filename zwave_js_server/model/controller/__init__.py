@@ -932,14 +932,6 @@ class Controller(EventBase):
         )
         return [self.nodes[nid] for nid in data["nodeIds"]]
 
-    async def async_get_dsk(self) -> bytes:
-        """Send getDSK command to Controller."""
-        data = await self.client.async_send_command(
-            {"command": "controller.get_dsk"},
-            require_schema=47,
-        )
-        return convert_base64_to_bytes(data["dsk"])
-
     async def async_get_all_association_groups(
         self, node: Node
     ) -> dict[int, dict[int, AssociationGroup]]:

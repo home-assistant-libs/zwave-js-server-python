@@ -2476,14 +2476,6 @@ async def test_get_long_range_nodes(
     )
 
 
-async def test_get_dsk(
-    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
-) -> None:
-    """Test get DSK command."""
-    mock_command({"command": "controller.get_dsk"}, {"dsk": "AQIDBA=="})
-    assert await controller.async_get_dsk() == b"\x01\x02\x03\x04"
-
-
 async def test_get_all_association_groups(
     controller: Controller,
     multisensor_6: Node,
