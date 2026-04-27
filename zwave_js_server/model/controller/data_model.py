@@ -48,6 +48,7 @@ class NVMProgress:
 
     Used for backup, restore, and convert progress updates.
     """
+
     bytes_read_or_written: int
     total_bytes: int
 
