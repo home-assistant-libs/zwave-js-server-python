@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import defaultdict
 from dataclasses import dataclass
 import logging
 from typing import TYPE_CHECKING, Any, Literal, cast
@@ -980,13 +981,13 @@ class Controller(EventBase):
             },
             require_schema=47,
         )
-        result: dict[int, dict[int, dict[int, list[AssociationAddress]]]] = {}
+        result: defaultdict[
+            int, defaultdict[int, dict[int, list[AssociationAddress]]]
+        ] = defaultdict(lambda: defaultdict(dict))
         for node_id_str, endpoints in data["associations"].items():
-            node_id_int = int(node_id_str)
-            result[node_id_int] = {}
             for endpoint_id, groups in endpoints.items():
-                result[node_id_int][int(endpoint_id)] = {
-                    int(group_id): [
+                for group_id, addresses in groups.items():
+                    result[int(node_id_str)][int(endpoint_id)][int(group_id)] = [
                         AssociationAddress(
                             self,
                             node_id=addr["nodeId"],
@@ -994,9 +995,7 @@ class Controller(EventBase):
                         )
                         for addr in addresses
                     ]
-                    for group_id, addresses in groups.items()
-                }
-        return result
+        return dict(result)
 
     async def async_get_all_available_firmware_updates(
         self,
