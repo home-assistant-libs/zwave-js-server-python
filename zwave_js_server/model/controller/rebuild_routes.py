@@ -13,7 +13,7 @@ class RebuildRoutesOptionsDataType(TypedDict, total=False):
     includeSleeping: bool
 
 
-@dataclass
+@dataclass(frozen=True)
 class RebuildRoutesOptions:
     """Represent options for rebuilding routes."""
 

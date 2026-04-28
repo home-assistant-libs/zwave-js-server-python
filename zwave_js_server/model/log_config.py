@@ -18,7 +18,7 @@ class LogConfigDataType(TypedDict, total=False):
     forceConsole: bool
 
 
-@dataclass
+@dataclass(frozen=True)
 class LogConfig:
     """Represent a log config dict type."""
 

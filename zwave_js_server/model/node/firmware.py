@@ -33,7 +33,7 @@ class NodeFirmwareUpdateDataDataType(FirmwareUpdateDataDataType):
     firmwareTarget: int
 
 
-@dataclass
+@dataclass(frozen=True)
 class NodeFirmwareUpdateData(FirmwareUpdateData):
     """Firmware update data."""
 
@@ -66,7 +66,7 @@ class NodeFirmwareUpdateCapabilitiesDict(TypedDict, total=False):
     supports_activation: bool | None
 
 
-@dataclass
+@dataclass(frozen=True)
 class NodeFirmwareUpdateCapabilities:
     """Model for firmware update capabilities."""
 
@@ -75,7 +75,7 @@ class NodeFirmwareUpdateCapabilities:
 
     def __post_init__(self) -> None:
         """Post initialize."""
-        self.firmware_upgradable = self.data["firmwareUpgradable"]
+        object.__setattr__(self, "firmware_upgradable", self.data["firmwareUpgradable"])
 
     @property
     def firmware_targets(self) -> list[int]:
@@ -144,7 +144,7 @@ class NodeFirmwareUpdateProgressDataType(FirmwareUpdateProgressDataType):
     totalFiles: int
 
 
-@dataclass
+@dataclass(frozen=True)
 class NodeFirmwareUpdateProgress(FirmwareUpdateProgress):
     """Model for a node firmware update progress data."""
 
@@ -160,13 +160,13 @@ class NodeFirmwareUpdateProgress(FirmwareUpdateProgress):
         that requires the node as first parameter.
         """
         super().__init__(data)
-        self.node = node
+        object.__setattr__(self, "node", node)
 
     def __post_init__(self) -> None:
         """Post initialize."""
         super().__post_init__()
-        self.current_file = self.data["currentFile"]
-        self.total_files = self.data["totalFiles"]
+        object.__setattr__(self, "current_file", self.data["currentFile"])
+        object.__setattr__(self, "total_files", self.data["totalFiles"])
 
 
 class NodeFirmwareUpdateResultDataType(FirmwareUpdateResultDataType, total=False):
@@ -176,7 +176,7 @@ class NodeFirmwareUpdateResultDataType(FirmwareUpdateResultDataType, total=False
     reInterview: Required[bool]
 
 
-@dataclass
+@dataclass(frozen=True)
 class NodeFirmwareUpdateResult(FirmwareUpdateResult):
     """Model for node firmware update result data."""
 
@@ -194,20 +194,20 @@ class NodeFirmwareUpdateResult(FirmwareUpdateResult):
         that requires the node as first parameter.
         """
         super().__init__(data)
-        self.node = node
+        object.__setattr__(self, "node", node)
 
     def __post_init__(self) -> None:
         """Post initialize."""
         super().__post_init__()
-        self.wait_time = self.data.get("waitTime")
-        self.reinterview = self.data["reInterview"]
+        object.__setattr__(self, "wait_time", self.data.get("waitTime"))
+        object.__setattr__(self, "reinterview", self.data["reInterview"])
 
 
 class NodeFirmwareUpdateFileInfoDataType(FirmwareUpdateFileInfoDataType):
     """Represent a node firmware update file info data dict type."""
 
 
-@dataclass
+@dataclass(frozen=True)
 class NodeFirmwareUpdateFileInfo(FirmwareUpdateFileInfo):
     """Represent a firmware update file info."""
 
@@ -227,7 +227,7 @@ class NodeFirmwareUpdateDeviceIDDataType(FirmwareUpdateDeviceIDDataType):
     """Represent a node firmware update device ID data dict type."""
 
 
-@dataclass
+@dataclass(frozen=True)
 class NodeFirmwareUpdateDeviceID(FirmwareUpdateDeviceID):
     """Represent a firmware update device ID."""
 
@@ -247,7 +247,7 @@ class NodeFirmwareUpdateInfoDataType(FirmwareUpdateInfoDataType):
     """Represent a node firmware update info data dict type."""
 
 
-@dataclass
+@dataclass(frozen=True)
 class NodeFirmwareUpdateInfo(FirmwareUpdateInfo):
     """Represent a firmware update info."""
 

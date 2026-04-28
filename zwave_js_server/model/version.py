@@ -16,7 +16,7 @@ class VersionInfoDataType(TypedDict):
     maxSchemaVersion: int
 
 
-@dataclass
+@dataclass(frozen=True)
 class VersionInfo:
     """Version info of the server."""
 

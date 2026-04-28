@@ -28,7 +28,7 @@ class BaseNotificationDataType(TypedDict):
     ccId: int  # required
 
 
-@dataclass
+@dataclass(frozen=True)
 class BaseNotification:
     """Model for a Zwave Node's notification event."""
 
@@ -40,9 +40,9 @@ class BaseNotification:
 
     def __post_init__(self) -> None:
         """Post initialization."""
-        self.node_id = self.data["nodeId"]
-        self.endpoint_idx = self.data["endpointIndex"]
-        self.command_class = self.data["ccId"]
+        object.__setattr__(self, "node_id", self.data["nodeId"])
+        object.__setattr__(self, "endpoint_idx", self.data["endpointIndex"])
+        object.__setattr__(self, "command_class", self.data["ccId"])
 
 
 class BatteryNotificationArgsDataType(TypedDict):
@@ -58,7 +58,7 @@ class BatteryNotificationDataType(BaseNotificationDataType):
     args: BatteryNotificationArgsDataType  # required
 
 
-@dataclass
+@dataclass(frozen=True)
 class BatteryNotification(BaseNotification):
     """Model for a Zwave Node's Battery CC notification event."""
 
@@ -69,8 +69,10 @@ class BatteryNotification(BaseNotification):
     def __post_init__(self) -> None:
         """Post initialize."""
         super().__post_init__()
-        self.event_type = self.data["args"]["eventType"]
-        self.urgency = BatteryReplacementStatus(self.data["args"]["urgency"])
+        object.__setattr__(self, "event_type", self.data["args"]["eventType"])
+        object.__setattr__(
+            self, "urgency", BatteryReplacementStatus(self.data["args"]["urgency"])
+        )
 
 
 class EntryControlNotificationArgsDataType(TypedDict, total=False):
@@ -89,7 +91,7 @@ class EntryControlNotificationDataType(BaseNotificationDataType):
     args: EntryControlNotificationArgsDataType  # required
 
 
-@dataclass
+@dataclass(frozen=True)
 class EntryControlNotification(BaseNotification):
     """Model for a Zwave Node's Entry Control CC notification event."""
 
@@ -103,12 +105,14 @@ class EntryControlNotification(BaseNotification):
     def __post_init__(self) -> None:
         """Post initialize."""
         super().__post_init__()
-        self.event_type = self.data["args"]["eventType"]
-        self.event_type_label = self.data["args"]["eventTypeLabel"]
-        self.data_type = self.data["args"]["dataType"]
-        self.data_type_label = self.data["args"]["dataTypeLabel"]
+        object.__setattr__(self, "event_type", self.data["args"]["eventType"])
+        object.__setattr__(
+            self, "event_type_label", self.data["args"]["eventTypeLabel"]
+        )
+        object.__setattr__(self, "data_type", self.data["args"]["dataType"])
+        object.__setattr__(self, "data_type_label", self.data["args"]["dataTypeLabel"])
         if event_data := self.data["args"].get("eventData"):
-            self.event_data = parse_buffer(event_data)
+            object.__setattr__(self, "event_data", parse_buffer(event_data))
 
 
 class NotificationNotificationArgsDataType(TypedDict, total=False):
@@ -127,7 +131,7 @@ class NotificationNotificationDataType(BaseNotificationDataType):
     args: NotificationNotificationArgsDataType  # required
 
 
-@dataclass
+@dataclass(frozen=True)
 class NotificationNotification(BaseNotification):
     """Model for a Zwave Node's Notification CC notification event."""
 
@@ -141,11 +145,11 @@ class NotificationNotification(BaseNotification):
     def __post_init__(self) -> None:
         """Post initialize."""
         super().__post_init__()
-        self.type_ = self.data["args"]["type"]
-        self.label = self.data["args"]["label"]
-        self.event = self.data["args"]["event"]
-        self.event_label = self.data["args"]["eventLabel"]
-        self.parameters = self.data["args"].get("parameters", {})
+        object.__setattr__(self, "type_", self.data["args"]["type"])
+        object.__setattr__(self, "label", self.data["args"]["label"])
+        object.__setattr__(self, "event", self.data["args"]["event"])
+        object.__setattr__(self, "event_label", self.data["args"]["eventLabel"])
+        object.__setattr__(self, "parameters", self.data["args"].get("parameters", {}))
 
 
 class PowerLevelNotificationArgsDataType(TypedDict):
@@ -162,7 +166,7 @@ class PowerLevelNotificationDataType(BaseNotificationDataType):
     args: PowerLevelNotificationArgsDataType  # required
 
 
-@dataclass
+@dataclass(frozen=True)
 class PowerLevelNotification(BaseNotification):
     """Model for a Zwave Node's Power Level CC notification event."""
 
@@ -174,9 +178,13 @@ class PowerLevelNotification(BaseNotification):
     def __post_init__(self) -> None:
         """Post initialize."""
         super().__post_init__()
-        self.test_node_id = self.data["args"]["testNodeId"]
-        self.status = PowerLevelTestStatus(self.data["args"]["status"])
-        self.acknowledged_frames = self.data["args"]["acknowledgedFrames"]
+        object.__setattr__(self, "test_node_id", self.data["args"]["testNodeId"])
+        object.__setattr__(
+            self, "status", PowerLevelTestStatus(self.data["args"]["status"])
+        )
+        object.__setattr__(
+            self, "acknowledged_frames", self.data["args"]["acknowledgedFrames"]
+        )
 
 
 class MultilevelSwitchNotificationArgsDataType(TypedDict, total=False):
@@ -193,7 +201,7 @@ class MultilevelSwitchNotificationDataType(BaseNotificationDataType):
     args: MultilevelSwitchNotificationArgsDataType  # required
 
 
-@dataclass
+@dataclass(frozen=True)
 class MultilevelSwitchNotification(BaseNotification):
     """Model for a Zwave Node's Multi Level CC notification event."""
 
@@ -205,6 +213,10 @@ class MultilevelSwitchNotification(BaseNotification):
     def __post_init__(self) -> None:
         """Post initialize."""
         super().__post_init__()
-        self.event_type = MultilevelSwitchCommand(self.data["args"]["eventType"])
-        self.event_type_label = self.data["args"]["eventTypeLabel"]
-        self.direction = self.data["args"].get("direction")
+        object.__setattr__(
+            self, "event_type", MultilevelSwitchCommand(self.data["args"]["eventType"])
+        )
+        object.__setattr__(
+            self, "event_type_label", self.data["args"]["eventTypeLabel"]
+        )
+        object.__setattr__(self, "direction", self.data["args"].get("direction"))

@@ -457,7 +457,7 @@ class DateAndTimeDataType(TypedDict, total=False):
     standardOffset: int
 
 
-@dataclass
+@dataclass(frozen=True)
 class DateAndTime:
     """Represent a date and time."""
 
@@ -474,16 +474,16 @@ class DateAndTime:
 
     def __post_init__(self) -> None:
         """Post initialization."""
-        self.hour = self.data.get("hour")
-        self.minute = self.data.get("minute")
+        object.__setattr__(self, "hour", self.data.get("hour"))
+        object.__setattr__(self, "minute", self.data.get("minute"))
         if weekday := self.data.get("weekday"):
-            self.weekday = Weekday(weekday)
-        self.second = self.data.get("second")
-        self.year = self.data.get("year")
-        self.month = self.data.get("month")
-        self.day = self.data.get("day")
-        self.dst_offset = self.data.get("dstOffset")
-        self.standard_offset = self.data.get("standardOffset")
+            object.__setattr__(self, "weekday", Weekday(weekday))
+        object.__setattr__(self, "second", self.data.get("second"))
+        object.__setattr__(self, "year", self.data.get("year"))
+        object.__setattr__(self, "month", self.data.get("month"))
+        object.__setattr__(self, "day", self.data.get("day"))
+        object.__setattr__(self, "dst_offset", self.data.get("dstOffset"))
+        object.__setattr__(self, "standard_offset", self.data.get("standardOffset"))
 
 
 class ControllerStatus(IntEnum):

@@ -152,7 +152,7 @@ def test_from_state(client):
     assert node.endpoints[0].index == 0
     assert node.endpoints[0].installer_icon is None
     assert node.endpoints[0].user_icon is None
-    assert node.endpoints[0].command_classes == []
+    assert node.endpoints[0].command_classes == ()
     assert node.endpoints[0].endpoint_label is None
     device_class = node.endpoints[0].device_class
     assert device_class.basic.key == 2
@@ -226,6 +226,12 @@ async def test_command_classes(endpoints_with_command_classes: Node) -> None:
     assert command_class_info.version == 2
     assert command_class_info.is_secure is False
     assert command_class_info.to_dict() == command_class_info.data
+
+    # Cache: same object returned on repeated access.
+    assert node.endpoints[0].command_classes is node.endpoints[0].command_classes
+
+    # Returns a tuple (immutable).
+    assert isinstance(node.endpoints[0].command_classes, tuple)
 
 
 async def test_device_config(

@@ -25,7 +25,7 @@ class DeviceClassDataType(TypedDict):
     specific: DeviceClassItemDataType
 
 
-@dataclass
+@dataclass(frozen=True)
 class DeviceClassItem:
     """Model for a DeviceClass item (e.g. basic or generic)."""
 

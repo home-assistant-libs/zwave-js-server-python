@@ -24,7 +24,7 @@ class LogMessageContextDataType(TypedDict, total=False):
     propertyKey: int | str
 
 
-@dataclass
+@dataclass(frozen=True)
 class LogMessageContext:
     """Represent log message context information."""
 
@@ -45,18 +45,18 @@ class LogMessageContext:
 
     def __post_init__(self) -> None:
         """Post initialize."""
-        self.source = self.data["source"]
-        self.type = self.data.get("type")
-        self.node_id = self.data.get("nodeId")
-        self.header = self.data.get("header")
-        self.direction = self.data.get("direction")
-        self.change = self.data.get("change")
-        self.internal = self.data.get("internal")
-        self.endpoint = self.data.get("endpoint")
+        object.__setattr__(self, "source", self.data["source"])
+        object.__setattr__(self, "type", self.data.get("type"))
+        object.__setattr__(self, "node_id", self.data.get("nodeId"))
+        object.__setattr__(self, "header", self.data.get("header"))
+        object.__setattr__(self, "direction", self.data.get("direction"))
+        object.__setattr__(self, "change", self.data.get("change"))
+        object.__setattr__(self, "internal", self.data.get("internal"))
+        object.__setattr__(self, "endpoint", self.data.get("endpoint"))
         if (command_class := self.data.get("commandClass")) is not None:
-            self.command_class = CommandClass(command_class)
-        self.property_ = self.data.get("property")
-        self.property_key = self.data.get("propertyKey")
+            object.__setattr__(self, "command_class", CommandClass(command_class))
+        object.__setattr__(self, "property_", self.data.get("property"))
+        object.__setattr__(self, "property_key", self.data.get("propertyKey"))
 
 
 class LogMessageDataType(TypedDict, total=False):
@@ -87,7 +87,7 @@ def _process_message(message: str | list[str]) -> list[str]:
     return [message.rstrip("\n") for message in message]
 
 
-@dataclass
+@dataclass(frozen=True)
 class LogMessage:
     """Represent a log message."""
 
@@ -106,14 +106,18 @@ class LogMessage:
 
     def __post_init__(self) -> None:
         """Post initialize."""
-        self.message = _process_message(self.data["message"])
-        self.formatted_message = _process_message(self.data["formattedMessage"])
-        self.direction = self.data["direction"]
-        self.level = self.data["level"]
-        self.context = LogMessageContext(self.data["context"])
-        self.primary_tags = self.data.get("primaryTags")
-        self.secondary_tags = self.data.get("secondaryTags")
-        self.secondary_tag_padding = self.data.get("secondaryTagPadding")
-        self.multiline = self.data.get("multiline")
-        self.timestamp = self.data.get("timestamp")
-        self.label = self.data.get("label")
+        object.__setattr__(self, "message", _process_message(self.data["message"]))
+        object.__setattr__(
+            self, "formatted_message", _process_message(self.data["formattedMessage"])
+        )
+        object.__setattr__(self, "direction", self.data["direction"])
+        object.__setattr__(self, "level", self.data["level"])
+        object.__setattr__(self, "context", LogMessageContext(self.data["context"]))
+        object.__setattr__(self, "primary_tags", self.data.get("primaryTags"))
+        object.__setattr__(self, "secondary_tags", self.data.get("secondaryTags"))
+        object.__setattr__(
+            self, "secondary_tag_padding", self.data.get("secondaryTagPadding")
+        )
+        object.__setattr__(self, "multiline", self.data.get("multiline"))
+        object.__setattr__(self, "timestamp", self.data.get("timestamp"))
+        object.__setattr__(self, "label", self.data.get("label"))
