@@ -460,6 +460,15 @@ class SupervisionResult:
             )
 
 
+def parse_supervision_result(
+    data: dict[str, Any] | None,
+) -> SupervisionResult | None:
+    """Return a parsed supervision result from a command response."""
+    if not data or (result := data.get("result")) is None:
+        return None
+    return SupervisionResult(result)
+
+
 class ConfigurationValue(Value):
     """Model for a Configuration Value."""
 
