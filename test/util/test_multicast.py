@@ -2,6 +2,7 @@
 
 from zwave_js_server.client import Client
 from zwave_js_server.const import CommandClass, SetValueStatus
+from zwave_js_server.model.node import Node
 from zwave_js_server.util.multicast import (
     _async_send_command,
     async_multicast_endpoint_get_cc_version,
@@ -323,6 +324,27 @@ async def test_broadcast_long_range(
     # With long_range=True — longRange key present.
     await _async_send_command(client, "test_cmd", long_range=True)
     assert ack_commands[1]["longRange"] is True
+
+
+async def test_multicast_long_range_ignored(
+    climate_radio_thermostat_ct100_plus: Node,
+    client: Client,
+    uuid4: str,
+    mock_command: MockCommandProtocol,
+) -> None:
+    """Test that long_range flag is ignored for multicast group commands."""
+    ack_commands = mock_command(
+        {"command": "multicast_group.test_cmd"},
+        {},
+    )
+
+    await _async_send_command(
+        client,
+        "test_cmd",
+        nodes=[climate_radio_thermostat_ct100_plus],
+        long_range=True,
+    )
+    assert "longRange" not in ack_commands[0]
 
 
 async def test_set_value_broadcast_missing_value(
