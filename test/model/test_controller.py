@@ -30,8 +30,9 @@ from zwave_js_server.model import (
     association as association_pkg,
     controller as controller_pkg,
 )
+from zwave_js_server.model.association import AssociationGroup
 from zwave_js_server.model.controller import Controller
-from zwave_js_server.model.controller.data_model import ZWaveChipType
+from zwave_js_server.model.controller.data_model import BackgroundRSSI, ZWaveChipType
 from zwave_js_server.model.controller.rebuild_routes import (
     RebuildRoutesOptions,
     RebuildRoutesStatus,
@@ -41,6 +42,7 @@ from zwave_js_server.model.node import Node
 from zwave_js_server.model.node.firmware import NodeFirmwareUpdateInfo
 
 from .. import load_fixture
+from ..common import MockCommandProtocol
 from .common import FIRMWARE_UPDATE_INFO
 
 
@@ -2441,3 +2443,151 @@ async def test_schema_47_network_lifecycle_events(controller: Controller) -> Non
         "joining network failed",
         "leaving network failed",
     ]
+
+
+async def test_get_background_rssi(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test get background RSSI command."""
+    mock_command(
+        {"command": "controller.get_background_rssi"},
+        {"rssiChannel0": -80, "rssiChannel1": -75, "rssiChannel2": -90},
+    )
+    result = await controller.async_get_background_rssi()
+    assert result == BackgroundRSSI(
+        channel_0=-80,
+        channel_1=-75,
+        channel_2=-90,
+        channel_3=None,
+    )
+
+
+async def test_get_long_range_nodes(
+    controller: Controller,
+    multisensor_6: Node,
+    uuid4: str,
+    mock_command: MockCommandProtocol,
+) -> None:
+    """Test get long range nodes command."""
+    mock_command({"command": "controller.get_long_range_nodes"}, {"nodeIds": [52]})
+    assert (
+        await multisensor_6.client.driver.controller.async_get_long_range_nodes()
+        == [multisensor_6]
+    )
+
+
+async def test_get_all_association_groups(
+    controller: Controller,
+    multisensor_6: Node,
+    uuid4: str,
+    mock_command: MockCommandProtocol,
+) -> None:
+    """Test get all association groups with nested map parsing."""
+    mock_command(
+        {"command": "controller.get_all_association_groups"},
+        {
+            "groups": {
+                "0": {
+                    "1": {
+                        "maxNodes": 5,
+                        "isLifeline": True,
+                        "multiChannel": True,
+                        "label": "Lifeline",
+                        "profile": 1,
+                        "issuedCommands": {"32": [1]},
+                    },
+                },
+            }
+        },
+    )
+    result = await controller.async_get_all_association_groups(multisensor_6)
+    assert 0 in result
+    assert result[0][1] == AssociationGroup(
+        max_nodes=5,
+        is_lifeline=True,
+        multi_channel=True,
+        label="Lifeline",
+        profile=1,
+        issued_commands={32: [1]},
+    )
+
+
+async def test_get_all_associations(
+    controller: Controller,
+    multisensor_6: Node,
+    uuid4: str,
+    mock_command: MockCommandProtocol,
+) -> None:
+    """Test get all associations with triple-nested map parsing."""
+    mock_command(
+        {"command": "controller.get_all_associations"},
+        {
+            "associations": {
+                "52": {
+                    "0": {
+                        "1": [
+                            {"nodeId": 1},
+                            {"nodeId": 2, "endpoint": 1},
+                        ],
+                    },
+                },
+            }
+        },
+    )
+    result = await multisensor_6.client.driver.controller.async_get_all_associations(
+        multisensor_6
+    )
+    addresses = result[52][0][1]
+    assert len(addresses) == 2
+    assert addresses[0].node_id == 1
+    assert addresses[0].endpoint is None
+    assert addresses[1].node_id == 2
+    assert addresses[1].endpoint == 1
+
+
+async def test_get_all_available_firmware_updates(
+    controller: Controller, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test get all available firmware updates command."""
+    ack_commands = mock_command(
+        {"command": "controller.get_all_available_firmware_updates"},
+        {"updates": {"52": [FIRMWARE_UPDATE_INFO]}},
+    )
+    result = await controller.async_get_all_available_firmware_updates("test-api-key")
+    assert 52 in result
+    assert result[52][0] == NodeFirmwareUpdateInfo.from_dict(FIRMWARE_UPDATE_INFO)
+    assert ack_commands[0]["apiKey"] == "test-api-key"
+    assert ack_commands[0]["includePrereleases"] is True
+
+    # With rf_region
+    await controller.async_get_all_available_firmware_updates(
+        "key", include_prereleases=False, rf_region=RFRegion.USA
+    )
+    assert ack_commands[1]["rfRegion"] == RFRegion.USA.value
+
+
+async def test_schema_47_joining_network_dsk_and_done_events(
+    controller: Controller,
+) -> None:
+    """Test joining network show dsk and joining network done events."""
+    received: list[str] = []
+    for evt in ("joining network show dsk", "joining network done"):
+        controller.on(evt, lambda data, name=evt: received.append(name))
+
+    controller.receive_event(
+        Event(
+            "joining network show dsk",
+            {
+                "source": "controller",
+                "event": "joining network show dsk",
+                "dsk": "12345-67890-11111-22222-33333-44444-55555-66666",
+            },
+        )
+    )
+    controller.receive_event(
+        Event(
+            "joining network done",
+            {"source": "controller", "event": "joining network done"},
+        )
+    )
+    assert received == ["joining network show dsk", "joining network done"]

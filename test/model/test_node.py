@@ -2874,3 +2874,24 @@ async def test_schema_47_node_state_properties(
     assert bare.has_suc_return_route is None
     assert bare.manufacturer is None
     assert bare.dsk is None
+
+
+async def test_check_link_reliability_progress_event(
+    multisensor_6: node_pkg.Node,
+) -> None:
+    """Test check link reliability progress event."""
+    event = Event(
+        "check link reliability progress",
+        {
+            "source": "node",
+            "event": "check link reliability progress",
+            "nodeId": multisensor_6.node_id,
+            "progress": {"round": 1, "totalRounds": 5},
+        },
+    )
+    multisensor_6.receive_event(event)
+    assert event.data["check_link_reliability_progress"]
+    assert event.data["check_link_reliability_progress"] == {
+        "round": 1,
+        "totalRounds": 5,
+    }
