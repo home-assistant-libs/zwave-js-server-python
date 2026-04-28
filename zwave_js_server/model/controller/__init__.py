@@ -971,7 +971,7 @@ class Controller(EventBase):
 
     async def async_get_all_associations(
         self, node: Node
-    ) -> dict[Node, dict[int, dict[int, list[AssociationAddress]]]]:
+    ) -> dict[int, dict[int, dict[int, list[AssociationAddress]]]]:
         """Send getAllAssociations command to Controller."""
         data = await self.client.async_send_command(
             {
@@ -980,12 +980,12 @@ class Controller(EventBase):
             },
             require_schema=47,
         )
-        result: dict[Node, dict[int, dict[int, list[AssociationAddress]]]] = {}
+        result: dict[int, dict[int, dict[int, list[AssociationAddress]]]] = {}
         for node_id_str, endpoints in data["associations"].items():
-            assoc_node = self.nodes[int(node_id_str)]
-            result[assoc_node] = {}
+            node_id_int = int(node_id_str)
+            result[node_id_int] = {}
             for endpoint_id, groups in endpoints.items():
-                result[assoc_node][int(endpoint_id)] = {
+                result[node_id_int][int(endpoint_id)] = {
                     int(group_id): [
                         AssociationAddress(
                             self,

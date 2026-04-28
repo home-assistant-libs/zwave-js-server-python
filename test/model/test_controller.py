@@ -2537,7 +2537,7 @@ async def test_get_all_associations(
     result = await multisensor_6.client.driver.controller.async_get_all_associations(
         multisensor_6
     )
-    addresses = result[multisensor_6][0][1]
+    addresses = result[52][0][1]
     assert len(addresses) == 2
     assert addresses[0].node_id == 1
     assert addresses[0].endpoint is None
