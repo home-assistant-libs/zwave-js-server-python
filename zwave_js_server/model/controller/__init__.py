@@ -951,9 +951,8 @@ class Controller(EventBase):
             },
             require_schema=47,
         )
-        result: dict[int, dict[int, AssociationGroup]] = {}
-        for endpoint_id, groups in data["groups"].items():
-            result[int(endpoint_id)] = {
+        return {
+            int(endpoint_id): {
                 int(group_id): AssociationGroup(
                     max_nodes=group["maxNodes"],
                     is_lifeline=group["isLifeline"],
@@ -967,7 +966,8 @@ class Controller(EventBase):
                 )
                 for group_id, group in groups.items()
             }
-        return result
+            for endpoint_id, groups in data["groups"].items()
+        }
 
     async def async_get_all_associations(
         self, node: Node
@@ -990,9 +990,12 @@ class Controller(EventBase):
                             endpoint=addr.get("endpoint"),
                         )
                         for addr in addresses
-                    ] for group_id, addresses in groups.items()
-                } for endpoint_id, groups in endpoints.items()
-            } for node_id_str, endpoints in data["associations"].items()
+                    ]
+                    for group_id, addresses in groups.items()
+                }
+                for endpoint_id, groups in endpoints.items()
+            }
+            for node_id_str, endpoints in data["associations"].items()
         }
 
     async def async_get_all_available_firmware_updates(
