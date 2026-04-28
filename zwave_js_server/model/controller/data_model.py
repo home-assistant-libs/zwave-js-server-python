@@ -42,6 +42,17 @@ class ZWaveChipType:
         return cls(type=data["type"], version=data["version"])
 
 
+@dataclass
+class NVMProgress:
+    """Class to represent an NVM operation progress event.
+
+    Used for backup, restore, and convert progress updates.
+    """
+
+    bytes_read_or_written: int
+    total_bytes: int
+
+
 @dataclass(frozen=True)
 class BackgroundRSSI:
     """Background RSSI noise levels for all channels."""
