@@ -53,6 +53,16 @@ class NVMProgress:
     total_bytes: int
 
 
+@dataclass(frozen=True)
+class BackgroundRSSI:
+    """Background RSSI noise levels for all channels."""
+
+    channel_0: int
+    channel_1: int
+    channel_2: int | None = None
+    channel_3: int | None = None
+
+
 class ControllerDataType(TypedDict, total=False):
     """Represent a controller data dict type."""
 

@@ -26,6 +26,7 @@ from ..association import AssociationAddress, AssociationGroup
 from ..node import Node
 from ..node.firmware import NodeFirmwareUpdateResult
 from .data_model import (
+    BackgroundRSSI,
     ControllerDataType,
     NVMProgress,
     ZWaveApiVersionDataType,
@@ -910,6 +911,107 @@ class Controller(EventBase):
         )
         return cast(bool, data["progress"])
 
+    async def async_get_background_rssi(self) -> BackgroundRSSI:
+        """Send getBackgroundRSSI command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.get_background_rssi"},
+            require_schema=47,
+        )
+        return BackgroundRSSI(
+            channel_0=data["rssiChannel0"],
+            channel_1=data["rssiChannel1"],
+            channel_2=data.get("rssiChannel2"),
+            channel_3=data.get("rssiChannel3"),
+        )
+
+    async def async_get_long_range_nodes(self) -> list[Node]:
+        """Send getLongRangeNodes command to Controller."""
+        data = await self.client.async_send_command(
+            {"command": "controller.get_long_range_nodes"},
+            require_schema=47,
+        )
+        return [self.nodes[nid] for nid in data["nodeIds"]]
+
+    async def async_get_all_association_groups(
+        self, node: Node
+    ) -> dict[int, dict[int, AssociationGroup]]:
+        """Send getAllAssociationGroups command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.get_all_association_groups",
+                "nodeId": node.node_id,
+            },
+            require_schema=47,
+        )
+        return {
+            int(endpoint_id): {
+                int(group_id): AssociationGroup(
+                    max_nodes=group["maxNodes"],
+                    is_lifeline=group["isLifeline"],
+                    multi_channel=group["multiChannel"],
+                    label=group["label"],
+                    profile=group.get("profile"),
+                    issued_commands={
+                        int(cc): cmds
+                        for cc, cmds in group.get("issuedCommands", {}).items()
+                    },
+                )
+                for group_id, group in groups.items()
+            }
+            for endpoint_id, groups in data["groups"].items()
+        }
+
+    async def async_get_all_associations(
+        self, node: Node
+    ) -> dict[int, dict[int, dict[int, list[AssociationAddress]]]]:
+        """Send getAllAssociations command to Controller."""
+        data = await self.client.async_send_command(
+            {
+                "command": "controller.get_all_associations",
+                "nodeId": node.node_id,
+            },
+            require_schema=47,
+        )
+        return {
+            int(node_id_str): {
+                int(endpoint_id): {
+                    int(group_id): [
+                        AssociationAddress(
+                            self,
+                            node_id=addr["nodeId"],
+                            endpoint=addr.get("endpoint"),
+                        )
+                        for addr in addresses
+                    ]
+                    for group_id, addresses in groups.items()
+                }
+                for endpoint_id, groups in endpoints.items()
+            }
+            for node_id_str, endpoints in data["associations"].items()
+        }
+
+    async def async_get_all_available_firmware_updates(
+        self,
+        api_key: str,
+        include_prereleases: bool = True,
+        rf_region: RFRegion | None = None,
+    ) -> dict[int, list[NodeFirmwareUpdateInfo]]:
+        """Send getAllAvailableFirmwareUpdates command to Controller."""
+        cmd: dict[str, Any] = {
+            "command": "controller.get_all_available_firmware_updates",
+            "apiKey": api_key,
+            "includePrereleases": include_prereleases,
+        }
+        if rf_region is not None:
+            cmd["rfRegion"] = rf_region.value
+        data = await self.client.async_send_command(cmd, require_schema=47)
+        return {
+            int(node_id): [
+                NodeFirmwareUpdateInfo.from_dict(update) for update in updates
+            ]
+            for node_id, updates in data["updates"].items()
+        }
+
     def receive_event(self, event: Event) -> None:
         """Receive an event."""
         if event.data["source"] == "node":
@@ -1051,6 +1153,12 @@ class Controller(EventBase):
 
     def handle_joining_network_failed(self, event: Event) -> None:
         """Process a `joining network failed` event (schema 47+)."""
+
+    def handle_joining_network_show_dsk(self, event: Event) -> None:
+        """Process a `joining network show dsk` event (schema 47+)."""
+
+    def handle_joining_network_done(self, event: Event) -> None:
+        """Process a `joining network done` event (schema 47+)."""
 
     def handle_leaving_network_failed(self, event: Event) -> None:
         """Process a `leaving network failed` event (schema 47+)."""
