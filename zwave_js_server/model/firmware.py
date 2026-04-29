@@ -10,7 +10,7 @@ from zwave_js_server.const import RFRegion
 from zwave_js_server.util.helpers import convert_bytes_to_base64
 
 
-@dataclass
+@dataclass(frozen=True)
 class FirmwareUpdateData:
     """Firmware update data."""
 
@@ -37,7 +37,7 @@ class FirmwareUpdateDataDataType(TypedDict, total=False):
     fileFormat: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class FirmwareUpdateInfo:
     """Represent a firmware update info."""
 
@@ -90,7 +90,7 @@ class FirmwareUpdateInfoDataType(TypedDict, total=False):
     device: FirmwareUpdateDeviceIDDataType
 
 
-@dataclass
+@dataclass(frozen=True)
 class FirmwareUpdateDeviceID:
     """Represent a firmware update device ID."""
 
@@ -134,7 +134,7 @@ class FirmwareUpdateDeviceIDDataType(TypedDict, total=False):
     rfRegion: int
 
 
-@dataclass
+@dataclass(frozen=True)
 class FirmwareUpdateFileInfo:
     """Represent a firmware update file info."""
 
@@ -164,7 +164,7 @@ class FirmwareUpdateFileInfoDataType(TypedDict):
     integrity: str  # sha256
 
 
-@dataclass
+@dataclass(frozen=True)
 class FirmwareUpdateProgress:
     """Model for a firmware update progress."""
 
@@ -175,9 +175,9 @@ class FirmwareUpdateProgress:
 
     def __post_init__(self) -> None:
         """Post initialize."""
-        self.sent_fragments = self.data["sentFragments"]
-        self.total_fragments = self.data["totalFragments"]
-        self.progress = float(self.data["progress"])
+        object.__setattr__(self, "sent_fragments", self.data["sentFragments"])
+        object.__setattr__(self, "total_fragments", self.data["totalFragments"])
+        object.__setattr__(self, "progress", float(self.data["progress"]))
 
 
 class FirmwareUpdateProgressDataType(TypedDict):
@@ -188,7 +188,7 @@ class FirmwareUpdateProgressDataType(TypedDict):
     progress: float
 
 
-@dataclass
+@dataclass(frozen=True)
 class FirmwareUpdateResult:
     """Model for firmware update result data."""
 
@@ -199,8 +199,8 @@ class FirmwareUpdateResult:
 
     def __post_init__(self) -> None:
         """Post initialize."""
-        self.status = self._status_class(self.data["status"])
-        self.success = self.data["success"]
+        object.__setattr__(self, "status", self._status_class(self.data["status"]))
+        object.__setattr__(self, "success", self.data["success"])
 
 
 class FirmwareUpdateResultDataType(TypedDict):

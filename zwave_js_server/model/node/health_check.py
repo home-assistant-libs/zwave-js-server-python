@@ -30,7 +30,7 @@ class LifelineHealthCheckSummaryDataType(TypedDict):
     rating: int
 
 
-@dataclass
+@dataclass(frozen=True)
 class LifelineHealthCheckResult:
     """Represent a lifeline health check result."""
 
@@ -46,18 +46,20 @@ class LifelineHealthCheckResult:
 
     def __post_init__(self) -> None:
         """Post initialize."""
-        self.latency = self.data["latency"]
-        self.num_neighbors = self.data["numNeighbors"]
-        self.failed_pings_node = self.data["failedPingsNode"]
-        self.rating = self.data["rating"]
-        self.route_changes = self.data.get("routeChanges")
+        object.__setattr__(self, "latency", self.data["latency"])
+        object.__setattr__(self, "num_neighbors", self.data["numNeighbors"])
+        object.__setattr__(self, "failed_pings_node", self.data["failedPingsNode"])
+        object.__setattr__(self, "rating", self.data["rating"])
+        object.__setattr__(self, "route_changes", self.data.get("routeChanges"))
         if (min_power_level := self.data.get("minPowerlevel")) is not None:
-            self.min_power_level = PowerLevel(min_power_level)
-        self.failed_pings_controller = self.data.get("failedPingsController")
-        self.snr_margin = self.data.get("snrMargin")
+            object.__setattr__(self, "min_power_level", PowerLevel(min_power_level))
+        object.__setattr__(
+            self, "failed_pings_controller", self.data.get("failedPingsController")
+        )
+        object.__setattr__(self, "snr_margin", self.data.get("snrMargin"))
 
 
-@dataclass
+@dataclass(frozen=True)
 class LifelineHealthCheckSummary:
     """Represent a lifeline health check summary update."""
 
@@ -67,10 +69,12 @@ class LifelineHealthCheckSummary:
 
     def __post_init__(self) -> None:
         """Post initialize."""
-        self.rating = self.data["rating"]
-        self.results = [
-            LifelineHealthCheckResult(r) for r in self.data.get("results", [])
-        ]
+        object.__setattr__(self, "rating", self.data["rating"])
+        object.__setattr__(
+            self,
+            "results",
+            [LifelineHealthCheckResult(r) for r in self.data.get("results", [])],
+        )
 
 
 class RouteHealthCheckResultDataType(TypedDict, total=False):
@@ -93,7 +97,7 @@ class RouteHealthCheckSummaryDataType(TypedDict):
     rating: int
 
 
-@dataclass
+@dataclass(frozen=True)
 class RouteHealthCheckResult:
     """Represent a route health check result."""
 
@@ -107,17 +111,25 @@ class RouteHealthCheckResult:
 
     def __post_init__(self) -> None:
         """Post initialize."""
-        self.num_neighbors = self.data["numNeighbors"]
-        self.rating = self.data["rating"]
-        self.failed_pings_to_target = self.data.get("failedPingsToTarget")
-        self.failed_pings_to_source = self.data.get("failedPingsToSource")
+        object.__setattr__(self, "num_neighbors", self.data["numNeighbors"])
+        object.__setattr__(self, "rating", self.data["rating"])
+        object.__setattr__(
+            self, "failed_pings_to_target", self.data.get("failedPingsToTarget")
+        )
+        object.__setattr__(
+            self, "failed_pings_to_source", self.data.get("failedPingsToSource")
+        )
         if (min_power_level_source := self.data.get("minPowerlevelSource")) is not None:
-            self.min_power_level_source = PowerLevel(min_power_level_source)
+            object.__setattr__(
+                self, "min_power_level_source", PowerLevel(min_power_level_source)
+            )
         if (min_power_level_target := self.data.get("minPowerlevelTarget")) is not None:
-            self.min_power_level_target = PowerLevel(min_power_level_target)
+            object.__setattr__(
+                self, "min_power_level_target", PowerLevel(min_power_level_target)
+            )
 
 
-@dataclass
+@dataclass(frozen=True)
 class RouteHealthCheckSummary:
     """Represent a route health check summary update."""
 
@@ -127,11 +139,15 @@ class RouteHealthCheckSummary:
 
     def __post_init__(self) -> None:
         """Post initialize."""
-        self.rating = self.data["rating"]
-        self.results = [RouteHealthCheckResult(r) for r in self.data.get("results", [])]
+        object.__setattr__(self, "rating", self.data["rating"])
+        object.__setattr__(
+            self,
+            "results",
+            [RouteHealthCheckResult(r) for r in self.data.get("results", [])],
+        )
 
 
-@dataclass
+@dataclass(frozen=True)
 class TestPowerLevelProgress:
     """Class to represent a test power level progress update."""
 
@@ -139,7 +155,7 @@ class TestPowerLevelProgress:
     total: int
 
 
-@dataclass
+@dataclass(frozen=True)
 class CheckHealthProgress:
     """Represent a check lifeline/route health progress update."""
 

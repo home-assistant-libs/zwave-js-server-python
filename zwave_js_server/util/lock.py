@@ -211,7 +211,7 @@ async def set_configuration(
                 f"- Can't provide value for {property_name} since it is unsupported"
             )
         elif cached_value is not None and val is None and not errors:
-            setattr(configuration, attr_name, cached_value.value)
+            object.__setattr__(configuration, attr_name, cached_value.value)
 
     if errors:
         raise ValueError("\n".join(errors))

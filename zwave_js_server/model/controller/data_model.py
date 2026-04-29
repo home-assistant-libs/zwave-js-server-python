@@ -42,7 +42,7 @@ class ZWaveChipType:
         return cls(type=data["type"], version=data["version"])
 
 
-@dataclass
+@dataclass(frozen=True)
 class NVMProgress:
     """Class to represent an NVM operation progress event.
 

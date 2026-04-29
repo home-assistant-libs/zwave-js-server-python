@@ -19,7 +19,7 @@ class DriverFirmwareUpdateDataDataType(FirmwareUpdateDataDataType):
     """Represent a driver firmware update data dict type."""
 
 
-@dataclass
+@dataclass(frozen=True)
 class DriverFirmwareUpdateData(FirmwareUpdateData):
     """Driver firmware update data."""
 
@@ -44,7 +44,7 @@ class DriverFirmwareUpdateProgressDataType(FirmwareUpdateProgressDataType):
     """Represent a driver firmware update progress dict type."""
 
 
-@dataclass
+@dataclass(frozen=True)
 class DriverFirmwareUpdateProgress(FirmwareUpdateProgress):
     """Model for a driver firmware update progress data."""
 
@@ -55,7 +55,7 @@ class DriverFirmwareUpdateResultDataType(FirmwareUpdateResultDataType):
     """Represent a driver firmware update result dict type."""
 
 
-@dataclass
+@dataclass(frozen=True)
 class DriverFirmwareUpdateResult(FirmwareUpdateResult):
     """Model for driver firmware update result data."""
 

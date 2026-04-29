@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from functools import cached_property
 import logging
 from typing import TYPE_CHECKING, Any, Literal, cast
 
@@ -264,7 +265,7 @@ class Controller(EventBase):
         """Return the Z-Wave API version (kind + version) supported by the controller."""
         return self.data.get("zwaveApiVersion")
 
-    @property
+    @cached_property
     def zwave_chip_type(self) -> ZWaveChipType | None:
         """Return the Z-Wave chip type."""
         if (raw := self.data.get("zwaveChipType")) is None:
@@ -274,6 +275,7 @@ class Controller(EventBase):
     def update(self, data: ControllerDataType) -> None:
         """Update controller data."""
         self.data = data
+        self.__dict__.pop("zwave_chip_type", None)
         self._statistics = ControllerStatistics(
             self.data.get("statistics", DEFAULT_CONTROLLER_STATISTICS)
         )

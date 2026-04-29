@@ -32,7 +32,7 @@ class NodeStatisticsDataType(TypedDict, total=False):
     lastSeen: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class NodeStatistics:
     """Represent a node statistics update."""
 
@@ -50,20 +50,20 @@ class NodeStatistics:
 
     def __post_init__(self) -> None:
         """Post initialize."""
-        self.commands_tx = self.data["commandsTX"]
-        self.commands_rx = self.data["commandsRX"]
-        self.commands_dropped_rx = self.data["commandsDroppedRX"]
-        self.commands_dropped_tx = self.data["commandsDroppedTX"]
-        self.timeout_response = self.data["timeoutResponse"]
-        self.rtt = self.data.get("rtt")
+        object.__setattr__(self, "commands_tx", self.data["commandsTX"])
+        object.__setattr__(self, "commands_rx", self.data["commandsRX"])
+        object.__setattr__(self, "commands_dropped_rx", self.data["commandsDroppedRX"])
+        object.__setattr__(self, "commands_dropped_tx", self.data["commandsDroppedTX"])
+        object.__setattr__(self, "timeout_response", self.data["timeoutResponse"])
+        object.__setattr__(self, "rtt", self.data.get("rtt"))
         if last_seen := self.data.get("lastSeen"):
-            self.last_seen = datetime.fromisoformat(last_seen)
+            object.__setattr__(self, "last_seen", datetime.fromisoformat(last_seen))
         if lwr := self.data.get("lwr"):
             with suppress(ValueError):
-                self.lwr = RouteStatistics(self.client, lwr)
+                object.__setattr__(self, "lwr", RouteStatistics(self.client, lwr))
         if nlwr := self.data.get("nlwr"):
             with suppress(ValueError):
-                self.nlwr = RouteStatistics(self.client, nlwr)
+                object.__setattr__(self, "nlwr", RouteStatistics(self.client, nlwr))
 
     @property
     def rssi(self) -> int | None:

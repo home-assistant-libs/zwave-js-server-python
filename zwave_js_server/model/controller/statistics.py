@@ -19,7 +19,7 @@ class ControllerLifelineRoutesDataType(TypedDict):
     nlwr: RouteStatisticsDataType
 
 
-@dataclass
+@dataclass(frozen=True)
 class ControllerLifelineRoutes:
     """Represent controller lifeline routes."""
 
@@ -32,10 +32,10 @@ class ControllerLifelineRoutes:
         """Post initialize."""
         if lwr := self.data.get("lwr"):
             with suppress(ValueError):
-                self.lwr = RouteStatistics(self.client, lwr)
+                object.__setattr__(self, "lwr", RouteStatistics(self.client, lwr))
         if nlwr := self.data.get("nlwr"):
             with suppress(ValueError):
-                self.nlwr = RouteStatistics(self.client, nlwr)
+                object.__setattr__(self, "nlwr", RouteStatistics(self.client, nlwr))
 
 
 class ChannelRSSIDataType(TypedDict):
@@ -72,7 +72,7 @@ class ControllerStatisticsDataType(TypedDict, total=False):
     backgroundRSSI: BackgroundRSSIDataType
 
 
-@dataclass
+@dataclass(frozen=True)
 class ChannelRSSI:
     """Represent a channel RSSI."""
 
@@ -82,11 +82,11 @@ class ChannelRSSI:
 
     def __post_init__(self) -> None:
         """Post initialize."""
-        self.average = self.data["average"]
-        self.current = self.data["current"]
+        object.__setattr__(self, "average", self.data["average"])
+        object.__setattr__(self, "current", self.data["current"])
 
 
-@dataclass
+@dataclass(frozen=True)
 class BackgroundRSSI:
     """Represent a background RSSI update."""
 
@@ -99,19 +99,19 @@ class BackgroundRSSI:
 
     def __post_init__(self) -> None:
         """Post initialize."""
-        self.timestamp = self.data["timestamp"]
-        self.channel_0 = ChannelRSSI(self.data["channel0"])
-        self.channel_1 = ChannelRSSI(self.data["channel1"])
+        object.__setattr__(self, "timestamp", self.data["timestamp"])
+        object.__setattr__(self, "channel_0", ChannelRSSI(self.data["channel0"]))
+        object.__setattr__(self, "channel_1", ChannelRSSI(self.data["channel1"]))
         # Channels 2 and 3 may not be present, but 3 requires 2 to be present
-        self.channel_2 = None
-        self.channel_3 = None
+        object.__setattr__(self, "channel_2", None)
+        object.__setattr__(self, "channel_3", None)
         if channel_2 := self.data.get("channel2"):
-            self.channel_2 = ChannelRSSI(channel_2)
+            object.__setattr__(self, "channel_2", ChannelRSSI(channel_2))
             if channel_3 := self.data.get("channel3"):
-                self.channel_3 = ChannelRSSI(channel_3)
+                object.__setattr__(self, "channel_3", ChannelRSSI(channel_3))
 
 
-@dataclass
+@dataclass(frozen=True)
 class ControllerStatistics:
     """Represent a controller statistics update."""
 
@@ -129,14 +129,14 @@ class ControllerStatistics:
 
     def __post_init__(self) -> None:
         """Post initialize."""
-        self.messages_tx = self.data["messagesTX"]
-        self.messages_rx = self.data["messagesRX"]
-        self.messages_dropped_rx = self.data["messagesDroppedRX"]
-        self.messages_dropped_tx = self.data["messagesDroppedTX"]
-        self.nak = self.data["NAK"]
-        self.can = self.data["CAN"]
-        self.timeout_ack = self.data["timeoutACK"]
-        self.timeout_response = self.data["timeoutResponse"]
-        self.timeout_callback = self.data["timeoutCallback"]
+        object.__setattr__(self, "messages_tx", self.data["messagesTX"])
+        object.__setattr__(self, "messages_rx", self.data["messagesRX"])
+        object.__setattr__(self, "messages_dropped_rx", self.data["messagesDroppedRX"])
+        object.__setattr__(self, "messages_dropped_tx", self.data["messagesDroppedTX"])
+        object.__setattr__(self, "nak", self.data["NAK"])
+        object.__setattr__(self, "can", self.data["CAN"])
+        object.__setattr__(self, "timeout_ack", self.data["timeoutACK"])
+        object.__setattr__(self, "timeout_response", self.data["timeoutResponse"])
+        object.__setattr__(self, "timeout_callback", self.data["timeoutCallback"])
         if background_rssi := self.data.get("backgroundRSSI"):
-            self.background_rssi = BackgroundRSSI(background_rssi)
+            object.__setattr__(self, "background_rssi", BackgroundRSSI(background_rssi))
