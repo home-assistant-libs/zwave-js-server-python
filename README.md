@@ -38,8 +38,8 @@ except zwave_js_server.client.FailedCommand as err:
 Schema 48 adds typed access-control helpers exposed via the `AccessControlAPI`
 wrapper:
 
-- `node.access_control` — shortcut for the root endpoint API.
-- `endpoint.access_control` — API for a specific endpoint.
+- `node.access_control`: shortcut for the root endpoint API.
+- `endpoint.access_control`: API for a specific endpoint.
 - Call `await endpoint.access_control.async_is_supported()` before using other
   methods.
 - Credential payloads accept `str | bytes`; binary credentials are converted to
