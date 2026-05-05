@@ -528,7 +528,7 @@ class AccessControlAPI:
         """Initialize the API wrapper for the given endpoint."""
         self._endpoint = endpoint
 
-    async def async_is_supported(self) -> bool:
+    async def is_supported(self) -> bool:
         """Return whether the endpoint supports access-control methods."""
         result = await self._endpoint.async_send_command(
             "access_control.is_supported",
@@ -538,7 +538,7 @@ class AccessControlAPI:
         assert result
         return cast(bool, result["supported"])
 
-    async def async_get_user_capabilities_cached(self) -> UserCapabilities:
+    async def get_user_capabilities_cached(self) -> UserCapabilities:
         """Return cached user capabilities for access control."""
         result = await self._endpoint.async_send_command(
             "access_control.get_user_capabilities_cached",
@@ -550,7 +550,7 @@ class AccessControlAPI:
         assert capabilities is not None
         return UserCapabilities.from_dict(cast(UserCapabilitiesDataType, capabilities))
 
-    async def async_get_credential_capabilities_cached(
+    async def get_credential_capabilities_cached(
         self,
     ) -> CredentialCapabilities:
         """Return cached credential capabilities for access control."""
@@ -566,7 +566,7 @@ class AccessControlAPI:
             cast(CredentialCapabilitiesDataType, capabilities)
         )
 
-    async def async_get_user(self, user_id: int) -> UserData | None:
+    async def get_user(self, user_id: int) -> UserData | None:
         """Return fresh data for a single access-control user."""
         result = await self._endpoint.async_send_command(
             "access_control.get_user",
@@ -579,7 +579,7 @@ class AccessControlAPI:
             return None
         return UserData.from_dict(cast(UserDataDataType, user))
 
-    async def async_get_user_cached(self, user_id: int) -> UserData | None:
+    async def get_user_cached(self, user_id: int) -> UserData | None:
         """Return cached data for a single access-control user."""
         result = await self._endpoint.async_send_command(
             "access_control.get_user_cached",
@@ -592,7 +592,7 @@ class AccessControlAPI:
             return None
         return UserData.from_dict(cast(UserDataDataType, user))
 
-    async def async_get_users(self) -> list[UserData]:
+    async def get_users(self) -> list[UserData]:
         """Return fresh data for all configured access-control users."""
         result = await self._endpoint.async_send_command(
             "access_control.get_users",
@@ -604,7 +604,7 @@ class AccessControlAPI:
         assert users is not None
         return [UserData.from_dict(cast(UserDataDataType, user)) for user in users]
 
-    async def async_get_users_cached(self) -> list[UserData]:
+    async def get_users_cached(self) -> list[UserData]:
         """Return cached data for all configured access-control users."""
         result = await self._endpoint.async_send_command(
             "access_control.get_users_cached",
@@ -616,9 +616,7 @@ class AccessControlAPI:
         assert users is not None
         return [UserData.from_dict(cast(UserDataDataType, user)) for user in users]
 
-    async def async_set_user(
-        self, user_id: int, options: SetUserOptions
-    ) -> SetUserResult:
+    async def set_user(self, user_id: int, options: SetUserOptions) -> SetUserResult:
         """Create or update an access-control user."""
         result = await self._endpoint.async_send_command(
             "access_control.set_user",
@@ -630,7 +628,7 @@ class AccessControlAPI:
         assert result is not None
         return SetUserResult(result["result"])
 
-    async def async_delete_user(self, user_id: int) -> SetUserResult:
+    async def delete_user(self, user_id: int) -> SetUserResult:
         """Delete an access-control user."""
         result = await self._endpoint.async_send_command(
             "access_control.delete_user",
@@ -641,7 +639,7 @@ class AccessControlAPI:
         assert result is not None
         return SetUserResult(result["result"])
 
-    async def async_delete_all_users(self) -> SetUserResult:
+    async def delete_all_users(self) -> SetUserResult:
         """Delete all configured access-control users."""
         result = await self._endpoint.async_send_command(
             "access_control.delete_all_users",
@@ -651,7 +649,7 @@ class AccessControlAPI:
         assert result is not None
         return SetUserResult(result["result"])
 
-    async def async_get_credential(
+    async def get_credential(
         self,
         credential_type: UserCredentialType,
         credential_slot: int,
@@ -669,7 +667,7 @@ class AccessControlAPI:
             return None
         return CredentialData.from_dict(cast(CredentialDataDataType, credential))
 
-    async def async_get_credential_cached(
+    async def get_credential_cached(
         self,
         credential_type: UserCredentialType,
         credential_slot: int,
@@ -687,7 +685,7 @@ class AccessControlAPI:
             return None
         return CredentialData.from_dict(cast(CredentialDataDataType, credential))
 
-    async def async_get_credentials(self, user_id: int) -> list[CredentialData]:
+    async def get_credentials(self, user_id: int) -> list[CredentialData]:
         """Return fresh data for all credentials assigned to a user."""
         result = await self._endpoint.async_send_command(
             "access_control.get_credentials",
@@ -703,7 +701,7 @@ class AccessControlAPI:
             for credential in credentials
         ]
 
-    async def async_get_credentials_cached(self, user_id: int) -> list[CredentialData]:
+    async def get_credentials_cached(self, user_id: int) -> list[CredentialData]:
         """Return cached data for all credentials assigned to a user."""
         result = await self._endpoint.async_send_command(
             "access_control.get_credentials_cached",
@@ -719,7 +717,7 @@ class AccessControlAPI:
             for credential in credentials
         ]
 
-    async def async_get_credentials_by_type(
+    async def get_credentials_by_type(
         self, credential_type: UserCredentialType
     ) -> list[CredentialData]:
         """Return fresh data for all credentials of the given type."""
@@ -737,7 +735,7 @@ class AccessControlAPI:
             for credential in credentials
         ]
 
-    async def async_get_credentials_by_type_cached(
+    async def get_credentials_by_type_cached(
         self, credential_type: UserCredentialType
     ) -> list[CredentialData]:
         """Return cached data for all credentials of the given type."""
@@ -755,7 +753,7 @@ class AccessControlAPI:
             for credential in credentials
         ]
 
-    async def async_get_all_credentials(self) -> list[CredentialData]:
+    async def get_all_credentials(self) -> list[CredentialData]:
         """Return fresh data for all credentials regardless of type or user."""
         result = await self._endpoint.async_send_command(
             "access_control.get_all_credentials",
@@ -770,7 +768,7 @@ class AccessControlAPI:
             for credential in credentials
         ]
 
-    async def async_get_all_credentials_cached(self) -> list[CredentialData]:
+    async def get_all_credentials_cached(self) -> list[CredentialData]:
         """Return cached data for all credentials regardless of type or user."""
         result = await self._endpoint.async_send_command(
             "access_control.get_all_credentials_cached",
@@ -785,7 +783,7 @@ class AccessControlAPI:
             for credential in credentials
         ]
 
-    async def async_assign_credential(
+    async def assign_credential(
         self,
         credential_type: UserCredentialType,
         credential_slot: int,
@@ -803,7 +801,7 @@ class AccessControlAPI:
         assert result is not None
         return AssignCredentialResult(result["result"])
 
-    async def async_set_credential(
+    async def set_credential(
         self,
         user_id: int,
         credential_type: UserCredentialType,
@@ -823,7 +821,7 @@ class AccessControlAPI:
         assert result is not None
         return SetCredentialResult(result["result"])
 
-    async def async_delete_credential(
+    async def delete_credential(
         self,
         user_id: int,
         credential_type: UserCredentialType,
@@ -841,7 +839,7 @@ class AccessControlAPI:
         assert result is not None
         return SetCredentialResult(result["result"])
 
-    async def async_start_credential_learn(
+    async def start_credential_learn(
         self,
         user_id: int,
         credential_type: UserCredentialType,
@@ -863,7 +861,7 @@ class AccessControlAPI:
         )
         return parse_supervision_result(result)
 
-    async def async_cancel_credential_learn(self) -> SupervisionResult | None:
+    async def cancel_credential_learn(self) -> SupervisionResult | None:
         """Cancel any active credential learn operation."""
         result = await self._endpoint.async_send_command(
             "access_control.cancel_credential_learn",
@@ -872,7 +870,7 @@ class AccessControlAPI:
         )
         return parse_supervision_result(result)
 
-    async def async_get_admin_code(self) -> str | None:
+    async def get_admin_code(self) -> str | None:
         """Return the configured admin code for access control."""
         result = await self._endpoint.async_send_command(
             "access_control.get_admin_code",
@@ -882,7 +880,7 @@ class AccessControlAPI:
         assert result
         return cast(str | None, result.get("code"))
 
-    async def async_set_admin_code(self, code: str) -> SupervisionResult | None:
+    async def set_admin_code(self, code: str) -> SupervisionResult | None:
         """Set the admin code for access control."""
         result = await self._endpoint.async_send_command(
             "access_control.set_admin_code",
