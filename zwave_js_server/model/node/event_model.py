@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Literal
+from typing import Any, Literal, Self
 
 from pydantic import BaseModel
 
@@ -220,7 +220,7 @@ class BaseNodeEndpointArgsEventModel(BaseNodeEventModel):
     args: Any
 
     @classmethod
-    def from_dict(cls, data: dict) -> BaseNodeEndpointArgsEventModel:
+    def from_dict(cls, data: dict) -> Self:
         """Initialize from dict."""
         return cls(
             source=data["source"],

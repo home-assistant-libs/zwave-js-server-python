@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, TypedDict, cast
+from typing import TYPE_CHECKING, Any, Self, TypedDict, cast
 
 from ..const.command_class.access_control import (
     AssignCredentialResult,
@@ -68,9 +68,7 @@ class UserCredentialCapability:
     credential_learn_number_of_steps: int | None = None
 
     @classmethod
-    def from_dict(
-        cls, data: UserCredentialCapabilityDataType
-    ) -> UserCredentialCapability:
+    def from_dict(cls, data: UserCredentialCapabilityDataType) -> Self:
         """Return capability from serialized data."""
         return cls(
             number_of_credential_slots=data["numberOfCredentialSlots"],
@@ -121,7 +119,7 @@ class UserCapabilities:
     supported_credential_rules: list[UserCredentialRule] = field(default_factory=list)
 
     @classmethod
-    def from_dict(cls, data: UserCapabilitiesDataType) -> UserCapabilities:
+    def from_dict(cls, data: UserCapabilitiesDataType) -> Self:
         """Return user capabilities from serialized data."""
         return cls(
             max_users=data["maxUsers"],
@@ -169,7 +167,7 @@ class CredentialCapabilities:
     supports_credential_assignment: bool = False
 
     @classmethod
-    def from_dict(cls, data: CredentialCapabilitiesDataType) -> CredentialCapabilities:
+    def from_dict(cls, data: CredentialCapabilitiesDataType) -> Self:
         """Return credential capabilities from serialized data."""
         supported_credential_types = {
             UserCredentialType(
@@ -226,7 +224,7 @@ class UserData:
     expiring_timeout_minutes: int | None = None
 
     @classmethod
-    def from_dict(cls, data: UserDataDataType) -> UserData:
+    def from_dict(cls, data: UserDataDataType) -> Self:
         """Return user data from serialized payload."""
         return cls(
             user_id=data["userId"],
@@ -312,7 +310,7 @@ class CredentialData:
     data: str | bytes | None = None
 
     @classmethod
-    def from_dict(cls, data: CredentialDataDataType) -> CredentialData:
+    def from_dict(cls, data: CredentialDataDataType) -> Self:
         """Return credential data from serialized payload."""
         return cls(
             user_id=data["userId"],
@@ -346,7 +344,7 @@ class UserDeletedArgs:
     user_id: int
 
     @classmethod
-    def from_dict(cls, data: UserDeletedArgsDataType) -> UserDeletedArgs:
+    def from_dict(cls, data: UserDeletedArgsDataType) -> Self:
         """Return user deleted args from serialized payload."""
         return cls(user_id=data["userId"])
 
@@ -374,7 +372,7 @@ class CredentialChangedArgs:
     data: str | bytes | None = None
 
     @classmethod
-    def from_dict(cls, data: CredentialChangedArgsDataType) -> CredentialChangedArgs:
+    def from_dict(cls, data: CredentialChangedArgsDataType) -> Self:
         """Return credential changed args from serialized payload."""
         return cls(
             user_id=data["userId"],
@@ -412,7 +410,7 @@ class CredentialDeletedArgs:
     credential_slot: int
 
     @classmethod
-    def from_dict(cls, data: CredentialDeletedArgsDataType) -> CredentialDeletedArgs:
+    def from_dict(cls, data: CredentialDeletedArgsDataType) -> Self:
         """Return credential deleted args from serialized payload."""
         return cls(
             user_id=data["userId"],
@@ -450,9 +448,7 @@ class CredentialLearnProgressArgs:
     status: UserCredentialLearnStatus
 
     @classmethod
-    def from_dict(
-        cls, data: CredentialLearnProgressArgsDataType
-    ) -> CredentialLearnProgressArgs:
+    def from_dict(cls, data: CredentialLearnProgressArgsDataType) -> Self:
         """Return credential learn progress args from serialized payload."""
         return cls(
             user_id=data["userId"],
@@ -494,9 +490,7 @@ class CredentialLearnCompletedArgs:
     success: bool
 
     @classmethod
-    def from_dict(
-        cls, data: CredentialLearnCompletedArgsDataType
-    ) -> CredentialLearnCompletedArgs:
+    def from_dict(cls, data: CredentialLearnCompletedArgsDataType) -> Self:
         """Return credential learn completed args from serialized payload."""
         return cls(
             user_id=data["userId"],

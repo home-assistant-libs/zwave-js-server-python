@@ -209,9 +209,9 @@ async def test_access_control_get_user_and_credential(
         },
     )
 
-    user = await node.access_control.get_user(3)
+    user = await node.access_control.get_user(user_id=3)
     credential = await node.access_control.get_credential(
-        UserCredentialType.PIN_CODE, 0
+        credential_type=UserCredentialType.PIN_CODE, credential_slot=0
     )
 
     assert len(ack_commands) == 2
@@ -261,8 +261,8 @@ async def test_access_control_set_user(
     )
 
     result = await node.access_control.set_user(
-        3,
-        SetUserOptions(
+        user_id=3,
+        options=SetUserOptions(
             active=True,
             user_type=UserCredentialUserType.GENERAL,
             user_name="Guest",
@@ -302,7 +302,7 @@ async def test_access_control_delete_user(
         {"result": SetUserResult.OK},
     )
 
-    result = await node.access_control.delete_user(3)
+    result = await node.access_control.delete_user(user_id=3)
 
     assert result is SetUserResult.OK
     assert ack_commands == [
@@ -358,7 +358,10 @@ async def test_access_control_set_credential(
     )
 
     result = await node.access_control.set_credential(
-        3, UserCredentialType.PIN_CODE, 0, b"1234"
+        user_id=3,
+        credential_type=UserCredentialType.PIN_CODE,
+        credential_slot=0,
+        data=b"1234",
     )
 
     assert result is SetCredentialResult.OK
@@ -391,7 +394,9 @@ async def test_access_control_delete_credential(
     )
 
     result = await node.access_control.delete_credential(
-        3, UserCredentialType.PIN_CODE, 0
+        user_id=3,
+        credential_type=UserCredentialType.PIN_CODE,
+        credential_slot=0,
     )
 
     assert result is SetCredentialResult.OK
@@ -423,7 +428,9 @@ async def test_access_control_assign_credential(
     )
 
     result = await node.access_control.assign_credential(
-        UserCredentialType.PIN_CODE, 1, 5
+        credential_type=UserCredentialType.PIN_CODE,
+        credential_slot=1,
+        destination_user_id=5,
     )
 
     assert result is AssignCredentialResult.OK
@@ -455,7 +462,10 @@ async def test_access_control_start_credential_learn(
     )
 
     result = await node.access_control.start_credential_learn(
-        3, UserCredentialType.PIN_CODE, 0, 30
+        user_id=3,
+        credential_type=UserCredentialType.PIN_CODE,
+        credential_slot=0,
+        timeout=30,
     )
 
     assert result is not None
@@ -516,7 +526,7 @@ async def test_access_control_set_admin_code(
         {"result": {"status": SupervisionStatus.SUCCESS}},
     )
 
-    result = await node.access_control.set_admin_code("2468")
+    result = await node.access_control.set_admin_code(code="2468")
 
     assert result is not None
     assert result.status is SupervisionStatus.SUCCESS
@@ -837,23 +847,23 @@ async def test_access_control_list_commands(
     assert await node.access_control.get_users_cached() == [
         UserData.from_dict(user_payload)
     ]
-    assert await node.access_control.get_user_cached(1) == UserData.from_dict(
+    assert await node.access_control.get_user_cached(user_id=1) == UserData.from_dict(
         user_payload
     )
-    assert await node.access_control.get_credentials(1) == [
+    assert await node.access_control.get_credentials(user_id=1) == [
         CredentialData.from_dict(credential_payload)
     ]
-    assert await node.access_control.get_credentials_cached(1) == [
+    assert await node.access_control.get_credentials_cached(user_id=1) == [
         CredentialData.from_dict(credential_payload)
     ]
     assert await node.access_control.get_credential_cached(
-        UserCredentialType.PIN_CODE, 0
+        credential_type=UserCredentialType.PIN_CODE, credential_slot=0
     ) == CredentialData.from_dict(credential_payload)
     assert await node.access_control.get_credentials_by_type(
-        UserCredentialType.PIN_CODE
+        credential_type=UserCredentialType.PIN_CODE
     ) == [CredentialData.from_dict(credential_payload)]
     assert await node.access_control.get_credentials_by_type_cached(
-        UserCredentialType.PIN_CODE
+        credential_type=UserCredentialType.PIN_CODE
     ) == [CredentialData.from_dict(credential_payload)]
     assert await node.access_control.get_all_credentials() == [
         CredentialData.from_dict(credential_payload)
@@ -863,33 +873,80 @@ async def test_access_control_list_commands(
     ]
 
 
-async def test_access_control_none_results(
+async def test_access_control_get_user_none_result(
     lock_schlage_be469: Node, mock_command: MockCommandProtocol
 ) -> None:
-    """Test that missing user/credential/admin-code responses return None."""
+    """Test that a missing user response returns None."""
     node = lock_schlage_be469
-    for command in (
-        "get_user",
-        "get_user_cached",
-        "get_credential",
-        "get_credential_cached",
-    ):
-        mock_command(
-            {
-                "command": f"endpoint.access_control.{command}",
-                "nodeId": node.node_id,
-                "endpoint": 0,
-            },
-            {},
-        )
-
-    assert await node.access_control.get_user(1) is None
-    assert await node.access_control.get_user_cached(1) is None
-    assert (
-        await node.access_control.get_credential(UserCredentialType.PIN_CODE, 0) is None
+    mock_command(
+        {
+            "command": "endpoint.access_control.get_user",
+            "nodeId": node.node_id,
+            "endpoint": 0,
+        },
+        {},
     )
+
+    assert await node.access_control.get_user(user_id=1) is None
+
+
+async def test_access_control_get_user_cached_none_result(
+    lock_schlage_be469: Node, mock_command: MockCommandProtocol
+) -> None:
+    """Test that a missing cached user response returns None."""
+    node = lock_schlage_be469
+    mock_command(
+        {
+            "command": "endpoint.access_control.get_user_cached",
+            "nodeId": node.node_id,
+            "endpoint": 0,
+        },
+        {},
+    )
+
+    assert await node.access_control.get_user_cached(user_id=1) is None
+
+
+async def test_access_control_get_credential_none_result(
+    lock_schlage_be469: Node, mock_command: MockCommandProtocol
+) -> None:
+    """Test that a missing credential response returns None."""
+    node = lock_schlage_be469
+    mock_command(
+        {
+            "command": "endpoint.access_control.get_credential",
+            "nodeId": node.node_id,
+            "endpoint": 0,
+        },
+        {},
+    )
+
     assert (
-        await node.access_control.get_credential_cached(UserCredentialType.PIN_CODE, 0)
+        await node.access_control.get_credential(
+            credential_type=UserCredentialType.PIN_CODE, credential_slot=0
+        )
+        is None
+    )
+
+
+async def test_access_control_get_credential_cached_none_result(
+    lock_schlage_be469: Node, mock_command: MockCommandProtocol
+) -> None:
+    """Test that a missing cached credential response returns None."""
+    node = lock_schlage_be469
+    mock_command(
+        {
+            "command": "endpoint.access_control.get_credential_cached",
+            "nodeId": node.node_id,
+            "endpoint": 0,
+        },
+        {},
+    )
+
+    assert (
+        await node.access_control.get_credential_cached(
+            credential_type=UserCredentialType.PIN_CODE, credential_slot=0
+        )
         is None
     )
 
@@ -909,7 +966,10 @@ async def test_access_control_set_credential_str_data(
     )
 
     result = await node.access_control.set_credential(
-        3, UserCredentialType.PIN_CODE, 0, "1234"
+        user_id=3,
+        credential_type=UserCredentialType.PIN_CODE,
+        credential_slot=0,
+        data="1234",
     )
 
     assert result is SetCredentialResult.OK
@@ -942,7 +1002,9 @@ async def test_access_control_start_credential_learn_no_timeout(
     )
 
     result = await node.access_control.start_credential_learn(
-        3, UserCredentialType.PIN_CODE, 0
+        user_id=3,
+        credential_type=UserCredentialType.PIN_CODE,
+        credential_slot=0,
     )
 
     assert result is not None
