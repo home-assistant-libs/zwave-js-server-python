@@ -32,3 +32,15 @@ try:
 except zwave_js_server.client.FailedCommand as err:
     print("Command failed with", err.error_code)
 ```
+
+## Access control
+
+Schema 48 adds typed access-control helpers exposed via the `AccessControlAPI`
+wrapper:
+
+- `node.access_control`: shortcut for the root endpoint API.
+- `endpoint.access_control`: API for a specific endpoint.
+- Call `await endpoint.access_control.is_supported()` before using other
+  methods.
+- Credential payloads accept `str | bytes`; binary credentials are converted to
+  the websocket Buffer transport shape internally.
