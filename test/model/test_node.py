@@ -2363,6 +2363,46 @@ async def test_get_firmware_update_capabilities_string(
     }
 
 
+async def test_get_firmware_update_capabilities_missing_optional_keys(
+    multisensor_6: node_pkg.Node, uuid4, mock_command
+):
+    """Test get_firmware_update_capabilities when optional keys are omitted.
+
+    Older devices that implement an earlier revision of the Firmware Update
+    Meta Data CC do not report continuesToFunction / supportsActivation, so
+    zwave-js-server omits the fields entirely from the capabilities payload.
+    """
+    node = multisensor_6
+    ack_commands = mock_command(
+        {"command": "node.get_firmware_update_capabilities", "nodeId": node.node_id},
+        {
+            "capabilities": {
+                "firmwareUpgradable": True,
+                "firmwareTargets": [0],
+            }
+        },
+    )
+    capabilities = await node.async_get_firmware_update_capabilities()
+    assert capabilities.firmware_upgradable
+    assert capabilities.firmware_targets == [0]
+    assert capabilities.continues_to_function is None
+    assert capabilities.supports_activation is None
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.get_firmware_update_capabilities",
+        "nodeId": node.node_id,
+        "messageId": uuid4,
+    }
+
+    assert capabilities.to_dict() == {
+        "firmware_upgradable": True,
+        "firmware_targets": [0],
+        "continues_to_function": None,
+        "supports_activation": None,
+    }
+
+
 async def test_get_firmware_update_capabilities_cached(
     multisensor_6: node_pkg.Node, uuid4, mock_command
 ):
