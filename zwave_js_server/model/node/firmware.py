@@ -89,7 +89,9 @@ class NodeFirmwareUpdateCapabilities:
         """Return whether node continues to function during update."""
         if not self.firmware_upgradable:
             raise TypeError("Firmware is not upgradeable.")
-        if (val := self.data["continuesToFunction"]) == VALUE_UNKNOWN:
+        if (
+            val := self.data.get("continuesToFunction", VALUE_UNKNOWN)
+        ) == VALUE_UNKNOWN:
             return None
         assert isinstance(val, bool)
         return val
@@ -99,7 +101,7 @@ class NodeFirmwareUpdateCapabilities:
         """Return whether node supports delayed activation of the new firmware."""
         if not self.firmware_upgradable:
             raise TypeError("Firmware is not upgradeable.")
-        if (val := self.data["supportsActivation"]) == VALUE_UNKNOWN:
+        if (val := self.data.get("supportsActivation", VALUE_UNKNOWN)) == VALUE_UNKNOWN:
             return None
         assert isinstance(val, bool)
         return val
