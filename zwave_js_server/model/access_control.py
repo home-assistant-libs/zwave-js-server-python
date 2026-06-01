@@ -291,6 +291,31 @@ class SetUserOptions:
         return data
 
 
+class AddUserCredentialDataType(TypedDict):
+    """Represent a credential serialized for an add-user command."""
+
+    credentialType: UserCredentialType
+    credentialSlot: int
+    data: str | BufferObjectDataType
+
+
+@dataclass
+class AddUserCredential:
+    """Credential to write together with a new user via add_user."""
+
+    credential_type: UserCredentialType
+    credential_slot: int
+    data: str | bytes
+
+    def to_dict(self) -> AddUserCredentialDataType:
+        """Return the serialized credential for an add-user command."""
+        return {
+            "credentialType": self.credential_type,
+            "credentialSlot": self.credential_slot,
+            "data": serialize_credential_data(self.data),
+        }
+
+
 class CredentialDataDataType(TypedDict, total=False):
     """Represent access-control credential payload."""
 
@@ -328,6 +353,43 @@ class CredentialData:
         }
         if self.data is not None:
             data["data"] = serialize_credential_data(self.data)
+        return data
+
+
+class AddUserResultDataType(TypedDict, total=False):
+    """Represent the result of an add-user command."""
+
+    user: SetUserResult
+    credential: SetCredentialResult
+
+
+@dataclass
+class AddUserResult:
+    """Result of an add-user command.
+
+    Mirrors zwave-js's ``addUser`` return value: the result of adding the user
+    and, when a credential was provided, the result of writing it.
+    """
+
+    user: SetUserResult
+    credential: SetCredentialResult | None = None
+
+    @classmethod
+    def from_dict(cls, data: AddUserResultDataType) -> Self:
+        """Return add-user result from serialized payload."""
+        credential = data.get("credential")
+        return cls(
+            user=SetUserResult(data["user"]),
+            credential=(
+                SetCredentialResult(credential) if credential is not None else None
+            ),
+        )
+
+    def to_dict(self) -> AddUserResultDataType:
+        """Return the serialized add-user result."""
+        data: AddUserResultDataType = {"user": self.user}
+        if self.credential is not None:
+            data["credential"] = self.credential
         return data
 
 
@@ -621,6 +683,31 @@ class AccessControlAPI:
         )
         assert result is not None
         return SetUserResult(result["result"])
+
+    async def add_user(
+        self,
+        user_id: int,
+        options: SetUserOptions,
+        credential: AddUserCredential | None = None,
+    ) -> AddUserResult:
+        """Create a new user, optionally writing a credential in the same call.
+
+        On devices using User Code CC, users and credentials cannot be stored
+        separately, so ``credential`` is required there.
+        """
+        cmd_kwargs: dict[str, Any] = {}
+        if credential is not None:
+            cmd_kwargs["credential"] = credential.to_dict()
+        result = await self._endpoint.async_send_command(
+            "access_control.add_user",
+            userId=user_id,
+            options=options.to_dict(),
+            require_schema=49,
+            wait_for_result=True,
+            **cmd_kwargs,
+        )
+        assert result is not None
+        return AddUserResult.from_dict(cast(AddUserResultDataType, result["result"]))
 
     async def delete_user(self, user_id: int) -> SetUserResult:
         """Delete an access-control user."""
