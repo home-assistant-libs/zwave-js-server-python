@@ -1288,6 +1288,19 @@ def test_credential_data_to_dict() -> None:
     assert CredentialData.from_dict(no_data_payload).to_dict() == no_data_payload
 
 
+def test_add_user_result_to_dict() -> None:
+    """Test AddUserResult round-trips with and without a credential result."""
+
+    with_credential = {
+        "user": SetUserResult.OK,
+        "credential": SetCredentialResult.OK,
+    }
+    without_credential = {"user": SetUserResult.OK}
+
+    assert AddUserResult.from_dict(with_credential).to_dict() == with_credential
+    assert AddUserResult.from_dict(without_credential).to_dict() == without_credential
+
+
 def test_user_deleted_args_to_dict() -> None:
     """Test UserDeletedArgs round-trips via from_dict/to_dict."""
 
