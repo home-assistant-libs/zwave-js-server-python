@@ -102,6 +102,7 @@ async def test_access_control_support_and_capabilities(
                     UserCredentialRule.SINGLE,
                     UserCredentialRule.DUAL,
                 ],
+                "supportsUsersWithoutCredentials": True,
             }
         },
     )
@@ -160,6 +161,7 @@ async def test_access_control_support_and_capabilities(
             UserCredentialRule.SINGLE,
             UserCredentialRule.DUAL,
         ],
+        supports_users_without_credentials=True,
     )
     assert credential_capabilities.supports_admin_code
     assert credential_capabilities.supports_admin_code_deactivation
@@ -1186,11 +1188,13 @@ def test_user_capabilities_to_dict() -> None:
             UserCredentialRule.SINGLE,
             UserCredentialRule.DUAL,
         ],
+        "supportsUsersWithoutCredentials": True,
     }
     minimal_payload = {
         "maxUsers": 25,
         "supportedUserTypes": [],
         "supportedCredentialRules": [],
+        "supportsUsersWithoutCredentials": False,
     }
 
     assert UserCapabilities.from_dict(full_payload).to_dict() == full_payload

@@ -107,6 +107,7 @@ class UserCapabilitiesDataType(TypedDict, total=False):
     supportedUserTypes: list[UserCredentialUserType]
     maxUserNameLength: int
     supportedCredentialRules: list[UserCredentialRule]
+    supportsUsersWithoutCredentials: bool
 
 
 @dataclass
@@ -117,6 +118,7 @@ class UserCapabilities:
     supported_user_types: list[UserCredentialUserType] = field(default_factory=list)
     max_user_name_length: int | None = None
     supported_credential_rules: list[UserCredentialRule] = field(default_factory=list)
+    supports_users_without_credentials: bool = False
 
     @classmethod
     def from_dict(cls, data: UserCapabilitiesDataType) -> Self:
@@ -132,6 +134,9 @@ class UserCapabilities:
                 UserCredentialRule(rule)
                 for rule in data.get("supportedCredentialRules", [])
             ],
+            supports_users_without_credentials=data.get(
+                "supportsUsersWithoutCredentials", False
+            ),
         )
 
     def to_dict(self) -> UserCapabilitiesDataType:
@@ -140,6 +145,9 @@ class UserCapabilities:
             "maxUsers": self.max_users,
             "supportedUserTypes": list(self.supported_user_types),
             "supportedCredentialRules": list(self.supported_credential_rules),
+            "supportsUsersWithoutCredentials": (
+                self.supports_users_without_credentials
+            ),
         }
         if self.max_user_name_length is not None:
             data["maxUserNameLength"] = self.max_user_name_length
