@@ -16,6 +16,8 @@ from zwave_js_server.const.command_class.access_control import (
 )
 from zwave_js_server.event import Event
 from zwave_js_server.model.access_control import (
+    AddUserCredential,
+    AddUserResult,
     CredentialCapabilities,
     CredentialChangedArgs,
     CredentialData,
@@ -100,6 +102,7 @@ async def test_access_control_support_and_capabilities(
                     UserCredentialRule.SINGLE,
                     UserCredentialRule.DUAL,
                 ],
+                "supportsUsersWithoutCredentials": True,
             }
         },
     )
@@ -158,6 +161,7 @@ async def test_access_control_support_and_capabilities(
             UserCredentialRule.SINGLE,
             UserCredentialRule.DUAL,
         ],
+        supports_users_without_credentials=True,
     )
     assert credential_capabilities.supports_admin_code
     assert credential_capabilities.supports_admin_code_deactivation
@@ -283,6 +287,90 @@ async def test_access_control_set_user(
                 "userName": "Guest",
                 "credentialRule": UserCredentialRule.SINGLE,
             },
+            "messageId": uuid4,
+        }
+    ]
+
+
+async def test_access_control_add_user_with_credential(
+    lock_schlage_be469: Node, mock_command: MockCommandProtocol, uuid4: str
+) -> None:
+    """Test add_user with a credential returns the user and credential results."""
+    node = lock_schlage_be469
+    ack_commands = mock_command(
+        {
+            "command": "endpoint.access_control.add_user",
+            "nodeId": node.node_id,
+            "endpoint": 0,
+        },
+        {"result": {"user": SetUserResult.OK, "credential": SetCredentialResult.OK}},
+    )
+
+    result = await node.access_control.add_user(
+        user_id=3,
+        options=SetUserOptions(
+            active=True,
+            user_type=UserCredentialUserType.GENERAL,
+            user_name="Guest",
+        ),
+        credential=AddUserCredential(
+            credential_type=UserCredentialType.PIN_CODE,
+            credential_slot=3,
+            data=b"1234",
+        ),
+    )
+
+    assert result == AddUserResult(
+        user=SetUserResult.OK, credential=SetCredentialResult.OK
+    )
+    assert ack_commands == [
+        {
+            "command": "endpoint.access_control.add_user",
+            "nodeId": node.node_id,
+            "endpoint": 0,
+            "userId": 3,
+            "options": {
+                "active": True,
+                "userType": UserCredentialUserType.GENERAL,
+                "userName": "Guest",
+            },
+            "credential": {
+                "credentialType": UserCredentialType.PIN_CODE,
+                "credentialSlot": 3,
+                "data": {"type": "Buffer", "data": [49, 50, 51, 52]},
+            },
+            "messageId": uuid4,
+        }
+    ]
+
+
+async def test_access_control_add_user_without_credential(
+    lock_schlage_be469: Node, mock_command: MockCommandProtocol, uuid4: str
+) -> None:
+    """Test add_user without a credential omits the credential field."""
+    node = lock_schlage_be469
+    ack_commands = mock_command(
+        {
+            "command": "endpoint.access_control.add_user",
+            "nodeId": node.node_id,
+            "endpoint": 0,
+        },
+        {"result": {"user": SetUserResult.OK}},
+    )
+
+    result = await node.access_control.add_user(
+        user_id=3,
+        options=SetUserOptions(active=True),
+    )
+
+    assert result == AddUserResult(user=SetUserResult.OK, credential=None)
+    assert ack_commands == [
+        {
+            "command": "endpoint.access_control.add_user",
+            "nodeId": node.node_id,
+            "endpoint": 0,
+            "userId": 3,
+            "options": {"active": True},
             "messageId": uuid4,
         }
     ]
@@ -1100,11 +1188,13 @@ def test_user_capabilities_to_dict() -> None:
             UserCredentialRule.SINGLE,
             UserCredentialRule.DUAL,
         ],
+        "supportsUsersWithoutCredentials": True,
     }
     minimal_payload = {
         "maxUsers": 25,
         "supportedUserTypes": [],
         "supportedCredentialRules": [],
+        "supportsUsersWithoutCredentials": False,
     }
 
     assert UserCapabilities.from_dict(full_payload).to_dict() == full_payload
@@ -1196,6 +1286,19 @@ def test_credential_data_to_dict() -> None:
     assert CredentialData.from_dict(bytes_payload).to_dict() == bytes_payload
     assert CredentialData.from_dict(str_payload).to_dict() == str_payload
     assert CredentialData.from_dict(no_data_payload).to_dict() == no_data_payload
+
+
+def test_add_user_result_to_dict() -> None:
+    """Test AddUserResult round-trips with and without a credential result."""
+
+    with_credential = {
+        "user": SetUserResult.OK,
+        "credential": SetCredentialResult.OK,
+    }
+    without_credential = {"user": SetUserResult.OK}
+
+    assert AddUserResult.from_dict(with_credential).to_dict() == with_credential
+    assert AddUserResult.from_dict(without_credential).to_dict() == without_credential
 
 
 def test_user_deleted_args_to_dict() -> None:
