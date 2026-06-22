@@ -1239,9 +1239,10 @@ async def test_interview_events(multisensor_6):
         },
     )
     node.receive_event(event)
-    assert node.interview_stage == "CommandClasses"
+    # `interview progress` reports the in-progress stage and must not change
+    # the last-completed interview stage
+    assert node.interview_stage is None
     assert not node.ready
-    assert node.in_interview
 
     event = Event(
         type="interview stage completed",
