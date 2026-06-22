@@ -1227,6 +1227,23 @@ async def test_interview_events(multisensor_6):
     assert node.awaiting_manual_interview
 
     event = Event(
+        type="interview progress",
+        data={
+            "source": "node",
+            "event": "interview progress",
+            "nodeId": 52,
+            "stage": "CommandClasses",
+            "progress": 42.5,
+            "endpoint": 0,
+            "commandClass": 112,
+        },
+    )
+    node.receive_event(event)
+    assert node.interview_stage == "CommandClasses"
+    assert not node.ready
+    assert node.in_interview
+
+    event = Event(
         type="interview stage completed",
         data={
             "source": "node",

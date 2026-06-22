@@ -163,6 +163,29 @@ class InterviewFailedEventModel(BaseNodeEventModel):
         )
 
 
+class InterviewProgressEventModel(BaseNodeEventModel):
+    """Model for `interview progress` event data."""
+
+    event: Literal["interview progress"]
+    stage: str
+    progress: float
+    endpoint: int | None = None
+    commandClass: int | None = None
+
+    @classmethod
+    def from_dict(cls, data: dict) -> InterviewProgressEventModel:
+        """Initialize from dict."""
+        return cls(
+            source=data["source"],
+            event=data["event"],
+            nodeId=data["nodeId"],
+            stage=data["stage"],
+            progress=data["progress"],
+            endpoint=data.get("endpoint"),
+            commandClass=data.get("commandClass"),
+        )
+
+
 class InterviewStageCompletedEventModel(BaseNodeEventModel):
     """Model for `interview stage completed` event data."""
 
@@ -452,6 +475,7 @@ NODE_EVENT_MODEL_MAP: dict[str, type[BaseNodeEventModel]] = {
     "firmware update progress": FirmwareUpdateProgressEventModel,
     "interview completed": InterviewCompletedEventModel,
     "interview failed": InterviewFailedEventModel,
+    "interview progress": InterviewProgressEventModel,
     "interview stage completed": InterviewStageCompletedEventModel,
     "interview started": InterviewStartedEventModel,
     "metadata updated": MetadataUpdatedEventModel,

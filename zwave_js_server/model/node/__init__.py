@@ -1114,6 +1114,12 @@ class Node(EventBase):
         self.data["ready"] = False
         self.data["interviewStage"] = None
 
+    def handle_interview_progress(self, event: Event) -> None:
+        """Process a node interview progress event."""
+        # Do not override the interview stage here. The stage of the
+        # `interview progress` event is the _current_ one, while the
+        # `interviewStage` field is the _last completed_ stage.
+
     def handle_interview_stage_completed(self, event: Event) -> None:
         """Process a node interview stage completed event."""
         self.data["interviewStage"] = event.data["stageName"]
