@@ -1238,7 +1238,7 @@ async def test_interview_events(multisensor_6):
             "commandClass": 112,
         },
     )
-    node.receive_event(event)
+    node.handle_interview_progress(event)
     # `interview progress` reports the in-progress stage and must not change
     # the last-completed interview stage
     assert node.interview_stage is None
