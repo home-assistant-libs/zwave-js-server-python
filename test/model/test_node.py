@@ -1205,7 +1205,7 @@ async def test_entry_control_notification(ring_keypad):
     assert event.data["notification"].event_data == "cat"
 
 
-async def test_interview_events(multisensor_6):
+async def test_interview_events(multisensor_6, caplog):
     """Test Node interview events."""
     node = multisensor_6
     assert node.interview_stage is None
@@ -1225,6 +1225,29 @@ async def test_interview_events(multisensor_6):
     assert not node.ready
     assert not node.in_interview
     assert node.awaiting_manual_interview
+
+    event = Event(
+        type="interview progress",
+        data={
+            "source": "node",
+            "event": "interview progress",
+            "nodeId": 52,
+            "stage": "CommandClasses",
+            "progress": 42.5,
+            "endpoint": 0,
+            "commandClass": 112,
+        },
+    )
+    with caplog.at_level(logging.DEBUG):
+        node.receive_event(event)
+    # The event must be handled, not dropped as an unknown event (which would
+    # happen if the `handle_interview_progress` handler were removed).
+    assert "Received unknown event" not in caplog.text
+    assert event.data["node"] is node
+    # `interview progress` reports the in-progress stage and must not change
+    # the last-completed interview stage.
+    assert node.interview_stage is None
+    assert not node.ready
 
     event = Event(
         type="interview stage completed",
