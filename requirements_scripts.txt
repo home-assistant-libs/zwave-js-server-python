@@ -1,4 +1,4 @@
-colorlog==6.10.1
+colorlog==6.11.0
 python-slugify==8.0.4
 types-python-slugify==8.0.2.20240310
 -r requirements.txt
