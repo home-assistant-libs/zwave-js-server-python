@@ -125,6 +125,9 @@ ignore = [
     "UP007",   # keep type annotation style as is
 ]
 
+[tool.ruff.lint.pylint]
+max-positional-args = 7
+
 [tool.ruff.lint.isort]
 force-sort-within-sections = true
 known-first-party = ["zwave_js_server", "test"]
