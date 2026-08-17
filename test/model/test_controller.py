@@ -1937,7 +1937,7 @@ async def test_toggle_rf(controller, uuid4, mock_command):
     assert len(ack_commands) == 1
     assert ack_commands[0] == {
         "command": "controller.toggle_rf",
-        "enable": True,
+        "enabled": True,
         "messageId": uuid4,
     }
 
