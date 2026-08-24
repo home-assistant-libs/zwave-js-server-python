@@ -55,7 +55,7 @@ if TYPE_CHECKING:
 
 _LOGGER = logging.getLogger(__package__)
 
-DEFAULT_CONTROLLER_STATISTICS = (  # pylint: disable=invalid-name
+DEFAULT_CONTROLLER_STATISTICS = (
     ControllerStatisticsDataType(
         messagesTX=0,
         messagesRX=0,
