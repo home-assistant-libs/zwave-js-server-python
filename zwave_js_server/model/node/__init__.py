@@ -56,6 +56,7 @@ from ..value import (
     ValueMetadata,
     ValueNotification,
     _get_value_id_str_from_dict,
+    parse_value_id_str,
 )
 from .data_model import NodeDataType
 from .event_model import NODE_EVENT_MODEL_MAP
@@ -577,33 +578,44 @@ class Node(EventBase):
         wait_for_result: bool | None = None,
     ) -> SetValueResult | None:
         """Send setValue command to Node for given value (or value_id)."""
-        # a value may be specified as value_id or the value itself
-        if not isinstance(val, Value):
-            if val not in self.values:
-                raise NotFoundError(f"Value {val} not found on node {self}")
-            val = self.values[val]
+        cmd_args: dict[str, Any] = {"value": new_value}
 
-        if val.metadata.writeable is False:
-            raise UnwriteableValue
+        if isinstance(val, Value) or val in self.values:
+            value = val if isinstance(val, Value) else self.values[val]
+            if value.metadata.writeable is False:
+                raise UnwriteableValue
 
-        cmd_args = {
-            "valueId": _get_value_id_dict_from_value_data(val.data),
-            "value": new_value,
-        }
-        if options:
-            option = next(
-                (
-                    option
-                    for option in options
-                    if option not in val.metadata.value_change_options
-                ),
-                None,
-            )
-            if option is not None:
-                raise NotFoundError(
-                    f"Option {option} not found on value {val} on node {self}"
+            if options:
+                option = next(
+                    (
+                        option
+                        for option in options
+                        if option not in value.metadata.value_change_options
+                    ),
+                    None,
                 )
-            cmd_args["options"] = options
+                if option is not None:
+                    raise NotFoundError(
+                        f"Option {option} not found on value {value} on node {self}"
+                    )
+                cmd_args["options"] = options
+
+            cmd_args["valueId"] = _get_value_id_dict_from_value_data(value.data)
+        else:
+            # All actuator devices support Basic CC (0x20), but node-zwave-js intentionally
+            # hides Basic CC values from node.values when higher-level command classes
+            # (such as Binary Switch or Multilevel Switch) exist. We exempt Basic CC from
+            # the node.values presence check so targetValue can still be set directly.
+            value_id_dict = parse_value_id_str(self, val)
+            if (
+                value_id_dict is None
+                or value_id_dict["commandClass"] != CommandClass.BASIC
+            ):
+                raise NotFoundError(f"Value {val} not found on node {self}")
+
+            cmd_args["valueId"] = value_id_dict
+            if options:
+                cmd_args["options"] = options
 
         # the value object needs to be send to the server
         result = await self.async_send_command(

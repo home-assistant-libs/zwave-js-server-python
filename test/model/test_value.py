@@ -14,6 +14,7 @@ from zwave_js_server.model.value import (
     ValueDataType,
     ValueMetadata,
     get_value_id_str,
+    parse_value_id_str,
 )
 
 
@@ -336,3 +337,52 @@ def test_configuration_value_metadata(inovelli_switch_state):
     assert metadata.no_bulk_support
     assert metadata.value_size == 1
     assert metadata.format == ConfigurationValueFormat.SIGNED_INTEGER
+
+
+def test_parse_value_id_str(inovelli_switch):
+    """Test parse_value_id_str helper."""
+    node = inovelli_switch
+    # 4-part with string property
+    assert parse_value_id_str(node, f"{node.node_id}-32-0-targetValue") == {
+        "commandClass": 32,
+        "endpoint": 0,
+        "property": "targetValue",
+    }
+
+    # 4-part with integer property
+    assert parse_value_id_str(node, f"{node.node_id}-112-0-8") == {
+        "commandClass": 112,
+        "endpoint": 0,
+        "property": 8,
+    }
+
+    # 5-part with integer propertyKey
+    assert parse_value_id_str(node, f"{node.node_id}-112-0-8-255") == {
+        "commandClass": 112,
+        "endpoint": 0,
+        "property": 8,
+        "propertyKey": 255,
+    }
+
+    # 5-part with string propertyKey
+    assert parse_value_id_str(node, f"{node.node_id}-99-0-userCode-abc") == {
+        "commandClass": 99,
+        "endpoint": 0,
+        "property": "userCode",
+        "propertyKey": "abc",
+    }
+
+    # >5-part propertyKey with hyphens
+    assert parse_value_id_str(node, f"{node.node_id}-99-0-userCode-key-part") == {
+        "commandClass": 99,
+        "endpoint": 0,
+        "property": "userCode",
+        "propertyKey": "key-part",
+    }
+
+    # Invalid formats / wrong node
+    assert parse_value_id_str(node, "invalid-format") is None
+    assert parse_value_id_str(node, "abc-32-0-targetValue") is None
+    assert parse_value_id_str(node, "999-32-0-targetValue") is None
+    assert parse_value_id_str(node, f"{node.node_id}-32-abc-targetValue") is None
+    assert parse_value_id_str(node, f"{node.node_id}-abc-0-targetValue") is None

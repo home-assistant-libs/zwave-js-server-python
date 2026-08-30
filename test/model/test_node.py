@@ -22,6 +22,7 @@ from zwave_js_server.const import (
     Protocols,
     RFRegion,
     SecurityClass,
+    SetValueStatus,
     SupervisionStatus,
     Weekday,
 )
@@ -382,7 +383,55 @@ async def test_set_value(multisensor_6, uuid4, mock_command):
 
     # Use invalid value
     with pytest.raises(NotFoundError):
-        await node.async_set_value(f"{value_id}_fake_value", 42)
+        await node.async_set_value(f"{node.node_id}-37-0-fakeValue", 42)
+
+
+async def test_set_value_basic_cc_exempt(inovelli_switch, uuid4, mock_command):
+    """Test set value with Basic CC exempt when not in node.values."""
+    node = inovelli_switch
+    ack_commands = mock_command(
+        {"command": "node.set_value", "nodeId": node.node_id},
+        {"result": {"status": 255}},
+    )
+    value_id = f"{node.node_id}-32-0-targetValue"
+    assert value_id not in node.values
+
+    # Set value with string value_id for Basic CC
+    result = await node.async_set_value(value_id, 255)
+    assert result is not None
+    assert result.status == SetValueStatus.SUCCESS
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.set_value",
+        "nodeId": node.node_id,
+        "valueId": {"commandClass": 32, "endpoint": 0, "property": "targetValue"},
+        "value": 255,
+        "messageId": uuid4,
+    }
+
+    # Set value with options for Basic CC
+    result = await node.async_set_value(value_id, 255, {"transitionDuration": 1})
+    assert result is not None
+    assert result.status == SetValueStatus.SUCCESS
+
+    assert len(ack_commands) == 2
+    assert ack_commands[1] == {
+        "command": "node.set_value",
+        "nodeId": node.node_id,
+        "valueId": {"commandClass": 32, "endpoint": 0, "property": "targetValue"},
+        "value": 255,
+        "options": {"transitionDuration": 1},
+        "messageId": uuid4,
+    }
+
+    # Setting a non-existent value ID for a non-exempt CC still raises NotFoundError
+    with pytest.raises(NotFoundError):
+        await node.async_set_value(f"{node.node_id}-37-0-fakeValue", 255)
+
+    # Invalid string format raises NotFoundError
+    with pytest.raises(NotFoundError):
+        await node.async_set_value("invalid-value-id", 255)
 
 
 async def test_set_value_node_status_change(driver, multisensor_6_state):
