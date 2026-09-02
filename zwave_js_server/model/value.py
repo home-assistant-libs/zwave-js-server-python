@@ -153,38 +153,6 @@ def get_value_id_str(
     return value_id
 
 
-def parse_value_id_str(node: Node, value_id: str) -> dict[str, Any] | None:
-    """Parse a value ID string for a node into a valueId dict."""
-    parts = value_id.split("-")
-    if len(parts) < 4:
-        return None
-    try:
-        node_id = int(parts[0])
-        command_class = int(parts[1])
-        endpoint = int(parts[2])
-    except ValueError:
-        return None
-
-    if node_id != node.node_id:
-        return None
-
-    property_: int | str = int(parts[3]) if parts[3].isdigit() else parts[3]
-    data: dict[str, Any] = {
-        "commandClass": command_class,
-        "endpoint": endpoint,
-        "property": property_,
-    }
-    if len(parts) == 5:
-        data["propertyKey"] = int(parts[4]) if parts[4].isdigit() else parts[4]
-    elif len(parts) > 5:
-        property_key = "-".join(parts[4:])
-        data["propertyKey"] = (
-            int(property_key) if property_key.isdigit() else property_key
-        )
-
-    return data
-
-
 class ValueMetadata:
     """Represent metadata on a value instance."""
 

@@ -56,7 +56,6 @@ from ..value import (
     ValueMetadata,
     ValueNotification,
     _get_value_id_str_from_dict,
-    parse_value_id_str,
 )
 from .data_model import NodeDataType
 from .event_model import NODE_EVENT_MODEL_MAP
@@ -570,6 +569,37 @@ class Node(EventBase):
         await self.client.async_send_command_no_wait(message, **kwargs)
         return None
 
+    def _parse_value_id_str(self, value_id: str) -> dict[str, Any] | None:
+        """Parse a value ID string for a node into a valueId dict."""
+        parts = value_id.split("-")
+        if len(parts) < 4:
+            return None
+        try:
+            node_id = int(parts[0])
+            command_class = int(parts[1])
+            endpoint = int(parts[2])
+        except ValueError:
+            return None
+
+        if node_id != self.node_id:
+            return None
+
+        property_: int | str = int(parts[3]) if parts[3].isdigit() else parts[3]
+        data: dict[str, Any] = {
+            "commandClass": command_class,
+            "endpoint": endpoint,
+            "property": property_,
+        }
+        if len(parts) == 5:
+            data["propertyKey"] = int(parts[4]) if parts[4].isdigit() else parts[4]
+        elif len(parts) > 5:
+            property_key = "-".join(parts[4:])
+            data["propertyKey"] = (
+                int(property_key) if property_key.isdigit() else property_key
+            )
+
+        return data
+
     async def async_set_value(
         self,
         val: Value | str,
@@ -606,7 +636,7 @@ class Node(EventBase):
             # hides Basic CC values from node.values when higher-level command classes
             # (such as Binary Switch or Multilevel Switch) exist. We exempt Basic CC from
             # the node.values presence check so targetValue can still be set directly.
-            value_id_dict = parse_value_id_str(self, val)
+            value_id_dict = self._parse_value_id_str(val)
             if (
                 value_id_dict is None
                 or value_id_dict["commandClass"] != CommandClass.BASIC
