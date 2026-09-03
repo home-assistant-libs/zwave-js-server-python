@@ -22,6 +22,7 @@ from zwave_js_server.const import (
     Protocols,
     RFRegion,
     SecurityClass,
+    SetValueStatus,
     SupervisionStatus,
     Weekday,
 )
@@ -64,6 +65,7 @@ from zwave_js_server.model.value import (
 )
 
 from .. import load_fixture
+from ..common import MockCommandProtocol
 
 # pylint: disable=unused-argument
 
@@ -382,7 +384,106 @@ async def test_set_value(multisensor_6, uuid4, mock_command):
 
     # Use invalid value
     with pytest.raises(NotFoundError):
-        await node.async_set_value(f"{value_id}_fake_value", 42)
+        await node.async_set_value(f"{node.node_id}-37-0-fakeValue", 42)
+
+
+async def test_set_value_basic_cc_exempt(
+    inovelli_switch: Node, uuid4: str, mock_command: MockCommandProtocol
+) -> None:
+    """Test set value with Basic CC exempt when not in node.values."""
+    node = inovelli_switch
+    ack_commands = mock_command(
+        {"command": "node.set_value", "nodeId": node.node_id},
+        {"result": {"status": 255}},
+    )
+    value_id = f"{node.node_id}-32-0-targetValue"
+    assert value_id not in node.values
+
+    # Set value with string value_id for Basic CC
+    result = await node.async_set_value(value_id, 255)
+    assert result is not None
+    assert result.status == SetValueStatus.SUCCESS
+
+    assert len(ack_commands) == 1
+    assert ack_commands[0] == {
+        "command": "node.set_value",
+        "nodeId": node.node_id,
+        "valueId": {"commandClass": 32, "endpoint": 0, "property": "targetValue"},
+        "value": 255,
+        "messageId": uuid4,
+    }
+
+    # Set value with options for Basic CC
+    result = await node.async_set_value(value_id, 255, {"transitionDuration": 1})
+    assert result is not None
+    assert result.status == SetValueStatus.SUCCESS
+
+    assert len(ack_commands) == 2
+    assert ack_commands[1] == {
+        "command": "node.set_value",
+        "nodeId": node.node_id,
+        "valueId": {"commandClass": 32, "endpoint": 0, "property": "targetValue"},
+        "value": 255,
+        "options": {"transitionDuration": 1},
+        "messageId": uuid4,
+    }
+
+    # Setting a non-existent value ID for a non-exempt CC still raises NotFoundError
+    with pytest.raises(NotFoundError):
+        await node.async_set_value(f"{node.node_id}-37-0-fakeValue", 255)
+
+    # Invalid string format raises NotFoundError
+    with pytest.raises(NotFoundError):
+        await node.async_set_value("invalid-value-id", 255)
+
+
+def test_parse_value_id_str(inovelli_switch: Node) -> None:
+    """Test _parse_value_id_str helper."""
+    node = inovelli_switch
+    # 4-part with string property
+    assert node._parse_value_id_str(f"{node.node_id}-32-0-targetValue") == {
+        "commandClass": 32,
+        "endpoint": 0,
+        "property": "targetValue",
+    }
+
+    # 4-part with integer property
+    assert node._parse_value_id_str(f"{node.node_id}-112-0-8") == {
+        "commandClass": 112,
+        "endpoint": 0,
+        "property": 8,
+    }
+
+    # 5-part with integer propertyKey
+    assert node._parse_value_id_str(f"{node.node_id}-112-0-8-255") == {
+        "commandClass": 112,
+        "endpoint": 0,
+        "property": 8,
+        "propertyKey": 255,
+    }
+
+    # 5-part with string propertyKey
+    assert node._parse_value_id_str(f"{node.node_id}-99-0-userCode-abc") == {
+        "commandClass": 99,
+        "endpoint": 0,
+        "property": "userCode",
+        "propertyKey": "abc",
+    }
+
+    # >5-part propertyKey with hyphens
+    assert node._parse_value_id_str(f"{node.node_id}-99-0-userCode-key-part") == {
+        "commandClass": 99,
+        "endpoint": 0,
+        "property": "userCode",
+        "propertyKey": "key-part",
+    }
+
+    # Invalid formats / wrong node
+    assert node._parse_value_id_str("invalid-format") is None
+    assert node._parse_value_id_str("abc-32-0-targetValue") is None
+    assert node._parse_value_id_str("999-32-0-targetValue") is None
+    assert node._parse_value_id_str(f"{node.node_id}-32-abc-targetValue") is None
+    assert node._parse_value_id_str(f"{node.node_id}-abc-0-targetValue") is None
 
 
 async def test_set_value_node_status_change(driver, multisensor_6_state):
