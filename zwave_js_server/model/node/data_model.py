@@ -37,7 +37,7 @@ class NodeDataType(TypedDict, total=False):
     isListening: bool
     isFrequentListening: bool | str
     isRouting: bool
-    maxDataRate: int
+    maxDataRate: int | None
     supportedDataRates: list[int]
     isSecure: bool
     supportsBeaming: bool
