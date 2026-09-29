@@ -35,8 +35,8 @@ class EndpointGroup:
     label: str = field(init=False)
     is_main_device: bool = field(init=False)
     # Taken as-is from the device config file and not checked against the
-    # endpoints the node reports, so this can contain indices of endpoints that
-    # don't exist on the node. `endpoints` only returns the existing ones.
+    # endpoints the node actually exposes. This may contain indices of endpoints
+    # do not exist.
     endpoint_indices: tuple[int, ...] = field(init=False)
 
     def __post_init__(self) -> None:
