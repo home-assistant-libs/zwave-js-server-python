@@ -3061,7 +3061,9 @@ async def test_check_link_reliability_progress_event(
     }
 
 
-async def test_endpoint_groups(driver, wallmote_central_scene_state):
+async def test_endpoint_groups(
+    client: Client, wallmote_central_scene_state: dict[str, Any]
+) -> None:
     """Test endpoint groups."""
     state = deepcopy(wallmote_central_scene_state)
     state["endpointGroups"] = [
@@ -3078,7 +3080,7 @@ async def test_endpoint_groups(driver, wallmote_central_scene_state):
             "endpointIndices": [3],
         },
     ]
-    node = node_pkg.Node(driver.client, state)
+    node = node_pkg.Node(client, state)
 
     groups = node.endpoint_groups
     assert list(groups) == [1, 2]
