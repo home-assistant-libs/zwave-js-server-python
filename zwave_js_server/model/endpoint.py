@@ -29,6 +29,7 @@ if TYPE_CHECKING:
     from ..client import Client
     from .node import Node
     from .node.data_model import NodeDataType
+    from .node.endpoint_group import EndpointGroup
 
 
 class EndpointDataType(TypedDict, total=False):
@@ -114,6 +115,11 @@ class Endpoint(EventBase):
     def endpoint_label(self) -> str | None:
         """Return endpoint label property."""
         return self.data.get("endpointLabel")
+
+    @property
+    def endpoint_group(self) -> EndpointGroup | None:
+        """Return the endpoint group this endpoint belongs to."""
+        return self.node.get_endpoint_group(self.index)
 
     def update(
         self, data: EndpointDataType, values: dict[str, ConfigurationValue | Value]

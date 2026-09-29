@@ -8,6 +8,7 @@ from ..device_class import DeviceClassDataType
 from ..device_config import DeviceConfigDataType
 from ..endpoint import EndpointDataType
 from ..value import ValueDataType
+from .endpoint_group import EndpointGroupDataType
 from .statistics import NodeStatisticsDataType
 
 
@@ -75,3 +76,5 @@ class NodeDataType(TypedDict, total=False):
     hasSUCReturnRoute: bool
     manufacturer: str
     dsk: str
+    # Schema 51+ properties
+    endpointGroups: list[EndpointGroupDataType]

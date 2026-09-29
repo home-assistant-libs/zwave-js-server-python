@@ -3059,3 +3059,59 @@ async def test_check_link_reliability_progress_event(
         "round": 1,
         "totalRounds": 5,
     }
+
+
+async def test_endpoint_groups(
+    client: Client, wallmote_central_scene_state: dict[str, Any]
+) -> None:
+    """Test endpoint groups."""
+    state = deepcopy(wallmote_central_scene_state)
+    state["endpointGroups"] = [
+        {
+            "id": 1,
+            "label": "Left",
+            "isMainDevice": False,
+            "endpointIndices": [1, 2, 9],
+        },
+        {
+            "id": 2,
+            "label": "Right",
+            "isMainDevice": True,
+            "endpointIndices": [3],
+        },
+    ]
+    node = node_pkg.Node(client, state)
+
+    groups = node.endpoint_groups
+    assert list(groups) == [1, 2]
+    left = groups[1]
+    assert left.id == 1
+    assert left.label == "Left"
+    assert not left.is_main_device
+    assert left.endpoint_indices == (1, 2, 9)
+    assert left.endpoints == [node.endpoints[1], node.endpoints[2]]
+    right = groups[2]
+    assert right.is_main_device
+    assert right.endpoints == [node.endpoints[3]]
+
+    assert node.endpoints[0].endpoint_group is None
+    assert node.endpoints[1].endpoint_group is left
+    assert node.endpoints[2].endpoint_group is left
+    assert node.endpoints[3].endpoint_group is right
+    assert node.endpoints[4].endpoint_group is None
+    assert node.get_endpoint_group(9) is left
+
+    # Endpoint groups follow the node state, e.g. after a config update
+    state = deepcopy(wallmote_central_scene_state)
+    event = Event(
+        type="ready",
+        data={
+            "source": "node",
+            "event": "ready",
+            "nodeId": node.node_id,
+            "nodeState": state,
+        },
+    )
+    node.receive_event(event)
+    assert node.endpoint_groups == {}
+    assert node.endpoints[1].endpoint_group is None

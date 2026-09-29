@@ -58,6 +58,7 @@ from ..value import (
     _get_value_id_str_from_dict,
 )
 from .data_model import NodeDataType
+from .endpoint_group import EndpointGroup
 from .event_model import NODE_EVENT_MODEL_MAP
 from .firmware import (
     NodeFirmwareUpdateCapabilities,
@@ -125,6 +126,7 @@ class Node(EventBase):
         self._last_seen: datetime | None = None
         self.values: dict[str, ConfigurationValue | Value] = {}
         self.endpoints: dict[int, Endpoint] = {}
+        self._endpoint_groups: dict[int, EndpointGroup] = {}
         self.status_event = asyncio.Event()
         self.update(data)
 
@@ -424,6 +426,18 @@ class Node(EventBase):
             return Protocols(self.data["protocol"])
         return None
 
+    @property
+    def endpoint_groups(self) -> dict[int, EndpointGroup]:
+        """Return the endpoint groups defined in the device config file."""
+        return self._endpoint_groups
+
+    def get_endpoint_group(self, endpoint_index: int) -> EndpointGroup | None:
+        """Return the endpoint group containing the given endpoint."""
+        for group in self._endpoint_groups.values():
+            if endpoint_index in group.endpoint_indices:
+                return group
+        return None
+
     def _update_endpoints(self, endpoints: list[EndpointDataType]) -> None:
         """Update the endpoints data."""
         new_endpoints_data = {endpoint["index"]: endpoint for endpoint in endpoints}
@@ -496,6 +510,11 @@ class Node(EventBase):
         if not self._statistics.last_seen and self.last_seen:
             object.__setattr__(self._statistics, "last_seen", self.last_seen)
             self._statistics.data["lastSeen"] = self.last_seen.isoformat()
+
+        self._endpoint_groups = {
+            group["id"]: EndpointGroup(self, group)
+            for group in self.data.get("endpointGroups", [])
+        }
 
         self._update_values(self.data.pop("values"))
         self._update_endpoints(self.data.pop("endpoints"))

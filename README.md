@@ -44,3 +44,18 @@ wrapper:
   methods.
 - Credential payloads accept `str | bytes`; binary credentials are converted to
   the websocket Buffer transport shape internally.
+
+## Endpoint groups
+
+Schema 51 exposes the endpoint groups defined in a device's config file. They
+semantically group the endpoints of a device, like the individual clamps of a
+multi-clamp energy meter:
+
+- `node.endpoint_groups`: dict of `EndpointGroup` by group ID, empty if the
+  device config defines none.
+- `EndpointGroup.endpoints`: the endpoints of the group that exist on the node.
+  `EndpointGroup.endpoint_indices` also contains indices the node does not have.
+- `EndpointGroup.is_main_device`: whether the group represents the device as a
+  whole.
+- `endpoint.endpoint_group` / `node.get_endpoint_group(index)`: the group an
+  endpoint belongs to, or `None` if it is ungrouped.
