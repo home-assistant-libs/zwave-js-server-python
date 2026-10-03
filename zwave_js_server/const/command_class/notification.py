@@ -8,12 +8,12 @@
 
 from __future__ import annotations
 
-from enum import IntEnum
+from .. import UnknownValueIntEnum
 
 CC_SPECIFIC_NOTIFICATION_TYPE = "notificationType"
 
 
-class NotificationType(IntEnum):
+class NotificationType(UnknownValueIntEnum):
     """Enum for known notification types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
@@ -41,17 +41,12 @@ class NotificationType(IntEnum):
     WATER_VALVE = 15
     WEATHER_ALARM = 16
 
-    @classmethod
-    def _missing_(cls: type, value: object) -> NotificationType:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return NotificationType.UNKNOWN
 
-
-class NotificationEvent(IntEnum):
+class NotificationEvent(UnknownValueIntEnum):
     """Common base class for Notification CC states enums."""
 
 
-class NotificationEventValue(IntEnum):
+class NotificationEventValue(UnknownValueIntEnum):
     """Common base class for Notification CC state value enums."""
 
 
@@ -122,13 +117,6 @@ class AccessControlNotificationEvent(NotificationEvent):
     VALID_CREDENTIAL_ACCESS_DENIED_SCHEDULE_INACTIVE = 48
     VALID_CREDENTIAL_ACCESS_DENIED_USER_ACTIVE_STATE_SET_TO_OCCUPIED_DISABLED = 47
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> AccessControlNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return AccessControlNotificationEvent.UNKNOWN
-
 
 class BarrierPerformingInitializationProcessNotificationEventValue(
     NotificationEventValue
@@ -140,13 +128,6 @@ class BarrierPerformingInitializationProcessNotificationEventValue(
     PERFORMING_PROCESS = 255
     PROCESS_COMPLETED = 0
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> BarrierPerformingInitializationProcessNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return BarrierPerformingInitializationProcessNotificationEventValue.UNKNOWN
-
 
 class BarrierSafetyBeamObstacleNotificationEventValue(NotificationEventValue):
     """Enum for known barrier safety beam obstacle notification event value."""
@@ -155,13 +136,6 @@ class BarrierSafetyBeamObstacleNotificationEventValue(NotificationEventValue):
     UNKNOWN = -1
     NO_OBSTRUCTION = 0
     OBSTRUCTION = 255
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> BarrierSafetyBeamObstacleNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return BarrierSafetyBeamObstacleNotificationEventValue.UNKNOWN
 
 
 class BarrierVacationModeNotificationEventValue(NotificationEventValue):
@@ -172,13 +146,6 @@ class BarrierVacationModeNotificationEventValue(NotificationEventValue):
     MODE_DISABLED = 0
     MODE_ENABLED = 255
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> BarrierVacationModeNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return BarrierVacationModeNotificationEventValue.UNKNOWN
-
 
 class DoorStateWindowDoorIsOpenNotificationEventValue(NotificationEventValue):
     """Enum for known door state window/door is open notification event value."""
@@ -187,13 +154,6 @@ class DoorStateWindowDoorIsOpenNotificationEventValue(NotificationEventValue):
     UNKNOWN = -1
     WINDOW_DOOR_IS_OPEN_IN_REGULAR_POSITION = 0
     WINDOW_DOOR_IS_OPEN_IN_TILT_POSITION = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> DoorStateWindowDoorIsOpenNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return DoorStateWindowDoorIsOpenNotificationEventValue.UNKNOWN
 
 
 class ApplianceNotificationEvent(NotificationEvent):
@@ -224,13 +184,6 @@ class ApplianceNotificationEvent(NotificationEvent):
     WASHING_FAILURE = 11
     WATER_SUPPLY_FAILURE = 7
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> ApplianceNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return ApplianceNotificationEvent.UNKNOWN
-
 
 class ClockNotificationEvent(NotificationEvent):
     """Enum for known clock notification event."""
@@ -241,11 +194,6 @@ class ClockNotificationEvent(NotificationEvent):
     TIME_REMAINING = 3
     TIMER_ENDED = 2
     WAKE_UP_ALERT = 1
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> ClockNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return ClockNotificationEvent.UNKNOWN
 
 
 class CoAlarmNotificationEvent(NotificationEvent):
@@ -262,11 +210,6 @@ class CoAlarmNotificationEvent(NotificationEvent):
     SENSOR_STATUS_CARBON_MONOXIDE_DETECTED_LOCATION_PROVIDED = 1
     TEST_STATUS_CARBON_MONOXIDE_TEST = 3
 
-    @classmethod
-    def _missing_(cls: type, value: object) -> CoAlarmNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return CoAlarmNotificationEvent.UNKNOWN
-
 
 class TestStatusCarbonMonoxideTestNotificationEventValue(NotificationEventValue):
     """Enum for known test status carbon monoxide test notification event value."""
@@ -275,13 +218,6 @@ class TestStatusCarbonMonoxideTestNotificationEventValue(NotificationEventValue)
     UNKNOWN = -1
     TEST_FAILED = 2
     TEST_OK = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> TestStatusCarbonMonoxideTestNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return TestStatusCarbonMonoxideTestNotificationEventValue.UNKNOWN
 
 
 class Co2AlarmNotificationEvent(NotificationEvent):
@@ -298,13 +234,6 @@ class Co2AlarmNotificationEvent(NotificationEvent):
     SENSOR_STATUS_CARBON_DIOXIDE_DETECTED_LOCATION_PROVIDED = 1
     TEST_STATUS_CARBON_DIOXIDE_TEST = 3
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> Co2AlarmNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return Co2AlarmNotificationEvent.UNKNOWN
-
 
 class TestStatusCarbonDioxideTestNotificationEventValue(NotificationEventValue):
     """Enum for known test status carbon dioxide test notification event value."""
@@ -313,13 +242,6 @@ class TestStatusCarbonDioxideTestNotificationEventValue(NotificationEventValue):
     UNKNOWN = -1
     TEST_FAILED = 2
     TEST_OK = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> TestStatusCarbonDioxideTestNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return TestStatusCarbonDioxideTestNotificationEventValue.UNKNOWN
 
 
 class EmergencyAlarmNotificationEvent(NotificationEvent):
@@ -331,13 +253,6 @@ class EmergencyAlarmNotificationEvent(NotificationEvent):
     CONTACT_MEDICAL_SERVICE = 3
     CONTACT_POLICE = 1
     IDLE = 0
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> EmergencyAlarmNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return EmergencyAlarmNotificationEvent.UNKNOWN
 
 
 class GasAlarmNotificationEvent(NotificationEvent):
@@ -352,13 +267,6 @@ class GasAlarmNotificationEvent(NotificationEvent):
     MAINTENANCE_STATUS_REPLACEMENT_REQUIRED = 6
     TOXIC_GAS_STATUS_TOXIC_GAS_DETECTED = 4
     TOXIC_GAS_STATUS_TOXIC_GAS_DETECTED_LOCATION_PROVIDED = 3
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> GasAlarmNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return GasAlarmNotificationEvent.UNKNOWN
 
 
 class HeatAlarmNotificationEvent(NotificationEvent):
@@ -381,13 +289,6 @@ class HeatAlarmNotificationEvent(NotificationEvent):
     RAPID_TEMPERATURE_RISE = 4
     RAPID_TEMPERATURE_RISE_LOCATION_PROVIDED = 3
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> HeatAlarmNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return HeatAlarmNotificationEvent.UNKNOWN
-
 
 class HomeHealthNotificationEvent(NotificationEvent):
     """Enum for known home health notification event."""
@@ -408,13 +309,6 @@ class HomeHealthNotificationEvent(NotificationEvent):
     SLEEP_STAGE_STATUS_SLEEP_STAGE_3_DETECTED_DEEP_SLEEP_NON_REM_3 = 11
     VOC_LEVEL_STATUS_VOLATILE_ORGANIC_COMPOUND_LEVEL = 6
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> HomeHealthNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return HomeHealthNotificationEvent.UNKNOWN
-
 
 class SleepApneaStatusSleepApneaDetectedNotificationEventValue(NotificationEventValue):
     """Enum for known sleep apnea status sleep apnea detected notification event value."""
@@ -423,13 +317,6 @@ class SleepApneaStatusSleepApneaDetectedNotificationEventValue(NotificationEvent
     UNKNOWN = -1
     LOW_BREATH = 1
     NO_BREATH_AT_ALL = 2
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> SleepApneaStatusSleepApneaDetectedNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return SleepApneaStatusSleepApneaDetectedNotificationEventValue.UNKNOWN
 
 
 class VocLevelStatusVolatileOrganicCompoundLevelNotificationEventValue(
@@ -444,15 +331,6 @@ class VocLevelStatusVolatileOrganicCompoundLevelNotificationEventValue(
     MODERATELY_POLLUTED = 3
     SLIGHTLY_POLLUTED = 2
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> (
-        VocLevelStatusVolatileOrganicCompoundLevelNotificationEventValue
-    ):  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return VocLevelStatusVolatileOrganicCompoundLevelNotificationEventValue.UNKNOWN
-
 
 class HomeMonitoringNotificationEvent(NotificationEvent):
     """Enum for known home monitoring notification event."""
@@ -462,13 +340,6 @@ class HomeMonitoringNotificationEvent(NotificationEvent):
     HOME_OCCUPANCY_STATUS_HOME_OCCUPIED = 2
     HOME_OCCUPANCY_STATUS_HOME_OCCUPIED_LOCATION_PROVIDED = 1
     IDLE = 0
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> HomeMonitoringNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return HomeMonitoringNotificationEvent.UNKNOWN
 
 
 class HomeSecurityNotificationEvent(NotificationEvent):
@@ -490,13 +361,6 @@ class HomeSecurityNotificationEvent(NotificationEvent):
     TAMPERING_INVALID_CODE = 4
     TAMPERING_PRODUCT_MOVED = 9
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> HomeSecurityNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return HomeSecurityNotificationEvent.UNKNOWN
-
 
 class IrrigationNotificationEvent(NotificationEvent):
     """Enum for known irrigation notification event."""
@@ -510,13 +374,6 @@ class IrrigationNotificationEvent(NotificationEvent):
     VALVE_ID_RUN_STATUS_VALVE_TABLE_RUN_FINISHED = 4
     VALVE_ID_RUN_STATUS_VALVE_TABLE_RUN_STARTED = 3
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> IrrigationNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return IrrigationNotificationEvent.UNKNOWN
-
 
 class LightSensorNotificationEvent(NotificationEvent):
     """Enum for known light sensor notification event."""
@@ -526,13 +383,6 @@ class LightSensorNotificationEvent(NotificationEvent):
     IDLE = 0
     LIGHT_COLOR_TRANSITION_DETECTED = 2
     LIGHT_DETECTION_STATUS_LIGHT_DETECTED = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> LightSensorNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return LightSensorNotificationEvent.UNKNOWN
 
 
 class PestControlNotificationEvent(NotificationEvent):
@@ -549,13 +399,6 @@ class PestControlNotificationEvent(NotificationEvent):
     TRAP_STATUS_TRAP_ARMED_LOCATION_PROVIDED = 1
     TRAP_STATUS_TRAP_RE_ARM_REQUIRED = 4
     TRAP_STATUS_TRAP_RE_ARM_REQUIRED_LOCATION_PROVIDED = 3
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> PestControlNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return PestControlNotificationEvent.UNKNOWN
 
 
 class PowerManagementNotificationEvent(NotificationEvent):
@@ -583,13 +426,6 @@ class PowerManagementNotificationEvent(NotificationEvent):
     SURGE_DETECTED = 4
     VOLTAGE_DROP_DRIFT = 5
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> PowerManagementNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return PowerManagementNotificationEvent.UNKNOWN
-
 
 class SirenNotificationEvent(NotificationEvent):
     """Enum for known siren notification event."""
@@ -598,11 +434,6 @@ class SirenNotificationEvent(NotificationEvent):
     UNKNOWN = -1
     IDLE = 0
     SIREN_STATUS_SIREN_ACTIVE = 1
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> SirenNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return SirenNotificationEvent.UNKNOWN
 
 
 class SmokeAlarmNotificationEvent(NotificationEvent):
@@ -620,13 +451,6 @@ class SmokeAlarmNotificationEvent(NotificationEvent):
     SENSOR_STATUS_SMOKE_DETECTED = 2
     SENSOR_STATUS_SMOKE_DETECTED_LOCATION_PROVIDED = 1
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> SmokeAlarmNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return SmokeAlarmNotificationEvent.UNKNOWN
-
 
 class SystemNotificationEvent(NotificationEvent):
     """Enum for known system notification event."""
@@ -641,11 +465,6 @@ class SystemNotificationEvent(NotificationEvent):
     IDLE = 0
     SOFTWARE_STATUS_SYSTEM_SOFTWARE_FAILURE = 2
     SOFTWARE_STATUS_SYSTEM_SOFTWARE_FAILURE_WITH_FAILURE_CODE = 4
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> SystemNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return SystemNotificationEvent.UNKNOWN
 
 
 class WaterAlarmNotificationEvent(NotificationEvent):
@@ -666,13 +485,6 @@ class WaterAlarmNotificationEvent(NotificationEvent):
     WATER_PRESSURE_ALARM = 7
     WATER_TEMPERATURE_ALARM = 8
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> WaterAlarmNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return WaterAlarmNotificationEvent.UNKNOWN
-
 
 class WaterFlowAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known water flow alarm notification event value."""
@@ -684,13 +496,6 @@ class WaterFlowAlarmNotificationEventValue(NotificationEventValue):
     MAX = 4
     NO_DATA = 1
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> WaterFlowAlarmNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return WaterFlowAlarmNotificationEventValue.UNKNOWN
-
 
 class WaterLevelAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known water level alarm notification event value."""
@@ -700,13 +505,6 @@ class WaterLevelAlarmNotificationEventValue(NotificationEventValue):
     ABOVE_HIGH_THRESHOLD = 3
     BELOW_LOW_THRESHOLD = 2
     NO_DATA = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> WaterLevelAlarmNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return WaterLevelAlarmNotificationEventValue.UNKNOWN
 
 
 class WaterPressureAlarmNotificationEventValue(NotificationEventValue):
@@ -719,13 +517,6 @@ class WaterPressureAlarmNotificationEventValue(NotificationEventValue):
     MAX = 4
     NO_DATA = 1
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> WaterPressureAlarmNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return WaterPressureAlarmNotificationEventValue.UNKNOWN
-
 
 class WaterTemperatureAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known water temperature alarm notification event value."""
@@ -735,13 +526,6 @@ class WaterTemperatureAlarmNotificationEventValue(NotificationEventValue):
     ABOVE_HIGH_THRESHOLD = 3
     BELOW_LOW_THRESHOLD = 2
     NO_DATA = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> WaterTemperatureAlarmNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return WaterTemperatureAlarmNotificationEventValue.UNKNOWN
 
 
 class WaterQualityMonitoringNotificationEvent(NotificationEvent):
@@ -768,13 +552,6 @@ class WaterQualityMonitoringNotificationEvent(NotificationEvent):
     WATERFLOW_CLEAR_WATER_SENSOR_WATERFLOW_CLEAR_WATER_SHORTAGE_DETECTED = 7
     WATERFLOW_MEASURING_STATION_SENSOR_WATERFLOW_MEASURING_STATION_SHORTAGE_DETECTED = 6
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> WaterQualityMonitoringNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return WaterQualityMonitoringNotificationEvent.UNKNOWN
-
 
 class AcidityStatusAcidityAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known acidity (ph) status acidity (ph) alarm notification event value."""
@@ -786,13 +563,6 @@ class AcidityStatusAcidityAlarmNotificationEventValue(NotificationEventValue):
     DECREASING_PH = 3
     INCREASING_PH = 4
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> AcidityStatusAcidityAlarmNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return AcidityStatusAcidityAlarmNotificationEventValue.UNKNOWN
-
 
 class ChlorineAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known chlorine alarm notification event value."""
@@ -802,13 +572,6 @@ class ChlorineAlarmNotificationEventValue(NotificationEventValue):
     ABOVE_HIGH_THRESHOLD = 2
     BELOW_LOW_THRESHOLD = 1
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> ChlorineAlarmNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return ChlorineAlarmNotificationEventValue.UNKNOWN
-
 
 class WaterOxidationAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known water oxidation alarm notification event value."""
@@ -817,13 +580,6 @@ class WaterOxidationAlarmNotificationEventValue(NotificationEventValue):
     UNKNOWN = -1
     ABOVE_HIGH_THRESHOLD = 2
     BELOW_LOW_THRESHOLD = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> WaterOxidationAlarmNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return WaterOxidationAlarmNotificationEventValue.UNKNOWN
 
 
 class WaterValveNotificationEvent(NotificationEvent):
@@ -840,13 +596,6 @@ class WaterValveNotificationEvent(NotificationEvent):
     VALVE_OPERATION = 1
     VALVE_SHORT_CIRCUIT = 3
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> WaterValveNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return WaterValveNotificationEvent.UNKNOWN
-
 
 class MasterValveCurrentAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known master valve current alarm notification event value."""
@@ -858,13 +607,6 @@ class MasterValveCurrentAlarmNotificationEventValue(NotificationEventValue):
     MAX = 4
     NO_DATA = 1
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> MasterValveCurrentAlarmNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return MasterValveCurrentAlarmNotificationEventValue.UNKNOWN
-
 
 class MasterValveOperationNotificationEventValue(NotificationEventValue):
     """Enum for known master valve operation notification event value."""
@@ -873,13 +615,6 @@ class MasterValveOperationNotificationEventValue(NotificationEventValue):
     UNKNOWN = -1
     OFF_CLOSED = 0
     ON_OPEN = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> MasterValveOperationNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return MasterValveOperationNotificationEventValue.UNKNOWN
 
 
 class ValveCurrentAlarmNotificationEventValue(NotificationEventValue):
@@ -892,13 +627,6 @@ class ValveCurrentAlarmNotificationEventValue(NotificationEventValue):
     MAX = 4
     NO_DATA = 1
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> ValveCurrentAlarmNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return ValveCurrentAlarmNotificationEventValue.UNKNOWN
-
 
 class ValveOperationNotificationEventValue(NotificationEventValue):
     """Enum for known valve operation notification event value."""
@@ -907,13 +635,6 @@ class ValveOperationNotificationEventValue(NotificationEventValue):
     UNKNOWN = -1
     OFF_CLOSED = 0
     ON_OPEN = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> ValveOperationNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return ValveOperationNotificationEventValue.UNKNOWN
 
 
 class WeatherAlarmNotificationEvent(NotificationEvent):
@@ -925,13 +646,6 @@ class WeatherAlarmNotificationEvent(NotificationEvent):
     IDLE = 0
     MOISTURE_ALARM = 2
     RAIN_ALARM = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> WeatherAlarmNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return WeatherAlarmNotificationEvent.UNKNOWN
 
 
 NOTIFICATION_TYPE_TO_EVENT_MAP: dict[NotificationType, type[NotificationEvent]] = {

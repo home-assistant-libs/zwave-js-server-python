@@ -70,7 +70,7 @@ def generate_int_enum_class_definition(
     enum_ref_url: str | None = None,
     get_id_func: Callable | None = None,
     docstring_info: str = "",
-    base_class: str = "IntEnum",
+    base_class: str = "UnknownValueIntEnum",
 ) -> list[str]:
     """Generate an IntEnum class definition as an array of lines of string."""
     class_def: list[str] = []
@@ -84,21 +84,13 @@ def generate_int_enum_class_definition(
         if get_id_func:
             _enum_id = get_id_func(_enum_id)
         class_def.append(f"    {enum_name_format(_enum_name, False)} = {_enum_id}")
-    class_def.extend(
-        [
-            "    @classmethod",
-            f"    def _missing_(cls: type, value: object) -> {class_name}:  # noqa: ARG003",
-            '        """Set default enum member if an unknown value is provided."""',
-            f"        return {class_name}.UNKNOWN",
-        ]
-    )
     return class_def
 
 
 def generate_int_enum_base_class(class_name: str, docstring: str) -> list[str]:
     """Generate an IntEnum base class definition."""
     class_def: list[str] = []
-    class_def.append(f"class {class_name}(IntEnum):")
+    class_def.append(f"class {class_name}(UnknownValueIntEnum):")
     class_def.append(f"    {docstring}")
     return class_def
 
@@ -111,7 +103,7 @@ lines = [
     *AUTO_GEN_PRE,
     "from __future__ import annotations",
     "",
-    "from enum import IntEnum",
+    "from .. import UnknownValueIntEnum",
     'CC_SPECIFIC_NOTIFICATION_TYPE = "notificationType"',
 ]
 
