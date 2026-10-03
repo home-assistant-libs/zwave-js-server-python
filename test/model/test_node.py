@@ -1273,6 +1273,41 @@ async def test_notification_unknown(lock_schlage_be469: node_pkg.Node, caplog):
     assert "notification" not in event.data
 
 
+async def test_entry_control_notification_unparseable_event_data(ring_keypad, caplog):
+    """Test an Entry Control notification carrying an unparseable buffer.
+
+    A malformed buffer raised UnparseableValue out of handle_notification, which
+    escaped the listen loop. Node values already skip unparseable payloads (see
+    Node._update_values); notifications now do the same.
+    """
+    node = ring_keypad
+    event = Event(
+        type="notification",
+        data={
+            "source": "node",
+            "event": "notification",
+            "nodeId": 10,
+            "endpointIndex": 0,
+            "ccId": 111,
+            "args": {
+                "eventType": 5,
+                "eventTypeLabel": "foo",
+                "dataType": 2,
+                "dataTypeLabel": "bar",
+                "eventData": {"type": "Buffer", "data": ["not-an-int"]},
+            },
+        },
+    )
+
+    node.handle_notification(event)
+
+    notification = event.data["notification"]
+    assert notification.command_class == CommandClass.ENTRY_CONTROL
+    assert notification.event_data is None
+    assert notification.event_type == EntryControlEventType.ARM_AWAY
+    assert "unparseable" in caplog.text.lower()
+
+
 async def test_entry_control_notification(ring_keypad):
     """Test entry control CC notification events."""
     node = ring_keypad
