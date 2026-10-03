@@ -79,7 +79,6 @@ def test_non_int_value_still_raises() -> None:
     "enum",
     [
         BatteryReplacementStatus,
-        CommandClass,
         MultilevelSwitchCommand,
         PowerLevelTestStatus,
     ],
@@ -90,6 +89,20 @@ def test_device_reported_enums_tolerate_unknown_values(
     """Test every device-reported enum tolerates an out-of-range value."""
     assert issubclass(enum, UnknownValueIntEnum)
     assert enum(190).value == 190
+
+
+def test_command_class_stays_strict() -> None:
+    """Test CommandClass still raises, so it can gate untrusted input.
+
+    CommandClass is dual-use: it is device-reported on the notification event
+    path, but consumers also rely on ValueError to reject invalid command class
+    ids supplied by a caller. Home Assistant does this in three places, so a
+    tolerant CommandClass would silently disable that validation. The event path
+    is guarded in Node.handle_notification instead.
+    """
+    assert not issubclass(CommandClass, UnknownValueIntEnum)
+    with pytest.raises(ValueError):
+        CommandClass(99999)
 
 
 def test_generated_notification_enum_preserves_value() -> None:

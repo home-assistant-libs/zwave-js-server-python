@@ -108,7 +108,7 @@ class UnknownValueIntEnum(IntEnum):
         return cast("Self", cls._value2member_map_.setdefault(value, member))
 
 
-class CommandClass(UnknownValueIntEnum):
+class CommandClass(IntEnum):
     """Enum with all known CommandClasses."""
 
     SENSOR_ALARM = 156
