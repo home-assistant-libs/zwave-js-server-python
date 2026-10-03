@@ -1273,11 +1273,22 @@ async def test_notification_unknown(lock_schlage_be469: node_pkg.Node, caplog):
     assert "notification" not in event.data
 
 
-async def test_entry_control_notification_unparseable_event_data(ring_keypad, caplog):
+@pytest.mark.parametrize(
+    "bad_data",
+    [
+        ["SECRET", 77, 88],
+        # Items outside the byte range used to raise bare ValueError from chr()
+        [-1, 77, 88],
+        [300, 77, 88],
+    ],
+)
+async def test_entry_control_notification_unparseable_event_data(
+    ring_keypad, caplog, bad_data
+):
     """Test an Entry Control notification carrying an unparseable buffer.
 
-    A malformed buffer raised UnparseableValue out of handle_notification, which
-    escaped the listen loop. Node values already skip unparseable payloads (see
+    A malformed buffer raised out of handle_notification and escaped the listen
+    loop. Node values already skip unparseable payloads (see
     Node._update_values); notifications now do the same.
     """
     node = ring_keypad
@@ -1294,7 +1305,7 @@ async def test_entry_control_notification_unparseable_event_data(ring_keypad, ca
                 "eventTypeLabel": "foo",
                 "dataType": 2,
                 "dataTypeLabel": "bar",
-                "eventData": {"type": "Buffer", "data": ["not-an-int"]},
+                "eventData": {"type": "Buffer", "data": bad_data},
             },
         },
     )
@@ -1306,6 +1317,11 @@ async def test_entry_control_notification_unparseable_event_data(ring_keypad, ca
     assert notification.event_data is None
     assert notification.event_type == EntryControlEventType.ARM_AWAY
     assert "unparseable" in caplog.text.lower()
+    # Entry Control event data can carry keypad input or credential bytes for
+    # ENTER/RFID events, so the payload itself must stay out of the log.
+    assert "Buffer" not in caplog.text
+    for item in bad_data:
+        assert str(item) not in caplog.text
 
 
 async def test_entry_control_notification(ring_keypad):

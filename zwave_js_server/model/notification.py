@@ -122,11 +122,16 @@ class EntryControlNotification(BaseNotification):
                 # A device can report a malformed buffer. Leave event_data unset
                 # rather than letting the error escape the listen loop, the same
                 # way Node._update_values skips unparseable value payloads.
+                #
+                # The payload is deliberately not logged: for ENTER and RFID
+                # events it carries keypad input or credential data, so only
+                # non-secret diagnostics go to the log.
                 _LOGGER.warning(
-                    "Unparseable event data in Entry Control notification "
-                    "from node %s: %s",
+                    "Unparseable event data in Entry Control notification from "
+                    "node %s (event type %s, data type %s)",
                     self.node_id,
-                    event_data,
+                    self.event_type,
+                    self.data_type,
                 )
 
 
