@@ -17,7 +17,6 @@ class NotificationType(UnknownValueIntEnum):
     """Enum for known notification types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ACCESS_CONTROL = 6
     APPLIANCE = 12
     CLOCK = 11
@@ -54,7 +53,6 @@ class AccessControlNotificationEvent(NotificationEvent):
     """Enum for known access control notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ALL_USER_CODES_DELETED = 12
     ALL_USERS_DELETED = 37
     AUTO_LOCK_LOCKED_OPERATION = 9
@@ -124,7 +122,6 @@ class BarrierPerformingInitializationProcessNotificationEventValue(
     """Enum for known barrier performing initialization process notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     PERFORMING_PROCESS = 255
     PROCESS_COMPLETED = 0
 
@@ -133,7 +130,6 @@ class BarrierSafetyBeamObstacleNotificationEventValue(NotificationEventValue):
     """Enum for known barrier safety beam obstacle notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     NO_OBSTRUCTION = 0
     OBSTRUCTION = 255
 
@@ -142,7 +138,6 @@ class BarrierVacationModeNotificationEventValue(NotificationEventValue):
     """Enum for known barrier vacation mode notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     MODE_DISABLED = 0
     MODE_ENABLED = 255
 
@@ -151,7 +146,6 @@ class DoorStateWindowDoorIsOpenNotificationEventValue(NotificationEventValue):
     """Enum for known door state window/door is open notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     WINDOW_DOOR_IS_OPEN_IN_REGULAR_POSITION = 0
     WINDOW_DOOR_IS_OPEN_IN_TILT_POSITION = 1
 
@@ -160,7 +154,6 @@ class ApplianceNotificationEvent(NotificationEvent):
     """Enum for known appliance notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     APPLIANCE_STATUS_BOILING = 8
     APPLIANCE_STATUS_DRAINING = 14
     APPLIANCE_STATUS_DRYING = 18
@@ -189,7 +182,6 @@ class ClockNotificationEvent(NotificationEvent):
     """Enum for known clock notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     IDLE = 0
     TIME_REMAINING = 3
     TIMER_ENDED = 2
@@ -200,7 +192,6 @@ class CoAlarmNotificationEvent(NotificationEvent):
     """Enum for known co alarm notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ALARM_STATUS_ALARM_SILENCED = 6
     IDLE = 0
     MAINTENANCE_STATUS_REPLACEMENT_REQUIRED = 4
@@ -215,7 +206,6 @@ class TestStatusCarbonMonoxideTestNotificationEventValue(NotificationEventValue)
     """Enum for known test status carbon monoxide test notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     TEST_FAILED = 2
     TEST_OK = 1
 
@@ -224,7 +214,6 @@ class Co2AlarmNotificationEvent(NotificationEvent):
     """Enum for known co2 alarm notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ALARM_STATUS_ALARM_SILENCED = 6
     IDLE = 0
     MAINTENANCE_STATUS_REPLACEMENT_REQUIRED = 4
@@ -239,7 +228,6 @@ class TestStatusCarbonDioxideTestNotificationEventValue(NotificationEventValue):
     """Enum for known test status carbon dioxide test notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     TEST_FAILED = 2
     TEST_OK = 1
 
@@ -248,7 +236,6 @@ class EmergencyAlarmNotificationEvent(NotificationEvent):
     """Enum for known emergency alarm notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     CONTACT_FIRE_SERVICE = 2
     CONTACT_MEDICAL_SERVICE = 3
     CONTACT_POLICE = 1
@@ -259,7 +246,6 @@ class GasAlarmNotificationEvent(NotificationEvent):
     """Enum for known gas alarm notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ALARM_STATUS_GAS_ALARM_TEST = 5
     COMBUSTIBLE_GAS_STATUS_COMBUSTIBLE_GAS_DETECTED = 2
     COMBUSTIBLE_GAS_STATUS_COMBUSTIBLE_GAS_DETECTED_LOCATION_PROVIDED = 1
@@ -273,7 +259,6 @@ class HeatAlarmNotificationEvent(NotificationEvent):
     """Enum for known heat alarm notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ALARM_STATUS_ALARM_SILENCED = 9
     ALARM_STATUS_HEAT_ALARM_TEST = 7
     DUST_IN_DEVICE_STATUS_MAINTENANCE_REQUIRED_DUST_IN_DEVICE = 10
@@ -294,7 +279,6 @@ class HomeHealthNotificationEvent(NotificationEvent):
     """Enum for known home health notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     FALL_DETECTED = 12
     IDLE = 0
     POSITION_STATUS_LEAVING_BED = 1
@@ -314,7 +298,6 @@ class SleepApneaStatusSleepApneaDetectedNotificationEventValue(NotificationEvent
     """Enum for known sleep apnea status sleep apnea detected notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     LOW_BREATH = 1
     NO_BREATH_AT_ALL = 2
 
@@ -325,7 +308,6 @@ class VocLevelStatusVolatileOrganicCompoundLevelNotificationEventValue(
     """Enum for known voc level status volatile organic compound level notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     CLEAN = 1
     HIGHLY_POLLUTED = 4
     MODERATELY_POLLUTED = 3
@@ -336,7 +318,6 @@ class HomeMonitoringNotificationEvent(NotificationEvent):
     """Enum for known home monitoring notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     HOME_OCCUPANCY_STATUS_HOME_OCCUPIED = 2
     HOME_OCCUPANCY_STATUS_HOME_OCCUPIED_LOCATION_PROVIDED = 1
     IDLE = 0
@@ -346,7 +327,6 @@ class HomeSecurityNotificationEvent(NotificationEvent):
     """Enum for known home security notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     COVER_STATUS_TAMPERING_PRODUCT_COVER_REMOVED = 3
     GLASS_BREAKAGE = 6
     GLASS_BREAKAGE_LOCATION_PROVIDED = 5
@@ -366,7 +346,6 @@ class IrrigationNotificationEvent(NotificationEvent):
     """Enum for known irrigation notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     DEVICE_CONFIGURATION_STATUS_DEVICE_IS_NOT_CONFIGURED = 5
     IDLE = 0
     SCHEDULE_ID_STATUS_SCHEDULE_FINISHED = 2
@@ -379,7 +358,6 @@ class LightSensorNotificationEvent(NotificationEvent):
     """Enum for known light sensor notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     IDLE = 0
     LIGHT_COLOR_TRANSITION_DETECTED = 2
     LIGHT_DETECTION_STATUS_LIGHT_DETECTED = 1
@@ -389,7 +367,6 @@ class PestControlNotificationEvent(NotificationEvent):
     """Enum for known pest control notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     IDLE = 0
     PEST_DETECTED = 6
     PEST_DETECTED_LOCATION_PROVIDED = 5
@@ -405,7 +382,6 @@ class PowerManagementNotificationEvent(NotificationEvent):
     """Enum for known power management notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     BACKUP_BATTERY_LEVEL_STATUS_BACK_UP_BATTERY_DISCONNECTED = 18
     BACKUP_BATTERY_LEVEL_STATUS_BACK_UP_BATTERY_IS_LOW = 16
     BATTERY_LEVEL_STATUS_BATTERY_IS_FULLY_CHARGED = 13
@@ -431,7 +407,6 @@ class SirenNotificationEvent(NotificationEvent):
     """Enum for known siren notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     IDLE = 0
     SIREN_STATUS_SIREN_ACTIVE = 1
 
@@ -440,7 +415,6 @@ class SmokeAlarmNotificationEvent(NotificationEvent):
     """Enum for known smoke alarm notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ALARM_STATUS_ALARM_SILENCED = 6
     ALARM_STATUS_SMOKE_ALARM_TEST = 3
     DUST_IN_DEVICE_STATUS_MAINTENANCE_REQUIRED_DUST_IN_DEVICE = 8
@@ -456,7 +430,6 @@ class SystemNotificationEvent(NotificationEvent):
     """Enum for known system notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     COVER_STATUS_TAMPERING_PRODUCT_COVER_REMOVED = 6
     EMERGENCY_SHUTOFF = 7
     HARDWARE_STATUS_SYSTEM_HARDWARE_FAILURE = 1
@@ -471,7 +444,6 @@ class WaterAlarmNotificationEvent(NotificationEvent):
     """Enum for known water alarm notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     IDLE = 0
     MAINTENANCE_STATUS_REPLACE_WATER_FILTER = 5
     PUMP_STATUS_SUMP_PUMP_ACTIVE = 10
@@ -490,7 +462,6 @@ class WaterFlowAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known water flow alarm notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ABOVE_HIGH_THRESHOLD = 3
     BELOW_LOW_THRESHOLD = 2
     MAX = 4
@@ -501,7 +472,6 @@ class WaterLevelAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known water level alarm notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ABOVE_HIGH_THRESHOLD = 3
     BELOW_LOW_THRESHOLD = 2
     NO_DATA = 1
@@ -511,7 +481,6 @@ class WaterPressureAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known water pressure alarm notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ABOVE_HIGH_THRESHOLD = 3
     BELOW_LOW_THRESHOLD = 2
     MAX = 4
@@ -522,7 +491,6 @@ class WaterTemperatureAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known water temperature alarm notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ABOVE_HIGH_THRESHOLD = 3
     BELOW_LOW_THRESHOLD = 2
     NO_DATA = 1
@@ -532,7 +500,6 @@ class WaterQualityMonitoringNotificationEvent(NotificationEvent):
     """Enum for known water quality monitoring notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ACIDITY_PH_SENSOR_STATUS_ACIDITY_PH_EMPTY = 5
     ACIDITY_PH_STATUS_ACIDITY_PH_ALARM = 2
     CHLORINE_ALARM = 1
@@ -557,7 +524,6 @@ class AcidityStatusAcidityAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known acidity (ph) status acidity (ph) alarm notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ABOVE_HIGH_THRESHOLD = 2
     BELOW_LOW_THRESHOLD = 1
     DECREASING_PH = 3
@@ -568,7 +534,6 @@ class ChlorineAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known chlorine alarm notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ABOVE_HIGH_THRESHOLD = 2
     BELOW_LOW_THRESHOLD = 1
 
@@ -577,7 +542,6 @@ class WaterOxidationAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known water oxidation alarm notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ABOVE_HIGH_THRESHOLD = 2
     BELOW_LOW_THRESHOLD = 1
 
@@ -586,7 +550,6 @@ class WaterValveNotificationEvent(NotificationEvent):
     """Enum for known water valve notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     IDLE = 0
     MASTER_VALVE_CURRENT_ALARM = 6
     MASTER_VALVE_OPERATION = 2
@@ -601,7 +564,6 @@ class MasterValveCurrentAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known master valve current alarm notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ABOVE_HIGH_THRESHOLD = 3
     BELOW_LOW_THRESHOLD = 2
     MAX = 4
@@ -612,7 +574,6 @@ class MasterValveOperationNotificationEventValue(NotificationEventValue):
     """Enum for known master valve operation notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     OFF_CLOSED = 0
     ON_OPEN = 1
 
@@ -621,7 +582,6 @@ class ValveCurrentAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known valve current alarm notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ABOVE_HIGH_THRESHOLD = 3
     BELOW_LOW_THRESHOLD = 2
     MAX = 4
@@ -632,7 +592,6 @@ class ValveOperationNotificationEventValue(NotificationEventValue):
     """Enum for known valve operation notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     OFF_CLOSED = 0
     ON_OPEN = 1
 
@@ -641,7 +600,6 @@ class WeatherAlarmNotificationEvent(NotificationEvent):
     """Enum for known weather alarm notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     FREEZE_ALARM = 3
     IDLE = 0
     MOISTURE_ALARM = 2

@@ -100,7 +100,13 @@ def test_generated_notification_enum_preserves_value() -> None:
     assert notification_type.is_unknown is True
 
 
-def test_generated_unknown_sentinel_is_retained() -> None:
-    """Test the pre-existing UNKNOWN member stays available to consumers."""
-    assert NotificationType.UNKNOWN.value == -1
-    assert NotificationType.UNKNOWN.is_unknown is True
+def test_generated_unknown_sentinel_is_removed() -> None:
+    """Test the old UNKNOWN sentinel is gone, so stale checks fail loudly.
+
+    Unknown values now carry their own value, so `== NotificationType.UNKNOWN`
+    would silently take the wrong branch. Removing the member turns that into an
+    AttributeError at the comparison site, which consumers cannot miss.
+    """
+    assert "UNKNOWN" not in NotificationType.__members__
+    with pytest.raises(AttributeError):
+        _ = NotificationType.UNKNOWN

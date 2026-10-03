@@ -79,7 +79,6 @@ def generate_int_enum_class_definition(
     class_def.append(f"    {docstring}")
     if enum_ref_url:
         class_def.append(f"    # {enum_ref_url}")
-    class_def.append("    UNKNOWN = -1")
     for _enum_name, _enum_id in sorted(enum_map.items(), key=lambda x: x[0]):
         if get_id_func:
             _enum_id = get_id_func(_enum_id)

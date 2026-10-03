@@ -81,9 +81,8 @@ class UnknownValueIntEnum(IntEnum):
     def is_unknown(self) -> bool:
         """Return whether this member represents an unrecognized value."""
         # Members minted by _missing_ are deliberately left out of __members__,
-        # so not being there is what marks a value as unrecognized. UNKNOWN is a
-        # real member kept for backwards compatibility and counts as unknown too.
-        return self._name_ not in type(self).__members__ or self._name_ == "UNKNOWN"
+        # so not being there is what marks a value as unrecognized.
+        return self._name_ not in type(self).__members__
 
     @classmethod
     def _missing_(cls, value: object) -> Self | None:
