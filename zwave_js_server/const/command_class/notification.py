@@ -8,16 +8,15 @@
 
 from __future__ import annotations
 
-from enum import IntEnum
+from .. import UnknownValueIntEnum
 
 CC_SPECIFIC_NOTIFICATION_TYPE = "notificationType"
 
 
-class NotificationType(IntEnum):
+class NotificationType(UnknownValueIntEnum):
     """Enum for known notification types."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ACCESS_CONTROL = 6
     APPLIANCE = 12
     CLOCK = 11
@@ -41,17 +40,12 @@ class NotificationType(IntEnum):
     WATER_VALVE = 15
     WEATHER_ALARM = 16
 
-    @classmethod
-    def _missing_(cls: type, value: object) -> NotificationType:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return NotificationType.UNKNOWN
 
-
-class NotificationEvent(IntEnum):
+class NotificationEvent(UnknownValueIntEnum):
     """Common base class for Notification CC states enums."""
 
 
-class NotificationEventValue(IntEnum):
+class NotificationEventValue(UnknownValueIntEnum):
     """Common base class for Notification CC state value enums."""
 
 
@@ -59,7 +53,6 @@ class AccessControlNotificationEvent(NotificationEvent):
     """Enum for known access control notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ALL_USER_CODES_DELETED = 12
     ALL_USERS_DELETED = 37
     AUTO_LOCK_LOCKED_OPERATION = 9
@@ -122,13 +115,6 @@ class AccessControlNotificationEvent(NotificationEvent):
     VALID_CREDENTIAL_ACCESS_DENIED_SCHEDULE_INACTIVE = 48
     VALID_CREDENTIAL_ACCESS_DENIED_USER_ACTIVE_STATE_SET_TO_OCCUPIED_DISABLED = 47
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> AccessControlNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return AccessControlNotificationEvent.UNKNOWN
-
 
 class BarrierPerformingInitializationProcessNotificationEventValue(
     NotificationEventValue
@@ -136,71 +122,38 @@ class BarrierPerformingInitializationProcessNotificationEventValue(
     """Enum for known barrier performing initialization process notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     PERFORMING_PROCESS = 255
     PROCESS_COMPLETED = 0
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> BarrierPerformingInitializationProcessNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return BarrierPerformingInitializationProcessNotificationEventValue.UNKNOWN
 
 
 class BarrierSafetyBeamObstacleNotificationEventValue(NotificationEventValue):
     """Enum for known barrier safety beam obstacle notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     NO_OBSTRUCTION = 0
     OBSTRUCTION = 255
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> BarrierSafetyBeamObstacleNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return BarrierSafetyBeamObstacleNotificationEventValue.UNKNOWN
 
 
 class BarrierVacationModeNotificationEventValue(NotificationEventValue):
     """Enum for known barrier vacation mode notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     MODE_DISABLED = 0
     MODE_ENABLED = 255
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> BarrierVacationModeNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return BarrierVacationModeNotificationEventValue.UNKNOWN
 
 
 class DoorStateWindowDoorIsOpenNotificationEventValue(NotificationEventValue):
     """Enum for known door state window/door is open notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     WINDOW_DOOR_IS_OPEN_IN_REGULAR_POSITION = 0
     WINDOW_DOOR_IS_OPEN_IN_TILT_POSITION = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> DoorStateWindowDoorIsOpenNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return DoorStateWindowDoorIsOpenNotificationEventValue.UNKNOWN
 
 
 class ApplianceNotificationEvent(NotificationEvent):
     """Enum for known appliance notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     APPLIANCE_STATUS_BOILING = 8
     APPLIANCE_STATUS_DRAINING = 14
     APPLIANCE_STATUS_DRYING = 18
@@ -224,35 +177,21 @@ class ApplianceNotificationEvent(NotificationEvent):
     WASHING_FAILURE = 11
     WATER_SUPPLY_FAILURE = 7
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> ApplianceNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return ApplianceNotificationEvent.UNKNOWN
-
 
 class ClockNotificationEvent(NotificationEvent):
     """Enum for known clock notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     IDLE = 0
     TIME_REMAINING = 3
     TIMER_ENDED = 2
     WAKE_UP_ALERT = 1
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> ClockNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return ClockNotificationEvent.UNKNOWN
 
 
 class CoAlarmNotificationEvent(NotificationEvent):
     """Enum for known co alarm notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ALARM_STATUS_ALARM_SILENCED = 6
     IDLE = 0
     MAINTENANCE_STATUS_REPLACEMENT_REQUIRED = 4
@@ -262,33 +201,19 @@ class CoAlarmNotificationEvent(NotificationEvent):
     SENSOR_STATUS_CARBON_MONOXIDE_DETECTED_LOCATION_PROVIDED = 1
     TEST_STATUS_CARBON_MONOXIDE_TEST = 3
 
-    @classmethod
-    def _missing_(cls: type, value: object) -> CoAlarmNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return CoAlarmNotificationEvent.UNKNOWN
-
 
 class TestStatusCarbonMonoxideTestNotificationEventValue(NotificationEventValue):
     """Enum for known test status carbon monoxide test notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     TEST_FAILED = 2
     TEST_OK = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> TestStatusCarbonMonoxideTestNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return TestStatusCarbonMonoxideTestNotificationEventValue.UNKNOWN
 
 
 class Co2AlarmNotificationEvent(NotificationEvent):
     """Enum for known co2 alarm notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ALARM_STATUS_ALARM_SILENCED = 6
     IDLE = 0
     MAINTENANCE_STATUS_REPLACEMENT_REQUIRED = 4
@@ -298,53 +223,29 @@ class Co2AlarmNotificationEvent(NotificationEvent):
     SENSOR_STATUS_CARBON_DIOXIDE_DETECTED_LOCATION_PROVIDED = 1
     TEST_STATUS_CARBON_DIOXIDE_TEST = 3
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> Co2AlarmNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return Co2AlarmNotificationEvent.UNKNOWN
-
 
 class TestStatusCarbonDioxideTestNotificationEventValue(NotificationEventValue):
     """Enum for known test status carbon dioxide test notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     TEST_FAILED = 2
     TEST_OK = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> TestStatusCarbonDioxideTestNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return TestStatusCarbonDioxideTestNotificationEventValue.UNKNOWN
 
 
 class EmergencyAlarmNotificationEvent(NotificationEvent):
     """Enum for known emergency alarm notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     CONTACT_FIRE_SERVICE = 2
     CONTACT_MEDICAL_SERVICE = 3
     CONTACT_POLICE = 1
     IDLE = 0
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> EmergencyAlarmNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return EmergencyAlarmNotificationEvent.UNKNOWN
 
 
 class GasAlarmNotificationEvent(NotificationEvent):
     """Enum for known gas alarm notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ALARM_STATUS_GAS_ALARM_TEST = 5
     COMBUSTIBLE_GAS_STATUS_COMBUSTIBLE_GAS_DETECTED = 2
     COMBUSTIBLE_GAS_STATUS_COMBUSTIBLE_GAS_DETECTED_LOCATION_PROVIDED = 1
@@ -353,19 +254,11 @@ class GasAlarmNotificationEvent(NotificationEvent):
     TOXIC_GAS_STATUS_TOXIC_GAS_DETECTED = 4
     TOXIC_GAS_STATUS_TOXIC_GAS_DETECTED_LOCATION_PROVIDED = 3
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> GasAlarmNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return GasAlarmNotificationEvent.UNKNOWN
-
 
 class HeatAlarmNotificationEvent(NotificationEvent):
     """Enum for known heat alarm notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ALARM_STATUS_ALARM_SILENCED = 9
     ALARM_STATUS_HEAT_ALARM_TEST = 7
     DUST_IN_DEVICE_STATUS_MAINTENANCE_REQUIRED_DUST_IN_DEVICE = 10
@@ -381,19 +274,11 @@ class HeatAlarmNotificationEvent(NotificationEvent):
     RAPID_TEMPERATURE_RISE = 4
     RAPID_TEMPERATURE_RISE_LOCATION_PROVIDED = 3
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> HeatAlarmNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return HeatAlarmNotificationEvent.UNKNOWN
-
 
 class HomeHealthNotificationEvent(NotificationEvent):
     """Enum for known home health notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     FALL_DETECTED = 12
     IDLE = 0
     POSITION_STATUS_LEAVING_BED = 1
@@ -408,28 +293,13 @@ class HomeHealthNotificationEvent(NotificationEvent):
     SLEEP_STAGE_STATUS_SLEEP_STAGE_3_DETECTED_DEEP_SLEEP_NON_REM_3 = 11
     VOC_LEVEL_STATUS_VOLATILE_ORGANIC_COMPOUND_LEVEL = 6
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> HomeHealthNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return HomeHealthNotificationEvent.UNKNOWN
-
 
 class SleepApneaStatusSleepApneaDetectedNotificationEventValue(NotificationEventValue):
     """Enum for known sleep apnea status sleep apnea detected notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     LOW_BREATH = 1
     NO_BREATH_AT_ALL = 2
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> SleepApneaStatusSleepApneaDetectedNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return SleepApneaStatusSleepApneaDetectedNotificationEventValue.UNKNOWN
 
 
 class VocLevelStatusVolatileOrganicCompoundLevelNotificationEventValue(
@@ -438,44 +308,25 @@ class VocLevelStatusVolatileOrganicCompoundLevelNotificationEventValue(
     """Enum for known voc level status volatile organic compound level notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     CLEAN = 1
     HIGHLY_POLLUTED = 4
     MODERATELY_POLLUTED = 3
     SLIGHTLY_POLLUTED = 2
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> (
-        VocLevelStatusVolatileOrganicCompoundLevelNotificationEventValue
-    ):  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return VocLevelStatusVolatileOrganicCompoundLevelNotificationEventValue.UNKNOWN
 
 
 class HomeMonitoringNotificationEvent(NotificationEvent):
     """Enum for known home monitoring notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     HOME_OCCUPANCY_STATUS_HOME_OCCUPIED = 2
     HOME_OCCUPANCY_STATUS_HOME_OCCUPIED_LOCATION_PROVIDED = 1
     IDLE = 0
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> HomeMonitoringNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return HomeMonitoringNotificationEvent.UNKNOWN
 
 
 class HomeSecurityNotificationEvent(NotificationEvent):
     """Enum for known home security notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     COVER_STATUS_TAMPERING_PRODUCT_COVER_REMOVED = 3
     GLASS_BREAKAGE = 6
     GLASS_BREAKAGE_LOCATION_PROVIDED = 5
@@ -490,19 +341,11 @@ class HomeSecurityNotificationEvent(NotificationEvent):
     TAMPERING_INVALID_CODE = 4
     TAMPERING_PRODUCT_MOVED = 9
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> HomeSecurityNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return HomeSecurityNotificationEvent.UNKNOWN
-
 
 class IrrigationNotificationEvent(NotificationEvent):
     """Enum for known irrigation notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     DEVICE_CONFIGURATION_STATUS_DEVICE_IS_NOT_CONFIGURED = 5
     IDLE = 0
     SCHEDULE_ID_STATUS_SCHEDULE_FINISHED = 2
@@ -510,36 +353,20 @@ class IrrigationNotificationEvent(NotificationEvent):
     VALVE_ID_RUN_STATUS_VALVE_TABLE_RUN_FINISHED = 4
     VALVE_ID_RUN_STATUS_VALVE_TABLE_RUN_STARTED = 3
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> IrrigationNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return IrrigationNotificationEvent.UNKNOWN
-
 
 class LightSensorNotificationEvent(NotificationEvent):
     """Enum for known light sensor notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     IDLE = 0
     LIGHT_COLOR_TRANSITION_DETECTED = 2
     LIGHT_DETECTION_STATUS_LIGHT_DETECTED = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> LightSensorNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return LightSensorNotificationEvent.UNKNOWN
 
 
 class PestControlNotificationEvent(NotificationEvent):
     """Enum for known pest control notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     IDLE = 0
     PEST_DETECTED = 6
     PEST_DETECTED_LOCATION_PROVIDED = 5
@@ -550,19 +377,11 @@ class PestControlNotificationEvent(NotificationEvent):
     TRAP_STATUS_TRAP_RE_ARM_REQUIRED = 4
     TRAP_STATUS_TRAP_RE_ARM_REQUIRED_LOCATION_PROVIDED = 3
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> PestControlNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return PestControlNotificationEvent.UNKNOWN
-
 
 class PowerManagementNotificationEvent(NotificationEvent):
     """Enum for known power management notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     BACKUP_BATTERY_LEVEL_STATUS_BACK_UP_BATTERY_DISCONNECTED = 18
     BACKUP_BATTERY_LEVEL_STATUS_BACK_UP_BATTERY_IS_LOW = 16
     BATTERY_LEVEL_STATUS_BATTERY_IS_FULLY_CHARGED = 13
@@ -583,33 +402,19 @@ class PowerManagementNotificationEvent(NotificationEvent):
     SURGE_DETECTED = 4
     VOLTAGE_DROP_DRIFT = 5
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> PowerManagementNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return PowerManagementNotificationEvent.UNKNOWN
-
 
 class SirenNotificationEvent(NotificationEvent):
     """Enum for known siren notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     IDLE = 0
     SIREN_STATUS_SIREN_ACTIVE = 1
-
-    @classmethod
-    def _missing_(cls: type, value: object) -> SirenNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return SirenNotificationEvent.UNKNOWN
 
 
 class SmokeAlarmNotificationEvent(NotificationEvent):
     """Enum for known smoke alarm notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ALARM_STATUS_ALARM_SILENCED = 6
     ALARM_STATUS_SMOKE_ALARM_TEST = 3
     DUST_IN_DEVICE_STATUS_MAINTENANCE_REQUIRED_DUST_IN_DEVICE = 8
@@ -620,19 +425,11 @@ class SmokeAlarmNotificationEvent(NotificationEvent):
     SENSOR_STATUS_SMOKE_DETECTED = 2
     SENSOR_STATUS_SMOKE_DETECTED_LOCATION_PROVIDED = 1
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> SmokeAlarmNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return SmokeAlarmNotificationEvent.UNKNOWN
-
 
 class SystemNotificationEvent(NotificationEvent):
     """Enum for known system notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     COVER_STATUS_TAMPERING_PRODUCT_COVER_REMOVED = 6
     EMERGENCY_SHUTOFF = 7
     HARDWARE_STATUS_SYSTEM_HARDWARE_FAILURE = 1
@@ -642,17 +439,11 @@ class SystemNotificationEvent(NotificationEvent):
     SOFTWARE_STATUS_SYSTEM_SOFTWARE_FAILURE = 2
     SOFTWARE_STATUS_SYSTEM_SOFTWARE_FAILURE_WITH_FAILURE_CODE = 4
 
-    @classmethod
-    def _missing_(cls: type, value: object) -> SystemNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return SystemNotificationEvent.UNKNOWN
-
 
 class WaterAlarmNotificationEvent(NotificationEvent):
     """Enum for known water alarm notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     IDLE = 0
     MAINTENANCE_STATUS_REPLACE_WATER_FILTER = 5
     PUMP_STATUS_SUMP_PUMP_ACTIVE = 10
@@ -666,89 +457,49 @@ class WaterAlarmNotificationEvent(NotificationEvent):
     WATER_PRESSURE_ALARM = 7
     WATER_TEMPERATURE_ALARM = 8
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> WaterAlarmNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return WaterAlarmNotificationEvent.UNKNOWN
-
 
 class WaterFlowAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known water flow alarm notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ABOVE_HIGH_THRESHOLD = 3
     BELOW_LOW_THRESHOLD = 2
     MAX = 4
     NO_DATA = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> WaterFlowAlarmNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return WaterFlowAlarmNotificationEventValue.UNKNOWN
 
 
 class WaterLevelAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known water level alarm notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ABOVE_HIGH_THRESHOLD = 3
     BELOW_LOW_THRESHOLD = 2
     NO_DATA = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> WaterLevelAlarmNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return WaterLevelAlarmNotificationEventValue.UNKNOWN
 
 
 class WaterPressureAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known water pressure alarm notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ABOVE_HIGH_THRESHOLD = 3
     BELOW_LOW_THRESHOLD = 2
     MAX = 4
     NO_DATA = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> WaterPressureAlarmNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return WaterPressureAlarmNotificationEventValue.UNKNOWN
 
 
 class WaterTemperatureAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known water temperature alarm notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ABOVE_HIGH_THRESHOLD = 3
     BELOW_LOW_THRESHOLD = 2
     NO_DATA = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> WaterTemperatureAlarmNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return WaterTemperatureAlarmNotificationEventValue.UNKNOWN
 
 
 class WaterQualityMonitoringNotificationEvent(NotificationEvent):
     """Enum for known water quality monitoring notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ACIDITY_PH_SENSOR_STATUS_ACIDITY_PH_EMPTY = 5
     ACIDITY_PH_STATUS_ACIDITY_PH_ALARM = 2
     CHLORINE_ALARM = 1
@@ -768,69 +519,37 @@ class WaterQualityMonitoringNotificationEvent(NotificationEvent):
     WATERFLOW_CLEAR_WATER_SENSOR_WATERFLOW_CLEAR_WATER_SHORTAGE_DETECTED = 7
     WATERFLOW_MEASURING_STATION_SENSOR_WATERFLOW_MEASURING_STATION_SHORTAGE_DETECTED = 6
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> WaterQualityMonitoringNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return WaterQualityMonitoringNotificationEvent.UNKNOWN
-
 
 class AcidityStatusAcidityAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known acidity (ph) status acidity (ph) alarm notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ABOVE_HIGH_THRESHOLD = 2
     BELOW_LOW_THRESHOLD = 1
     DECREASING_PH = 3
     INCREASING_PH = 4
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> AcidityStatusAcidityAlarmNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return AcidityStatusAcidityAlarmNotificationEventValue.UNKNOWN
 
 
 class ChlorineAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known chlorine alarm notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ABOVE_HIGH_THRESHOLD = 2
     BELOW_LOW_THRESHOLD = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> ChlorineAlarmNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return ChlorineAlarmNotificationEventValue.UNKNOWN
 
 
 class WaterOxidationAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known water oxidation alarm notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ABOVE_HIGH_THRESHOLD = 2
     BELOW_LOW_THRESHOLD = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> WaterOxidationAlarmNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return WaterOxidationAlarmNotificationEventValue.UNKNOWN
 
 
 class WaterValveNotificationEvent(NotificationEvent):
     """Enum for known water valve notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     IDLE = 0
     MASTER_VALVE_CURRENT_ALARM = 6
     MASTER_VALVE_OPERATION = 2
@@ -840,98 +559,51 @@ class WaterValveNotificationEvent(NotificationEvent):
     VALVE_OPERATION = 1
     VALVE_SHORT_CIRCUIT = 3
 
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> WaterValveNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return WaterValveNotificationEvent.UNKNOWN
-
 
 class MasterValveCurrentAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known master valve current alarm notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ABOVE_HIGH_THRESHOLD = 3
     BELOW_LOW_THRESHOLD = 2
     MAX = 4
     NO_DATA = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> MasterValveCurrentAlarmNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return MasterValveCurrentAlarmNotificationEventValue.UNKNOWN
 
 
 class MasterValveOperationNotificationEventValue(NotificationEventValue):
     """Enum for known master valve operation notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     OFF_CLOSED = 0
     ON_OPEN = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> MasterValveOperationNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return MasterValveOperationNotificationEventValue.UNKNOWN
 
 
 class ValveCurrentAlarmNotificationEventValue(NotificationEventValue):
     """Enum for known valve current alarm notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     ABOVE_HIGH_THRESHOLD = 3
     BELOW_LOW_THRESHOLD = 2
     MAX = 4
     NO_DATA = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> ValveCurrentAlarmNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return ValveCurrentAlarmNotificationEventValue.UNKNOWN
 
 
 class ValveOperationNotificationEventValue(NotificationEventValue):
     """Enum for known valve operation notification event value."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     OFF_CLOSED = 0
     ON_OPEN = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> ValveOperationNotificationEventValue:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return ValveOperationNotificationEventValue.UNKNOWN
 
 
 class WeatherAlarmNotificationEvent(NotificationEvent):
     """Enum for known weather alarm notification event."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/core/src/registries/Notifications.ts
-    UNKNOWN = -1
     FREEZE_ALARM = 3
     IDLE = 0
     MOISTURE_ALARM = 2
     RAIN_ALARM = 1
-
-    @classmethod
-    def _missing_(
-        cls: type, value: object
-    ) -> WeatherAlarmNotificationEvent:  # noqa: ARG003
-        """Set default enum member if an unknown value is provided."""
-        return WeatherAlarmNotificationEvent.UNKNOWN
 
 
 NOTIFICATION_TYPE_TO_EVENT_MAP: dict[NotificationType, type[NotificationEvent]] = {
