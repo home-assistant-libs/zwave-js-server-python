@@ -1254,6 +1254,64 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
     assert event.data["notification"].urgency == BatteryReplacementStatus.SOON
 
 
+async def test_notification_with_unknown_command_class(
+    lock_schlage_be469: node_pkg.Node, caplog
+):
+    """Test a notification whose ccId is not a known CommandClass.
+
+    CommandClass stays strict so consumers can use it to validate untrusted
+    input, so handle_notification guards the conversion itself rather than
+    letting ValueError escape the listen loop.
+    """
+    node = lock_schlage_be469
+    event = Event(
+        type="notification",
+        data={
+            "source": "node",
+            "event": "notification",
+            "nodeId": 23,
+            "endpointIndex": 0,
+            "ccId": 99999,
+            "args": {},
+        },
+    )
+
+    with caplog.at_level(logging.INFO):
+        node.handle_notification(event)
+
+    assert "notification" not in event.data
+    assert "99999" in caplog.text
+
+
+async def test_notification_with_unknown_status(lock_schlage_be469: node_pkg.Node):
+    """Test a notification whose status is outside the known range.
+
+    Regression test for home-assistant/core#184144: a Powerlevel CC report with
+    a corrupted status raised ValueError out of handle_notification, which
+    escaped the listen loop and reloaded the whole config entry.
+    """
+    node = lock_schlage_be469
+    event = Event(
+        type="notification",
+        data={
+            "source": "node",
+            "event": "notification",
+            "nodeId": 23,
+            "endpointIndex": 0,
+            "ccId": 115,
+            "args": {"testNodeId": 1, "status": 190, "acknowledgedFrames": 2},
+        },
+    )
+
+    node.handle_notification(event)
+
+    notification = event.data["notification"]
+    assert notification.status == 190
+    assert notification.status.is_unknown is True
+    assert notification.test_node_id == 1
+    assert notification.acknowledged_frames == 2
+
+
 async def test_notification_unknown(lock_schlage_be469: node_pkg.Node, caplog):
     """Test unrecognized command class notification events."""
     # Validate that an unrecognized CC notification event raises Exception
