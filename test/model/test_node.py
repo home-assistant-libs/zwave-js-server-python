@@ -812,6 +812,36 @@ def test_node_inclusion(multisensor_6_state):
     assert 1 not in node.endpoints
 
 
+def test_node_ready_event_null_max_data_rate(multisensor_6_state):
+    """A node that reports maxDataRate null must not fail the ready event.
+
+    Some nodes send an explicit null for maxDataRate in the ready event, which
+    used to raise a ValidationError and take down the whole client.
+    See home-assistant/core#182649.
+    """
+    node = node_pkg.Node(
+        None, {"nodeId": 52, "status": 1, "ready": False, "values": [], "endpoints": []}
+    )
+
+    node_state = deepcopy(multisensor_6_state)
+    node_state["maxDataRate"] = None
+
+    event = Event(
+        "ready",
+        {
+            "event": "ready",
+            "source": "node",
+            "nodeId": node.node_id,
+            "nodeState": node_state,
+            "result": [],
+        },
+    )
+    node.receive_event(event)
+
+    assert node.ready
+    assert node.max_data_rate is None
+
+
 def test_node_ready_event(switch_enbrighten_zw3010_state):
     """Emulate a node ready event."""
     # when a node node is added, it has minimal info first
