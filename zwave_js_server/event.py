@@ -79,4 +79,4 @@ class EventBase:
         if handler is None:
             LOGGER.debug("Received unknown event: %s", event)
             return
-        handler(event)  # pylint: disable=not-callable
+        handler(event)
