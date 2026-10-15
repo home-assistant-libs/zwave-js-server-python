@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from enum import IntEnum
 
+from .. import UnknownValueIntEnum
+
 SET_TO_PREVIOUS_VALUE = 255
 
 COVER_OPEN_PROPERTY = "Open"
@@ -21,7 +23,7 @@ class CoverStates(IntEnum):
     OPEN = 99
 
 
-class MultilevelSwitchCommand(IntEnum):
+class MultilevelSwitchCommand(UnknownValueIntEnum):
     """Enum for known multilevel switch notifications."""
 
     START_LEVEL_CHANGE = 4
