@@ -22,7 +22,11 @@ def is_buffer_object(value: Any) -> TypeGuard[BufferObjectDataType]:
         isinstance(value, dict)
         and value.get("type") == "Buffer"
         and isinstance(value.get("data"), list)
-        and all(isinstance(item, int) for item in value["data"])
+        # A Buffer transports bytes, so anything outside 0-255 is not a valid
+        # buffer. Checking the range here keeps chr() and bytes() from raising
+        # bare ValueError further down, where callers guarding against
+        # UnparseableValue would not catch it.
+        and all(isinstance(item, int) and 0 <= item <= 255 for item in value["data"])
     )
 
 
