@@ -7,15 +7,19 @@ https://zwave-js.github.io/node-zwave-js/#/api/node?id=quotnotificationquot
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import logging
 from typing import TYPE_CHECKING, Any, Literal, TypedDict
 
 from ..const.command_class.battery import BatteryReplacementStatus
 from ..const.command_class.multilevel_switch import MultilevelSwitchCommand
 from ..const.command_class.power_level import PowerLevelTestStatus
+from ..exceptions import UnparseableValue
 from ..util.helpers import parse_buffer
 
 if TYPE_CHECKING:
     from .node import Node
+
+_LOGGER = logging.getLogger(__package__)
 
 
 class BaseNotificationDataType(TypedDict):
@@ -112,7 +116,23 @@ class EntryControlNotification(BaseNotification):
         object.__setattr__(self, "data_type", self.data["args"]["dataType"])
         object.__setattr__(self, "data_type_label", self.data["args"]["dataTypeLabel"])
         if event_data := self.data["args"].get("eventData"):
-            object.__setattr__(self, "event_data", parse_buffer(event_data))
+            try:
+                object.__setattr__(self, "event_data", parse_buffer(event_data))
+            except UnparseableValue:
+                # A device can report a malformed buffer. Leave event_data unset
+                # rather than letting the error escape the listen loop, the same
+                # way Node._update_values skips unparseable value payloads.
+                #
+                # The payload is deliberately not logged: for ENTER and RFID
+                # events it carries keypad input or credential data, so only
+                # non-secret diagnostics go to the log.
+                _LOGGER.warning(
+                    "Unparseable event data in Entry Control notification from "
+                    "node %s (event type %s, data type %s)",
+                    self.node_id,
+                    self.event_type,
+                    self.data_type,
+                )
 
 
 class NotificationNotificationArgsDataType(TypedDict, total=False):
