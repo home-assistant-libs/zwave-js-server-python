@@ -1255,8 +1255,8 @@ async def test_notification(lock_schlage_be469: node_pkg.Node):
 
 
 async def test_notification_with_unknown_command_class(
-    lock_schlage_be469: node_pkg.Node, caplog
-):
+    lock_schlage_be469: node_pkg.Node, caplog: pytest.LogCaptureFixture
+) -> None:
     """Test a notification whose ccId is not a known CommandClass.
 
     CommandClass stays strict so consumers can use it to validate untrusted
@@ -1283,7 +1283,9 @@ async def test_notification_with_unknown_command_class(
     assert "99999" in caplog.text
 
 
-async def test_notification_with_unknown_status(lock_schlage_be469: node_pkg.Node):
+async def test_notification_with_unknown_status(
+    lock_schlage_be469: node_pkg.Node,
+) -> None:
     """Test a notification whose status is outside the known range.
 
     Regression test for home-assistant/core#184144: a Powerlevel CC report with
@@ -1341,8 +1343,10 @@ async def test_notification_unknown(lock_schlage_be469: node_pkg.Node, caplog):
     ],
 )
 async def test_entry_control_notification_unparseable_event_data(
-    ring_keypad, caplog, bad_data
-):
+    ring_keypad: node_pkg.Node,
+    caplog: pytest.LogCaptureFixture,
+    bad_data: list[Any],
+) -> None:
     """Test an Entry Control notification carrying an unparseable buffer.
 
     A malformed buffer raised out of handle_notification and escaped the listen
