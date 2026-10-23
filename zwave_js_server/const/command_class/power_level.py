@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from enum import IntEnum
+from .. import UnknownValueIntEnum
 
 
-class PowerLevelTestStatus(IntEnum):
+class PowerLevelTestStatus(UnknownValueIntEnum):
     """Enum with all known power level test statuses."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/zwave-js/src/lib/commandclass/PowerlevelCC.ts#L52

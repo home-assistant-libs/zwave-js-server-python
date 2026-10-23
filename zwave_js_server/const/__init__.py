@@ -5,7 +5,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import IntEnum, StrEnum
 import logging
-from typing import TypedDict
+from typing import Self, TypedDict, cast
+
+LOGGER = logging.getLogger(__package__)
 
 PACKAGE_NAME = "zwave-js-server-python"
 __version__ = "0.74.0"
@@ -62,6 +64,48 @@ LOG_LEVEL_MAP: dict[LogLevel, int] = {
     LogLevel.DEBUG: logging.DEBUG,
     LogLevel.SILLY: logging.DEBUG,
 }
+
+
+class UnknownValueIntEnum(IntEnum):
+    """
+    Base class for IntEnums whose values come from device-reported data.
+
+    A device can report a value outside the range we know about, either because
+    it is non-compliant or because the frame was corrupted in transit. A strict
+    IntEnum raises ValueError for such a value, and on an event path that
+    exception escapes the listen loop and tears down the connection, so these
+    enums fall back to a member carrying the reported value instead.
+    """
+
+    @property
+    def is_unknown(self) -> bool:
+        """Return whether this member represents an unrecognized value."""
+        # Members minted by _missing_ are deliberately left out of __members__,
+        # so not being there is what marks a value as unrecognized.
+        return self._name_ not in type(self).__members__
+
+    @classmethod
+    def _missing_(cls, value: object) -> Self | None:
+        """
+        Return a member carrying an unrecognized device-reported value.
+
+        Returning None defers to the default behavior and raises ValueError.
+        """
+        if not isinstance(value, int) or isinstance(value, bool):
+            return None
+        # This is the construction the stdlib itself uses for Flag's composite
+        # members: make an instance of the member type, then fill in the sunder
+        # attributes the enum machinery reads.
+        member = int.__new__(cls, value)
+        member._value_ = value
+        member._name_ = f"UNKNOWN_{value}"
+        LOGGER.warning("Unknown %s value: %s", cls.__name__, value)
+        # setdefault rather than assignment so callers racing on the same value
+        # all receive whichever instance landed first. Caching also stops a
+        # device that repeats a bad value from warning on every report. Unknown
+        # members are never added to _member_map_, so they stay out of
+        # iteration and __members__.
+        return cast("Self", cls._value2member_map_.setdefault(value, member))
 
 
 class CommandClass(IntEnum):

@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from enum import IntEnum
+from .. import UnknownValueIntEnum
 
 
-class BatteryReplacementStatus(IntEnum):
+class BatteryReplacementStatus(UnknownValueIntEnum):
     """Enum with all (known/used) Z-Wave Battery Replacement Statuses."""
 
     # https://github.com/zwave-js/node-zwave-js/blob/master/packages/cc/src/lib/_Types.ts#L328

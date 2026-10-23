@@ -4,8 +4,10 @@ from __future__ import annotations
 
 from enum import IntEnum
 
+from .. import UnknownValueIntEnum
 
-class UserCredentialType(IntEnum):
+
+class UserCredentialType(UnknownValueIntEnum):
     """Credential types supported by User Credential CC."""
 
     NONE = 0
@@ -43,7 +45,7 @@ class UserCredentialRule(IntEnum):
     TRIPLE = 3
 
 
-class UserCredentialLearnStatus(IntEnum):
+class UserCredentialLearnStatus(UnknownValueIntEnum):
     """Credential learn statuses supported by User Credential CC."""
 
     STARTED = 0
