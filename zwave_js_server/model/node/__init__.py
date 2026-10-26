@@ -1244,7 +1244,16 @@ class Node(EventBase):
 
     def handle_notification(self, event: Event) -> None:
         """Process a node notification event."""
-        match command_class := CommandClass(event.data["ccId"]):
+        # CommandClass stays strict so consumers can use it to validate
+        # untrusted input, so guard the conversion here rather than letting a
+        # device-reported id escape the listen loop.
+        try:
+            command_class = CommandClass(event.data["ccId"])
+        except ValueError:
+            _LOGGER.info("Unhandled notification command class: %s", event.data["ccId"])
+            return
+
+        match command_class:
             case CommandClass.BATTERY:
                 event.data["notification"] = BatteryNotification(
                     self, cast(BatteryNotificationDataType, event.data)
