@@ -16,7 +16,7 @@ class FoundNodeDataType(TypedDict, total=False):
     """Represent a found node data dict type."""
 
     nodeId: int
-    deviceClass: DeviceClassDataType
+    deviceClass: DeviceClassDataType | None
     supportedCCs: list[int]
     controlledCCs: list[int]
 

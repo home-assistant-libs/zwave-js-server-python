@@ -2241,6 +2241,26 @@ async def test_node_found(controller):
     assert event.data["node"] == found_node
 
 
+async def test_node_found_without_device_class(controller):
+    """Test node found event when the device class is not known yet."""
+    found_node = {
+        "nodeId": 1,
+        "deviceClass": None,
+        "supportedCCs": [],
+        "controlledCCs": [],
+    }
+    event = Event(
+        "node found",
+        {
+            "source": "controller",
+            "event": "node found",
+            "node": found_node,
+        },
+    )
+    controller.receive_event(event)
+    assert event.data["node"] == found_node
+
+
 async def test_node_added(controller, multisensor_6_state):
     """Test node added event."""
     event = Event(
