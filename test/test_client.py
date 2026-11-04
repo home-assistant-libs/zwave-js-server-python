@@ -474,6 +474,7 @@ async def test_additional_user_agent_components(client_session, url):
 
 async def test_pop_future_none(client_session, url, driver_ready):
     """Test when a future has been cleared from futures dict, popping still works."""
+    # pylint: disable=protected-access
     client = Client(url, client_session)
     await client.connect()
 
@@ -483,8 +484,27 @@ async def test_pop_future_none(client_session, url, driver_ready):
 
     await driver_ready.wait()
 
-    with pytest.raises(asyncio.CancelledError):
+    with pytest.raises(NotConnected):
         await client.async_send_command({"command": "some_command"})
+
+    # The caller's task was not cancelled, only the connection was closed.
+    current_task = asyncio.current_task()
+    assert current_task is not None
+    assert current_task.cancelling() == 0
+    assert not client._result_futures
+
+
+async def test_send_command_not_connected_pops_future(client_session, url):
+    """Test the result future is removed when sending the command fails."""
+    # pylint: disable=protected-access
+    client = Client(url, client_session)
+
+    assert not client.connected
+
+    with pytest.raises(NotConnected):
+        await client.async_send_command({"command": "some_command"})
+
+    assert not client._result_futures
 
 
 async def test_log_server(

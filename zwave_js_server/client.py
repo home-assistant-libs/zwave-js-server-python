@@ -126,8 +126,8 @@ class Client:
         future: asyncio.Future[dict] = self._loop.create_future()
         message_id = message["messageId"] = uuid.uuid4().hex
         self._result_futures[message_id] = future
-        await self._send_json_message(message)
         try:
+            await self._send_json_message(message)
             return await future
         finally:
             self._result_futures.pop(message_id, None)
@@ -290,7 +290,8 @@ class Client:
             LOGGER.debug("Listen completed. Cleaning up")
 
             for future in self._result_futures.values():
-                future.cancel()
+                if not future.done():
+                    future.set_exception(NotConnected("Connection closed"))
             self._result_futures.clear()
 
             if not self._client.closed:
@@ -477,8 +478,8 @@ class Client:
         if msg["type"] == "result":
             future = self._result_futures.get(msg["messageId"])
 
-            if future is None or future.cancelled():
-                # no listener for this result or the future was canceled
+            if future is None or future.done():
+                # no listener for this result or the future is already done
                 return
 
             if self._record_messages and msg["messageId"] not in LISTEN_MESSAGE_IDS:
