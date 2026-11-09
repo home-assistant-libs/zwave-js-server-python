@@ -408,11 +408,8 @@ class Value:
 
         self._update_value()
 
-    def replace_metadata(self, metadata: MetaDataType | None) -> None:
-        """Replace metadata, or reset it if None."""
-        if metadata is None:
-            self.data.pop("metadata", None)
-            metadata = {"type": "unknown"}
+    def replace_metadata(self, metadata: MetaDataType) -> None:
+        """Replace metadata."""
         self._metadata.replace(metadata)
         self._update_value()
 

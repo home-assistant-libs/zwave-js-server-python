@@ -1137,7 +1137,7 @@ async def test_metadata_updated_replaces_metadata(
     assert value.metadata.label == "Air temperature"
     assert value.value == 72
 
-    # Metadata deleted in the driver means no metadata in the event
+    # Metadata deleted in the driver means the default metadata in the event
     event = Event(
         type="metadata updated",
         data={
@@ -1150,15 +1150,15 @@ async def test_metadata_updated_replaces_metadata(
                 "endpoint": 1,
                 "property": "Air temperature",
                 "propertyName": "Air temperature",
+                "metadata": {"type": "any", "readable": True, "writeable": True},
             },
         },
     )
 
     node.handle_metadata_updated(event)
-    assert value.metadata.type == "unknown"
+    assert value.metadata.type == "any"
     assert value.metadata.label is None
     assert value.metadata.cc_specific == {}
-    assert "metadata" not in value.data
     assert value.value == 72
 
 

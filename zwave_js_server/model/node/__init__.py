@@ -1243,7 +1243,7 @@ class Node(EventBase):
         self.handle_value_updated(event)
         # The event carries the full metadata, so replace instead of merge to
         # drop keys that are no longer set, eg unit.
-        event.data["value"].replace_metadata(event.data["args"].get("metadata"))
+        event.data["value"].replace_metadata(event.data["args"]["metadata"])
 
     def handle_notification(self, event: Event) -> None:
         """Process a node notification event."""
