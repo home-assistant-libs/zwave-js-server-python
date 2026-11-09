@@ -128,6 +128,10 @@ def test_metadata_allowed_cache_invalidation():
     assert metadata.allowed is not first
     assert metadata.allowed == [AllowedRangeValue(from_=0, to=5, step=None)]
 
+    # Replacing the data invalidates the cache.
+    metadata.replace(MetaDataType(type="number"))
+    assert metadata.allowed is None
+
 
 def test_configuration_value_type(inovelli_switch_state):
     """Test configuration value types."""
