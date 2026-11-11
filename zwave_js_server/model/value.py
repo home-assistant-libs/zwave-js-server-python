@@ -87,8 +87,8 @@ class MetaDataType(TypedDict, total=False):
     writeable: bool  # required
     description: str
     label: str
-    min: int | None
-    max: int | None
+    min: int | float | None
+    max: int | float | None
     unit: str | None
     states: dict[str, str]
     ccSpecific: dict[str, Any]
@@ -96,7 +96,7 @@ class MetaDataType(TypedDict, total=False):
     allowManualEntry: bool
     stateful: bool
     secret: bool
-    default: int
+    default: int | float
     allowed: list[AllowedValueDataType]  # schema 46+
     # Configuration Value specific attributes
     valueSize: int
@@ -186,12 +186,12 @@ class ValueMetadata:
         return self.data.get("description")
 
     @property
-    def min(self) -> int | None:
+    def min(self) -> int | float | None:
         """Return min."""
         return self.data.get("min")
 
     @property
-    def max(self) -> int | None:
+    def max(self) -> int | float | None:
         """Return max."""
         return self.data.get("max")
 
@@ -255,7 +255,7 @@ class ValueMetadata:
         ]
 
     @property
-    def default(self) -> int | None:
+    def default(self) -> int | float | None:
         """Return default."""
         return self.data.get("default")
 
