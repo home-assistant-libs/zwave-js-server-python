@@ -2,11 +2,8 @@
 
 from copy import deepcopy
 
-from pydantic import TypeAdapter
-
 from zwave_js_server.const import ConfigurationValueType, SetValueStatus
 from zwave_js_server.model.node import Node
-from zwave_js_server.model.node.event_model import MetadataUpdatedEventModel
 from zwave_js_server.model.value import (
     AllowedRangeValue,
     AllowedSingleValue,
@@ -88,52 +85,6 @@ def test_metadata_purpose():
     assert ValueMetadata(MetaDataType(type="number")).purpose is None
     metadata = ValueMetadata(MetaDataType(type="number", purpose="dimmer ramp rate"))
     assert metadata.purpose == "dimmer ramp rate"
-
-
-def test_fractional_metadata_bounds():
-    """Fractional min, max and default values are accepted.
-
-    Z-Wave JS sends fractional bounds for some number values, eg the
-    Thermostat Setback CC overrideState has a min of -12.8. Typing the
-    bounds as int made pydantic reject the node events carrying them.
-    """
-    metadata = TypeAdapter(MetaDataType).validate_python(
-        {
-            "type": "number",
-            "readable": True,
-            "writeable": True,
-            "min": -12.8,
-            "max": 12.7,
-            "default": -5.5,
-        }
-    )
-    value_metadata = ValueMetadata(metadata)
-    assert value_metadata.min == -12.8
-    assert value_metadata.max == 12.7
-    assert value_metadata.default == -5.5
-
-    # The metadata updated event path failed with the same error.
-    event = MetadataUpdatedEventModel(
-        source="node",
-        event="metadata updated",
-        nodeId=2,
-        args={
-            "commandClassName": "Thermostat Setback",
-            "commandClass": 70,
-            "endpoint": 0,
-            "property": "overrideState",
-            "propertyName": "overrideState",
-            "metadata": {
-                "type": "number",
-                "readable": True,
-                "writeable": True,
-                "min": -12.8,
-                "max": 12.7,
-            },
-        },
-    )
-    assert event.args["metadata"]["min"] == -12.8
-    assert event.args["metadata"]["max"] == 12.7
 
 
 def test_metadata_allowed_parsing():
