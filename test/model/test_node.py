@@ -1096,6 +1096,50 @@ async def test_metadata_updated(climate_radio_thermostat_ct100_plus: node_pkg.No
     assert value.metadata.states
 
 
+async def test_metadata_updated_fractional_bounds(
+    climate_radio_thermostat_ct100_plus: node_pkg.Node,
+):
+    """Test metadata updated events with fractional bounds."""
+    node = climate_radio_thermostat_ct100_plus
+
+    value = node.values["13-135-1-value"]
+
+    # Z-Wave JS sends fractional bounds for some number values, eg the
+    # Thermostat Setback CC overrideState has a min of -12.8. Receiving
+    # the event failed while the bounds were typed as int.
+    event = Event(
+        type="metadata updated",
+        data={
+            "source": "node",
+            "event": "metadata updated",
+            "nodeId": 13,
+            "args": {
+                "commandClassName": "Indicator",
+                "commandClass": 135,
+                "endpoint": 1,
+                "property": "value",
+                "propertyName": "value",
+                "metadata": {
+                    "type": "number",
+                    "readable": True,
+                    "writeable": True,
+                    "min": -12.8,
+                    "max": 12.7,
+                    "default": -5.5,
+                    "label": "Indicator value",
+                    "ccSpecific": {"indicatorId": 0},
+                },
+                "value": 0,
+            },
+        },
+    )
+
+    node.receive_event(event)
+    assert value.metadata.min == -12.8
+    assert value.metadata.max == 12.7
+    assert value.metadata.default == -5.5
+
+
 async def test_notification(lock_schlage_be469: node_pkg.Node):
     """Test notification CC notification events."""
     node = lock_schlage_be469
