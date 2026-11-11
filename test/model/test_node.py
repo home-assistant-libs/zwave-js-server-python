@@ -1096,6 +1096,72 @@ async def test_metadata_updated(climate_radio_thermostat_ct100_plus: node_pkg.No
     assert value.metadata.states
 
 
+async def test_metadata_updated_replaces_metadata(
+    climate_radio_thermostat_ct100_plus: node_pkg.Node,
+):
+    """Test metadata updated events replace the metadata instead of merging."""
+    node = climate_radio_thermostat_ct100_plus
+
+    value = node.values["13-49-1-Air temperature"]
+
+    assert value.metadata.unit == "°F"
+
+    # An unknown scale has no unit, so the unit key is omitted from the event
+    event = Event(
+        type="metadata updated",
+        data={
+            "source": "node",
+            "event": "metadata updated",
+            "nodeId": 13,
+            "args": {
+                "commandClassName": "Multilevel Sensor",
+                "commandClass": 49,
+                "endpoint": 1,
+                "property": "Air temperature",
+                "propertyName": "Air temperature",
+                "metadata": {
+                    "type": "number",
+                    "readable": True,
+                    "writeable": False,
+                    "label": "Air temperature",
+                    "ccSpecific": {"sensorType": 1, "scale": 2},
+                },
+            },
+        },
+    )
+
+    node.handle_metadata_updated(event)
+    assert event.data["value"] is value
+    assert value.metadata.unit is None
+    assert value.metadata.cc_specific == {"sensorType": 1, "scale": 2}
+    assert value.metadata.label == "Air temperature"
+    assert value.value == 72
+
+    # Metadata deleted in the driver means the default metadata in the event
+    event = Event(
+        type="metadata updated",
+        data={
+            "source": "node",
+            "event": "metadata updated",
+            "nodeId": 13,
+            "args": {
+                "commandClassName": "Multilevel Sensor",
+                "commandClass": 49,
+                "endpoint": 1,
+                "property": "Air temperature",
+                "propertyName": "Air temperature",
+                "metadata": {"type": "any", "readable": True, "writeable": True},
+            },
+        },
+    )
+
+    node.handle_metadata_updated(event)
+    assert value.metadata.type == "any"
+    assert value.metadata.label is None
+    assert value.metadata.cc_specific == {}
+    assert value.value == 72
+
+
 async def test_notification(lock_schlage_be469: node_pkg.Node):
     """Test notification CC notification events."""
     node = lock_schlage_be469

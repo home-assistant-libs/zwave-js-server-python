@@ -241,7 +241,7 @@ class ValueMetadata:
 
         Each entry is either an `AllowedSingleValue` or an `AllowedRangeValue`;
         use ``isinstance`` to discriminate. Cached because parsing allocates
-        new dataclass instances; the cache is invalidated by `update()`.
+        new dataclass instances; the cache is invalidated by `update()` and `replace()`.
         """
         if (raw := self.data.get("allowed")) is None:
             return None
@@ -297,6 +297,11 @@ class ValueMetadata:
         # Invalidate cached_property entries when their backing key changed.
         if "allowed" in data:
             self.__dict__.pop("allowed", None)
+
+    def replace(self, data: MetaDataType) -> None:
+        """Replace data."""
+        self.data = cast(MetaDataType, dict(data))
+        self.__dict__.pop("allowed", None)
 
 
 class Value:
@@ -401,6 +406,15 @@ class Value:
         if "metadata" in data:
             self._metadata.update(data["metadata"])
 
+        self._update_value()
+
+    def replace_metadata(self, metadata: MetaDataType) -> None:
+        """Replace metadata."""
+        self._metadata.replace(metadata)
+        self._update_value()
+
+    def _update_value(self) -> None:
+        """Update value from data."""
         self._value = self.data.get("value")
 
         # Handle buffer dict and json string in value.
