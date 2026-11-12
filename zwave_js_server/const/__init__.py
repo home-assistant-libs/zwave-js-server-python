@@ -10,7 +10,7 @@ from typing import Self, TypedDict, cast
 LOGGER = logging.getLogger(__package__)
 
 PACKAGE_NAME = "zwave-js-server-python"
-__version__ = "0.74.0"
+__version__ = "0.75.0"
 
 # minimal server schema version we can handle
 MIN_SERVER_SCHEMA_VERSION = 52
